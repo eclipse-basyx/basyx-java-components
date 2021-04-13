@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Creates multiple {@link AASBundle} from a JSON containing several AAS and
- * Submodels <br />
+ * Submodels <br>
  * TODO: ConceptDescriptions
  * 
  * @author espen
