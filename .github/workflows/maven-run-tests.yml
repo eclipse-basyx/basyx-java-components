@@ -38,7 +38,6 @@ jobs:
         cache: maven
     - name: Configure postgres
       run: |
-        chmod +x ./ci/init_postgres.sh 
         ./ci/init_postgres.sh postgres 
         pg_ctl start
     - name: Build with Maven
