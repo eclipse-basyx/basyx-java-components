@@ -38,9 +38,5 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
-    - name: Configure postgres
-      run: psql -f ci/sql/setup_postgres.sql postgresql://postgres:admin@localhost:5432/postgres
-    - name: Start postgres
-      run: pg_ctl start
     - name: Build with Maven
       run: mvn -B package --file basyx.components/pom.xml
