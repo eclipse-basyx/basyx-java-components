@@ -36,6 +36,10 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
+    - name: Install PostgreSQL client
+      run: |
+          apt-get update
+          apt-get install --yes postgresql-client
     - name: Change permissions of postgres init script
       run: chmod +x ./ci/init_postgres.sh
     - name: Configure postgres
