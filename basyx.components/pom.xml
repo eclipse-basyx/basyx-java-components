@@ -9,14 +9,15 @@
 	<name>BaSyx Components</name>
 
 	<packaging>pom</packaging>
-
-	<repository>
-          <id>github</id>
-          <url>https://maven.pkg.github.com/eclipse-basyx/java-sdk</url>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
+  	<repositories>
+		<repository>
+		  <id>github</id>
+		  <url>https://maven.pkg.github.com/eclipse-basyx/java-sdk</url>
+		  <snapshots>
+		    <enabled>true</enabled>
+		  </snapshots>
+		</repository>
+    	</repositories>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
