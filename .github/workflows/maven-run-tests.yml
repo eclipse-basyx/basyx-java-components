@@ -11,23 +11,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
-    # Service containers to run with `container-job`
-    services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
-        image: postgres
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: admin
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -36,16 +19,17 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
-    - name: Install PostgreSQL client
+    - name: Install PostgreSQL 
       run: |
           sudo apt-get update
-          sudo apt-get install --yes postgresql-client
+          sudo apt-get install --yes postgresql
     - name: Change permissions of postgres init script
       run: chmod +x ./ci/init_postgres.sh
     - name: Configure postgres
       run: ./ci/init_postgres.sh postgres 
       env:
         PGDATA: run/postgresql/data
+        POSTGRES_PASSWORD: admin
     - name: Start postgres
       run: pg_ctl start
     - name: Build with Maven
