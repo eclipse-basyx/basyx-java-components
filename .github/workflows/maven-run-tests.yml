@@ -36,9 +36,10 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
+    - name: Change permissions of postgres init script
+      run: chmod +x ./ci/init_postgres.sh
     - name: Configure postgres
       run: |
-        chmod +x ./ci/init_postgres.sh
         ./ci/init_postgres.sh postgres 
         pg_ctl start
     - name: Build with Maven
