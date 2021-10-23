@@ -37,11 +37,9 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Configure postgres
-      run: chmod +x ./ci/init_postgres.sh && ./ci/init_postgres.sh postgres && pg_ctl start
-      env:
-        # The hostname used to communicate with the PostgreSQL service container
-        POSTGRES_HOST: postgres
-        # The default PostgreSQL port
-        POSTGRES_PORT: 5432
+      run: 
+        chmod +x ./ci/init_postgres.sh 
+        ./ci/init_postgres.sh postgres 
+        pg_ctl start
     - name: Build with Maven
       run: mvn -B package --file basyx.components/pom.xml
