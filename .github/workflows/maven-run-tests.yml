@@ -41,7 +41,7 @@ jobs:
     - name: Configure postgres
       run: ./ci/init_postgres.sh postgres 
       env:
-        PGDATA: /run/postgresql/data
+        PGDATA: run/postgresql/data
     - name: Start postgres
       run: pg_ctl start
     - name: Build with Maven
