@@ -21,7 +21,6 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: admin
-          PGDATA: /run/postgresql/data
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -41,6 +40,8 @@ jobs:
       run: chmod +x ./ci/init_postgres.sh
     - name: Configure postgres
       run: ./ci/init_postgres.sh postgres 
+      env:
+        PGDATA: /run/postgresql/data
     - name: Start postgres
       run: pg_ctl start
     - name: Build with Maven
