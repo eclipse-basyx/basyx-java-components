@@ -39,8 +39,8 @@ jobs:
     - name: Change permissions of postgres init script
       run: chmod +x ./ci/init_postgres.sh
     - name: Configure postgres
-      run: |
-        ./ci/init_postgres.sh postgres 
-        pg_ctl start
+      run: ./ci/init_postgres.sh postgres 
+    - name: Start postgres
+      run: pg_ctl start
     - name: Build with Maven
       run: mvn -B package --file basyx.components/pom.xml
