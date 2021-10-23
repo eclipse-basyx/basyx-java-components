@@ -38,12 +38,8 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
-    - name: Install PostgreSQL 
-      run: |
-          sudo apt-get update
-          sudo apt-get install --yes postgresql
     - name: Configure postgres
-      run: psql -f ci/sql/setup_postgres.sql postgresql://postgres:postgres@localhost:5432/postgres
+      run: psql -f ci/sql/setup_postgres.sql postgresql://postgres:admin@localhost:5432/postgres
     - name: Start postgres
       run: pg_ctl start
     - name: Build with Maven
