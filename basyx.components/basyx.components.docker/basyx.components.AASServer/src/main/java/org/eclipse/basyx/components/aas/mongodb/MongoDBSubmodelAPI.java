@@ -30,13 +30,16 @@ import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
 import org.eclipse.basyx.submodel.restapi.SubmodelElementProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
+import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 import org.eclipse.basyx.vab.exception.provider.MalformedRequestException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -53,6 +56,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	private static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
+	protected DelegatedInvocationManager invocationHelper;
+	
 	protected BaSyxMongoDBConfiguration config;
 	protected MongoOperations mongoOps;
 	protected String collection;
@@ -64,18 +69,28 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	 * @param config
 	 */
 	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId) {
+		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	}
+	
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
+		this.invocationHelper = invocationHelper;
 	}
-
+	
 	/**
 	 * Receives the path of the .properties file in it's constructor from a resource.
 	 */
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId) {
+		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	}
+
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
+		this.invocationHelper = invocationHelper;
 	}
 
 	/**
@@ -83,6 +98,10 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	 */
 	public MongoDBSubmodelAPI(String smId) {
 		this(DEFAULT_CONFIG_PATH, smId);
+	}
+	
+	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper) {
+		this(DEFAULT_CONFIG_PATH, smId, invocationHelper);
 	}
 
 	/**
@@ -283,8 +302,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	@SuppressWarnings("unchecked")
-	private IModelProvider getElementProvider(Submodel sm, String idShort) {
-		ISubmodelElement elem = sm.getSubmodelElements().get(idShort);
+	private IModelProvider getElementProvider(Submodel sm, String idShortPath) {
+		ISubmodelElement elem = sm.getSubmodelElement(idShortPath);
 		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) elem);
 		return SubmodelElementProvider.getElementProvider(mapProvider);
 	}
@@ -317,11 +336,6 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		return convertSubmodelElement(getNestedSubmodelElement(sm, idShorts));
 	}
 
-	private Object invokeTopLevelOperation(String idShort, Object... params) {
-		// not possible to invoke operations on a submodel that is stored in a db
-		throw new MalformedRequestException("Invoke not supported by this backend");
-	}
-
 	private void deleteNestedSubmodelElement(List<String> idShorts) {
 		if ( idShorts.size() == 1 ) {
 			deleteSubmodelElement(idShorts.get(0));
@@ -339,11 +353,6 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		// Replace db entry
 		Query hasId = query(where(SMIDPATH).is(smId));
 		mongoOps.findAndReplace(hasId, sm, collection);
-	}
-
-	private Object invokeNestedOperation(List<String> idShorts, Object... params) {
-		// not possible to invoke operations on a submodel that is stored in a db
-		throw new MalformedRequestException("Invoke not supported by this backend");
 	}
 
 	private Object invokeNestedOperationAsync(List<String> idShorts, Object... params) {
@@ -401,15 +410,17 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object invokeOperation(String idShortPath, Object... params) {
-		if(idShortPath.contains("/")) {
-			String[] splitted = VABPathTools.splitPath(idShortPath);
-			List<String> idShorts = Arrays.asList(splitted);
-			return invokeNestedOperation(idShorts, params);
-		}else {
-			return invokeTopLevelOperation(idShortPath, params);
+		
+		String elementPath =  VABPathTools.getParentPath(idShortPath);
+		
+		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>)getSubmodelElement(elementPath));
+		if(!DelegatedInvocationManager.isDelegatingOperation(operation)) {
+			throw new MalformedRequestException("This backend supports only delegating operations.");
 		}
+		return invocationHelper.invokeDelegatedOperation(operation, params);
 	}
 
 	@Override
