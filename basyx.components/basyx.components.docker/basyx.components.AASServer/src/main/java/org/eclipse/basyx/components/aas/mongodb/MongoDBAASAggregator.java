@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
@@ -23,12 +23,12 @@ import org.eclipse.basyx.aas.aggregator.AASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.restapi.AASModelProvider;
 import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.registry.api.IRegistry;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
@@ -55,9 +55,9 @@ import com.mongodb.client.MongoClients;
 
 /**
  * An IAASAggregator for persistent storage in a MongoDB.
- * 
+ *
  * @see AASAggregator AASAggregator for the "InMemory"-variant
- * 
+ *
  * @author espen
  *
  */
@@ -73,7 +73,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected String aasCollection;
 	protected String smCollection;
 
-	private IAASRegistry registry;
+	private IRegistry registry;
 
 	/**
 	 * Store AAS API Provider. By default, uses the MongoDB API Provider
@@ -87,7 +87,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
-	 * 
+	 *
 	 * @param config
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
@@ -95,7 +95,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		init();
 	}
 
-	public void setRegistry(IAASRegistry registry) {
+	public void setRegistry(IRegistry registry) {
 		this.registry = registry;
 	}
 
@@ -118,7 +118,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Sets the db configuration for this Aggregator.
-	 * 
+	 *
 	 * @param config
 	 */
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
@@ -250,7 +250,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	@Override
-	public void createAAS(AssetAdministrationShell aas) {
+	public void createShell(AssetAdministrationShell aas) {
 		IAASAPI aasApi = this.aasApiProvider.getAASApi(aas);
 		MultiSubmodelProvider provider = initMultiSubmodelProvider(aasApi);
 		aasProviderMap.put(aas.getIdentification().getId(), provider);
@@ -258,7 +258,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	@Override
 	public void updateAAS(AssetAdministrationShell aas) {
-		createAAS(aas);
+		createShell(aas);
 	}
 
 	@Override

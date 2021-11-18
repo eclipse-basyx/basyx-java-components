@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 package org.eclipse.basyx.components.aas;
@@ -30,10 +30,6 @@ import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
 import org.eclipse.basyx.aas.factory.aasx.SubmodelFileEndpointLoader;
 import org.eclipse.basyx.aas.factory.json.JSONAASBundleFactory;
 import org.eclipse.basyx.aas.factory.xml.XMLAASBundleFactory;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.aas.restapi.vab.VABAASAPIFactory;
 import org.eclipse.basyx.components.IComponent;
@@ -49,6 +45,11 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
+import org.eclipse.basyx.registry.api.IRegistry;
+import org.eclipse.basyx.registry.descriptor.AASDescriptor;
+import org.eclipse.basyx.registry.descriptor.SubmodelDescriptor;
+import org.eclipse.basyx.registry.descriptor.parts.Endpoint;
+import org.eclipse.basyx.registry.proxy.RegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
@@ -65,7 +66,7 @@ import org.xml.sax.SAXException;
  * Component providing an empty AAS server that is able to receive AAS/SMs from
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
  * ${URL}/shells
- * 
+ *
  * @author schnicke, espen
  *
  */
@@ -74,7 +75,7 @@ public class AASServerComponent implements IComponent {
 
 	// The server with the servlet that will be created
 	private BaSyxHTTPServer server;
-	private IAASRegistry registry;
+	private IRegistry registry;
 
 	// Configurations
 	private BaSyxContextConfiguration contextConfig;
@@ -84,7 +85,7 @@ public class AASServerComponent implements IComponent {
 
 	// Initial AASBundle
 	protected Collection<AASBundle> aasBundles;
-	
+
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
 
@@ -118,7 +119,7 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is
 	 * started. Currently only works for InMemory backend.
-	 * 
+	 *
 	 * @param configuration
 	 */
 	public void enableMQTT(BaSyxMqttConfiguration configuration) {
@@ -131,7 +132,7 @@ public class AASServerComponent implements IComponent {
 	public void disableMQTT() {
 		this.mqttConfig = null;
 	}
-	
+
 	/**
 	 * Enables AASX upload functionality
 	 */
@@ -141,10 +142,10 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Sets a registry service for registering AAS that are created during startup
-	 * 
+	 *
 	 * @param registry
 	 */
-	public void setRegistry(IAASRegistry registry) {
+	public void setRegistry(IRegistry registry) {
 		this.registry = registry;
 	}
 
@@ -182,7 +183,7 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Retrieves the URL on which the component is providing its HTTP server
-	 * 
+	 *
 	 * @return
 	 */
 	public String getURL() {
@@ -191,10 +192,10 @@ public class AASServerComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
-		
+
 		// Remove all AASs/SMs that were registered on startup
 		AASBundleHelper.deregister(registry, aasBundles);
-		
+
 		server.shutdown();
 	}
 
@@ -249,11 +250,11 @@ public class AASServerComponent implements IComponent {
 
 		// Return the servlet for the resulting aggregator
 		if (isAASXUploadEnabled) {
-			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));	
+			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));
 		} else {
 			return new AASAggregatorServlet(aggregator);
 		}
-		
+
 	}
 
 	private void loadAASFromSource(String aasSource) {
@@ -286,7 +287,7 @@ public class AASServerComponent implements IComponent {
 		// Load registry url from config
 		String registryUrl = this.aasConfig.getRegistry();
 		if (registryUrl != null && !registryUrl.isEmpty()) {
-			registry = new AASRegistryProxy(registryUrl);
+			registry = new RegistryProxy(registryUrl);
 			logger.info("Registry loaded at \"" + registryUrl + "\"");
 		}
 	}
@@ -301,7 +302,7 @@ public class AASServerComponent implements IComponent {
 
 	private void registerSubmodelsFromWhitelist() {
 		logger.info("Register from whitelist");
-		List<AASDescriptor> descriptors = registry.lookupAll();
+		List<AASDescriptor> descriptors = registry.lookupAllShells();
 		List<String> smWhitelist = aasConfig.getSubmodels();
 		for (String s : smWhitelist) {
 			updateSMEndpoint(s, descriptors);
@@ -324,19 +325,19 @@ public class AASServerComponent implements IComponent {
 			Collection<SubmodelDescriptor> smDescriptors = desc.getSubmodelDescriptors();
 			SubmodelDescriptor smDescriptor = findSMDescriptor(smId, smDescriptors);
 			updateSMEndpoint(smDescriptor);
-			registry.register(desc.getIdentifier(), smDescriptor);
+			registry.registerSubmodelForShell(desc.getIdentifier(), smDescriptor);
 		});
 	}
 
 	private void updateSMEndpoint(SubmodelDescriptor smDescriptor) {
-		String smEndpoint = getSMEndpoint(smDescriptor.getIdentifier());
-		String firstEndpoint = smDescriptor.getFirstEndpoint();
-		if (firstEndpoint.isEmpty()) {
-			smDescriptor.removeEndpoint("");
-		} else if (firstEndpoint.equals("/submodel")) {
-			smDescriptor.removeEndpoint("/submodel");
-		}
-		smDescriptor.addEndpoint(smEndpoint);
+		String smEndpointAddress = getSMEndpointAddress(smDescriptor.getIdentifier());
+		// Endpoint firstEndpoint = smDescriptor.getFirstEndpoint();
+		// if (firstEndpoint.isEmpty()) {
+		// smDescriptor.removeEndpoint("");
+		// } else if (firstEndpoint.equals("/submodel")) {
+		// smDescriptor.removeEndpoint("/submodel");
+		// }
+		smDescriptor.addEndpoint(new Endpoint(smEndpointAddress));
 	}
 
 	private SubmodelDescriptor findSMDescriptor(String smId, Collection<SubmodelDescriptor> smDescriptors) {
@@ -348,7 +349,7 @@ public class AASServerComponent implements IComponent {
 		return null;
 	}
 
-	private String getSMEndpoint(IIdentifier smId) {
+	private String getSMEndpointAddress(IIdentifier smId) {
 		String aasId = getAASIdFromSMId(smId);
 		String encodedAASId = VABPathTools.encodePathElement(aasId);
 		String aasBasePath = VABPathTools.concatenatePaths(getComponentBasePath(), encodedAASId, "aas");
@@ -401,7 +402,7 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Loads a aas aggregator servlet with a backend according to the configuration
-	 * 
+	 *
 	 * @return
 	 */
 	private IAASAggregator loadAASAggregator() {

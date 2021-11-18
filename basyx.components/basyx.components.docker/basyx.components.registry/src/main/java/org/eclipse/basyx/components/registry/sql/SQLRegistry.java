@@ -1,46 +1,48 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.sql;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 
-import org.eclipse.basyx.aas.registration.memory.AASRegistry;
-import org.eclipse.basyx.aas.registration.memory.MapRegistryHandler;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
+import org.eclipse.basyx.registry.descriptor.SubmodelDescriptor;
+import org.eclipse.basyx.registry.memory.MapRegistryHandler;
+import org.eclipse.basyx.registry.memory.Registry;
 import org.eclipse.basyx.tools.sqlproxy.SQLRootElement;
 
 /**
  * Implements a local registry based on an SQL database
- * 
+ *
  * @author espen
  *
  */
-public class SQLRegistry extends AASRegistry {
+public class SQLRegistry extends Registry {
 	public final static String TABLE_ID = "root_registry";
 
 	/**
 	 * Constructor using default sql connection
 	 */
 	public SQLRegistry() {
-		super(new MapRegistryHandler(new AASDescriptorMap(createRootMap(new BaSyxSQLConfiguration()))));
+		super(new MapRegistryHandler(new AASDescriptorMap(createRootMap(new BaSyxSQLConfiguration())), new HashMap<String, SubmodelDescriptor>()));
 	}
 
 	/**
 	 * Creates a SQLRegistry from a sql configuration
 	 */
 	public SQLRegistry(BaSyxSQLConfiguration configuration) {
-		super(new MapRegistryHandler(new AASDescriptorMap(createRootMap(configuration))));
+		super(new MapRegistryHandler(new AASDescriptorMap(createRootMap(configuration)), new HashMap<String, SubmodelDescriptor>()));
 	}
 
 	private static Map<String, Object> createRootMap(BaSyxSQLConfiguration config) {
@@ -51,10 +53,10 @@ public class SQLRegistry extends AASRegistry {
 
 	/**
 	 * Initialize sqlDriver
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws FileNotFoundException
-	 * 
+	 *
 	 * @throws ServletException
 	 */
 	private static final SQLRootElement initSQLConnection(BaSyxSQLConfiguration config) {
