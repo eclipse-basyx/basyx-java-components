@@ -82,12 +82,6 @@ public class TestMqttRegistryBackend {
 		testMqttEventForRegistryComponent(inMemoryRegistryComponent);
 	}
 
-	@Test
-	public void testEventsWithSQLBackend() {
-		RegistryComponent sqlRegistryComponent = createSQLRegistryComponent();
-		testMqttEventForRegistryComponent(sqlRegistryComponent);
-	}
-
 	protected void testMqttEventForRegistryComponent(RegistryComponent registryComponent) {
 		registryComponent.enableMQTT(mqttConfig);
 		registryComponent.startComponent();

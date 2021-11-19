@@ -19,7 +19,6 @@ import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.servlet.InMemoryRegistryServlet;
-import org.eclipse.basyx.components.registry.servlet.SQLRegistryServlet;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
@@ -27,9 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generic registry that can start and stop a registry with different kinds of backends.
- * Currently supports MongoDB and SQL. For development purposes, the component can also start a
- * registry without a backend and without persistency.
+ * Generic registry that can start and stop a registry with different kinds of
+ * backends. Currently supports MongoDB and SQL. For development purposes, the
+ * component can also start a registry without a backend and without
+ * persistency.
  *
  * @author espen
  *
@@ -58,10 +58,11 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create an
-	 * InMemory registry.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create an InMemory registry.
 	 *
-	 * @param contextConfig The context configuration
+	 * @param contextConfig
+	 *            The context configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig) {
 		this.contextConfig = contextConfig;
@@ -69,11 +70,13 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create a
-	 * registry with a MongoDB backend.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with a MongoDB backend.
 	 *
-	 * @param contextConfig The context configuration
-	 * @param mongoDBConfig The mongoDB configuration
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param mongoDBConfig
+	 *            The mongoDB configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
@@ -82,11 +85,13 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create a
-	 * registry with an SQL backend.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with an SQL backend.
 	 *
-	 * @param contextConfig The context configuration
-	 * @param sqlConfig     The sql configuration
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param sqlConfig
+	 *            The sql configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
@@ -98,8 +103,10 @@ public class RegistryComponent implements IComponent {
 	 * Constructor with given configuration for the registry and its server context.
 	 * Will load the backend configuration using the default load process.
 	 *
-	 * @param contextConfig  The context configuration
-	 * @param registryConfig The registry configuration
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param registryConfig
+	 *            The registry configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig) {
 		this.contextConfig = contextConfig;
@@ -145,39 +152,16 @@ public class RegistryComponent implements IComponent {
 	private HttpServlet loadRegistryServlet() {
 		HttpServlet registryServlet = null;
 		RegistryBackend backendType = registryConfig.getRegistryBackend();
-		switch(backendType) {
+		switch (backendType) {
 		case MONGODB:
 			throw new ProviderException("MongoDB backend currently not supported.");
 		case SQL:
-			registryServlet = loadSQLRegistryServlet();
-			break;
+			throw new ProviderException("SQL backend currently not supported.");
 		case INMEMORY:
 			registryServlet = loadInMemoryRegistryServlet();
 			break;
 		}
 		return registryServlet;
-	}
-
-	private HttpServlet loadSQLRegistryServlet() {
-		logger.info("Loading SQLRegistry servlet");
-		BaSyxSQLConfiguration appliedSQLConfig = loadSQLConfiguration();
-		if (this.mqttConfig == null) {
-			return new SQLRegistryServlet(appliedSQLConfig);
-		} else {
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			return new SQLRegistryServlet(appliedSQLConfig, this.mqttConfig);
-		}
-	}
-
-	private BaSyxSQLConfiguration loadSQLConfiguration() {
-		BaSyxSQLConfiguration config;
-		if (this.sqlConfig == null) {
-			config = new BaSyxSQLConfiguration();
-			config.loadFromDefaultSource();
-		} else {
-			config = this.sqlConfig;
-		}
-		return config;
 	}
 
 	/**
