@@ -121,10 +121,9 @@ public class TestMqttRegistryBackend {
 	}
 
 	private static AASDescriptor createTestAASDescriptor() {
-		String shellIdShort = "shellIdShort";
 		Identifier shellIdentifier = new Identifier(IdentifierType.CUSTOM, "testAAS");
 		Endpoint shellEndpoint = new Endpoint("http://localhost:8080/aasList/" + shellIdentifier.getId() + "/aas");
-		AASDescriptor shellDescriptor = new AASDescriptor(shellIdShort, shellIdentifier, Arrays.asList(shellEndpoint));
+		AASDescriptor shellDescriptor = new AASDescriptor("shellIdShort", shellIdentifier, Arrays.asList(shellEndpoint));
 		return shellDescriptor;
 	}
 
