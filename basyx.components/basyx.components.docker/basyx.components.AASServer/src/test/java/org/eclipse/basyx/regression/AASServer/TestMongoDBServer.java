@@ -10,8 +10,10 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,7 +32,13 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
+import org.eclipse.basyx.submodel.metamodel.map.qualifier.qualifiable.Qualifier;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
+import org.eclipse.basyx.submodel.restapi.OperationProvider;
+import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
+import org.eclipse.basyx.testsuite.regression.vab.gateway.ConnectorProviderStub;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
+import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,14 +54,21 @@ public class TestMongoDBServer extends AASServerSuite {
 
 	private static final Identifier SM_IDENTIFICATION = new Identifier(IdentifierType.CUSTOM, "MongoDBId");
 	private static final String SM_IDSHORT = "MongoDB";
+	
+	private static final String DELEGATE_OP_ID_SHORT = "delegateOp";
+	private static final String DELEGATE_OP_INVOKE_PATH = "delegateOp/invoke";
+	private static final String OP_ID_SHORT = "op";
+	
 	private static AASServerComponent component;
 	private static BaSyxMongoDBConfiguration mongoDBConfig;
 	private static BaSyxContextConfiguration contextConfig;
 	private static BaSyxAASServerConfiguration aasConfig;
+	
+	private boolean executed = false;
 
 	@Override
 	protected String getURL() {
-		return component.getURL() + "/shells";
+		return component.getURL();
 	}
 
 	@BeforeClass
@@ -98,6 +113,30 @@ public class TestMongoDBServer extends AASServerSuite {
 
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
 	}
+	
+	@Test
+	public void testInvokeDelegatedOperation() {
+		createAssetAdministrationShell();
+		createSubmodel();
+		
+		Operation op = new Operation(OP_ID_SHORT);
+		op.setInvokable((Runnable) -> {
+			executed = true;
+		});
+		OperationProvider opProvider = new OperationProvider(new VABMapProvider(op));
+		
+		
+		ConnectorProviderStub connector = new ConnectorProviderStub();
+		connector.addMapping(OP_ID_SHORT, opProvider);
+		
+		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(mongoDBConfig, SM_IDENTIFICATION.getId(), new DelegatedInvocationManager(connector));
+		
+		executed = false;
+		api.invokeOperation(DELEGATE_OP_INVOKE_PATH);
+		
+		assertTrue(executed);
+		
+	}
 
 	@SuppressWarnings("unchecked")
 	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator) {
@@ -109,6 +148,11 @@ public class TestMongoDBServer extends AASServerSuite {
 
 	private void createSubmodel() {
 		Submodel sm = new Submodel(SM_IDSHORT, SM_IDENTIFICATION);
+		Operation delegateOp = new Operation(DELEGATE_OP_ID_SHORT);
+		Qualifier qualifier = DelegatedInvocationManager.createDelegationQualifier(OP_ID_SHORT);
+		delegateOp.setQualifiers(Arrays.asList(qualifier));
+		sm.addSubmodelElement(delegateOp);
+		
 		manager.createSubmodel(new ModelUrn(aasId), sm);
 	}
 
