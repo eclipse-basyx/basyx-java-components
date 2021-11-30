@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
  * Represents a BaSyx http servlet configuration for a BaSyxContext,
@@ -36,6 +37,10 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public static final String DOCBASE = "contextDocPath";
 	public static final String HOSTNAME = "contextHostname";
 	public static final String PORT = "contextPort";
+
+	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI = "jwtBearerTokenAuthenticationIssuerUri";
+	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI = "jwtBearerTokenAuthenticationJwkSetUri";
+	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD = "jwtBearerTokenAuthenticationRequiredAud";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "context.properties";
@@ -95,7 +100,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { CONTEXTPATH, DOCBASE, HOSTNAME, PORT };
+		String[] properties = { CONTEXTPATH, DOCBASE, HOSTNAME, PORT, JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI, JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI, JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -109,7 +114,29 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		String reqDocBasePath = getDocBasePath();
 		String hostName = getHostname();
 		int reqPort = getPort();
-		return new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
+		final BaSyxContext baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
+
+		if(atLeastOneJwtPropertyIsSet()) {
+			configureJwtAuthentication(baSyxContext);
+		}
+
+		return baSyxContext;
+	}
+
+	private boolean atLeastOneJwtPropertyIsSet() {
+		return getJwtBearerTokenAuthenticationIssuerUri() != null
+				|| getJwtBearerTokenAuthenticationJwkSetUri() != null
+				|| getJwtBearerTokenAuthenticationRequiredAud() != null;
+	}
+
+	private void configureJwtAuthentication(final BaSyxContext baSyxContext) {
+		baSyxContext.setJwtBearerTokenAuthenticationConfiguration(
+				JwtBearerTokenAuthenticationConfiguration.of(
+						getJwtBearerTokenAuthenticationIssuerUri(),
+						getJwtBearerTokenAuthenticationJwkSetUri(),
+						getJwtBearerTokenAuthenticationRequiredAud()
+				)
+		);
 	}
 
 	public String getContextPath() {
@@ -142,6 +169,30 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 
 	public void setPort(int port) {
 		setProperty(PORT, Integer.toString(port));
+	}
+
+	public String getJwtBearerTokenAuthenticationIssuerUri() {
+		return getProperty(JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI);
+	}
+
+	public void setJwtBearerTokenAuthenticationIssuerUri(String jwtBearerAuthIssuerUri) {
+		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI, jwtBearerAuthIssuerUri);
+	}
+
+	public String getJwtBearerTokenAuthenticationJwkSetUri() {
+		return getProperty(JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI);
+	}
+
+	public void setJwtBearerTokenAuthenticationJwkSetUri(String jwtBearerAuthJwkSetUri) {
+		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI, jwtBearerAuthJwkSetUri);
+	}
+
+	public String getJwtBearerTokenAuthenticationRequiredAud() {
+		return getProperty(JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD);
+	}
+
+	public void setJwtBearerTokenAuthenticationRequiredAud(String jwtBearerAuthRequiredAud) {
+		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD, jwtBearerAuthRequiredAud);
 	}
 
 	public String getUrl() {
