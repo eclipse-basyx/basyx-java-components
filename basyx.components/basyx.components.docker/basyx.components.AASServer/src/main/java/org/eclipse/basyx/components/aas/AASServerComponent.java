@@ -52,8 +52,10 @@ import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXU
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
+import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
@@ -84,40 +86,58 @@ public class AASServerComponent implements IComponent {
 
 	// Initial AASBundle
 	protected Collection<AASBundle> aasBundles;
-	
+
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
+
+	protected DelegatedInvocationManager invocationHelper;
 
 	/**
 	 * Constructs an empty AAS server using the passed context
 	 */
-	public AASServerComponent(BaSyxContextConfiguration contextConfig) {
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, DelegatedInvocationManager invocationHelper) {
 		this.contextConfig = contextConfig;
+		this.invocationHelper = invocationHelper;
 		this.aasConfig = new BaSyxAASServerConfiguration();
 	}
 
-	/**
-	 * Constructs an empty AAS server using the passed configuration
-	 */
-	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig) {
-		this.contextConfig = contextConfig;
-		this.aasConfig = aasConfig;
+	public AASServerComponent(BaSyxContextConfiguration contextConfig) {
+		this(contextConfig, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
 	/**
 	 * Constructs an empty AAS server using the passed configuration
 	 */
-	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig,
-			BaSyxMongoDBConfiguration mongoDBConfig) {
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig, DelegatedInvocationManager invocationHelper) {
+		this.contextConfig = contextConfig;
+		this.aasConfig = aasConfig;
+		this.invocationHelper = invocationHelper;
+	}
+
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig) {
+		this(contextConfig, aasConfig, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	}
+
+	/**
+	 * Constructs an empty AAS server using the passed configuration
+	 */
+
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig, BaSyxMongoDBConfiguration mongoDBConfig, DelegatedInvocationManager invocationHelper) {
 		this.contextConfig = contextConfig;
 		this.aasConfig = aasConfig;
 		this.aasConfig.setAASBackend(AASServerBackend.MONGODB);
 		this.mongoDBConfig = mongoDBConfig;
+		this.invocationHelper = invocationHelper;
+	}
+
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
+		this(contextConfig, aasConfig, mongoDBConfig, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
 	/**
-	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is
-	 * started. Currently only works for InMemory backend.
+	 * Sets and enables mqtt connection configuration for this component. Has to be
+	 * called before the component is started. Currently only works for InMemory
+	 * backend.
 	 * 
 	 * @param configuration
 	 */
@@ -126,12 +146,13 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
-	 * Disables mqtt configuration. Has to be called before the component is started.
+	 * Disables mqtt configuration. Has to be called before the component is
+	 * started.
 	 */
 	public void disableMQTT() {
 		this.mqttConfig = null;
 	}
-	
+
 	/**
 	 * Enables AASX upload functionality
 	 */
@@ -162,7 +183,6 @@ public class AASServerComponent implements IComponent {
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", aggregatorServlet);
 
-
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
 			// 1. Also provide the files
@@ -191,10 +211,10 @@ public class AASServerComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
-		
+
 		// Remove all AASs/SMs that were registered on startup
 		AASBundleHelper.deregister(registry, aasBundles);
-		
+
 		server.shutdown();
 	}
 
@@ -221,8 +241,7 @@ public class AASServerComponent implements IComponent {
 		this.aasBundles = new JSONAASBundleFactory(jsonContent).create();
 	}
 
-	private void loadBundleFromAASX(String aasxPath)
-			throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InvalidFormatException {
+	private void loadBundleFromAASX(String aasxPath) throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InvalidFormatException {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
@@ -249,11 +268,11 @@ public class AASServerComponent implements IComponent {
 
 		// Return the servlet for the resulting aggregator
 		if (isAASXUploadEnabled) {
-			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));	
+			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));
 		} else {
 			return new AASAggregatorServlet(aggregator);
 		}
-		
+
 	}
 
 	private void loadAASFromSource(String aasSource) {
@@ -387,7 +406,8 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
-	 * Fixes the File submodel element value paths according to the given endpoint configuration
+	 * Fixes the File submodel element value paths according to the given endpoint
+	 * configuration
 	 */
 	private void modifyFilePaths(String hostName, int port, String rootPath) {
 		rootPath = rootPath + "/files";
@@ -416,7 +436,7 @@ public class AASServerComponent implements IComponent {
 			IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
 			ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
 			aggregator = new AASAggregator(aasApiProvider, smApiProvider, registry);
-		} else if ( backendType == AASServerBackend.MONGODB ) {
+		} else if (backendType == AASServerBackend.MONGODB) {
 			logger.info("Using MongoDB backend");
 			aggregator = loadMongoDBAggregator();
 		}
