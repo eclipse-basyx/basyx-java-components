@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.ProviderException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
+import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
@@ -57,6 +59,8 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -415,13 +419,21 @@ public class AASServerComponent implements IComponent {
 			logger.info("Using InMemory backend with MQTT providers");
 			IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
 			ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
-			aggregator = new AASAggregator(aasApiProvider, smApiProvider, registry);
+			try {
+				aggregator = new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), new MqttClient(mqttConfig.getServer(), getFirstShellIdShort() /* "test" */));
+			} catch (MqttException e) {
+				throw new ProviderException("Mqtt Configuration Error");
+			}
 		} else if ( backendType == AASServerBackend.MONGODB ) {
 			logger.info("Using MongoDB backend");
 			aggregator = loadMongoDBAggregator();
 		}
 
 		return aggregator;
+	}
+
+	private String getFirstShellIdShort() {
+		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
 	}
 
 	private IAASAggregator loadMongoDBAggregator() {
