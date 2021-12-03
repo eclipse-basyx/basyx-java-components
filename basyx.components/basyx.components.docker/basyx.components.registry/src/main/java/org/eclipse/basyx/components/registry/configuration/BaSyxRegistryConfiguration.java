@@ -28,10 +28,12 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	// Default BaSyx Context configuration
 	public static final String DEFAULT_BACKEND = RegistryBackend.INMEMORY.toString();
 	public static final String DEFAULT_EVENTS = RegistryEventBackend.NONE.toString();
+	public static final String DEFAULT_AUTHORIZATION_ENABLED = "false";
 
 	// Configuration keys
 	public static final String BACKEND = "registry.backend";
 	public static final String EVENTS = "registry.events";
+	public static final String AUTHORIZATION_ENABLED = "registry.authorizationEnabled";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "registry.properties";
@@ -43,6 +45,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 		Map<String, String> defaultProps = new HashMap<>();
 		defaultProps.put(BACKEND, DEFAULT_BACKEND);
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
+		defaultProps.put(AUTHORIZATION_ENABLED, DEFAULT_AUTHORIZATION_ENABLED);
 		return defaultProps;
 	}
 
@@ -60,7 +63,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		loadFromEnvironmentVariables(ENV_PREFIX, BACKEND, EVENTS);
+		loadFromEnvironmentVariables(ENV_PREFIX, BACKEND, EVENTS, AUTHORIZATION_ENABLED);
 	}
 
 	public void loadFromDefaultSource() {
@@ -82,5 +85,13 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 
 	public void setRegistryEvents(RegistryEventBackend events) {
 		setProperty(EVENTS, events.toString());
+	}
+
+	public boolean isAuthorizationEnabled() {
+		return Boolean.parseBoolean(getProperty(AUTHORIZATION_ENABLED));
+	}
+
+	public void setAuthorizationEnabled(boolean authorizationEnabled) {
+		setProperty(AUTHORIZATION_ENABLED, Boolean.toString(authorizationEnabled));
 	}
 }

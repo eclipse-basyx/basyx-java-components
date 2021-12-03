@@ -9,12 +9,10 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.servlet;
 
-import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
-import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 /**
  * A registry servlet based on an SQL database. The servlet therefore provides an implementation
@@ -22,7 +20,7 @@ import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
  * 
  * @author kuhn, pschorn, espen
  */
-public class SQLRegistryServlet extends VABHTTPInterface<AASRegistryModelProvider> {
+public class SQLRegistryServlet extends RegistryServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -30,14 +28,14 @@ public class SQLRegistryServlet extends VABHTTPInterface<AASRegistryModelProvide
 	 * with default configuration
 	 */
 	public SQLRegistryServlet() {
-		super(new AASRegistryModelProvider(new SQLRegistry()));
+		super(new SQLRegistry());
 	}
 
 	/**
 	 * Provide HTTP interface with JSONProvider and SQLDirectoryProvider as backend
 	 */
 	public SQLRegistryServlet(BaSyxSQLConfiguration sqlConfig) {
-		super(new AASRegistryModelProvider(new SQLRegistry(sqlConfig)));
+		super(new SQLRegistry(sqlConfig));
 	}
 
 	/**
@@ -45,6 +43,6 @@ public class SQLRegistryServlet extends VABHTTPInterface<AASRegistryModelProvide
 	 * and MQTT as event backend
 	 */
 	public SQLRegistryServlet(BaSyxSQLConfiguration sqlConfig, BaSyxMqttConfiguration mqttConfig) {
-		super(new AASRegistryModelProvider(new MqttRegistryFactory().create(new SQLRegistry(sqlConfig), mqttConfig)));
+		super(new MqttRegistryFactory().create(new SQLRegistry(sqlConfig), mqttConfig));
 	}
 }

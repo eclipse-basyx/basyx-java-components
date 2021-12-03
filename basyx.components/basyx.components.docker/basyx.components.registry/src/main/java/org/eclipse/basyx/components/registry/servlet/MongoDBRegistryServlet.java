@@ -10,13 +10,11 @@
 package org.eclipse.basyx.components.registry.servlet;
 
 import org.eclipse.basyx.aas.registration.memory.AASRegistry;
-import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistryHandler;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
-import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 /**
  * A registry servlet based on an SQL database. The servlet therefore provides an implementation
@@ -24,7 +22,7 @@ import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
  * 
  * @author espen
  */
-public class MongoDBRegistryServlet extends VABHTTPInterface<AASRegistryModelProvider> {
+public class MongoDBRegistryServlet extends RegistryServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -32,14 +30,14 @@ public class MongoDBRegistryServlet extends VABHTTPInterface<AASRegistryModelPro
 	 * configuration
 	 */
 	public MongoDBRegistryServlet() {
-		super(new AASRegistryModelProvider(new AASRegistry(new MongoDBRegistryHandler())));
+		super(new AASRegistry(new MongoDBRegistryHandler()));
 	}
 
 	/**
 	 * Provide HTTP interface with JSONProvider and MongoDB as backend
 	 */
 	public MongoDBRegistryServlet(BaSyxMongoDBConfiguration config) {
-		super(new AASRegistryModelProvider(new MongoDBRegistry(config)));
+		super(new MongoDBRegistry(config));
 	}
 
 	/**
@@ -47,7 +45,6 @@ public class MongoDBRegistryServlet extends VABHTTPInterface<AASRegistryModelPro
 	 * event backend
 	 */
 	public MongoDBRegistryServlet(BaSyxMongoDBConfiguration mongoDBConfig, BaSyxMqttConfiguration mqttConfig) {
-		super(new AASRegistryModelProvider(
-				new MqttRegistryFactory().create(new MongoDBRegistry(mongoDBConfig), mqttConfig)));
+		super(new MqttRegistryFactory().create(new MongoDBRegistry(mongoDBConfig), mqttConfig));
 	}
 }

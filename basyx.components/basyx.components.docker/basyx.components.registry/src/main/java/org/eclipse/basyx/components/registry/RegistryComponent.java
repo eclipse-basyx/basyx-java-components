@@ -11,6 +11,8 @@ package org.eclipse.basyx.components.registry;
 
 import javax.servlet.http.HttpServlet;
 
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
@@ -18,9 +20,11 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
-import org.eclipse.basyx.components.registry.servlet.InMemoryRegistryServlet;
-import org.eclipse.basyx.components.registry.servlet.MongoDBRegistryServlet;
-import org.eclipse.basyx.components.registry.servlet.SQLRegistryServlet;
+import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
+import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
+import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
+import org.eclipse.basyx.components.registry.sql.SQLRegistry;
+import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.slf4j.Logger;
@@ -112,7 +116,7 @@ public class RegistryComponent implements IComponent {
 	@Override
 	public void startComponent() {
 		BaSyxContext context = contextConfig.createBaSyxContext();
-		context.addServletMapping("/*", loadRegistryServlet());
+		context.addServletMapping("/*", createRegistryServlet());
 		server = new BaSyxHTTPServer(context);
 		server.start();
 		logger.info("Registry server started");
@@ -136,39 +140,6 @@ public class RegistryComponent implements IComponent {
 		this.mqttConfig = null;
 	}
 
-	/**
-	 * Loads a registry with a backend according to the registryConfig
-	 * 
-	 * @return
-	 */
-	private HttpServlet loadRegistryServlet() {
-		HttpServlet registryServlet = null;
-		RegistryBackend backendType = registryConfig.getRegistryBackend();
-		switch(backendType) {
-			case MONGODB:
-				registryServlet = loadMongoDBRegistryServlet();
-				break;
-			case SQL:
-				registryServlet = loadSQLRegistryServlet();
-				break;
-			case INMEMORY:
-				registryServlet = loadInMemoryRegistryServlet();
-				break;
-		}
-		return registryServlet;
-	}
-
-	private HttpServlet loadSQLRegistryServlet() {
-		logger.info("Loading SQLRegistry servlet");
-		BaSyxSQLConfiguration appliedSQLConfig = loadSQLConfiguration();
-		if (this.mqttConfig == null) {
-			return new SQLRegistryServlet(appliedSQLConfig);
-		} else {
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			return new SQLRegistryServlet(appliedSQLConfig, this.mqttConfig);
-		}
-	}
-
 	private BaSyxSQLConfiguration loadSQLConfiguration() {
 		BaSyxSQLConfiguration config;
 		if (this.sqlConfig == null) {
@@ -178,17 +149,6 @@ public class RegistryComponent implements IComponent {
 			config = this.sqlConfig;
 		}
 		return config;
-	}
-
-	private HttpServlet loadMongoDBRegistryServlet() {
-		logger.info("Loading MongoDBRegistry servlet");
-		BaSyxMongoDBConfiguration appliedMongoDBConfig = loadMongoDBConfiguration();
-		if (this.mqttConfig == null) {
-			return new MongoDBRegistryServlet(appliedMongoDBConfig);
-		} else {
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			return new MongoDBRegistryServlet(appliedMongoDBConfig, this.mqttConfig);
-		}
 	}
 
 	private BaSyxMongoDBConfiguration loadMongoDBConfiguration() {
@@ -202,19 +162,58 @@ public class RegistryComponent implements IComponent {
 		return config;
 	}
 
-	/**
-	 * Creates an registry servlet with in memory data (=> not persistent)
-	 * 
-	 * @return
-	 */
-	private HttpServlet loadInMemoryRegistryServlet() {
-		logger.info("Loading InMemoryRegistry");
-		if (this.mqttConfig == null) {
-			return new InMemoryRegistryServlet();
-		} else {
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			return new InMemoryRegistryServlet(this.mqttConfig);
+	private HttpServlet createRegistryServlet() {
+		return new RegistryServlet(createRegistry());
+	}
+
+	private IAASRegistry createRegistry() {
+		final IAASRegistry registryBackend = createRegistryBackend();
+		final IAASRegistry decoratedRegistry = decorate(registryBackend);
+		return decoratedRegistry;
+	}
+
+	private IAASRegistry createRegistryBackend() {
+		final RegistryBackend backendType = registryConfig.getRegistryBackend();
+		switch (backendType) {
+			case MONGODB:
+				return createMongoDBRegistryBackend();
+			case SQL:
+				return createSQLRegistryBackend();
+			case INMEMORY:
+				return createInMemoryRegistryBackend();
+			default:
+				throw new RuntimeException("Unknown backend type " + backendType);
 		}
+	}
+
+	private IAASRegistry createInMemoryRegistryBackend() {
+		logger.info("Creating InMemoryRegistry");
+		return new InMemoryRegistry();
+	}
+
+	private IAASRegistry createSQLRegistryBackend() {
+		logger.info("Creating SQLRegistry");
+		final BaSyxSQLConfiguration sqlConfiguration = loadSQLConfiguration();
+		return new SQLRegistry(sqlConfiguration);
+	}
+
+	private IAASRegistry createMongoDBRegistryBackend() {
+		logger.info("Creating MongoDBRegistry");
+		final BaSyxMongoDBConfiguration mongoDBConfiguration = loadMongoDBConfiguration();
+		return new MongoDBRegistry(mongoDBConfiguration);
+	}
+
+	private IAASRegistry decorate(IAASRegistry aasRegistry) {
+		IAASRegistry decoratedRegistry = aasRegistry;
+		if (this.mqttConfig != null) {
+			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+			decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
+		}
+		if (this.registryConfig.isAuthorizationEnabled()) {
+			logger.info("Enable Authorization for Registry");
+			decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
+		}
+		return decoratedRegistry;
 	}
 
 	@Override

@@ -35,14 +35,14 @@
 	    <dependency>
 	        <groupId>org.mongodb</groupId>
 	        <artifactId>mongodb-driver-sync</artifactId>
-	        <version>4.0.5</version>
+	        <version>4.2.3</version>
 	    </dependency>
 
 		<!-- Use Spring Data MongoDB for db data management -->		
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.0.2.RELEASE</version>
+			<version>3.2.6</version>
 		</dependency>
 		
 		<!-- Moquette MQTT broker for testing MQTT events -->
