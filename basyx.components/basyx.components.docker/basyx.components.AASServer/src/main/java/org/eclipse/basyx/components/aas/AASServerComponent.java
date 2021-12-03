@@ -420,7 +420,7 @@ public class AASServerComponent implements IComponent {
 			IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
 			ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
 			try {
-				aggregator = new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), new MqttClient(mqttConfig.getServer(), getFirstShellIdShort() /* "test" */));
+				aggregator = new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), new MqttClient(mqttConfig.getServer(), getMqttClientId()));
 			} catch (MqttException e) {
 				throw new ProviderException("Mqtt Configuration Error");
 			}
@@ -432,7 +432,10 @@ public class AASServerComponent implements IComponent {
 		return aggregator;
 	}
 
-	private String getFirstShellIdShort() {
+	private String getMqttClientId() {
+		if (aasBundles == null || aasBundles.isEmpty()) {
+			return "defaultNoShellId";
+		}
 		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
 	}
 
