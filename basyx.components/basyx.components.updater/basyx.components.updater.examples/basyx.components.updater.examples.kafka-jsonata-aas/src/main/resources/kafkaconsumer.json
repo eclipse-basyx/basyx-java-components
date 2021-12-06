@@ -1,0 +1,22 @@
+[
+	{
+		"uniqueId": "property1",
+		"serverUrl": "localhost",
+		"serverPort": 9092,
+		"topic": "first-topic",
+		"maxPollRecords": 5000,
+		"groupId": "basyx-updater",
+		"consumersCount": 1,
+		"seekTo": "latest"
+	},
+	{
+		"uniqueId": "property2",
+		"serverUrl": "localhost",
+		"serverPort": 9092,
+		"topic": "second-topic",
+		"maxPollRecords": 5000,
+		"groupId": "basyx-updater",
+		"consumersCount": 1,
+		"seekTo": "latest"
+	}
+]

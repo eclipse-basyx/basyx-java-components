@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.eclipse.basyx</groupId>
+	<artifactId>basyx.components.updater.examples</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Example</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<modules>
+		<module>basyx.components.updater.examples.aasinternal</module>
+		<module>basyx.components.updater.examples.aasserver</module>
+		<module>basyx.components.updater.examples.kafkaproducer</module>
+		<module>basyx.components.updater.examples.activemqproducer</module>
+		<module>basyx.components.updater.examples.debsdatagenerator</module>
+		<module>basyx.components.updater.examples.kafka-jsonata-aas</module>
+		<module>basyx.components.updater.examples.hono-jsonata-aas</module>
+		<module>basyx.components.updater.examples.kafka-jsonatamultiple-aas</module>
+		<module>basyx.components.updater.examples.activemq-jsonata-aas</module>
+		<module>basyx.components.updater.examples.mqtt-jsonata-aas</module>
+	</modules>
+
+	<packaging>pom</packaging>
+</project>

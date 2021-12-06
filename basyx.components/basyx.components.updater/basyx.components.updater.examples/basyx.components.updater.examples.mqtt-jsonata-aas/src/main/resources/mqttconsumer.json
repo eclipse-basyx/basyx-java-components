@@ -1,0 +1,14 @@
+[
+	{
+		"uniqueId": "property1",
+		"serverUrl": "localhost",
+		"serverPort": 1884,
+		"topic": "Properties"
+	},
+	{
+		"uniqueId": "property2",
+		"serverUrl": "localhost",
+		"serverPort": 1884,
+		"topic": "PropertyB"
+	}
+]

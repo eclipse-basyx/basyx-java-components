@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.4.1">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Kafka Updater Jmeter" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Kakfa Jmeter Producer Thread" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">50</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">4</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1487173362000</longProp>
+        <longProp name="ThreadGroup.end_time">1487173362000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration">60</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Connector" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="bootstrap.servers" elementType="Argument">
+                <stringProp name="Argument.name">bootstrap.servers</stringProp>
+                <stringProp name="Argument.value">localhost:9092</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="zookeeper.servers" elementType="Argument">
+                <stringProp name="Argument.name">zookeeper.servers</stringProp>
+                <stringProp name="Argument.value">&lt;Zookeeper List&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="kafka.topic.name" elementType="Argument">
+                <stringProp name="Argument.name">kafka.topic.name</stringProp>
+                <stringProp name="Argument.value">jmeter-topic</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="key.serializer" elementType="Argument">
+                <stringProp name="Argument.name">key.serializer</stringProp>
+                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="value.serializer" elementType="Argument">
+                <stringProp name="Argument.name">value.serializer</stringProp>
+                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="compression.type" elementType="Argument">
+                <stringProp name="Argument.name">compression.type</stringProp>
+                <stringProp name="Argument.value">none</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="batch.size" elementType="Argument">
+                <stringProp name="Argument.name">batch.size</stringProp>
+                <stringProp name="Argument.value">16384</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="linger.ms" elementType="Argument">
+                <stringProp name="Argument.name">linger.ms</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="buffer.memory" elementType="Argument">
+                <stringProp name="Argument.name">buffer.memory</stringProp>
+                <stringProp name="Argument.value">33554432</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="acks" elementType="Argument">
+                <stringProp name="Argument.name">acks</stringProp>
+                <stringProp name="Argument.value">1</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="send.buffer.bytes" elementType="Argument">
+                <stringProp name="Argument.name">send.buffer.bytes</stringProp>
+                <stringProp name="Argument.value">131072</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="receive.buffer.bytes" elementType="Argument">
+                <stringProp name="Argument.name">receive.buffer.bytes</stringProp>
+                <stringProp name="Argument.value">32768</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="security.protocol" elementType="Argument">
+                <stringProp name="Argument.name">security.protocol</stringProp>
+                <stringProp name="Argument.value">PLAINTEXT</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="message.placeholder.key" elementType="Argument">
+                <stringProp name="Argument.name">message.placeholder.key</stringProp>
+                <stringProp name="Argument.value">MESSAGE</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="kerberos.auth.enabled" elementType="Argument">
+                <stringProp name="Argument.name">kerberos.auth.enabled</stringProp>
+                <stringProp name="Argument.value">NO</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="java.security.auth.login.config" elementType="Argument">
+                <stringProp name="Argument.name">java.security.auth.login.config</stringProp>
+                <stringProp name="Argument.value">&lt;JAAS File Location&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="java.security.krb5.conf" elementType="Argument">
+                <stringProp name="Argument.name">java.security.krb5.conf</stringProp>
+                <stringProp name="Argument.value">&lt;krb5.conf location&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="sasl.kerberos.service.name" elementType="Argument">
+                <stringProp name="Argument.name">sasl.kerberos.service.name</stringProp>
+                <stringProp name="Argument.value">kafka</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">com.gslab.pepper.sampler.PepperBoxKafkaSampler</stringProp>
+        </JavaSampler>
+        <hashTree/>
+        <com.gslab.pepper.config.plaintext.PlainTextConfigElement guiclass="TestBeanGUI" testclass="com.gslab.pepper.config.plaintext.PlainTextConfigElement" testname="Kafka PlainText Load Generator" enabled="true">
+          <stringProp name="placeHolder">MESSAGE</stringProp>
+          <stringProp name="configClass">com.gslab.pepper.loadgen.impl.PlaintTextLoadGenerator</stringProp>
+          <stringProp name="jsonSchema">{
+	&quot;id&quot;:{{SEQUENCE(&quot;id&quot;, 1, 1)}},
+	&quot;temperature&quot;:&quot;{{RANDOM_INT_RANGE(30, 50)}}&quot;,
+	&quot;messageTime&quot;:{{TIMESTAMP()}}
+}</stringProp>
+        </com.gslab.pepper.config.plaintext.PlainTextConfigElement>
+        <hashTree/>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Serialized" enabled="false">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="bootstrap.servers" elementType="Argument">
+                <stringProp name="Argument.name">bootstrap.servers</stringProp>
+                <stringProp name="Argument.value">&lt;Broker List&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="zookeeper.servers" elementType="Argument">
+                <stringProp name="Argument.name">zookeeper.servers</stringProp>
+                <stringProp name="Argument.value">&lt;Zookeeper List&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="kafka.topic.name" elementType="Argument">
+                <stringProp name="Argument.name">kafka.topic.name</stringProp>
+                <stringProp name="Argument.value">&lt;Topic&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="key.serializer" elementType="Argument">
+                <stringProp name="Argument.name">key.serializer</stringProp>
+                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="value.serializer" elementType="Argument">
+                <stringProp name="Argument.name">value.serializer</stringProp>
+                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="compression.type" elementType="Argument">
+                <stringProp name="Argument.name">compression.type</stringProp>
+                <stringProp name="Argument.value">none</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="batch.size" elementType="Argument">
+                <stringProp name="Argument.name">batch.size</stringProp>
+                <stringProp name="Argument.value">16384</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="linger.ms" elementType="Argument">
+                <stringProp name="Argument.name">linger.ms</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="buffer.memory" elementType="Argument">
+                <stringProp name="Argument.name">buffer.memory</stringProp>
+                <stringProp name="Argument.value">33554432</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="acks" elementType="Argument">
+                <stringProp name="Argument.name">acks</stringProp>
+                <stringProp name="Argument.value">1</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="send.buffer.bytes" elementType="Argument">
+                <stringProp name="Argument.name">send.buffer.bytes</stringProp>
+                <stringProp name="Argument.value">131072</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="receive.buffer.bytes" elementType="Argument">
+                <stringProp name="Argument.name">receive.buffer.bytes</stringProp>
+                <stringProp name="Argument.value">32768</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="security.protocol" elementType="Argument">
+                <stringProp name="Argument.name">security.protocol</stringProp>
+                <stringProp name="Argument.value">PLAINTEXT</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="message.placeholder.key" elementType="Argument">
+                <stringProp name="Argument.name">message.placeholder.key</stringProp>
+                <stringProp name="Argument.value">MESSAGE</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="kerberos.auth.enabled" elementType="Argument">
+                <stringProp name="Argument.name">kerberos.auth.enabled</stringProp>
+                <stringProp name="Argument.value">NO</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="java.security.auth.login.config" elementType="Argument">
+                <stringProp name="Argument.name">java.security.auth.login.config</stringProp>
+                <stringProp name="Argument.value">&lt;JAAS File Location&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="java.security.krb5.conf" elementType="Argument">
+                <stringProp name="Argument.name">java.security.krb5.conf</stringProp>
+                <stringProp name="Argument.value">&lt;krb5.conf location&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="sasl.kerberos.service.name" elementType="Argument">
+                <stringProp name="Argument.name">sasl.kerberos.service.name</stringProp>
+                <stringProp name="Argument.value">kafka</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">com.gslab.pepper.sampler.PepperBoxKafkaSampler</stringProp>
+        </JavaSampler>
+        <hashTree/>
+        <com.gslab.pepper.config.serialized.SerializedConfigElement guiclass="TestBeanGUI" testclass="com.gslab.pepper.config.serialized.SerializedConfigElement" testname="Kafka Serialized Load Generator Config" enabled="false">
+          <stringProp name="className">com.gslab.pepper.Message</stringProp>
+          <stringProp name="messagePlaceholder">MESSAGE</stringProp>
+          <collectionProp name="objProperties">
+            <elementProp name="" elementType="com.gslab.pepper.model.FieldExpressionMapping">
+              <stringProp name="fieldName">messageId</stringProp>
+              <stringProp name="fieldExpression">SEQUENCE(&quot;messageId&quot;, 1, 1)</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.gslab.pepper.model.FieldExpressionMapping">
+              <stringProp name="fieldName">messageBody</stringProp>
+              <stringProp name="fieldExpression">RANDOM_ALPHA_NUMERIC(&quot;abcedefghijklmnopqrwxyzABCDEFGHIJKLMNOPQRWXYZ&quot;, 100)</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.gslab.pepper.model.FieldExpressionMapping">
+              <stringProp name="fieldName">messageStatus</stringProp>
+              <stringProp name="fieldExpression">RANDOM_STRING(&quot;Accepted&quot;,&quot;Pending&quot;,&quot;Processing&quot;,&quot;Rejected&quot;)</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.gslab.pepper.model.FieldExpressionMapping">
+              <stringProp name="fieldName">messageCategory</stringProp>
+              <stringProp name="fieldExpression">RANDOM_STRING(&quot;Finance&quot;, &quot;Insurance&quot;, &quot;Healthcare&quot;, &quot;Shares&quot;)</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.gslab.pepper.model.FieldExpressionMapping">
+              <stringProp name="fieldName">messageTime</stringProp>
+              <stringProp name="fieldExpression">TIMESTAMP()</stringProp>
+            </elementProp>
+          </collectionProp>
+          <stringProp name="placeHolder">MESSAGE1</stringProp>
+        </com.gslab.pepper.config.serialized.SerializedConfigElement>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

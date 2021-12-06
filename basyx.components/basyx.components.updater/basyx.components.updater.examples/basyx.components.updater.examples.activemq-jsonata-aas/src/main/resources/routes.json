@@ -1,0 +1,12 @@
+[
+	{
+		"datasource": "property1",
+		"transformers": ["jsonataA"],
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"]
+	},
+	{
+		"datasource": "property2",
+		"transformers": ["jsonataB"],
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"]
+	}
+]
