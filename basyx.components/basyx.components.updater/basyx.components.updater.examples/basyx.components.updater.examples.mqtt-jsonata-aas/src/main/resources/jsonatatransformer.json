@@ -1,0 +1,14 @@
+[
+	{
+		"uniqueId": "jsonataA",
+		"queryPath": "classpath://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.updater.examples/basyx.components.updater.examples.mqtt-jsonata-aas/src/main/resources/jsonataA.json",
+		"inputType": "JsonString",
+		"outputType": "JsonString"
+	},
+	{
+		"uniqueId": "jsonataB",
+		"queryPath": "file://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.updater.examples/basyx.components.updater.examples.mqtt-jsonata-aas/src/main/resources/jsonataB.json",
+		"inputType": "JsonString",
+		"outputType": "JsonString"
+	}
+]

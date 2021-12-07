@@ -1,0 +1,14 @@
+[
+	{
+		"uniqueId": "property1",
+		"serverUrl": "127.0.0.1",
+		"serverPort": 61616,
+		"queue": "first-topic"
+	},
+	{
+		"uniqueId": "property2",
+		"serverUrl": "127.0.0.1",
+		"serverPort": 9092,
+		"queue": "second-topic"
+	}
+]

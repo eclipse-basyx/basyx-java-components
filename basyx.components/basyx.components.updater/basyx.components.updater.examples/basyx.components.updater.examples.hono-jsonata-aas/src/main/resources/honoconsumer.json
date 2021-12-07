@@ -1,0 +1,11 @@
+[
+	{
+		"uniqueId": "property1",
+		"serverUrl": "http://hono.eclipseprojects.io",
+		"serverPort": 15672,
+		"userName": "consumer@HONO",
+		"password": "verysecret",
+		"tenantId": "mytenantid",
+		"deviceId": "mytenantdevice"
+	}
+]
