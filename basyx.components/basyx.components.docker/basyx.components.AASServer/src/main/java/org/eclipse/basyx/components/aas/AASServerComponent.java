@@ -84,7 +84,7 @@ public class AASServerComponent implements IComponent {
 
 	// Initial AASBundle
 	protected Collection<AASBundle> aasBundles;
-	
+
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
 
@@ -107,8 +107,7 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Constructs an empty AAS server using the passed configuration
 	 */
-	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig,
-			BaSyxMongoDBConfiguration mongoDBConfig) {
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
 		this.aasConfig = aasConfig;
 		this.aasConfig.setAASBackend(AASServerBackend.MONGODB);
@@ -116,8 +115,9 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
-	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is
-	 * started. Currently only works for InMemory backend.
+	 * Sets and enables mqtt connection configuration for this component. Has to be
+	 * called before the component is started. Currently only works for InMemory
+	 * backend.
 	 * 
 	 * @param configuration
 	 */
@@ -126,12 +126,13 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
-	 * Disables mqtt configuration. Has to be called before the component is started.
+	 * Disables mqtt configuration. Has to be called before the component is
+	 * started.
 	 */
 	public void disableMQTT() {
 		this.mqttConfig = null;
 	}
-	
+
 	/**
 	 * Enables AASX upload functionality
 	 */
@@ -191,10 +192,10 @@ public class AASServerComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
-		
+
 		// Remove all AASs/SMs that were registered on startup
 		AASBundleHelper.deregister(registry, aasBundles);
-		
+
 		server.shutdown();
 	}
 
@@ -221,8 +222,7 @@ public class AASServerComponent implements IComponent {
 		this.aasBundles = new JSONAASBundleFactory(jsonContent).create();
 	}
 
-	private void loadBundleFromAASX(String aasxPath)
-			throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InvalidFormatException {
+	private void loadBundleFromAASX(String aasxPath) throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InvalidFormatException {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
@@ -249,11 +249,11 @@ public class AASServerComponent implements IComponent {
 
 		// Return the servlet for the resulting aggregator
 		if (isAASXUploadEnabled) {
-			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));	
+			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));
 		} else {
 			return new AASAggregatorServlet(aggregator);
 		}
-		
+
 	}
 
 	private void loadAASFromSource(String aasSource) {
@@ -387,7 +387,8 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
-	 * Fixes the File submodel element value paths according to the given endpoint configuration
+	 * Fixes the File submodel element value paths according to the given endpoint
+	 * configuration
 	 */
 	private void modifyFilePaths(String hostName, int port, String rootPath) {
 		rootPath = rootPath + "/files";
@@ -416,7 +417,7 @@ public class AASServerComponent implements IComponent {
 			IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
 			ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
 			aggregator = new AASAggregator(aasApiProvider, smApiProvider, registry);
-		} else if ( backendType == AASServerBackend.MONGODB ) {
+		} else if (backendType == AASServerBackend.MONGODB) {
 			logger.info("Using MongoDB backend");
 			aggregator = loadMongoDBAggregator();
 		}
