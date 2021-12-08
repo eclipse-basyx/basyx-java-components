@@ -423,7 +423,8 @@ public class AASServerComponent implements IComponent {
 			try {
 				aggregator = new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), new MqttClient(mqttConfig.getServer(), getMqttClientId()));
 			} catch (MqttException e) {
-				throw new ProviderException("Mqtt Configuration Error");
+				logger.error(e.getMessage(), e);
+				throw new ProviderException("Mqtt Configuration Error: " + e.getMessage(), e);
 			}
 		} else if ( backendType == AASServerBackend.MONGODB ) {
 			logger.info("Using MongoDB backend");
