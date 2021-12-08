@@ -59,7 +59,6 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -418,14 +417,7 @@ public class AASServerComponent implements IComponent {
 			aggregator = new AASAggregator(registry);
 		} else if (backendType == AASServerBackend.INMEMORY && mqttConfig != null) {
 			logger.info("Using InMemory backend with MQTT providers");
-			IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
-			ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
-			try {
-				aggregator = new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), new MqttClient(mqttConfig.getServer(), getMqttClientId()));
-			} catch (MqttException e) {
-				logger.error(e.getMessage(), e);
-				throw new ProviderException("Mqtt Configuration Error: " + e.getMessage(), e);
-			}
+			aggregator = loadMqttAASAggregator();
 		} else if ( backendType == AASServerBackend.MONGODB ) {
 			logger.info("Using MongoDB backend");
 			aggregator = loadMongoDBAggregator();
@@ -434,11 +426,22 @@ public class AASServerComponent implements IComponent {
 		return aggregator;
 	}
 
+
 	private String getMqttClientId() {
 		if (aasBundles == null || aasBundles.isEmpty()) {
 			return "defaultNoShellId";
 		}
 		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
+	}
+
+	private IAASAggregator loadMqttAASAggregator() {
+		IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
+		ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
+		try {
+			return new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), mqttConfig.getServer(), getMqttClientId());
+		} catch (MqttException e) {
+			throw new ProviderException("MqttException: " + e.getMessage(), e);
+		}
 	}
 
 	private IAASAggregator loadMongoDBAggregator() {
