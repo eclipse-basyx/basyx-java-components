@@ -340,7 +340,7 @@ public class AASServerComponent implements IComponent {
 		} else {
 			config = this.mongoDBConfig;
 		}
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
 		aggregator.setRegistry(registry);
 		return aggregator;
 	}

@@ -79,8 +79,6 @@
 						<excludes>
 							<exclude>**/*HTTP*</exclude>
 							<exclude>**/*TCP*</exclude>
-							<!-- Exclude explicit MongoDB tests for CI -->
-							<exclude>**/*MongoDB*</exclude>
 						</excludes>
 					</configuration>
 				</plugin>

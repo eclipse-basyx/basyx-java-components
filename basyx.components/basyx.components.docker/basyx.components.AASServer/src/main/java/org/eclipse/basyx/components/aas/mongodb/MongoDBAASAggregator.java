@@ -95,18 +95,47 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this.setConfiguration(config);
 		init();
 	}
+	
+	/**
+	 * Receives the path of the configuration.properties file and the registry in it's constructor.
+	 * 
+	 * @param configFilePath
+	 * @param registry
+	 */
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
+		this.setConfiguration(config);
+		this.registry = registry;
+		init();
+	}
 
+	@Deprecated
 	public void setRegistry(IAASRegistry registry) {
 		this.registry = registry;
 	}
 
 	/**
 	 * Receives the path of the .properties file in it's constructor from a resource.
+	 * 
+	 * @param Path of the configuration file
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
+		init();
+	}
+	
+	/**
+	 * Receives the path of the .properties file from a resource and the registry in it's constructor.
+	 * 
+	 * @param Path of the configuration file
+	 * @param registry
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		this.setConfiguration(config);
+		this.registry = registry;
 		init();
 	}
 
@@ -115,6 +144,15 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 */
 	public MongoDBAASAggregator() {
 		this(DEFAULT_CONFIG_PATH);
+	}
+	
+	/**
+	 * Constructor using default connections with registry as a parameter
+	 * 
+	 * @param registry
+	 */
+	public MongoDBAASAggregator(IAASRegistry registry) {
+		this(DEFAULT_CONFIG_PATH, registry);
 	}
 
 	/**
@@ -282,5 +320,9 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		}
 
 		return provider;
+	}
+	
+	public boolean isRegistryNull() {
+		return this.registry == null;
 	}
 }
