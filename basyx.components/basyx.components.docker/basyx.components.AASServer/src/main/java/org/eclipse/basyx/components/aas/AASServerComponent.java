@@ -35,14 +35,10 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.aas.restapi.vab.VABAASAPIFactory;
 import org.eclipse.basyx.components.IComponent;
-import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
-import org.eclipse.basyx.components.aas.mqtt.MqttSubmodelAPIFactory;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
@@ -53,7 +49,6 @@ import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXU
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
@@ -159,13 +154,11 @@ public class AASServerComponent implements IComponent {
 	public void startComponent() {
 		logger.info("Create the server...");
 		// Load the aggregator servlet
-		createRegistryFromUrl();
-		VABHTTPInterface<?> aggregatorServlet = loadAggregatorServlet();
+		registry = createRegistryFromConfig(aasConfig);
 
 		// Init HTTP context and add an XMLAASServlet according to the configuration
 		BaSyxContext context = contextConfig.createBaSyxContext();
-		context.addServletMapping("/*", aggregatorServlet);
-
+		context.addServletMapping("/*", createAggregatorServlet());
 
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
@@ -229,7 +222,7 @@ public class AASServerComponent implements IComponent {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
-		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
+		AASXToMetamodelConverter packageManager = new AASXToMetamodelConverter(aasxPath);
 
 		// Unpack the files referenced by the aas
 		packageManager.unzipRelatedFiles();
@@ -238,25 +231,73 @@ public class AASServerComponent implements IComponent {
 		this.aasBundles = packageManager.retrieveAASBundles();
 	}
 
-	private VABHTTPInterface<?> loadAggregatorServlet() {
-		// Load the initial AAS bundles from given source
+	private VABHTTPInterface<?> createAggregatorServlet() {
 		loadAASFromSource(aasConfig.getAASSource());
+		IAASAggregator aggregator = createAggregator();
 
-		// Load the aggregator
-		IAASAggregator aggregator = loadAASAggregator();
-
-		// Integrate the loaded bundles into the aggregator
 		if (aasBundles != null) {
 			AASBundleHelper.integrate(aggregator, aasBundles);
 		}
 
-		// Return the servlet for the resulting aggregator
 		if (isAASXUploadEnabled) {
 			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));
 		} else {
 			return new AASAggregatorServlet(aggregator);
 		}
+	}
 
+	private IAASAggregator createAggregator() {
+		final IAASAggregator aggregatorBackend = createAggregatorBackend();
+		final IAASAggregator decoratedRegistry = decorate(aggregatorBackend);
+		return decoratedRegistry;
+	}
+
+	private IAASAggregator decorate(IAASAggregator aasAggregator) {
+		IAASAggregator decoratedAggregator = aasAggregator;
+		if (this.mqttConfig != null) {
+			try {
+				decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttClientId());
+			} catch (MqttException e) {
+				throw new ProviderException("moquette.conf Error" + e.getMessage());
+			}
+			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+		}
+		return decoratedAggregator;
+	}
+
+	private IAASAggregator createAggregatorBackend() {
+		final AASServerBackend backendType = aasConfig.getAASBackend();
+		switch (backendType) {
+		case MONGODB:
+			return createMongoDBAggregatorBackend();
+		case INMEMORY:
+			return createInMemoryAggregatorBackend();
+		default:
+			throw new RuntimeException("Unknown backend type " + backendType);
+		}
+	}
+
+	private IAASAggregator createMongoDBAggregatorBackend() {
+		logger.info("Using MongoDB backend");
+		return createMongoDBAggregator();
+	}
+
+	private IAASAggregator createInMemoryAggregatorBackend() {
+		logger.info("Using InMemory backend");
+		return new AASAggregator(registry);
+	}
+
+	private IAASAggregator createMongoDBAggregator() {
+		BaSyxMongoDBConfiguration config;
+		if (this.mongoDBConfig == null) {
+			config = new BaSyxMongoDBConfiguration();
+			config.loadFromDefaultSource();
+		} else {
+			config = this.mongoDBConfig;
+		}
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
+		aggregator.setRegistry(registry);
+		return aggregator;
 	}
 
 	private void loadAASFromSource(String aasSource) {
@@ -281,17 +322,19 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Only creates the registry, if it hasn't been set explicitly before
 	 */
-	private void createRegistryFromUrl() {
+	private IAASRegistry createRegistryFromConfig(BaSyxAASServerConfiguration aasConfig) {
 		if (this.registry != null) {
 			// Do not overwrite an explicitly set registry
-			return;
+			return this.registry;
+		}
+		String registryUrl = aasConfig.getRegistry();
+		if (registryUrl == null || registryUrl.isEmpty()) {
+			return null;
 		}
 		// Load registry url from config
-		String registryUrl = this.aasConfig.getRegistry();
-		if (registryUrl != null && !registryUrl.isEmpty()) {
-			registry = new AASRegistryProxy(registryUrl);
-			logger.info("Registry loaded at \"" + registryUrl + "\"");
-		}
+		logger.info("Registry loaded at \"" + registryUrl + "\"");
+		return new AASRegistryProxy(registryUrl);
+
 	}
 
 	private void registerEnvironment() {
@@ -403,30 +446,6 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	/**
-	 * Loads a aas aggregator servlet with a backend according to the configuration
-	 * 
-	 * @return
-	 */
-	private IAASAggregator loadAASAggregator() {
-		// Get aggregator according to backend config
-		AASServerBackend backendType = aasConfig.getAASBackend();
-		IAASAggregator aggregator = null;
-		if (backendType == AASServerBackend.INMEMORY && mqttConfig == null) {
-			logger.info("Using InMemory backend");
-			aggregator = new AASAggregator(registry);
-		} else if (backendType == AASServerBackend.INMEMORY && mqttConfig != null) {
-			logger.info("Using InMemory backend with MQTT providers");
-			aggregator = loadMqttAASAggregator();
-		} else if ( backendType == AASServerBackend.MONGODB ) {
-			logger.info("Using MongoDB backend");
-			aggregator = loadMongoDBAggregator();
-		}
-
-		return aggregator;
-	}
-
-
 	private String getMqttClientId() {
 		if (aasBundles == null || aasBundles.isEmpty()) {
 			return "defaultNoShellId";
@@ -434,26 +453,4 @@ public class AASServerComponent implements IComponent {
 		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
 	}
 
-	private IAASAggregator loadMqttAASAggregator() {
-		IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
-		ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
-		try {
-			return new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), mqttConfig.getServer(), getMqttClientId());
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error" + e.getMessage());
-		}
-	}
-
-	private IAASAggregator loadMongoDBAggregator() {
-		BaSyxMongoDBConfiguration config;
-		if (this.mongoDBConfig == null) {
-			config = new BaSyxMongoDBConfiguration();
-			config.loadFromDefaultSource();
-		} else {
-			config = this.mongoDBConfig;
-		}
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
-		aggregator.setRegistry(registry);
-		return aggregator;
-	}
 }

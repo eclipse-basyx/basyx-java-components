@@ -36,7 +36,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_SOURCE = "";
 	public static final String DEFAULT_REGISTRY = "";
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
-	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.DISABLED.toString();
+	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";

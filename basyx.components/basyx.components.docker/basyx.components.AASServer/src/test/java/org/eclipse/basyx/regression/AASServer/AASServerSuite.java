@@ -51,7 +51,7 @@ public abstract class AASServerSuite {
 	@Test
 	public void testAddAAS() throws Exception {
 		IIdentifier shellIdentifier = new ModelUrn(shellId);
-		AssetAdministrationShell shell = makeShell("aasIdShort", new ModelUrn(shellId));
+		AssetAdministrationShell shell = createShell("aasIdShort", new ModelUrn(shellId));
 
 		manager.createAAS(shell, getURL());
 
@@ -59,7 +59,7 @@ public abstract class AASServerSuite {
 		assertEquals(shell.getIdShort(), remote.getIdShort());
 	}
 
-	private AssetAdministrationShell makeShell(String idShort, IIdentifier identifier) {
+	private AssetAdministrationShell createShell(String idShort, IIdentifier identifier) {
 		AssetAdministrationShell shell = new AssetAdministrationShell();
 		shell.setIdentification(identifier);
 		shell.setIdShort(idShort);
