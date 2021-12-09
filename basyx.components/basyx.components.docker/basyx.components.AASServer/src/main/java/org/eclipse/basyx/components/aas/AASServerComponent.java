@@ -440,7 +440,7 @@ public class AASServerComponent implements IComponent {
 		try {
 			return new MqttAASAggregator(new AASAggregator(aasApiProvider, smApiProvider, registry), mqttConfig.getServer(), getMqttClientId());
 		} catch (MqttException e) {
-			throw new ProviderException("MqttException: " + e.getMessage(), e);
+			throw new ProviderException("moquette.conf Error" + e.getMessage());
 		}
 	}
 

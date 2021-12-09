@@ -37,25 +37,17 @@ public class TestAASServerWithMqtt extends AASServerSuite {
 
 	@BeforeClass
 	public static void setUpClass() throws ParserConfigurationException, SAXException, IOException {
-		mqttBroker = new Server();
+		startMqttBroker();
 
-		IResourceLoader classpathLoader = new ClasspathResourceLoader();
-		final IConfig classPathConfig = new ResourceLoaderConfig(classpathLoader);
-
-		mqttBroker.startServer(classPathConfig);
-
-		BaSyxContextConfiguration config = new BaSyxContextConfiguration();
-		config.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
+		BaSyxContextConfiguration config = createBaSyxContextConfiguration();
 		component = new AASServerComponent(config);
 
-
-		BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
-		mqttConfig.setServer("tcp://localhost:" + mqttBroker.getPort());
-		mqttConfig.setPersistenceType(MqttPersistence.INMEMORY);
+		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 		component.enableMQTT(mqttConfig);
 
 		component.startComponent();
 	}
+
 
 	@AfterClass
 	public static void tearDownClass() {
@@ -81,5 +73,26 @@ public class TestAASServerWithMqtt extends AASServerSuite {
 	public void testAddAAS() throws Exception {
 		super.testAddAAS();
 		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);
+	}
+
+	private static void startMqttBroker() throws IOException {
+		mqttBroker = new Server();
+		IResourceLoader classpathLoader = new ClasspathResourceLoader();
+		final IConfig classPathConfig = new ResourceLoaderConfig(classpathLoader);
+		mqttBroker.startServer(classPathConfig);
+	}
+
+	private static BaSyxContextConfiguration createBaSyxContextConfiguration() {
+		BaSyxContextConfiguration config = new BaSyxContextConfiguration();
+		config.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
+		return config;
+	}
+
+	private static BaSyxMqttConfiguration createMqttConfig() {
+		BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
+		mqttConfig.setServer("tcp://localhost:" + mqttBroker.getPort());
+		System.err.println(mqttConfig.getServer());
+		mqttConfig.setPersistenceType(MqttPersistence.INMEMORY);
+		return mqttConfig;
 	}
 }
