@@ -6,12 +6,16 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelper;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.testsuite.regression.extensions.shared.mqtt.MqttTestListener;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -25,7 +29,7 @@ import io.moquette.broker.config.IConfig;
 import io.moquette.broker.config.IResourceLoader;
 import io.moquette.broker.config.ResourceLoaderConfig;
 
-public class TestAASServerWithMqtt extends AASServerSuite {
+public class TestAASServerWithInMemoryMqtt extends AASServerSuite {
 	private static AASServerComponent component;
 	private static Server mqttBroker;
 	private MqttTestListener listener;
@@ -39,15 +43,13 @@ public class TestAASServerWithMqtt extends AASServerSuite {
 	public static void setUpClass() throws ParserConfigurationException, SAXException, IOException {
 		startMqttBroker();
 
-		BaSyxContextConfiguration config = createBaSyxContextConfiguration();
-		component = new AASServerComponent(config);
+		component = new AASServerComponent(createBaSyxContextConfiguration());
 
 		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 		component.enableMQTT(mqttConfig);
 
 		component.startComponent();
 	}
-
 
 	@AfterClass
 	public static void tearDownClass() {
@@ -68,11 +70,18 @@ public class TestAASServerWithMqtt extends AASServerSuite {
 		mqttBroker.removeInterceptHandler(listener);
 	}
 
-	@Override
-	@Test
-	public void testAddAAS() throws Exception {
-		super.testAddAAS();
+	@Test(expected = ResourceNotFoundException.class)
+	public void shellLifeCycle() {
+		IIdentifier shellIdentifier = new ModelUrn(shellId);
+		AssetAdministrationShell shell = createShell(shellId, shellIdentifier);
+
+		manager.createAAS(shell, getURL());
 		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);
+		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
+
+		manager.deleteAAS(shellIdentifier);
+		assertEquals(MqttAASAggregatorHelper.TOPIC_DELETEAAS, listener.lastTopic);
+		manager.retrieveAAS(shellIdentifier); // ResourceNotFoundException expected
 	}
 
 	private static void startMqttBroker() throws IOException {
@@ -91,8 +100,14 @@ public class TestAASServerWithMqtt extends AASServerSuite {
 	private static BaSyxMqttConfiguration createMqttConfig() {
 		BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 		mqttConfig.setServer("tcp://localhost:" + mqttBroker.getPort());
-		System.err.println(mqttConfig.getServer());
 		mqttConfig.setPersistenceType(MqttPersistence.INMEMORY);
 		return mqttConfig;
+	}
+
+	private AssetAdministrationShell createShell(String idShort, IIdentifier identifier) {
+		AssetAdministrationShell shell = new AssetAdministrationShell();
+		shell.setIdentification(identifier);
+		shell.setIdShort(idShort);
+		return shell;
 	}
 }
