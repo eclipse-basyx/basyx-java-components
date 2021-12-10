@@ -1,6 +1,7 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -78,7 +79,7 @@ public class TestAASServerWithMongoDbAndMqtt extends AASServerSuite {
 		mqttBroker.removeInterceptHandler(listener);
 	}
 
-	@Test(expected = ResourceNotFoundException.class)
+	@Test
 	public void shellLifeCycle() {
 		IIdentifier shellIdentifier = new ModelUrn(shellId);
 		AssetAdministrationShell shell = createShell(shellId, shellIdentifier);
@@ -89,7 +90,12 @@ public class TestAASServerWithMongoDbAndMqtt extends AASServerSuite {
 
 		manager.deleteAAS(shellIdentifier);
 		assertEquals(MqttAASAggregatorHelper.TOPIC_DELETEAAS, listener.lastTopic);
-		manager.retrieveAAS(shellIdentifier); // ResourceNotFoundException expected
+		try {
+			manager.retrieveAAS(shellIdentifier);
+			fail();
+		} catch (ResourceNotFoundException e) {
+			// expected
+		}
 	}
 
 	private static void startMqttBroker() throws IOException {
