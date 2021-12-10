@@ -35,17 +35,18 @@ import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
  * @author jungjan
  *
  */
-public class OperationTestServerExecutable extends BaSyxHTTPServer {
+public class OperationTestServerExecutable {
 	private static final String DEFAULT_HOST = "localhost";
 	private static final int DEFAULT_PORT = 4002;
 	private static final String DEFAULT_OPERATION_ID = "test_operation";
+	private BaSyxHTTPServer operationTestServer;
 
 	public OperationTestServerExecutable() {
-		super(makeDefaultContext(DEFAULT_HOST, DEFAULT_PORT));
+		operationTestServer = new BaSyxHTTPServer(makeDefaultContext(DEFAULT_HOST, DEFAULT_PORT));
 	}
 
 	public OperationTestServerExecutable(String host, int port) {
-		super(makeDefaultContext(host, port));
+		operationTestServer = new BaSyxHTTPServer(makeDefaultContext(host, port));
 	}
 
 	private static BaSyxContext makeDefaultContext(String host, int port) {
@@ -107,6 +108,10 @@ public class OperationTestServerExecutable extends BaSyxHTTPServer {
 		}
 
 		server.start();
+	}
+
+	private void start() {
+		operationTestServer.start();
 	}
 
 }
