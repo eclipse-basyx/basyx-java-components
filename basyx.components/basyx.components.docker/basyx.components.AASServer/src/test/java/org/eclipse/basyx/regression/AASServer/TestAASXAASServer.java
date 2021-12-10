@@ -53,8 +53,7 @@ public class TestAASXAASServer extends AASXSuite {
 		component = new AASServerComponent(contextConfig, aasConfig);
 		component.startComponent();
 		
-		rootEndpoint = "http://" + contextConfig.getHostname() + ":" + contextConfig.getPort() + "/"
-				+ contextConfig.getContextPath() + "/";
+		rootEndpoint = contextConfig.getUrl() + "/";
 		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
 		smEndpoint = aasEndpoint + "/submodels/" + smShortId + "/submodel";
 		logger.info("AAS URL for servlet test: " + aasEndpoint);

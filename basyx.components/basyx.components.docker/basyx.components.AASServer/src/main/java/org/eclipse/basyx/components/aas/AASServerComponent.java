@@ -36,6 +36,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.components.IComponent;
+import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
@@ -222,7 +223,7 @@ public class AASServerComponent implements IComponent {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
-		AASXToMetamodelConverter packageManager = new AASXToMetamodelConverter(aasxPath);
+		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
 
 		// Unpack the files referenced by the aas
 		packageManager.unzipRelatedFiles();

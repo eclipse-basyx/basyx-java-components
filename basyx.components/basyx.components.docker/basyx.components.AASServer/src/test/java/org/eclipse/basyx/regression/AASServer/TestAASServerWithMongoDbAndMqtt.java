@@ -78,11 +78,7 @@ public class TestAASServerWithMongoDbAndMqtt extends AASServerSuite {
 		mqttBroker.removeInterceptHandler(listener);
 	}
 
-	@Test(expected = ResourceNotFoundException.class) // TODO: bring this back
-	/*
-	 * TODO: find out, why listener.lastTopic is "BaSyxAggregator_updatedAAS"
-	 *                                instead of "BaSyxAggregator_createdAAS"
-	 */
+	@Test(expected = ResourceNotFoundException.class)
 	public void shellLifeCycle() {
 		IIdentifier shellIdentifier = new ModelUrn(shellId);
 		AssetAdministrationShell shell = createShell(shellId, shellIdentifier);
