@@ -11,7 +11,11 @@ package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +23,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
+import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
@@ -35,6 +42,9 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.testsuite.regression.aas.aggregator.AASAggregatorSuite;
+import org.eclipse.basyx.vab.exception.provider.MalformedRequestException;
+import org.eclipse.basyx.vab.exception.provider.ProviderException;
+import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
@@ -44,11 +54,15 @@ import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.xml.sax.SAXException;
 import org.eclipse.basyx.aas.registration.memory.AASRegistry;
+import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
+
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import java.util.logging.Logger;
 
 
-public class TestMongoDBAggregator extends AASAggregatorSuite {
+public class TestMongoDBAggregator {
+	private static final Logger LOGGER = Logger.getLogger(TestMongoDBAggregator.class.getName());
 	private static final Identifier SM_IDENTIFICATION = new Identifier(IdentifierType.CUSTOM, "MongoDBId");
 	private static final String SM_IDSHORT = "MongoDB";
 	private static AASServerComponent component;
@@ -59,10 +73,87 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	protected static ConnectedAssetAdministrationShellManager manager;
 	protected static String aasId = "testId";
 	
-	@BeforeClass
-	public static void setUpClass() throws ParserConfigurationException, SAXException, IOException {
+	
+	@Test
+	public void mainTest()  throws ParserConfigurationException, SAXException, IOException{
+		mongoDBConfig = new BaSyxMongoDBConfiguration();
+		mongoDBConfig.setAASCollection("basyxTestAAS");
+		mongoDBConfig.setSubmodelCollection("basyxTestSM");
+		
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
+		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator);
+		
+		IAssetAdministrationShell shell = aggregator.getAAS(new ModelUrn(aasId));
+		
+		System.out.println("shell =" + shell);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator) throws ParserConfigurationException, SAXException, IOException {
+		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(new ModelUrn(aasId));
+		
+		Object omnd = getValue("/aas/submodels/" + SM_IDSHORT + "/submodel", aasProvider);
+		
+		Object submodelObject = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
+		
+		aasProvider.removeProvider(SM_IDSHORT);
+		System.out.println("provider : " + aasProvider.getClass());
+		
+		Object submodelObject3 = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
+		setUpClass();
+		getTotalDistance();
+		
+		component.stopComponent();
+		setUpClass();
+		getTotalDistance();
+		System.out.println("URL : " + component.getURL());
+		
+		Object submodelObject2 = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
+		System.out.println("aasProvider class : " + aasProvider.getClass());
+		System.out.println("submodelObject : " + submodelObject);
+		System.out.println("submodelObject2 : " + submodelObject2);
+		
+		ISubmodel persistentSubmodel = Submodel.createAsFacade((Map<String, Object>) submodelObject);
+		
+		return persistentSubmodel;
+	}
+	
+	public Object getValue(String path, IModelProvider aasProvider) throws ProviderException {
+		VABPathTools.checkPathForNull(path);
+		path = VABPathTools.stripSlashes(path);
+		String[] pathElements = VABPathTools.splitPath(path);
+		if (pathElements.length > 0 && pathElements[0].equals("aas")) {
+			if (pathElements.length == 1) {
+				//return aas_provider.getValue("");
+			}
+			if (pathElements[1].equals(AssetAdministrationShell.SUBMODELS)) {
+				if (pathElements.length == 2) {
+					//return retrieveSubmodels();
+				} else {
+					System.out.println("Inside else");
+//					IModelProvider provider = submodel_providers.get(pathElements[2]);
+
+//					if (provider == null) {
+//						// Get a model provider for the submodel in the registry
+//						provider = getModelProvider(pathElements[2]);
+//					}
+
+					// - Retrieve submodel or property value
+//					return provider.getValue(VABPathTools.buildPath(pathElements, 3));
+				}
+			} else {
+				// Handle access to AAS
+//				return aas_provider.getValue(VABPathTools.buildPath(pathElements, 1));
+			}
+		} else {
+			throw new MalformedRequestException("The request " + path + " is not allowed for this endpoint");
+		}
+		return pathElements;
+	}
+	
+	public void setUpClass() throws ParserConfigurationException, SAXException, IOException {
 		initConfiguration();
-		resetMongoDBTestData();
+//		resetMongoDBTestData();
 		
 		component = new AASServerComponent(contextConfig, aasConfig, mongoDBConfig);
 		registry = new AASRegistry(new MongoDBRegistryHandler("mongodb.properties"));
@@ -85,6 +176,39 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		
 		aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.MONGODB, "");
 	}
+	
+	
+    public void getTotalDistance() {
+            String BASE_URL2 = "http://localhost:4001/aasServer/shells/testId/aas/submodels/MongoDB/submodel";
+            LOGGER.info("Full URL : " + BASE_URL2 );
+            Double totalDistance = 0.0;
+            URL url = null;
+            try {
+                url = new URL(BASE_URL2);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                LOGGER.info("Response code : " + con.getResponseCode() );
+
+                if(con.getResponseCode() == 200 || con.getResponseCode() == 201){
+                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line+"\n");
+                    }
+                    br.close();
+                    String data = sb.toString();
+                    System.out.println(data);
+//                    JSONObject json = new JSONObject(data.trim());
+//                    System.out.println(json.getJSONArray("resourceSets").getJSONObject(0).getJSONArray("resources").getJSONObject(0).get("travelDistance"));
+//                    totalDistance = (Double) json.getJSONArray("resourceSets").getJSONObject(0).getJSONArray("resources").getJSONObject(0).get("travelDistance");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+	
+	/*
 	
 	private static void resetMongoDBTestData() {
 		new MongoDBAASAggregator(mongoDBConfig).reset();
@@ -159,8 +283,8 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	
 	@Test
 	public void checkPersistencyOfAggregator() throws Exception {
-		createAssetAdministrationShell();
-		createSubmodel();
+		IAssetAdministrationShell shell = createAssetAdministrationShell();
+		ISubmodel submodel = createSubmodel();
 
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
 		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator);
@@ -168,9 +292,10 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		assertEquals(SM_IDSHORT, persistentSubmodel.getIdShort());
 	}
 	
-	private void createSubmodel() {
+	private ISubmodel createSubmodel() {
 		Submodel sm = new Submodel(SM_IDSHORT, SM_IDENTIFICATION);
 		manager.createSubmodel(new ModelUrn(aasId), sm);
+		return sm;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -179,12 +304,14 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		
 		Object submodelObject = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
 		
+		System.out.println("aasProvider class : " + aasProvider.getClass());
+		
 		ISubmodel persistentSubmodel = Submodel.createAsFacade((Map<String, Object>) submodelObject);
 		
 		return persistentSubmodel;
 	}
 
-	private void createAssetAdministrationShell() {
+	private IAssetAdministrationShell createAssetAdministrationShell() {
 		AssetAdministrationShell assetAdministrationShell = new AssetAdministrationShell();
 		
 		IIdentifier identifier = new ModelUrn(aasId);
@@ -192,7 +319,10 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		assetAdministrationShell.setIdentification(identifier);
 		assetAdministrationShell.setIdShort("aasIdShort");
 		
+		
 		manager.createAAS(assetAdministrationShell, getURL());
+		
+		return assetAdministrationShell;
 	}
 	
 	protected String getURL() {
@@ -201,7 +331,8 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	
 	@AfterClass
 	public static void tearDownClass() {
-		resetMongoDBTestData();
+//		resetMongoDBTestData();
 		component.stopComponent();
 	}
+	*/
 }

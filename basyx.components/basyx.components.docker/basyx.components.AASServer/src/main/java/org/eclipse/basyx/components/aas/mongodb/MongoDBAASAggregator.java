@@ -97,17 +97,18 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 	
 	/**
-	 * Receives the path of the configuration.properties file and the registry in it's constructor.
+	 * Variant
+	 * Receives the path of the configuration.properties file in it's constructor.
 	 * 
 	 * @param configFilePath
-	 * @param registry
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
 		this.setConfiguration(config);
 		this.registry = registry;
+		System.out.println("Registry MDBAAS is : " + registry);
 		init();
 	}
-
+	
 	@Deprecated
 	public void setRegistry(IAASRegistry registry) {
 		this.registry = registry;
@@ -126,16 +127,17 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 	
 	/**
-	 * Receives the path of the .properties file from a resource and the registry in it's constructor.
-	 * 
-	 * @param Path of the configuration file
-	 * @param registry
+	 * Variant2
+	 * Receives the path of the .properties file in it's constructor from a resource.
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry) {
+		System.out.println("In Constructor");
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
+		System.out.println("Going to init");
 		this.registry = registry;
+		System.out.println("Registry is : " + registry);
 		init();
 	}
 
@@ -147,9 +149,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 	
 	/**
-	 * Constructor using default connections with registry as a parameter
-	 * 
-	 * @param registry
+	 * Variant 3
+	 * Constructor using default connections
 	 */
 	public MongoDBAASAggregator(IAASRegistry registry) {
 		this(DEFAULT_CONFIG_PATH, registry);
@@ -197,7 +198,9 @@ public class MongoDBAASAggregator implements IAASAggregator {
 			logger.info("Adding AAS from DB: " + aasId);
 			MongoDBAASAPI aasApi = new MongoDBAASAPI(config, aasId);
 			MultiSubmodelProvider provider = initMultiSubmodelProvider(aasApi);
+			System.out.println("provider : " + provider.getClass().hashCode());
 			addSubmodelsFromDB(provider, aas);
+			System.out.println("provider registry : " + provider.getValue("/aas/submodels/MongoDB/submodel/values"));
 			aasProviderMap.put(aas.getIdentification().getId(), provider);
 		}
 	}
@@ -318,6 +321,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		if (provider == null) {
 			throw new ResourceNotFoundException("AAS with Id " + aasId.getId() + " does not exist");
 		}
+		
+		System.out.println("provider : " + provider.getClass().hashCode());
 
 		return provider;
 	}
