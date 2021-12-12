@@ -19,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
+import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
@@ -44,6 +45,9 @@ import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.xml.sax.SAXException;
 import org.eclipse.basyx.aas.registration.memory.AASRegistry;
+import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
+import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
+
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -65,6 +69,24 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		resetMongoDBTestData();
 		
 		component = new AASServerComponent(contextConfig, aasConfig, mongoDBConfig);
+		registry = new AASRegistry(new MongoDBRegistryHandler("mongodb.properties"));
+//		registry.delete(new ModelUrn(aasId));
+		
+		System.out.println("Initial Registry status All: " + registry.lookupAll());
+		
+		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
+	
+		manager = new ConnectedAssetAdministrationShellManager(registry, connectorFactory);
+		
+		component.setRegistry(registry);
+		component.startComponent();
+	}
+	
+	public void setUpClass2() throws ParserConfigurationException, SAXException, IOException {
+		initConfiguration();
+//		resetMongoDBTestData();
+		
+//		component = new AASServerComponent(contextConfig, aasConfig, mongoDBConfig);
 		registry = new AASRegistry(new MongoDBRegistryHandler("mongodb.properties"));
 		
 		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
@@ -145,25 +167,69 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	
 	@Test
 	public void checkForMongoDBAASAggregatorRegistryIsNotNull() throws Exception {
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
+		createAssetAdministrationShell();
+		createSubmodel();
 		
-		assertEquals(false, aggregator.isRegistryNull());
+		System.out.println("After creating submodel and aas Registry status AAS : " +  registry.lookupAll());
+
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
+		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator);
+		
+		System.out.println("After restarting aas Registry status AAS : " +  registry.lookupAAS(new ModelUrn(aasId)));
+
+		assertEquals(SM_IDSHORT, persistentSubmodel.getIdShort());
+	}
+	
+	private void restartServer() {
+		component.stopComponent();
+		System.out.println("Start the server after stop");
+		component.startComponent();
+	}
+	
+	private void getMongoDBConfig() {
+		mongoDBConfig = new BaSyxMongoDBConfiguration();
+		mongoDBConfig.setAASCollection("basyxTestAAS");
+		mongoDBConfig.setSubmodelCollection("basyxTestSM");
 	}
 	
 	@Test
 	public void checkMongoDBAASAggregatorRegistryIsNull() throws Exception {
+		getMongoDBConfig();
+		
+		System.out.println("Registry status : " + registry);
+		
+//		setUpClass2();
+		
+		restartServer();
+		
+		System.out.println("After setup call registry status : " + registry.lookupAll());
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
-
-		assertEquals(true, aggregator.isRegistryNull());
+		System.out.println("1 isRegistry Null : " + aggregator.isRegistryNull());
+		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) getSubmodelFromAggregator2(aggregator);
+		
+		Object submodelObject = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
+		
+		System.out.println("shell =" + submodelObject);
 	}
 	
-	@Test
 	public void checkPersistencyOfAggregator() throws Exception {
-		createAssetAdministrationShell();
-		createSubmodel();
+//		createAssetAdministrationShell();
+//		createSubmodel();
+		
+		System.out.println("After creating submodel and aas Registry status AAS : " +  registry.lookupAll());
 
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
 		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator);
+		
+//		component.stopComponent();
+		
+		component = new AASServerComponent(contextConfig, aasConfig, mongoDBConfig);
+		component.startComponent();
+		
+		MongoDBAASAggregator aggregator2 = new MongoDBAASAggregator(mongoDBConfig, registry);
+		ISubmodel persistentSubmodel2 = getSubmodelFromAggregator(aggregator);
+		
+		System.out.println("After restarting aas Registry status AAS : " +  registry.lookupAAS(new ModelUrn(aasId)));
 
 		assertEquals(SM_IDSHORT, persistentSubmodel.getIdShort());
 	}
@@ -175,13 +241,24 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	
 	@SuppressWarnings("unchecked")
 	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator) {
-		IModelProvider aasProvider = aggregator.getAASProvider(new ModelUrn(aasId));
+		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(new ModelUrn(aasId));
 		
 		Object submodelObject = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
 		
 		ISubmodel persistentSubmodel = Submodel.createAsFacade((Map<String, Object>) submodelObject);
 		
+		aasProvider.removeProvider(SM_IDSHORT);
+		
 		return persistentSubmodel;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private IModelProvider getSubmodelFromAggregator2(MongoDBAASAggregator aggregator) {
+		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(new ModelUrn(aasId));
+		
+		aasProvider.removeProvider(SM_IDSHORT);
+		
+		return aasProvider;
 	}
 
 	private void createAssetAdministrationShell() {
@@ -201,7 +278,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	
 	@AfterClass
 	public static void tearDownClass() {
-		resetMongoDBTestData();
+//		resetMongoDBTestData();
 		component.stopComponent();
 	}
 }
