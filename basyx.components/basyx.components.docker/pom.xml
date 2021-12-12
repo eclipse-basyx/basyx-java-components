@@ -174,7 +174,7 @@
 	
 	<!--  Defines common dependencies for all docker components -->
 	<dependencies>
-	<!-- Depends on the components library -->
+		<!-- Depends on the components library -->
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>

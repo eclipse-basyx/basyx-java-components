@@ -11,14 +11,12 @@ package org.eclipse.basyx.components.aas.mongodb;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.eclipse.basyx.aas.aggregator.AASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
@@ -49,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -107,7 +104,18 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this.registry = registry;
 		init();
 	}
-
+	
+	/**
+	 * Sets the IAASRegistry instance.
+	 * 
+	 * @deprecated This method is deprecated due to a bug. 
+	 * Use constructors {@link #MongoDBAASAggregator(IAASRegistry) 
+	 * or #MongoDBAASAggregator(BaSyxMongoDBConfiguration, IAASRegistry) 
+	 * or #MongoDBAASAggregator(String, IAASRegistry) }
+	 * to set the IAASRegistry instance.
+	 * 
+	 * @param Asset Adminstration Shell's Registry
+	 */
 	@Deprecated
 	public void setRegistry(IAASRegistry registry) {
 		this.registry = registry;
@@ -320,9 +328,5 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		}
 
 		return provider;
-	}
-	
-	public boolean isRegistryNull() {
-		return this.registry == null;
 	}
 }

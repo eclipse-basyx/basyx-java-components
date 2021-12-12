@@ -341,7 +341,6 @@ public class AASServerComponent implements IComponent {
 			config = this.mongoDBConfig;
 		}
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
-		aggregator.setRegistry(registry);
 		return aggregator;
 	}
 }

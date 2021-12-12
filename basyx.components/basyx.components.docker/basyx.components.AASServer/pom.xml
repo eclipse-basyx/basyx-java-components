@@ -66,6 +66,7 @@
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.registry</artifactId>
 			<version>1.0.3</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	
