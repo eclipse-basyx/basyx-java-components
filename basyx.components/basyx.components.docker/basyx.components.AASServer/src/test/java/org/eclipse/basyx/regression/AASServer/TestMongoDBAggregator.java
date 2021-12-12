@@ -212,6 +212,26 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		System.out.println("shell =" + submodelObject);
 	}
 	
+	@Test
+	public void bugFixPassCase() throws Exception {
+		getMongoDBConfig();
+		
+		System.out.println("Registry status : " + registry);
+		
+//		setUpClass2();
+		
+		restartServer();
+		
+		System.out.println("After setup call registry status : " + registry.lookupAll());
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
+		System.out.println("1 isRegistry Null : " + aggregator.isRegistryNull());
+		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) getSubmodelFromAggregator2(aggregator);
+		
+		Object submodelObject = aasProvider.getValue("/aas/submodels/" + SM_IDSHORT + "/submodel");
+		
+		System.out.println("shell =" + submodelObject);
+	}
+	
 	public void checkPersistencyOfAggregator() throws Exception {
 //		createAssetAdministrationShell();
 //		createSubmodel();
