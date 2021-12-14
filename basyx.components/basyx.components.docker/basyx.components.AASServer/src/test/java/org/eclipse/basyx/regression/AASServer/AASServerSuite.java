@@ -34,7 +34,7 @@ public abstract class AASServerSuite {
 	protected IAASRegistry aasRegistry;
 	protected ConnectedAssetAdministrationShellManager manager;
 
-	protected String aasId = "testId";
+	protected String shellId = "testId";
 
 	protected abstract String getURL();
 
@@ -50,13 +50,19 @@ public abstract class AASServerSuite {
 
 	@Test
 	public void testAddAAS() throws Exception {
-		AssetAdministrationShell shell = new AssetAdministrationShell();
-		IIdentifier identifier = new ModelUrn(aasId);
-		shell.setIdentification(identifier);
-		shell.setIdShort("aasIdShort");
+		IIdentifier shellIdentifier = new ModelUrn(shellId);
+		AssetAdministrationShell shell = createShell("aasIdShort", new ModelUrn(shellId));
+
 		manager.createAAS(shell, getURL());
 
-		IAssetAdministrationShell remote = manager.retrieveAAS(identifier);
+		IAssetAdministrationShell remote = manager.retrieveAAS(shellIdentifier);
 		assertEquals(shell.getIdShort(), remote.getIdShort());
+	}
+
+	private AssetAdministrationShell createShell(String idShort, IIdentifier identifier) {
+		AssetAdministrationShell shell = new AssetAdministrationShell();
+		shell.setIdentification(identifier);
+		shell.setIdShort(idShort);
+		return shell;
 	}
 }

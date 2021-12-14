@@ -125,7 +125,6 @@ public class TestMongoDBServer extends AASServerSuite {
 		});
 		OperationProvider opProvider = new OperationProvider(new VABMapProvider(op));
 		
-		
 		ConnectorProviderStub connector = new ConnectorProviderStub();
 		connector.addMapping(OP_ID_SHORT, opProvider);
 		
@@ -140,7 +139,7 @@ public class TestMongoDBServer extends AASServerSuite {
 
 	@SuppressWarnings("unchecked")
 	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator) {
-		IModelProvider aasProvider = aggregator.getAASProvider(new ModelUrn(aasId));
+		IModelProvider aasProvider = aggregator.getAASProvider(new ModelUrn(shellId));
 		Object smObject = aasProvider.getValue("/aas/submodels/MongoDB/submodel");
 		ISubmodel persistentSM = Submodel.createAsFacade((Map<String, Object>) smObject);
 		return persistentSM;
@@ -153,12 +152,12 @@ public class TestMongoDBServer extends AASServerSuite {
 		delegateOp.setQualifiers(Arrays.asList(qualifier));
 		sm.addSubmodelElement(delegateOp);
 		
-		manager.createSubmodel(new ModelUrn(aasId), sm);
+		manager.createSubmodel(new ModelUrn(shellId), sm);
 	}
 
 	private void createAssetAdministrationShell() {
 		AssetAdministrationShell shell = new AssetAdministrationShell();
-		IIdentifier identifier = new ModelUrn(aasId);
+		IIdentifier identifier = new ModelUrn(shellId);
 		shell.setIdentification(identifier);
 		shell.setIdShort("aasIdShort");
 		manager.createAAS(shell, getURL());
