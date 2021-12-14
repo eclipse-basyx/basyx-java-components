@@ -61,7 +61,13 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>4.1.2</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.eclipse.basyx</groupId>
+			<artifactId>basyx.components.registry</artifactId>
+			<version>1.0.3</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	
 	<profiles>
