@@ -7,7 +7,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
@@ -72,8 +71,7 @@ public class TestAASServerWithInMemoryMqtt extends AASServerSuite {
 
 	@Test(expected = ResourceNotFoundException.class)
 	public void shellLifeCycle() {
-		IIdentifier shellIdentifier = new ModelUrn(shellId);
-		AssetAdministrationShell shell = createShell(shellId, shellIdentifier);
+		AssetAdministrationShell shell = createShell(shellIdentifier.getId(), shellIdentifier);
 
 		manager.createAAS(shell, getURL());
 		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);

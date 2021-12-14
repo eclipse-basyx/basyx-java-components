@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -34,8 +34,7 @@ public abstract class AASServerSuite {
 	protected IAASRegistry aasRegistry;
 	protected ConnectedAssetAdministrationShellManager manager;
 
-	protected String shellId = "testId";
-
+	protected IIdentifier shellIdentifier = new CustomId("testId");
 	protected abstract String getURL();
 
 	@Before
@@ -50,11 +49,8 @@ public abstract class AASServerSuite {
 
 	@Test
 	public void testAddAAS() throws Exception {
-		IIdentifier shellIdentifier = new ModelUrn(shellId);
-		AssetAdministrationShell shell = createShell("aasIdShort", new ModelUrn(shellId));
-
+		AssetAdministrationShell shell = createShell("aasIdShort", shellIdentifier);
 		manager.createAAS(shell, getURL());
-
 		IAssetAdministrationShell remote = manager.retrieveAAS(shellIdentifier);
 		assertEquals(shell.getIdShort(), remote.getIdShort());
 	}
