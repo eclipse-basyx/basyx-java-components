@@ -12,6 +12,7 @@ package org.eclipse.basyx.regression.AASServer;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +22,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPI;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
@@ -28,6 +30,7 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
@@ -82,10 +85,8 @@ public class TestMongoDBServer extends AASServerSuite {
 		createAssetAdministrationShell();
 		createSubmodel();
 
-		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(mongoDBConfig, SM_IDENTIFICATION.getId());
-		ISubmodel persistentSM = api.getSubmodel();
-
-		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
+		checkIfSubmodelHasBeenPersisted(SM_IDENTIFICATION);
+		checkSubmodelReferencesSize(1);
 	}
 
 	@Test
@@ -99,6 +100,27 @@ public class TestMongoDBServer extends AASServerSuite {
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
 	}
 
+	@Test
+	public void testDeleteSubmodelPersistency() {
+		createAssetAdministrationShell();
+		createSubmodel();
+
+		deleteSubmodel();
+		checkSubmodelReferencesSize(0);
+	}
+
+	private void checkIfSubmodelHasBeenPersisted(Identifier smIdentification) {
+		MongoDBSubmodelAPI smAPI = new MongoDBSubmodelAPI(mongoDBConfig, smIdentification.getId());
+		ISubmodel persistentSM = smAPI.getSubmodel();
+		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
+	}
+
+	private void checkSubmodelReferencesSize(int expectedSize) {
+		MongoDBAASAPI aasAPI = new MongoDBAASAPI(mongoDBConfig, aasId);
+		Collection<IReference> submodelReferences = aasAPI.getAAS().getSubmodelReferences();
+		assertEquals(expectedSize, submodelReferences.size());
+	}
+
 	@SuppressWarnings("unchecked")
 	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator) {
 		IModelProvider aasProvider = aggregator.getAASProvider(new ModelUrn(aasId));
@@ -110,6 +132,10 @@ public class TestMongoDBServer extends AASServerSuite {
 	private void createSubmodel() {
 		Submodel sm = new Submodel(SM_IDSHORT, SM_IDENTIFICATION);
 		manager.createSubmodel(new ModelUrn(aasId), sm);
+	}
+
+	private void deleteSubmodel() {
+		manager.deleteSubmodel(new ModelUrn(aasId), SM_IDENTIFICATION);
 	}
 
 	private void createAssetAdministrationShell() {

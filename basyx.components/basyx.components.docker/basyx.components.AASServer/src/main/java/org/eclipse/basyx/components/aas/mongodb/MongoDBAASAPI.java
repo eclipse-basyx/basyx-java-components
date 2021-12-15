@@ -157,6 +157,8 @@ public class MongoDBAASAPI implements IAASAPI {
 				break;
 			}
 		}
+		aas.setSubmodelReferences(smReferences);
+
 		// Update db entry
 		mongoOps.findAndReplace(hasId, aas, collection);
 	}
