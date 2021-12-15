@@ -96,7 +96,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives the path of the configuration.properties file and the registry in it's constructor.
 	 * 
-	 * @param configFilePath
+	 * @param config
 	 * @param registry
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
@@ -114,7 +114,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * or #MongoDBAASAggregator(String, IAASRegistry) }
 	 * to set the IAASRegistry instance.
 	 * 
-	 * @param Asset Adminstration Shell's Registry
+	 * @param registry Asset Adminstration Shell's Registry
 	 */
 	@Deprecated
 	public void setRegistry(IAASRegistry registry) {
@@ -124,7 +124,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives the path of the .properties file in it's constructor from a resource.
 	 * 
-	 * @param Path of the configuration file
+	 * @param resourceConfigPath Path of the configuration file
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath) {
 		config = new BaSyxMongoDBConfiguration();
@@ -136,7 +136,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives the path of the .properties file from a resource and the registry in it's constructor.
 	 * 
-	 * @param Path of the configuration file
+	 * @param resourceConfigPath Path of the configuration file
 	 * @param registry
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry) {
