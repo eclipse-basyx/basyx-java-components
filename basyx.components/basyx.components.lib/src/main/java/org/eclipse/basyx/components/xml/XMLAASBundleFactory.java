@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Creates multiple {@link AASBundle} from an XML containing several AAS and
- * Submodels <br />
+ * Submodels <br>
  * TODO: ConceptDescriptions
  * 
  * @author schnicke

@@ -37,7 +37,7 @@ public class ResultFilter {
 	/**
 	 * Extract a column from a SQL result set and return this column as set
 	 * 
-	 * @param result     SQL result
+	 * @param sqlResult     SQL result
 	 * @param columnName Name of column to extract
 	 */
 	public static Set<String> stringSet(ResultSet sqlResult, Object... columnName) {
@@ -59,7 +59,7 @@ public class ResultFilter {
 	/**
 	 * Extract a column from a SQL result set and return this column as collection
 	 * 
-	 * @param result     SQL result
+	 * @param sqlResult     SQL result
 	 * @param columnName Name of column to extract
 	 */
 	public static Object stringArray(ResultSet sqlResult, Object... columnName) {
@@ -81,8 +81,8 @@ public class ResultFilter {
 	/**
 	 * Return SQL result set as Map
 	 * 
-	 * @param result     SQL result
-	 * @param columnName Name of column to extract
+	 * @param sqlResult     SQL result
+	 * @param columnNames Name of column to extract
 	 */
 	public static Object mapArray(ResultSet sqlResult, Object... columnNames) {
 		// Create result
@@ -108,8 +108,8 @@ public class ResultFilter {
 	/**
 	 * Return SQL result set as List of Maps
 	 * 
-	 * @param result     SQL result
-	 * @param columnName Name of column to extract
+	 * @param sqlResult     SQL result
+	 * @param columnNames Name of column to extract
 	 */
 	public static Object listOfMaps(ResultSet sqlResult, Object... columnNames) {
 		// Create result
