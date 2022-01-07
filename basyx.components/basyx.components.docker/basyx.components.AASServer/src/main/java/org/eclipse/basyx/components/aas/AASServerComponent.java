@@ -262,7 +262,7 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator createMongoDBAggregatorBackend() {
 		logger.info("Using MongoDB backend");
 		if (this.mqttConfig != null) {
-			return decorateAggregator(createMongoDBAggregator());
+			return decorateAggregator(createMongoDbAggregatorWithMqttSubmodelAggregator());
 		}
 		return createMongoDBAggregator();
 	}
@@ -277,7 +277,7 @@ public class AASServerComponent implements IComponent {
 
 	private AASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
 		try {
-			return new AASAggregator(registry, mqttConfig.getServer(), getMqttClientId());
+			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error " + e.getMessage());
 		}
@@ -285,7 +285,7 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator decorateAggregator(IAASAggregator aggregator) {
 		try {
-			MqttAASAggregator mqttAggregator = new MqttAASAggregator(aggregator, mqttConfig.getServer(), getMqttClientId());
+			MqttAASAggregator mqttAggregator = new MqttAASAggregator(aggregator, mqttConfig.getServer(), getMqttAASClientId());
 			logger.info("Enable MQTT events for broker " + mqttConfig.getServer());
 			return mqttAggregator;
 		} catch (MqttException e) {
@@ -294,6 +294,24 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private IAASAggregator createMongoDBAggregator() {
+		BaSyxMongoDBConfiguration config = createMogoDbConfiguration();
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
+		aggregator.setRegistry(registry);
+		return aggregator;
+	}
+
+	private IAASAggregator createMongoDbAggregatorWithMqttSubmodelAggregator() {
+		BaSyxMongoDBConfiguration config = createMogoDbConfiguration();
+		try {
+			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId());
+			aggregator.setRegistry(registry);
+			return aggregator;
+		} catch (MqttException e) {
+			throw new ProviderException("moquette.conf Error " + e.getMessage());
+		}
+	}
+
+	private BaSyxMongoDBConfiguration createMogoDbConfiguration() {
 		BaSyxMongoDBConfiguration config;
 		if (this.mongoDBConfig == null) {
 			config = new BaSyxMongoDBConfiguration();
@@ -301,9 +319,7 @@ public class AASServerComponent implements IComponent {
 		} else {
 			config = this.mongoDBConfig;
 		}
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
-		aggregator.setRegistry(registry);
-		return aggregator;
+		return config;
 	}
 
 	private void loadAASFromSource(String aasSource) {
@@ -452,11 +468,14 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	private String getMqttClientId() {
+	private String getMqttAASClientId() {
 		if (aasBundles == null || aasBundles.isEmpty()) {
 			return "defaultNoShellId";
 		}
 		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
 	}
 
+	private String getMqttSubmodelClientId() {
+		return getMqttAASClientId() + "/submodelAggregator";
+	}
 }

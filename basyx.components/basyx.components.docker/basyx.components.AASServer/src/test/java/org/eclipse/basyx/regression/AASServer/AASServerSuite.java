@@ -17,7 +17,9 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.junit.Before;
@@ -34,7 +36,9 @@ public abstract class AASServerSuite {
 	protected IAASRegistry aasRegistry;
 	protected ConnectedAssetAdministrationShellManager manager;
 
-	protected IIdentifier shellIdentifier = new CustomId("testId");
+	protected IIdentifier shellIdentifier = new CustomId("shellId");
+	protected IIdentifier submodelIdentifier = new CustomId("submodelId");
+
 	protected abstract String getURL();
 
 	@Before
@@ -49,16 +53,37 @@ public abstract class AASServerSuite {
 
 	@Test
 	public void testAddAAS() throws Exception {
-		AssetAdministrationShell shell = createShell("aasIdShort", shellIdentifier);
+		AssetAdministrationShell shell = createShell(shellIdentifier.getId(), shellIdentifier);
 		manager.createAAS(shell, getURL());
+
 		IAssetAdministrationShell remote = manager.retrieveAAS(shellIdentifier);
 		assertEquals(shell.getIdShort(), remote.getIdShort());
 	}
 
-	private AssetAdministrationShell createShell(String idShort, IIdentifier identifier) {
+	@Test
+	public void testAddSubmodel() throws Exception {
+		IIdentifier shellIdentifierForSubmodel = new CustomId("shellSubmodelId");
+		AssetAdministrationShell shell = createShell(shellIdentifierForSubmodel.getId(), shellIdentifierForSubmodel);
+		manager.createAAS(shell, getURL());
+
+		Submodel submodel = createSubmodel(submodelIdentifier.getId(), submodelIdentifier);
+		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
+
+		ISubmodel remote = manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
+		assertEquals(submodel.getIdShort(), remote.getIdShort());
+	}
+
+	protected AssetAdministrationShell createShell(String idShort, IIdentifier identifier) {
 		AssetAdministrationShell shell = new AssetAdministrationShell();
 		shell.setIdentification(identifier);
 		shell.setIdShort(idShort);
 		return shell;
+	}
+
+	protected Submodel createSubmodel(String idShort, IIdentifier submodelIdentifier) {
+		Submodel submodel = new Submodel();
+		submodel.setIdentification(submodelIdentifier);
+		submodel.setIdShort(idShort);
+		return submodel;
 	}
 }
