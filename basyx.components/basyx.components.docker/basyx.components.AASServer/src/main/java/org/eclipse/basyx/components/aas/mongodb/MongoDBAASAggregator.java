@@ -29,6 +29,9 @@ import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
@@ -44,6 +47,7 @@ import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -86,17 +90,32 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected ISubmodelAPIFactory smApiProvider;
 
 	/**
+	 * Store SubmodelAggregator. By default, uses standard SubmodelAggregator
+	 */
+	protected ISubmodelAggregator submodelAggregator;
+
+	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
 	 * 
 	 * @param config
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
 		this.setConfiguration(config);
+		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		init();
 	}
 
-	public void setRegistry(IAASRegistry registry) {
-		this.registry = registry;
+	/**
+	 * Receives the path of the configuration.properties file in it's constructor.
+	 * 
+	 * @param config
+	 * @throws MqttException
+	 */
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) throws MqttException {
+		this.setConfiguration(config);
+		submodelAggregator = new SubmodelAggregator(smApiProvider);
+		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, serverEndpoint, clientId);
+		init();
 	}
 
 	/**
@@ -106,6 +125,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
+		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		init();
 	}
 
@@ -114,6 +134,10 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 */
 	public MongoDBAASAggregator() {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH);
+	}
+
+	public void setRegistry(IAASRegistry registry) {
+		this.registry = registry;
 	}
 
 	/**
@@ -157,22 +181,20 @@ public class MongoDBAASAggregator implements IAASAggregator {
 			String aasId = aas.getIdentification().getId();
 			logger.info("Adding AAS from DB: " + aasId);
 			MongoDBAASAPI aasApi = new MongoDBAASAPI(config, aasId);
-			MultiSubmodelProvider provider = initMultiSubmodelProvider(aasApi);
+			MultiSubmodelProvider provider = createMultiSubmodelProvider(aasApi);
 			addSubmodelsFromDB(provider, aas);
 			aasProviderMap.put(aas.getIdentification().getId(), provider);
 		}
 	}
 
+
 	/**
 	 * Initializes and returns a VABMultiSubmodelProvider with only the AssetAdministrationShell
 	 */
-	private MultiSubmodelProvider initMultiSubmodelProvider(IAASAPI aasApi) {
+	private MultiSubmodelProvider createMultiSubmodelProvider(IAASAPI aasApi) {
 		AASModelProvider aasProvider = new AASModelProvider(aasApi);
 		IConnectorFactory connProvider = new HTTPConnectorFactory();
-		MultiSubmodelProvider provider = new MultiSubmodelProvider(aasProvider, registry, connProvider,
-				smApiProvider, aasApiProvider);
-		provider.setAssetAdministrationShell(aasProvider);
-		return provider;
+		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, submodelAggregator);
 	}
 
 	/**
@@ -252,7 +274,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	@Override
 	public void createAAS(AssetAdministrationShell aas) {
 		IAASAPI aasApi = this.aasApiProvider.getAASApi(aas);
-		MultiSubmodelProvider provider = initMultiSubmodelProvider(aasApi);
+		MultiSubmodelProvider provider = createMultiSubmodelProvider(aasApi);
 		aasProviderMap.put(aas.getIdentification().getId(), provider);
 	}
 

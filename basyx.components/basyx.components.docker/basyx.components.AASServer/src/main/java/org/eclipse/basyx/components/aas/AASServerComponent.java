@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 package org.eclipse.basyx.components.aas;
@@ -64,7 +64,7 @@ import org.xml.sax.SAXException;
  * Component providing an empty AAS server that is able to receive AAS/SMs from
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
  * ${URL}/shells
- * 
+ *
  * @author schnicke, espen
  *
  */
@@ -117,7 +117,7 @@ public class AASServerComponent implements IComponent {
 	 * Sets and enables mqtt connection configuration for this component. Has to be
 	 * called before the component is started. Currently only works for InMemory
 	 * backend.
-	 * 
+	 *
 	 * @param configuration
 	 */
 	public void enableMQTT(BaSyxMqttConfiguration configuration) {
@@ -141,7 +141,7 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Sets a registry service for registering AAS that are created during startup
-	 * 
+	 *
 	 * @param registry
 	 */
 	public void setRegistry(IAASRegistry registry) {
@@ -180,7 +180,7 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Retrieves the URL on which the component is providing its HTTP server
-	 * 
+	 *
 	 * @return
 	 */
 	public String getURL() {
@@ -248,25 +248,6 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private IAASAggregator createAggregator() {
-		final IAASAggregator aggregatorBackend = createAggregatorBackend();
-		final IAASAggregator decoratedRegistry = decorate(aggregatorBackend);
-		return decoratedRegistry;
-	}
-
-	private IAASAggregator decorate(IAASAggregator aasAggregator) {
-		IAASAggregator decoratedAggregator = aasAggregator;
-		if (this.mqttConfig != null) {
-			try {
-				decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttClientId());
-			} catch (MqttException e) {
-				throw new ProviderException("moquette.conf Error" + e.getMessage());
-			}
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-		}
-		return decoratedAggregator;
-	}
-
-	private IAASAggregator createAggregatorBackend() {
 		final AASServerBackend backendType = aasConfig.getAASBackend();
 		switch (backendType) {
 		case MONGODB:
@@ -280,15 +261,57 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createMongoDBAggregatorBackend() {
 		logger.info("Using MongoDB backend");
+		if (this.mqttConfig != null) {
+			return decorateAggregator(createMongoDbAggregatorWithMqttSubmodelAggregator());
+		}
 		return createMongoDBAggregator();
 	}
 
 	private IAASAggregator createInMemoryAggregatorBackend() {
 		logger.info("Using InMemory backend");
+		if (this.mqttConfig != null) {
+			return decorateAggregator(createAASAggregatorWithMqttSubmodelAggregator());
+		}
 		return new AASAggregator(registry);
 	}
 
+	private AASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
+		try {
+			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
+		} catch (MqttException e) {
+			throw new ProviderException("moquette.conf Error " + e.getMessage());
+		}
+	}
+
+	private IAASAggregator decorateAggregator(IAASAggregator aggregator) {
+		try {
+			MqttAASAggregator mqttAggregator = new MqttAASAggregator(aggregator, mqttConfig.getServer(), getMqttAASClientId());
+			logger.info("Enable MQTT events for broker " + mqttConfig.getServer());
+			return mqttAggregator;
+		} catch (MqttException e) {
+			throw new ProviderException("moquette.conf Error " + e.getMessage());
+		}
+	}
+
 	private IAASAggregator createMongoDBAggregator() {
+		BaSyxMongoDBConfiguration config = createMogoDbConfiguration();
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
+		aggregator.setRegistry(registry);
+		return aggregator;
+	}
+
+	private IAASAggregator createMongoDbAggregatorWithMqttSubmodelAggregator() {
+		BaSyxMongoDBConfiguration config = createMogoDbConfiguration();
+		try {
+			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId());
+			aggregator.setRegistry(registry);
+			return aggregator;
+		} catch (MqttException e) {
+			throw new ProviderException("moquette.conf Error " + e.getMessage());
+		}
+	}
+
+	private BaSyxMongoDBConfiguration createMogoDbConfiguration() {
 		BaSyxMongoDBConfiguration config;
 		if (this.mongoDBConfig == null) {
 			config = new BaSyxMongoDBConfiguration();
@@ -296,9 +319,7 @@ public class AASServerComponent implements IComponent {
 		} else {
 			config = this.mongoDBConfig;
 		}
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
-		aggregator.setRegistry(registry);
-		return aggregator;
+		return config;
 	}
 
 	private void loadAASFromSource(String aasSource) {
@@ -447,11 +468,14 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	private String getMqttClientId() {
+	private String getMqttAASClientId() {
 		if (aasBundles == null || aasBundles.isEmpty()) {
 			return "defaultNoShellId";
 		}
 		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
 	}
 
+	private String getMqttSubmodelClientId() {
+		return getMqttAASClientId() + "/submodelAggregator";
+	}
 }
