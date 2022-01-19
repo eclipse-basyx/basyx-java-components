@@ -257,17 +257,27 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator decorate(IAASAggregator aasAggregator) {
 		IAASAggregator decoratedAggregator = aasAggregator;
 		if (this.mqttConfig != null) {
-			try {
-				decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttAASClientId());
-			} catch (MqttException e) {
-				throw new ProviderException("moquette.conf Error" + e.getMessage());
-			}
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+			decoratedAggregator = decorateWithMQTT(decoratedAggregator);
 		}
 		if (this.aasConfig.isAuthorizationEnabled()) {
-			logger.info("Enable Authorization for AASAggregator");
-			decoratedAggregator = new AuthorizedAASAggregator(decoratedAggregator);
+			decoratedAggregator = decorateWithAuthorization(decoratedAggregator);
 		}
+		return decoratedAggregator;
+	}
+
+	private IAASAggregator decorateWithAuthorization(IAASAggregator decoratedAggregator) {
+		decoratedAggregator = new AuthorizedAASAggregator(decoratedAggregator);
+		logger.info("Enable Authorization for AASAggregator");
+		return decoratedAggregator;
+	}
+
+	private IAASAggregator decorateWithMQTT(IAASAggregator decoratedAggregator) {
+		try {
+			decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttAASClientId());
+		} catch (MqttException e) {
+			throw new ProviderException("moquette.conf Error" + e.getMessage());
+		}
+		logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 		return decoratedAggregator;
 	}
 
