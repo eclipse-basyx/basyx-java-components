@@ -1,10 +1,15 @@
 # Add java runtime environment for execution
 FROM alpine
 
-RUN apk update && apk add openjdk8
+RUN apk update && apk add openjdk8 && apk add bash && apk add jq
 
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
+COPY wait-for-it.sh /
+RUN ["chmod", "+x", "/wait-for-it.sh"]
+COPY wait-for-it-env.sh /
+RUN ["chmod", "+x", "/wait-for-it-env.sh"]
+
 COPY target/${JAR_FILE} /usr/share/basyxExecutable.jar
 COPY target/lib /usr/share/lib
 COPY src/main/resources/aas.properties /usr/share/config/aas.properties
@@ -28,4 +33,4 @@ ARG MONGODB_CONFIG_KEY
 ENV ${MONGODB_CONFIG_KEY} "/usr/share/config/mongodb.properties"
 
 # Start the jar
-CMD java -jar "/usr/share/basyxExecutable.jar"
+CMD ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"
