@@ -255,13 +255,21 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator decorate(IAASAggregator aasAggregator) {
 		IAASAggregator decoratedAggregator = aasAggregator;
-		if (this.mqttConfig != null) {
+		if (shouldDecorateWithMQTT()) {
 			decoratedAggregator = decorateWithMQTT(decoratedAggregator);
 		}
-		if (this.aasConfig.isAuthorizationEnabled()) {
+		if (shouldDecoreateWithAuthorization()) {
 			decoratedAggregator = decorateWithAuthorization(decoratedAggregator);
 		}
 		return decoratedAggregator;
+	}
+
+	private boolean shouldDecoreateWithAuthorization() {
+		return this.aasConfig.isAuthorizationEnabled();
+	}
+
+	private boolean shouldDecorateWithMQTT() {
+		return this.mqttConfig != null;
 	}
 
 	private IAASAggregator decorateWithAuthorization(IAASAggregator decoratedAggregator) {
@@ -294,7 +302,7 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createMongoDBAggregatorBackend() {
 		logger.info("Using MongoDB backend");
-		if (this.mqttConfig != null) {
+		if (shouldDecorateWithMQTT()) {
 			return createMongoDbAggregatorWithMqttSubmodelAggregator();
 		}
 		return createMongoDBAggregator();
@@ -302,13 +310,13 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createInMemoryAggregatorBackend() {
 		logger.info("Using InMemory backend");
-		if (this.mqttConfig != null) {
+		if (shouldDecorateWithMQTT()) {
 			return createAASAggregatorWithMqttSubmodelAggregator();
 		}
 		return new AASAggregator(registry);
 	}
 
-	private AASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
+	private IAASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
 		try {
 			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
 		} catch (MqttException e) {
