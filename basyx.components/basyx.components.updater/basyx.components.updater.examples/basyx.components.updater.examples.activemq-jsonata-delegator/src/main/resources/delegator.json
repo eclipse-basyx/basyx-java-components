@@ -1,0 +1,14 @@
+[
+	{
+		"uniqueId": "DelegatorA",
+		"host": "localhost",
+		"path": "/valueA",
+		"port": 8090
+	},
+	{
+		"uniqueId": "DelegatorB",
+		"host": "localhost",
+		"path": "/valueB",
+		"port": 8091
+	}
+]

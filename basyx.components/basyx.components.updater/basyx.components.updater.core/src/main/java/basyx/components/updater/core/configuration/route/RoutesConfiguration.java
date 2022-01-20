@@ -19,6 +19,7 @@ import java.util.Map;
 import basyx.components.updater.core.configuration.DataSinkConfiguration;
 import basyx.components.updater.core.configuration.DataSourceConfiguration;
 import basyx.components.updater.core.configuration.DataTransformerConfiguration;
+import basyx.components.updater.core.configuration.DelegatorConfiguration;
 
 /**
  * An implementation of configurations of all the routes 
@@ -30,17 +31,35 @@ public class RoutesConfiguration {
 	private Map<String, DataSourceConfiguration> datasources = new HashMap<>();
 	private Map<String, DataTransformerConfiguration> transformers = new HashMap<>();
 	private Map<String, DataSinkConfiguration> datasinks = new HashMap<>();
+	private Map<String, DelegatorConfiguration> delegators = new HashMap<>();
 	private List<RouteConfiguration> routes = new ArrayList<>();
 
 	public RoutesConfiguration() {}
 
-	public RoutesConfiguration(List<DataSourceConfiguration> datasources,
-			List<DataTransformerConfiguration> transformers, List<DataSinkConfiguration> datasinks,
+	public RoutesConfiguration(
+			List<DataSourceConfiguration> datasources,
+			List<DataTransformerConfiguration> transformers,
+			List<DataSinkConfiguration> datasinks,
+			List<DelegatorConfiguration> delegators,
 			List<RouteConfiguration> routes) {
 		addDatasources(datasources);
 		addTransformers(transformers);
 		addDatasinks(datasinks);
 		addRoutes(routes);
+		addDelegators(delegators);
+	}
+	
+	public RoutesConfiguration(
+			Map<String, DataSourceConfiguration> datasources,
+			Map<String, DataTransformerConfiguration> transformers,
+			Map<String, DataSinkConfiguration> datasinks,
+			Map<String, DelegatorConfiguration> delegators,
+			List<RouteConfiguration> routes) {
+		setDatasources(datasources);
+		setTransformers(transformers);
+		setDatasinks(datasinks);
+		addRoutes(routes);
+		setDelegators(delegators);
 	}
 
 	public Map<String, DataSourceConfiguration> getDatasources() {
@@ -95,6 +114,24 @@ public class RoutesConfiguration {
 
 	public void addDatasink(DataSinkConfiguration datasink) {
 		this.datasinks.put(datasink.getUniqueId(), datasink);
+	}
+	
+	public Map<String, DelegatorConfiguration> getDelegators() {
+		return delegators;
+	}
+
+	public void setDelegators(Map<String, DelegatorConfiguration> delegators) {
+		this.delegators = delegators;
+	}
+
+	public void addDelegators(List<DelegatorConfiguration> delegators) {
+		for (DelegatorConfiguration delegator : delegators) {
+			addDelegator(delegator);
+		}
+	}
+
+	public void addDelegator(DelegatorConfiguration delegator) {
+		this.delegators.put(delegator.getUniqueId(), delegator);
 	}
 
 	public List<RouteConfiguration> getRoutes() {

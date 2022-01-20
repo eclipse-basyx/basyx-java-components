@@ -33,7 +33,7 @@ Then include in your pom.xml-
 
 This will include all the core logics in your project. To run the updater, there is an UpdaterComponent class which expects a RoutesConfiguration. Using the RoutesConfiguration the UpdaterComponent starts the updater with the capability to start multiple routes based on the configurations.
 
-Each route can right now can have a single data source, multiple data transformer in a pipeline fashion and multiple data sinks.
+Each route can right now can have a single data source, multiple data transformer in a pipeline fashion and multiple data sinks and/or also a delegator to expose the route via an Http API.
 
 To provide the connection of each routes, a json file must be given which will look like this-
 
@@ -47,7 +47,8 @@ To provide the connection of each routes, a json file must be given which will l
 	{
 		"datasource": "property2",
 		"transformers": ["jsonataB"],
-		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"]
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"],
+		"delegator": "delegatorA"
 	}
 ]
 ```
@@ -58,7 +59,33 @@ DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfiguration
 configuration.addRoutes(routesFactory.getRouteConfigurations());
 ```
 
+To extend delegator configurations is to use DefaultDelegatorsConfigurationFactory which have 2 constructors. one constructor will collect the delegator configuration from a default path **delegator.json**. But there is another constructor where the location of the json can be sent as a parameter. The following code can be run to load the delegator configurations-
 
+```
+DefaultDelegatorsConfigurationFactory delegatorConfigFactory = new DefaultDelegatorsConfigurationFactory(loader);
+configuration.addDelegators(delegatorConfigFactory.getDelegatorConfigurations());
+```
+
+Delegators can be configured by json files like below-
+
+```
+[
+	{
+		"uniqueId": "DelegatorA",
+		"host": "localhost",
+		"path": "/valueA",
+		"port": 8090
+	},
+	{
+		"uniqueId": "DelegatorB",
+		"host": "localhost",
+		"path": "/valueB",
+		"port": 8091
+	}
+]
+```
+
+If a route contains a delegator, then the route will not be started right away. The delegator will expose an API endpoint based on the delegator configurations and upon receiving a request, it will start the route, receive one message, stop the route again and return the retrieved message as a response.
 
 
 #### basyx.components.updater.camel-aas
@@ -357,7 +384,85 @@ updater.startComponent();
 
 Then the updater will run with the routes from the configurations.
 
-In the **basyx.components.updater.examples** there are many integration examples between kafka, activemq, paho, aas internal, jsonata etc. Take a look at them.
+### An integration example between ActiveMQ, Jsonata and AAS with a delegator route and one normal route
+
+Include the core, jsonata, activeMQ and aas component to the project-
+```
+<dependency>
+	<groupId>org.eclipse.basyx</groupId>
+	<artifactId>basyx.components.updater.core</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
+		
+<dependency>
+	<groupId>org.eclipse.basyx</groupId>
+	<artifactId>basyx.components.updater.camel-activemq</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
+
+<dependency>
+	<groupId>org.eclipse.basyx</groupId>
+	<artifactId>basyx.components.updater.camel-aas</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
+
+<dependency>
+	<groupId>org.eclipse.basyx</groupId>
+	<artifactId>basyx.components.updater.transformer.camel-jsonata</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+routes.json has one delegated route and one normal routes like given below- 
+```
+[
+	{
+		"datasource": "property1",
+		"transformers": ["jsonataA"],
+		"datasinks": [],
+		"delegator": "DelegatorA"
+	},
+	{
+		"datasource": "property2",
+		"transformers": ["jsonataB"],
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"]
+	}
+]
+```
+
+After providing all necessary json configuration files for activemq, jsonata, delegator and aas, the following code can load the configurations and run the updater-
+
+```
+        ClassLoader loader = TestAASUpdater.class.getClassLoader();
+		RoutesConfiguration configuration = new RoutesConfiguration();
+
+		// Extend configutation for connections
+		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.getRouteConfigurations());
+
+		// Extend configutation for Kafka Source
+		ActiveMQDefaultConfigurationFactory activeMQConfigFactory = new ActiveMQDefaultConfigurationFactory(loader);
+		configuration.addDatasources(activeMQConfigFactory.getDataSourceConfigurations());
+
+		// Extend configuration for AAS
+		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
+		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
+
+		// Extend configuration for Delegator
+		DefaultDelegatorsConfigurationFactory delegatorConfigFactory = new DefaultDelegatorsConfigurationFactory(loader);
+		configuration.addDelegators(delegatorConfigFactory.getDelegatorConfigurations());
+
+		// Extend configuration for Jsonata
+		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
+		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+
+		updater = new UpdaterComponent(configuration);
+		updater.startComponent();
+
+```
+
+
+In the **basyx.components.updater.examples** there are many integration examples between kafka, activemq, paho, aas internal, jsonata, delegator routes etc. Take a look at them.
 
 
 #### Example
