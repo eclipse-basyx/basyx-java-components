@@ -250,8 +250,7 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createAggregator() {
 		final IAASAggregator aggregatorBackend = createAggregatorBackend();
-		final IAASAggregator decoratedRegistry = decorate(aggregatorBackend);
-		return decoratedRegistry;
+		return decorate(aggregatorBackend);
 	}
 
 	private IAASAggregator decorate(IAASAggregator aasAggregator) {
@@ -296,7 +295,7 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator createMongoDBAggregatorBackend() {
 		logger.info("Using MongoDB backend");
 		if (this.mqttConfig != null) {
-			return decorateAggregator(createMongoDbAggregatorWithMqttSubmodelAggregator());
+			return createMongoDbAggregatorWithMqttSubmodelAggregator();
 		}
 		return createMongoDBAggregator();
 	}
@@ -304,7 +303,7 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator createInMemoryAggregatorBackend() {
 		logger.info("Using InMemory backend");
 		if (this.mqttConfig != null) {
-			return decorateAggregator(createAASAggregatorWithMqttSubmodelAggregator());
+			return createAASAggregatorWithMqttSubmodelAggregator();
 		}
 		return new AASAggregator(registry);
 	}
@@ -312,16 +311,6 @@ public class AASServerComponent implements IComponent {
 	private AASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
 		try {
 			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error " + e.getMessage());
-		}
-	}
-
-	private IAASAggregator decorateAggregator(IAASAggregator aggregator) {
-		try {
-			MqttAASAggregator mqttAggregator = new MqttAASAggregator(aggregator, mqttConfig.getServer(), getMqttAASClientId());
-			logger.info("Enable MQTT events for broker " + mqttConfig.getServer());
-			return mqttAggregator;
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error " + e.getMessage());
 		}
