@@ -47,6 +47,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
+import org.eclipse.basyx.extensions.aas.aggregator.authorization.AuthorizedAASAggregator;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -248,6 +249,46 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private IAASAggregator createAggregator() {
+		final IAASAggregator aggregatorBackend = createAggregatorBackend();
+		return decorate(aggregatorBackend);
+	}
+
+	private IAASAggregator decorate(IAASAggregator aasAggregator) {
+		IAASAggregator decoratedAggregator = aasAggregator;
+		if (shouldDecorateWithMQTT()) {
+			decoratedAggregator = decorateWithMQTT(decoratedAggregator);
+		}
+		if (shouldDecoreateWithAuthorization()) {
+			decoratedAggregator = decorateWithAuthorization(decoratedAggregator);
+		}
+		return decoratedAggregator;
+	}
+
+	private boolean shouldDecoreateWithAuthorization() {
+		return this.aasConfig.isAuthorizationEnabled();
+	}
+
+	private boolean shouldDecorateWithMQTT() {
+		return this.mqttConfig != null;
+	}
+
+	private IAASAggregator decorateWithAuthorization(IAASAggregator decoratedAggregator) {
+		decoratedAggregator = new AuthorizedAASAggregator(decoratedAggregator);
+		logger.info("Enable Authorization for AASAggregator");
+		return decoratedAggregator;
+	}
+
+	private IAASAggregator decorateWithMQTT(IAASAggregator decoratedAggregator) {
+		try {
+			decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttAASClientId());
+		} catch (MqttException e) {
+			throw new ProviderException("moquette.conf Error" + e.getMessage());
+		}
+		logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+		return decoratedAggregator;
+	}
+
+	private IAASAggregator createAggregatorBackend() {
 		final AASServerBackend backendType = aasConfig.getAASBackend();
 		switch (backendType) {
 		case MONGODB:
@@ -261,21 +302,21 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createMongoDBAggregatorBackend() {
 		logger.info("Using MongoDB backend");
-		if (this.mqttConfig != null) {
-			return decorateAggregator(createMongoDbAggregatorWithMqttSubmodelAggregator());
+		if (shouldDecorateWithMQTT()) {
+			return createMongoDbAggregatorWithMqttSubmodelAggregator();
 		}
 		return createMongoDBAggregator();
 	}
 
 	private IAASAggregator createInMemoryAggregatorBackend() {
 		logger.info("Using InMemory backend");
-		if (this.mqttConfig != null) {
-			return decorateAggregator(createAASAggregatorWithMqttSubmodelAggregator());
+		if (shouldDecorateWithMQTT()) {
+			return createAASAggregatorWithMqttSubmodelAggregator();
 		}
 		return new AASAggregator(registry);
 	}
 
-	private AASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
+	private IAASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
 		try {
 			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
 		} catch (MqttException e) {
@@ -283,25 +324,15 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	private IAASAggregator decorateAggregator(IAASAggregator aggregator) {
-		try {
-			MqttAASAggregator mqttAggregator = new MqttAASAggregator(aggregator, mqttConfig.getServer(), getMqttAASClientId());
-			logger.info("Enable MQTT events for broker " + mqttConfig.getServer());
-			return mqttAggregator;
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error " + e.getMessage());
-		}
-	}
-
 	private IAASAggregator createMongoDBAggregator() {
-		BaSyxMongoDBConfiguration config = createMogoDbConfiguration();
+		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config);
 		aggregator.setRegistry(registry);
 		return aggregator;
 	}
 
 	private IAASAggregator createMongoDbAggregatorWithMqttSubmodelAggregator() {
-		BaSyxMongoDBConfiguration config = createMogoDbConfiguration();
+		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
 		try {
 			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId());
 			aggregator.setRegistry(registry);
@@ -311,7 +342,7 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	private BaSyxMongoDBConfiguration createMogoDbConfiguration() {
+	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {
 		BaSyxMongoDBConfiguration config;
 		if (this.mongoDBConfig == null) {
 			config = new BaSyxMongoDBConfiguration();

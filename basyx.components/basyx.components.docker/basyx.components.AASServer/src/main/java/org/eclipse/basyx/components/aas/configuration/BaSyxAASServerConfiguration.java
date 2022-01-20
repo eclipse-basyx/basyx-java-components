@@ -37,6 +37,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_REGISTRY = "";
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
 	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
+	public static final String DEFAULT_AUTHORIZATION_ENABLED = "false";
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -46,6 +47,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String SOURCE = "aas.source";
 	public static final String EVENTS = "aas.events";
 	public static final String AASX_UPLOAD = "aas.aasxUpload";
+	public static final String AUTHORIZATION_ENABLED = "aas.authorizationEnabled";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -62,6 +64,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(SUBMODELS, DEFAULT_SUBMODELS);
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
+		defaultProps.put(AUTHORIZATION_ENABLED, DEFAULT_AUTHORIZATION_ENABLED);
 		return defaultProps;
 	}
 
@@ -90,11 +93,11 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	 * Constructor with initial configuration values
 	 * 
 	 * @param backend
-	 *                    The backend for the AASServer
+	 *            The backend for the AASServer
 	 * @param source
-	 *                    The file source for the AASServer (e.g. an .aasx file)
+	 *            The file source for the AASServer (e.g. an .aasx file)
 	 * @param registryUrl
-	 *                    The url to the registry
+	 *            The url to the registry
 	 */
 	public BaSyxAASServerConfiguration(AASServerBackend backend, String source, String registryUrl) {
 		this(backend, source);
@@ -127,7 +130,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD };
+		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION_ENABLED };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -151,7 +154,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public void setAASEvents(AASEventBackend events) {
 		setProperty(EVENTS, events.toString());
 	}
-	
+
 	public AASXUploadBackend getAASXUpload() {
 		return AASXUploadBackend.fromString(getProperty(AASX_UPLOAD));
 	}
@@ -204,5 +207,13 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	private String serializeSubmodels(List<String> submodels) {
 		return new Gson().toJson(submodels);
+	}
+
+	public boolean isAuthorizationEnabled() {
+		return Boolean.parseBoolean(getProperty(AUTHORIZATION_ENABLED));
+	}
+
+	public void setAuthorizationEnabled(boolean authorizationEnabled) {
+		setProperty(AUTHORIZATION_ENABLED, Boolean.toString(authorizationEnabled));
 	}
 }
