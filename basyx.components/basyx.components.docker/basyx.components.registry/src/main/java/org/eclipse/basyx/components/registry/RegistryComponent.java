@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2022 the Eclipse BaSyx Authors
  * 
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.basyx.components.registry;
 
 import javax.servlet.http.HttpServlet;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.components.IComponent;
@@ -23,7 +24,9 @@ import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
+import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
+import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
@@ -124,7 +127,7 @@ public class RegistryComponent implements IComponent {
 
 	/**
 	 * Sets and enables mqtt connection configuration for this component. Has to be
-	 * called before the component is started. backend.
+	 * called before the component is started.
 	 * 
 	 * @param configuration
 	 */
@@ -163,7 +166,30 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private HttpServlet createRegistryServlet() {
+		if (this.registryConfig.isTaggedDirectoryEnabled()) {
+			logger.info("enable tagged directory functionality");
+			return new TaggedDirectoryServlet(createTaggedDirectory());
+		}
 		return new RegistryServlet(createRegistry());
+	}
+
+	private MapTaggedDirectory createTaggedDirectory() {
+		throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory();
+		return new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+	}
+
+	private void throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory() {
+		if (registryConfig.getRegistryBackend().equals(RegistryBackend.SQL)
+			|| registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB)
+			|| this.mqttConfig != null
+			|| this.registryConfig.isAuthorizationEnabled())
+		{
+			throw new RuntimeException("The current version does not support this configuration.\n"
+					+ "\t* Persistent backends (SQL, MongoDB)\n"
+					+ "\t* Authorization\n"
+					+ "\t* or MQTT eventing\n"
+					+ "are currently not supported in combination with tagged directory functionality.");
+		}
 	}
 
 	private IAASRegistry createRegistry() {
