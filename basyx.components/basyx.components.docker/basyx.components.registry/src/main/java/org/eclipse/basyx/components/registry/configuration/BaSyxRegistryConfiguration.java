@@ -34,6 +34,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	public static final String BACKEND = "registry.backend";
 	public static final String EVENTS = "registry.events";
 	public static final String AUTHORIZATION_ENABLED = "registry.authorizationEnabled";
+	private static final String TAGGED_DIRECTORY_ENABLED = "registry.taggedDirectoryEnabled";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "registry.properties";
@@ -93,5 +94,13 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 
 	public void setAuthorizationEnabled(boolean authorizationEnabled) {
 		setProperty(AUTHORIZATION_ENABLED, Boolean.toString(authorizationEnabled));
+	}
+
+	public boolean isTaggedDirectoryEnabled() {
+		return Boolean.parseBoolean(getProperty(TAGGED_DIRECTORY_ENABLED));
+	}
+
+	public void setTaggedDirectoryEnabled(boolean taggedDirectoryEnabled) {
+		setProperty(TAGGED_DIRECTORY_ENABLED, Boolean.toString(taggedDirectoryEnabled));
 	}
 }
