@@ -21,63 +21,55 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestTaggedDirectoryRaw {
-	private static BaSyxContextConfiguration contectConfig;
-	private static BaSyxRegistryConfiguration registryCongig;
+	private static BaSyxContextConfiguration contextConfig;
+	private static BaSyxRegistryConfiguration registryConfig;
 
 	protected static AASRegistryProxy aasRegistryProxy;
 
 	@BeforeClass
 	public static void setUpClass() {
-		contectConfig = new BaSyxContextConfiguration();
-		registryCongig = new BaSyxRegistryConfiguration();
-		registryCongig.setTaggedDirectoryEnabled(true);
+		contextConfig = new BaSyxContextConfiguration();
+		registryConfig = new BaSyxRegistryConfiguration();
+		registryConfig.setTaggedDirectoryEnabled(true);
 	}
 
 	@Test
 	public void directedDirectoryWithMqtt() {
 		try {
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contectConfig, registryCongig);
+			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.enableMQTT(new BaSyxMqttConfiguration());
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException e) {
-			// expected
-		}
+		} catch (RuntimeException expected) {}
 	}
 
 	@Test
 	public void directedDirectoryWithAuthorization() {
 		try {
-			registryCongig.setAuthorizationEnabled(true);
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contectConfig, registryCongig);
+			registryConfig.setAuthorizationEnabled(true);
+			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException e) {
-			// expected
-		}
+		} catch (RuntimeException expected) {}
 	}
 
 	@Test
 	public void directedDirectoryWithMongoDb() {
 		try {
-			registryCongig.setRegistryBackend(RegistryBackend.MONGODB);
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contectConfig, registryCongig);
+			registryConfig.setRegistryBackend(RegistryBackend.MONGODB);
+			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException e) {
-			// expected
-		}
+		} catch (RuntimeException expected) {}
 	}
 
 	@Test
 	public void directedDirectoryWithSQL() {
 		try {
-			registryCongig.setRegistryBackend(RegistryBackend.SQL);
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contectConfig, registryCongig);
+			registryConfig.setRegistryBackend(RegistryBackend.SQL);
+			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException e) {
-			// expected
-		}
+		} catch (RuntimeException expected) {}
 	}
 }

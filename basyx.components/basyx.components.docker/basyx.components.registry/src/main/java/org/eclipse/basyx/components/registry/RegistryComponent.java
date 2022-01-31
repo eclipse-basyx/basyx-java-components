@@ -179,10 +179,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private void throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory() {
-		if (registryConfig.getRegistryBackend().equals(RegistryBackend.SQL)
-			|| registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB)
-			|| this.mqttConfig != null
-			|| this.registryConfig.isAuthorizationEnabled())
+		if (!isConfigurationSuitableForTaggedDirectory())
 		{
 			throw new RuntimeException("The current version does not support this configuration.\n"
 					+ "\t* Persistent backends (SQL, MongoDB)\n"
@@ -242,6 +239,13 @@ public class RegistryComponent implements IComponent {
 		return decoratedRegistry;
 	}
 
+	private boolean isConfigurationSuitableForTaggedDirectory() {
+		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) 
+				|| registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB) 
+				|| registryConfig.isAuthorizationEnabled()
+				|| mqttConfig != null);
+	}
+	
 	@Override
 	public void stopComponent() {
 		server.shutdown();
