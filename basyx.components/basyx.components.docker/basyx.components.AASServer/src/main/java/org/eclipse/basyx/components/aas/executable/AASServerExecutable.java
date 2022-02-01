@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * They are made available at
  * <i>localhost:4000/aasServer/shells/${aasId}/aas</i>. Submodels are available
  * at
- * <i>localhost:4000/aasServer/shells/${aasId}/submodels/${submodelId}/submodel</i><br>
+ * <i>localhost:4000/aasServer/shells/${aasId}/aas/submodels/${submodelId}/submodel</i><br>
  *
  * @author schnicke, espen
  */

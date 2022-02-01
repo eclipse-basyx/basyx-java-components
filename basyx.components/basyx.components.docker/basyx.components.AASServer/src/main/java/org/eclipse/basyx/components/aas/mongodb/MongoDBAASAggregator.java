@@ -180,6 +180,19 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, registry);
 	}
 
+	/**
+	 * Sets the IAASRegistry instance.
+	 *
+	 * @deprecated This method is deprecated due to a bug. Use constructors
+	 *             {@link #MongoDBAASAggregator(IAASRegistry) or
+	 *             #MongoDBAASAggregator(BaSyxMongoDBConfiguration, IAASRegistry) or
+	 *             #MongoDBAASAggregator(String, IAASRegistry) } to set the
+	 *             IAASRegistry instance.
+	 *
+	 * @param registry
+	 *            Asset Adminstration Shell's Registry
+	 */
+	@Deprecated
 	public void setRegistry(IAASRegistry registry) {
 		this.registry = registry;
 	}
