@@ -121,15 +121,22 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
-	 *
+	 * 
 	 * @param config
+	 * @param serverEndpoint
+	 * @param clientId
 	 * @throws MqttException
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) throws MqttException {
+		createMQTTSubmodelAggregator(config, serverEndpoint, clientId);
+		init();
+	}
+
+	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId)
+			throws MqttException {
 		this.setConfiguration(config);
 		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, serverEndpoint, clientId);
-		init();
 	}
 
 	/**
@@ -178,6 +185,22 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 */
 	public MongoDBAASAggregator(IAASRegistry registry) {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, registry);
+	}
+
+	/**
+	 * Receives the path of the configuration.properties file in it's constructor.
+	 * 
+	 * @param config
+	 * @param serverEndpoint
+	 * @param clientId
+	 * @param registry
+	 * @throws MqttException
+	 */
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId,
+			IAASRegistry registry) throws MqttException {
+		this.registry = registry;
+		createMQTTSubmodelAggregator(config, serverEndpoint, clientId);
+		init();
 	}
 
 	/**
