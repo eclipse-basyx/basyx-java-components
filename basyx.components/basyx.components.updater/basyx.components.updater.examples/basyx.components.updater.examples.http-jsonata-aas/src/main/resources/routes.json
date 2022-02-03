@@ -1,7 +1,6 @@
 [
 	{
-		"datasource": "httpsource",
-		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"],
-      	"timer": "timer1"
+		"datasource": "timer1",
+		"datasinks": ["httpsource" ,"ConnectedSubmodel/ConnectedPropertyA"]
 	}
 ]

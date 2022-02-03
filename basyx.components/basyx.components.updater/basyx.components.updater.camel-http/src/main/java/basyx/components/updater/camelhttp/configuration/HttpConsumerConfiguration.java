@@ -11,20 +11,41 @@
 
 package basyx.components.updater.camelhttp.configuration;
 
+import basyx.components.updater.core.configuration.DataSinkConfiguration;
 import basyx.components.updater.core.configuration.DataSourceConfiguration;
 /**
  * An implementation of http consumer configuration
  * @author n14s
  *
  */
-public class HttpConsumerConfiguration extends DataSourceConfiguration {
+public class HttpConsumerConfiguration extends DataSinkConfiguration {
+    private String serverUrl;
+    private int serverPort;
     private String query;
 
 	public HttpConsumerConfiguration() {}
 	
 	public HttpConsumerConfiguration(String uniqueId, String serverUrl, int serverPort, String query) {
-		super(uniqueId, serverUrl, serverPort);
+		super(uniqueId);
+		this.serverUrl = serverUrl;
+		this.serverPort = serverPort;
 		this.query= query;
+	}
+
+	public String getServerUrl() {
+		return serverUrl;
+	}
+
+	public void setServerUrl(String serverUrl) {
+		this.serverUrl = serverUrl;
+	}
+
+	public int getServerPort() {
+		return serverPort;
+	}
+
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
 	}
 
 	public String getQuery() {
@@ -34,7 +55,6 @@ public class HttpConsumerConfiguration extends DataSourceConfiguration {
 	public void setQuery(String query) {
 		this.query = query;
 	}
-
 
 	public String getConnectionURI() {
 		return getServerUrl();

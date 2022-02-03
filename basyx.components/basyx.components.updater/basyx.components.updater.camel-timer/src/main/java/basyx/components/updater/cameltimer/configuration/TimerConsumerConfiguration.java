@@ -33,7 +33,7 @@ public class TimerConsumerConfiguration extends DataSourceConfiguration {
 	}
 
 	public String getConnectionURI() {
-		return "timer://foo?fixedRate" + getFixedRate()
+		return "timer://foo?fixedRate=" + getFixedRate()
 				+ "&delay=" + getDelay()
 				+ "&period=" + getPeriod();
 	}

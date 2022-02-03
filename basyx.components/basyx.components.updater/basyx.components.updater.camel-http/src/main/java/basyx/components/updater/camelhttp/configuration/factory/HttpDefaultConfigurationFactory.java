@@ -1,6 +1,7 @@
 package basyx.components.updater.camelhttp.configuration.factory;
 
 import basyx.components.updater.camelhttp.configuration.HttpConsumerConfiguration;
+import basyx.components.updater.core.configuration.factory.DataSinkConfigurationFactory;
 import basyx.components.updater.core.configuration.factory.DataSourceConfigurationFactory;
 
 /**
@@ -8,7 +9,7 @@ import basyx.components.updater.core.configuration.factory.DataSourceConfigurati
  * @author Niklas Mertens
  *
  */
-public class HttpDefaultConfigurationFactory extends DataSourceConfigurationFactory {
+public class HttpDefaultConfigurationFactory extends DataSinkConfigurationFactory {
 	private static final String FILE_PATH = "httpconsumer.json";
 	
 	public HttpDefaultConfigurationFactory(ClassLoader loader) {

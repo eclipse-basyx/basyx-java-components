@@ -66,7 +66,7 @@ public class TestAASUpdater {
 
 		// Extend configuration for Http Source
 		HttpDefaultConfigurationFactory httpConfigFactory = new HttpDefaultConfigurationFactory(loader);
-		configuration.addDatasources(httpConfigFactory.getDataSourceConfigurations());
+		configuration.addDatasinks(httpConfigFactory.getDataSinkConfigurations());
 
 		// Extend configuration for AAS
 		// DefaulRoutesConfigFactory takes default aasserver.json as to config
