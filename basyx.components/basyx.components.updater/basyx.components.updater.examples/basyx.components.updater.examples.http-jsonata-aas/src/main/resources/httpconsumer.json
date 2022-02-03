@@ -1,0 +1,8 @@
+[
+  {
+    "uniqueId": "httpsource",
+    "serverUrl": "https://d74a28a2-52d8-428d-8548-2c28f15cfcde.mock.pstmn.io/getsomevaluefromhttp",
+    "serverPort": 1234,
+    "query": "bums"
+  }
+]

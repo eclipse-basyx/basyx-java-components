@@ -23,21 +23,24 @@ public class RouteConfiguration {
 	private String datasource;
 	private List<String> transformers = new ArrayList<>();
 	private List<String> datasinks = new ArrayList<>();
+	private String timer;
 	private String delegator;
 	
 	public RouteConfiguration() {}
 	
-	public RouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
+	public RouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, String timer) {
 		this.datasource = datasource;
 		this.transformers = transformers;
 		this.datasinks = datasinks;
+		this.timer = timer;
 	}
 	
-	public RouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, String delegator) {
+	public RouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, String delegator, String timer) {
 		this.datasource = datasource;
 		this.transformers = transformers;
 		this.datasinks = datasinks;
 		this.delegator = delegator;
+		this.timer = timer;
 	}
 
 	public String getDatasource() {
@@ -70,5 +73,13 @@ public class RouteConfiguration {
 
 	public void setDelegator(String delegator) {
 		this.delegator = delegator;
+	}
+
+	public String getTimer() {
+		return timer;
+	}
+
+	public void setTimer(String timer) {
+		this.timer = timer;
 	}
 }
