@@ -167,7 +167,7 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 	/**
 	 * Gets the delegator servlet of the {@link DataSourceConfiguration}
 	 * @param routesConfig
-	 * @param dataSourceId
+	 * @param delegatorId
 	 * @return
 	 */
 	private DelegatorServlet getDelegatorServlet(RoutesConfiguration routesConfig, String delegatorId) {
