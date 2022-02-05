@@ -28,10 +28,10 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import basyx.components.updater.camelactivemq.configuration.factory.ActiveMQDefaultConfigurationFactory;
+import basyx.components.updater.camelhttp.configuration.factory.HttpDefaultConfigurationFactory;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.DefaultDelegatorsConfigurationFactory;
@@ -76,6 +76,10 @@ public class TestAASUpdater {
 		// Extend configutation for Kafka Source
 		ActiveMQDefaultConfigurationFactory activeMQConfigFactory = new ActiveMQDefaultConfigurationFactory(loader);
 		configuration.addDatasources(activeMQConfigFactory.getDataSourceConfigurations());
+		
+		// Extend configutation for Kafka Source
+		HttpDefaultConfigurationFactory httpConfigFactory = new HttpDefaultConfigurationFactory(loader);
+		configuration.addDatasources(httpConfigFactory.getDataSourceConfigurations());
 
 		// Extend configuration for AAS
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);

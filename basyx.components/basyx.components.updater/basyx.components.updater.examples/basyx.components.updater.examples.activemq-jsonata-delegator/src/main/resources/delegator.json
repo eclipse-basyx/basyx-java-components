@@ -3,12 +3,18 @@
 		"uniqueId": "DelegatorA",
 		"host": "localhost",
 		"path": "/valueA",
-		"port": 8090
+		"port": 8090,
+		"timerName": "timerA",
+		"delay": -1,
+		"repeatCount": 1
 	},
 	{
 		"uniqueId": "DelegatorB",
 		"host": "localhost",
 		"path": "/valueB",
-		"port": 8091
+		"port": 8091,
+		"timerName": "timerB",
+		"delay": -1,
+		"repeatCount": 1
 	}
 ]

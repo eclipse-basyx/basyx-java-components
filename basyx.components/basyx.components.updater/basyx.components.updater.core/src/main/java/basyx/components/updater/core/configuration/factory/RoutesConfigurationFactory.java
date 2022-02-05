@@ -13,6 +13,8 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
+import org.apache.camel.tooling.model.Strings;
+
 import basyx.components.updater.core.configuration.route.RouteConfiguration;
 
 /**
@@ -21,7 +23,7 @@ import basyx.components.updater.core.configuration.route.RouteConfiguration;
  *
  */
 public class RoutesConfigurationFactory extends ConfigurationFactory {
-
+	
 	public RoutesConfigurationFactory(String filePath, ClassLoader loader,
 			Class<?> mapperClass) {
 		super(filePath, loader, mapperClass);
@@ -29,6 +31,7 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 
 	@SuppressWarnings("unchecked")
 	public List<RouteConfiguration> getRouteConfigurations() {
-		return (List<RouteConfiguration>) getConfigurationLoader().loadListConfiguration();
+		List<RouteConfiguration> routeConfigurations = (List<RouteConfiguration>) getConfigurationLoader().loadListConfiguration();
+		return routeConfigurations;
 	}
 }
