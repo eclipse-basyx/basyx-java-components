@@ -14,7 +14,7 @@ package basyx.components.updater.core.configuration;
 import basyx.components.updater.core.delegator.servlet.DelegatorServlet;
 
 /**
- * Configuration properties of a delegator 
+ * Configuration properties of a delegator with poll timer 
  * @author haque
  *
  */
@@ -22,6 +22,9 @@ public class DelegatorConfiguration extends RouteEntity {
 	private String host;
 	private int port;
 	private String path;
+	private String timerName = "pollTimer";
+	private int delay = -1;
+	private int repeatCount = 1;
 	private DelegatorServlet delegatorServlet;
 	
 	public DelegatorConfiguration() {}
@@ -65,8 +68,32 @@ public class DelegatorConfiguration extends RouteEntity {
 		this.delegatorServlet = delegatorServlet;
 	}
 
+	public String getTimerName() {
+		return timerName;
+	}
+
+	public void setTimerName(String timerName) {
+		this.timerName = timerName;
+	}
+
+	public int getDelay() {
+		return delay;
+	}
+
+	public void setDelay(int delay) {
+		this.delay = delay;
+	}
+
+	public int getRepeatCount() {
+		return repeatCount;
+	}
+
+	public void setRepeatCount(int repeatCount) {
+		this.repeatCount = repeatCount;
+	}
+
 	@Override
 	public String getConnectionURI() {
-		return null;
+		return "timer://" + getTimerName() + "?delay=" + getDelay() + "&repeatCount=" + getRepeatCount();
 	}
 }

@@ -33,9 +33,11 @@ import basyx.components.updater.core.delegator.servlet.DelegatorServlet;
  *
  */
 public class UpdaterRouteBuilder extends RouteBuilder {
+	private static final String ROUTE_ID_PREFIX = "route";
 	private RoutesConfiguration configuration;
 
 	public UpdaterRouteBuilder(RoutesConfiguration configuration) {
+		configureRouteId(configuration.getRoutes());
 		this.configuration = configuration;
 	}
 	
@@ -69,19 +71,20 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		String dataSourceEndpoint = createDatasourceEndpoint(configuration, routeConfig.getDatasource());
 		String[] dataSinkEndpoints = createDatasinkEndpoint(configuration, routeConfig.getDatasinks());
 		String[] dataTransformerEndpoints = createDataTransformerEndpoint(configuration, routeConfig.getTransformers());
-		
+		String routeId = routeConfig.getRouteId();
 		if (Strings.isNullOrEmpty(routeConfig.getDelegator())) {
 			if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
-				from(dataSourceEndpoint).to("log:updater").to(dataSinkEndpoints).to("log:updater");
+				from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
 			} else {
-				from(dataSourceEndpoint).to("log:updater").to(dataTransformerEndpoints).to("log:updater").to(dataSinkEndpoints).to("log:updater");
+				from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
 			}
 		} else {
 			DelegatorServlet delegatorServlet = getDelegatorServlet(configuration, routeConfig.getDelegator());
+			String timerEndpoint = createTimerEndpoint(configuration, routeConfig.getDelegator());
 			if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
-				from(dataSourceEndpoint).to("log:updater").to(dataSinkEndpoints).to("log:updater").bean(delegatorServlet, "processMessage");
+				from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId).bean(delegatorServlet, "processMessage");
 			} else {
-				from(dataSourceEndpoint).to("log:updater").to(dataTransformerEndpoints).to("log:updater").to(dataSinkEndpoints).to("log:updater").bean(delegatorServlet, "processMessage");
+				from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId).bean(delegatorServlet, "processMessage");
 			}	
 		}
 	}
@@ -176,6 +179,35 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 			return delegatorConfig.getDelegatorServlet();	
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * Creates a timer endpoint from {@link DelegatorConfiguration}
+	 * @param routesConfig
+	 * @param dataSourceId
+	 * @return
+	 */
+	private String createTimerEndpoint(RoutesConfiguration routesConfig, String delegatorId) {
+		DelegatorConfiguration delegatorConfig = routesConfig.getDelegators().get(delegatorId);
+		if (delegatorConfig != null) {
+			return delegatorConfig.getConnectionURI();	
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Sets a predefined/ default routeId for each routes
+	 * @param routeConfigurations
+	 */
+	public void configureRouteId(List<RouteConfiguration> routeConfigurations) {
+		long incrementalId = 1;
+		for (RouteConfiguration route: routeConfigurations) {
+			if (Strings.isNullOrEmpty(route.getRouteId())) {
+				route.setRouteId(ROUTE_ID_PREFIX + incrementalId);
+				incrementalId++;
+			}	
 		}
 	}
 }

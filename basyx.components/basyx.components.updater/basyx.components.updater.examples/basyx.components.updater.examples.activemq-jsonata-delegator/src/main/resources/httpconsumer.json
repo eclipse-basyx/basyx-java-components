@@ -1,0 +1,8 @@
+[
+	{
+		"uniqueId": "property1",
+		"serverUrl": "http://localhost",
+		"serverPort": 1111,
+		"path": ""
+	}
+]

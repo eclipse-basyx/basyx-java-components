@@ -23,6 +23,7 @@
 		<module>basyx.components.updater.examples.kafka-jsonatamultiple-aas</module>
 		<module>basyx.components.updater.examples.activemq-jsonata-aas</module>
 		<module>basyx.components.updater.examples.mqtt-jsonata-aas</module>
+		<module>basyx.components.updater.examples.httpserver</module>
 		<module>basyx.components.updater.examples.activemq-jsonata-delegator</module>
 	</modules>
 

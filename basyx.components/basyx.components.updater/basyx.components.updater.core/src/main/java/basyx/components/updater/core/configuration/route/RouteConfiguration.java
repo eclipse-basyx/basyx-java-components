@@ -20,6 +20,7 @@ import java.util.List;
  *
  */
 public class RouteConfiguration {
+	private String routeId;
 	private String datasource;
 	private List<String> transformers = new ArrayList<>();
 	private List<String> datasinks = new ArrayList<>();
@@ -34,10 +35,13 @@ public class RouteConfiguration {
 	}
 	
 	public RouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, String delegator) {
-		this.datasource = datasource;
-		this.transformers = transformers;
-		this.datasinks = datasinks;
+		this(datasource, transformers, datasinks);
 		this.delegator = delegator;
+	}
+	
+	public RouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, String delegator, String routeId) {
+		this(datasource, transformers, datasinks, delegator);
+		this.routeId = routeId;
 	}
 
 	public String getDatasource() {
@@ -70,5 +74,13 @@ public class RouteConfiguration {
 
 	public void setDelegator(String delegator) {
 		this.delegator = delegator;
+	}
+
+	public String getRouteId() {
+		return routeId;
+	}
+
+	public void setRouteId(String routeId) {
+		this.routeId = routeId;
 	}
 }

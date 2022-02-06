@@ -1,5 +1,6 @@
 [
 	{
+		"routeId": "namedRoute",
 		"datasource": "property1",
 		"transformers": ["jsonataA"],
 		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"]

@@ -52,6 +52,12 @@
 			<artifactId>basyx.components.updater.camel-activemq</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.eclipse.basyx</groupId>
+			<artifactId>basyx.components.updater.camel-http</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
