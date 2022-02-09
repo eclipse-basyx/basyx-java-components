@@ -17,8 +17,8 @@ import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
- * Represents a BaSyx http servlet configuration for a BaSyxContext,
- * that can be loaded from a properties file.
+ * Represents a BaSyx http servlet configuration for a BaSyxContext, that can be
+ * loaded from a properties file.
  * 
  * @author espen
  *
@@ -38,6 +38,9 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public static final String HOSTNAME = "contextHostname";
 	public static final String PORT = "contextPort";
 
+	public static final String SSL_KEY_PATH = "sslKeyPath";
+	public static final String SSL_KEY_PASSWORD = "sslKeyPass";
+
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI = "jwtBearerTokenAuthenticationIssuerUri";
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI = "jwtBearerTokenAuthenticationJwkSetUri";
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD = "jwtBearerTokenAuthenticationRequiredAud";
@@ -54,6 +57,9 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		defaultProps.put(DOCBASE, DEFAULT_DOCBASE);
 		defaultProps.put(HOSTNAME, DEFAULT_HOSTNAME);
 		defaultProps.put(PORT, Integer.toString(DEFAULT_PORT));
+		defaultProps.put(SSL_KEY_PATH, null);
+		defaultProps.put(SSL_KEY_PASSWORD, null);
+
 		return defaultProps;
 	}
 
@@ -72,10 +78,13 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * Constructor with initial configuration - docBasePath and hostname are default values
+	 * Constructor with initial configuration - docBasePath and hostname are default
+	 * values
 	 * 
-	 * @param port        The port that will be occupied
-	 * @param contextPath The subpath for this context
+	 * @param port
+	 *            The port that will be occupied
+	 * @param contextPath
+	 *            The subpath for this context
 	 */
 	public BaSyxContextConfiguration(int port, String contextPath) {
 		this();
@@ -84,12 +93,17 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * Constructor with initial configuration - docBasePath and hostname are default values
+	 * Constructor with initial configuration - docBasePath and hostname are default
+	 * values
 	 * 
-	 * @param contextPath The subpath for this context
-	 * @param docBasePath The local base path for the documents
-	 * @param hostname    The hostname
-	 * @param port        The port that will be occupied
+	 * @param contextPath
+	 *            The subpath for this context
+	 * @param docBasePath
+	 *            The local base path for the documents
+	 * @param hostname
+	 *            The hostname
+	 * @param port
+	 *            The port that will be occupied
 	 */
 	public BaSyxContextConfiguration(String contextPath, String docBasePath, String hostname, int port) {
 		this();
@@ -113,30 +127,36 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		String reqContextPath = getContextPath();
 		String reqDocBasePath = getDocBasePath();
 		String hostName = getHostname();
+		Boolean isSecuredCon = getSecureConnection();
+		String sslKeyPath = getSSLKeyPath();
+		String sslKeyPass = getSSLKeyPassword();
 		int reqPort = getPort();
-		final BaSyxContext baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
 
-		if(atLeastOneJwtPropertyIsSet()) {
+		final BaSyxContext baSyxContext;
+		if (!isSecuredCon) {
+			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
+		} else {
+			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort, isSecuredCon, sslKeyPath, sslKeyPass);
+		}
+
+		if (atLeastOneJwtPropertyIsSet()) {
 			configureJwtAuthentication(baSyxContext);
 		}
 
 		return baSyxContext;
 	}
 
+	private Boolean getSecureConnection() {
+		return (getSSLKeyPath() != null && getSSLKeyPassword() != null);
+	}
+
 	private boolean atLeastOneJwtPropertyIsSet() {
-		return getJwtBearerTokenAuthenticationIssuerUri() != null
-				|| getJwtBearerTokenAuthenticationJwkSetUri() != null
-				|| getJwtBearerTokenAuthenticationRequiredAud() != null;
+		return getJwtBearerTokenAuthenticationIssuerUri() != null || getJwtBearerTokenAuthenticationJwkSetUri() != null || getJwtBearerTokenAuthenticationRequiredAud() != null;
 	}
 
 	private void configureJwtAuthentication(final BaSyxContext baSyxContext) {
 		baSyxContext.setJwtBearerTokenAuthenticationConfiguration(
-				JwtBearerTokenAuthenticationConfiguration.of(
-						getJwtBearerTokenAuthenticationIssuerUri(),
-						getJwtBearerTokenAuthenticationJwkSetUri(),
-						getJwtBearerTokenAuthenticationRequiredAud()
-				)
-		);
+				JwtBearerTokenAuthenticationConfiguration.of(getJwtBearerTokenAuthenticationIssuerUri(), getJwtBearerTokenAuthenticationJwkSetUri(), getJwtBearerTokenAuthenticationRequiredAud()));
 	}
 
 	public String getContextPath() {
@@ -169,6 +189,22 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 
 	public void setPort(int port) {
 		setProperty(PORT, Integer.toString(port));
+	}
+
+	public String getSSLKeyPassword() {
+		return getProperty(SSL_KEY_PASSWORD);
+	}
+
+	public void setSSLKeyPassword(String sslKeyPass) {
+		setProperty(SSL_KEY_PASSWORD, sslKeyPass);
+	}
+
+	public String getSSLKeyPath() {
+		return getProperty(SSL_KEY_PATH);
+	}
+
+	public void setSSLKeyPath(String sslKeyPath) {
+		setProperty(SSL_KEY_PATH, sslKeyPath);
 	}
 
 	public String getJwtBearerTokenAuthenticationIssuerUri() {
