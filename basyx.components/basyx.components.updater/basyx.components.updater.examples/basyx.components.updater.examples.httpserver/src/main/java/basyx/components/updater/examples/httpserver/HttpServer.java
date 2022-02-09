@@ -14,6 +14,7 @@ package basyx.components.updater.examples.httpserver;
 import java.io.File;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,15 @@ public class HttpServer {
     	try {
     		tomcat.start();
     	} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			e.printStackTrace();
+		}
+    }
+    
+    public void stop() {
+    	try {
+			tomcat.stop();
+		} catch (LifecycleException e) {
 			LOGGER.error(e.getMessage());
 			e.printStackTrace();
 		}

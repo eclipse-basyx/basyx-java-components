@@ -7,8 +7,8 @@
 		<artifactId>basyx.components.updater.examples</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>basyx.components.updater.examples.activemq-jsonata-delegator</artifactId>
-	<name>ActiveMQ Jsonata Delegator</name>
+	<artifactId>basyx.components.updater.examples.http-jsonata-delegator</artifactId>
+	<name>Http Jsonata Delegator</name>
 	<description>Delegates the data to rest api</description>
 
 	<packaging>jar</packaging>
@@ -49,12 +49,6 @@
 
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
-			<artifactId>basyx.components.updater.camel-activemq</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.updater.camel-http</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -71,33 +65,11 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-		<!-- BaSyx SDK -->
-		<dependency>
-			<groupId>org.eclipse.basyx</groupId>
-			<artifactId>basyx.sdk</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-
-		<!-- BaSyx SDK tests -->
-		<dependency>
-			<groupId>org.eclipse.basyx</groupId>
-			<artifactId>basyx.sdk</artifactId>
-			<version>1.0.1</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Depends on the components library -->
-		<dependency>
-			<groupId>org.eclipse.basyx</groupId>
-			<artifactId>basyx.components.lib</artifactId>
-			<version>1.0.1</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
-			<artifactId>basyx.components.AASServer</artifactId>
-			<version>1.0.1</version>
+			<artifactId>basyx.components.updater.examples.httpserver</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<!-- JUnit 4 for running JUnit tests -->
