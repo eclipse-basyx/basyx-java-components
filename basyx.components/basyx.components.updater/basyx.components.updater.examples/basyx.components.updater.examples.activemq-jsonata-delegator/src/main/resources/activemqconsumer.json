@@ -1,8 +1,0 @@
-[
-	{
-		"uniqueId": "property2",
-		"serverUrl": "127.0.0.1",
-		"serverPort": 9092,
-		"path": "second-topic"
-	}
-]

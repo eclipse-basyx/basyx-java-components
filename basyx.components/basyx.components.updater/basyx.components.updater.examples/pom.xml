@@ -24,7 +24,7 @@
 		<module>basyx.components.updater.examples.activemq-jsonata-aas</module>
 		<module>basyx.components.updater.examples.mqtt-jsonata-aas</module>
 		<module>basyx.components.updater.examples.httpserver</module>
-		<module>basyx.components.updater.examples.activemq-jsonata-delegator</module>
+		<module>basyx.components.updater.examples.http-jsonata-delegator</module>
 	</modules>
 
 	<packaging>pom</packaging>

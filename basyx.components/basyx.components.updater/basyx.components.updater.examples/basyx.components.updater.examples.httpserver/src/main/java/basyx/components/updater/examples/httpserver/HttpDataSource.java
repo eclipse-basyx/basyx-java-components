@@ -11,11 +11,16 @@
 
 package basyx.components.updater.examples.httpserver;
 
-public class Main {
-	public static void main(String[] args) throws InterruptedException {
+public class HttpDataSource {
+	private HttpServer server;
+	
+	public void runHttpServer() throws InterruptedException {
 		DummyServlet servlet = new DummyServlet();
-		HttpServer server = new HttpServer(1111, "localhost", "", servlet);
+		server = new HttpServer(8091, "localhost", "", servlet);
 		server.start();
-		Thread.sleep(1000000);
+	}
+	
+	public void stopHttpServer() {
+		server.stop();
 	}
 }
