@@ -39,10 +39,9 @@ public class TestServerWithHTTPS extends AASServerSuite {
 	}
 
 	private static BaSyxContextConfiguration createBaSyxContextConfiguration() {
-		BaSyxContextConfiguration config = new BaSyxContextConfiguration();
-		config.setSSLKeyPath("resources/ssl.cert");
+		BaSyxContextConfiguration config = new BaSyxContextConfiguration(8080, "");
+		config.setSSLKeyStoreLocation("resources/basyxtest.jks");
 		config.setSSLKeyPassword("pass123");
 		return config;
 	}
-
 }

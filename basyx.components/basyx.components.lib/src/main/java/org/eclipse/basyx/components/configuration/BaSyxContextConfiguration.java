@@ -38,7 +38,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public static final String HOSTNAME = "contextHostname";
 	public static final String PORT = "contextPort";
 
-	public static final String SSL_KEY_PATH = "sslKeyPath";
+	public static final String SSL_KEY_STORE_LOCATION = "sslKeyStoreLocation";
 	public static final String SSL_KEY_PASSWORD = "sslKeyPass";
 
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI = "jwtBearerTokenAuthenticationIssuerUri";
@@ -57,7 +57,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		defaultProps.put(DOCBASE, DEFAULT_DOCBASE);
 		defaultProps.put(HOSTNAME, DEFAULT_HOSTNAME);
 		defaultProps.put(PORT, Integer.toString(DEFAULT_PORT));
-		defaultProps.put(SSL_KEY_PATH, null);
+		defaultProps.put(SSL_KEY_STORE_LOCATION, null);
 		defaultProps.put(SSL_KEY_PASSWORD, null);
 
 		return defaultProps;
@@ -127,8 +127,8 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		String reqContextPath = getContextPath();
 		String reqDocBasePath = getDocBasePath();
 		String hostName = getHostname();
-		Boolean isSecuredCon = getSecureConnection();
-		String sslKeyPath = getSSLKeyPath();
+		Boolean isSecuredCon = isSecureConnection();
+		String sslKeyStoreLocation = getSSLKeyStoreLocation();
 		String sslKeyPass = getSSLKeyPassword();
 		int reqPort = getPort();
 
@@ -136,7 +136,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		if (!isSecuredCon) {
 			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
 		} else {
-			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort, isSecuredCon, sslKeyPath, sslKeyPass);
+			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort, isSecuredCon, sslKeyStoreLocation, sslKeyPass);
 		}
 
 		if (atLeastOneJwtPropertyIsSet()) {
@@ -146,8 +146,8 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		return baSyxContext;
 	}
 
-	private Boolean getSecureConnection() {
-		return (getSSLKeyPath() != null && getSSLKeyPassword() != null);
+	private Boolean isSecureConnection() {
+		return (getSSLKeyStoreLocation() != null && getSSLKeyPassword() != null);
 	}
 
 	private boolean atLeastOneJwtPropertyIsSet() {
@@ -199,12 +199,12 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		setProperty(SSL_KEY_PASSWORD, sslKeyPass);
 	}
 
-	public String getSSLKeyPath() {
-		return getProperty(SSL_KEY_PATH);
+	public String getSSLKeyStoreLocation() {
+		return getProperty(SSL_KEY_STORE_LOCATION);
 	}
 
-	public void setSSLKeyPath(String sslKeyPath) {
-		setProperty(SSL_KEY_PATH, sslKeyPath);
+	public void setSSLKeyStoreLocation(String sslKeyStoreLocation) {
+		setProperty(SSL_KEY_STORE_LOCATION, sslKeyStoreLocation);
 	}
 
 	public String getJwtBearerTokenAuthenticationIssuerUri() {
@@ -233,11 +233,18 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 
 	public String getUrl() {
 		String contextPath = getContextPath();
-		String base = "http://" + getHostname() + ":" + getPort();
+		String base = getProtocol() + getHostname() + ":" + getPort();
 		if (contextPath.isEmpty()) {
 			return base;
 		} else {
 			return VABPathTools.concatenatePaths(base, contextPath);
 		}
+	}
+
+	private String getProtocol() {
+		if (isSecureConnection()) {
+			return "https://";
+		}
+		return "http://";
 	}
 }
