@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.configuration;
@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 /**
  * Represents a BaSyx server configuration for an AAS Server with any backend,
  * that can be loaded from a properties file.
- * 
+ *
  * @author espen
  *
  */
@@ -38,6 +38,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
 	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
 	public static final String DEFAULT_AUTHORIZATION_ENABLED = "false";
+	public static final String DEFAULT_SUBMODELELEMENT_STORAGE_OPTION = "";
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -48,6 +49,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String EVENTS = "aas.events";
 	public static final String AASX_UPLOAD = "aas.aasxUpload";
 	public static final String AUTHORIZATION_ENABLED = "aas.authorizationEnabled";
+	public static final String SUBMODELELEMENT_STORAGE_OPTION = "aas.submodelElementStorageOption";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -65,6 +67,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
 		defaultProps.put(AUTHORIZATION_ENABLED, DEFAULT_AUTHORIZATION_ENABLED);
+		defaultProps.put(SUBMODELELEMENT_STORAGE_OPTION, DEFAULT_SUBMODELELEMENT_STORAGE_OPTION);
 		return defaultProps;
 	}
 
@@ -77,7 +80,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	/**
 	 * Constructor with initial configuration
-	 * 
+	 *
 	 * @param backend
 	 *            The backend for the AASServer
 	 * @param source
@@ -91,7 +94,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	/**
 	 * Constructor with initial configuration values
-	 * 
+	 *
 	 * @param backend
 	 *            The backend for the AASServer
 	 * @param source
@@ -106,7 +109,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	/**
 	 * Constructor with initial configuration values
-	 * 
+	 *
 	 * @param backend
 	 *            The backend for the AASServer
 	 * @param source
@@ -215,5 +218,13 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	public void setAuthorizationEnabled(boolean authorizationEnabled) {
 		setProperty(AUTHORIZATION_ENABLED, Boolean.toString(authorizationEnabled));
+	}
+
+	public String getSubmodelElementStorageOption() {
+		return getProperty(SUBMODELELEMENT_STORAGE_OPTION);
+	}
+
+	public void setSubmodelElementStorageEnabled(String submodelElementStorageEnabled) {
+		setProperty(SUBMODELELEMENT_STORAGE_OPTION, submodelElementStorageEnabled);
 	}
 }

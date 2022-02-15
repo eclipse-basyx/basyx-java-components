@@ -61,6 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 /**
  * Component providing an empty AAS server that is able to receive AAS/SMs from
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
@@ -87,6 +91,8 @@ public class AASServerComponent implements IComponent {
 
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
+
+	private String submodelElementStorageOption = "";
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -138,6 +144,13 @@ public class AASServerComponent implements IComponent {
 	 */
 	public void enableAASXUpload() {
 		this.isAASXUploadEnabled = true;
+	}
+
+	/**
+	 * Enables AASX upload functionality
+	 */
+	public void enableSubmodelElementStorage(String submodelElementStorageOption) {
+		this.submodelElementStorageOption = submodelElementStorageOption;
 	}
 
 	/**
@@ -258,13 +271,13 @@ public class AASServerComponent implements IComponent {
 		if (shouldDecorateWithMQTT()) {
 			decoratedAggregator = decorateWithMQTT(decoratedAggregator);
 		}
-		if (shouldDecoreateWithAuthorization()) {
+		if (shouldDecorateWithAuthorization()) {
 			decoratedAggregator = decorateWithAuthorization(decoratedAggregator);
 		}
 		return decoratedAggregator;
 	}
 
-	private boolean shouldDecoreateWithAuthorization() {
+	private boolean shouldDecorateWithAuthorization() {
 		return this.aasConfig.isAuthorizationEnabled();
 	}
 
@@ -305,6 +318,9 @@ public class AASServerComponent implements IComponent {
 		if (shouldDecorateWithMQTT()) {
 			return createMongoDbAggregatorWithMqttSubmodelAggregator();
 		}
+		if (!submodelElementStorageOption.isEmpty()) {
+			return createMongoDBAggregatorWithStorage();
+		}
 		return createMongoDBAggregator();
 	}
 
@@ -313,7 +329,16 @@ public class AASServerComponent implements IComponent {
 		if (shouldDecorateWithMQTT()) {
 			return createAASAggregatorWithMqttSubmodelAggregator();
 		}
+		if (!submodelElementStorageOption.isEmpty()) {
+			return createAASAggregatorWithStorage();
+		}
 		return new AASAggregator(registry);
+	}
+
+	private IAASAggregator createAASAggregatorWithStorage() {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(submodelElementStorageOption);
+		EntityManager entityManager = emf.createEntityManager();
+		return new AASAggregator(registry, entityManager);
 	}
 
 	private IAASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
@@ -340,6 +365,15 @@ public class AASServerComponent implements IComponent {
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error " + e.getMessage());
 		}
+	}
+
+	private IAASAggregator createMongoDBAggregatorWithStorage() {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(submodelElementStorageOption);
+		EntityManager entityManager = emf.createEntityManager();
+		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, entityManager);
+		aggregator.setRegistry(registry);
+		return aggregator;
 	}
 
 	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {
