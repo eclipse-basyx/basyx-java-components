@@ -332,12 +332,8 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createMongoDbAggregatorWithMqttSubmodelAggregator() {
 		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
-		try {
-			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId(), registry);
-			return aggregator;
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error " + e.getMessage());
-		}
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId(), registry);
+		return aggregator;
 	}
 
 	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {

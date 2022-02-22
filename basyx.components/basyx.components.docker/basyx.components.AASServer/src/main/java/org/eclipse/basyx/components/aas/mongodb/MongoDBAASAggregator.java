@@ -90,9 +90,16 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected ISubmodelAPIFactory smApiProvider;
 
 	/**
-	 * Store SubmodelAggregator. By default, uses standard SubmodelAggregator
+	 * Store MQTT server endpoint
 	 */
-	protected ISubmodelAggregator submodelAggregator;
+	protected String mqttServerEndpoint;
+	/**
+	 * Store MQTT client id
+	 * Not really needed! Is overwritten per MqttSubmodelAggregator.
+	 * @see #createMultiSubmodelProvider(IAASAPI)
+	 */
+	//
+	protected String mqttClientId;
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
@@ -101,7 +108,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		init();
 	}
 
@@ -115,7 +121,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
 		this.setConfiguration(config);
 		this.registry = registry;
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		init();
 	}
 
@@ -127,16 +132,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param clientId
 	 * @throws MqttException
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) throws MqttException {
-		createMQTTSubmodelAggregator(config, serverEndpoint, clientId);
-		init();
-	}
-
-	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId)
-			throws MqttException {
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) {
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
-		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, serverEndpoint, clientId);
+		this.mqttServerEndpoint = serverEndpoint;
+		this.mqttClientId = clientId;
+		init();
 	}
 
 	/**
@@ -150,7 +150,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		init();
 	}
 
@@ -166,7 +165,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
 		this.registry = registry;
 		init();
 	}
@@ -197,9 +195,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @throws MqttException
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId,
-			IAASRegistry registry) throws MqttException {
+			IAASRegistry registry) {
 		this.registry = registry;
-		createMQTTSubmodelAggregator(config, serverEndpoint, clientId);
+		this.setConfiguration(config);
+		this.mqttServerEndpoint = serverEndpoint;
+		this.mqttClientId = clientId;
 		init();
 	}
 
@@ -274,6 +274,21 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	private MultiSubmodelProvider createMultiSubmodelProvider(IAASAPI aasApi) {
 		AASModelProvider aasProvider = new AASModelProvider(aasApi);
 		IConnectorFactory connProvider = new HTTPConnectorFactory();
+
+		// Init ISubmodelAggregator per MultiSubmodelProvider
+		ISubmodelAggregator submodelAggregator = new SubmodelAggregator(smApiProvider);
+		// If mqtt config set, init as MqttSubmodelAggregator
+		if ( mqttServerEndpoint != null && !mqttServerEndpoint.isEmpty()) {
+			try {
+				// Overwrite mqttClientId per MqttSubmodelAggregator
+				mqttClientId = aasApi.getAAS().getIdShort() + "/submodelAggregator";
+				submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, mqttServerEndpoint, mqttClientId);
+			} catch (MqttException mqttException) {
+				logger.error("Failed to init MqttSubmodelAggregator for server '{}' with client id '{}' due to MQTT exception.", mqttServerEndpoint, mqttClientId, mqttException);
+				// TODO: Throw MqttException (to be handled by caller)
+			}
+		}
+
 		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, submodelAggregator);
 	}
 
@@ -352,7 +367,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	@Override
-	public void createAAS(AssetAdministrationShell aas) {
+	public void createAAS(AssetAdministrationShell aas)  {
 		IAASAPI aasApi = this.aasApiProvider.getAASApi(aas);
 		MultiSubmodelProvider provider = createMultiSubmodelProvider(aasApi);
 		aasProviderMap.put(aas.getIdentification().getId(), provider);
