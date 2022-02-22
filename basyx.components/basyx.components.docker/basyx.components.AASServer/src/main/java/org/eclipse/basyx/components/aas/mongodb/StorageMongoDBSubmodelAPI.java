@@ -10,20 +10,20 @@
 package org.eclipse.basyx.components.aas.mongodb;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.extensions.submodel.storage.SubmodelElementStorageComponent;
+import org.eclipse.basyx.extensions.submodel.storage.elements.StorageSubmodelElementComponent;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 
 import jakarta.persistence.EntityManager;
 
 /**
- * Implements the ISubmodelAPI for a mongoDB backend.
+ * Implements the IStorageSubmodelAPI for a mongoDB backend.
  *
- * @author espen
+ * @author fischer
  */
 public class StorageMongoDBSubmodelAPI extends MongoDBSubmodelAPI {
 	protected EntityManager entityManager;
-	protected SubmodelElementStorageComponent submodelElementStorageComponent;
+	protected StorageSubmodelElementComponent submodelElementStorageComponent;
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
@@ -64,7 +64,7 @@ public class StorageMongoDBSubmodelAPI extends MongoDBSubmodelAPI {
 	@Override
 	public void addSubmodelElement(ISubmodelElement elem) {
 		submodelElementStorageComponent.beginTransaction();
-		submodelElementStorageComponent.persistStorageElementCreation(getSubmodel(), elem.getIdShort(), elem);
+		submodelElementStorageComponent.persistStorageElementCreation(getSubmodel(), elem.getIdShort(), elem.getLocalCopy());
 		super.addSubmodelElement(elem);
 		submodelElementStorageComponent.commitTransaction();
 	}
@@ -72,7 +72,7 @@ public class StorageMongoDBSubmodelAPI extends MongoDBSubmodelAPI {
 	@Override
 	public void addSubmodelElement(String idShortPath, ISubmodelElement elem) {
 		submodelElementStorageComponent.beginTransaction();
-		submodelElementStorageComponent.persistStorageElementCreation(getSubmodel(), idShortPath, elem);
+		submodelElementStorageComponent.persistStorageElementCreation(getSubmodel(), idShortPath, elem.getLocalCopy());
 		super.addSubmodelElement(idShortPath, elem);
 		submodelElementStorageComponent.commitTransaction();
 	}
