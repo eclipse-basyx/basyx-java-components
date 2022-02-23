@@ -35,6 +35,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
+import org.eclipse.basyx.aas.restapi.vab.VABAASAPIFactory;
 import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
@@ -49,8 +50,13 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.AuthorizedAASAggregator;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregator;
+import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIFactory;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregator;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttSubmodelAPIFactory;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPIFactory;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
@@ -318,7 +324,14 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
 		try {
-			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
+			String serverEndpoint = mqttConfig.getServer();
+			String clientId = getMqttSubmodelClientId();
+
+			MqttAASAPIFactory aasApiFactory = new MqttAASAPIFactory(new VABAASAPIFactory(), serverEndpoint, clientId);
+			SubmodelAggregator submodelAPIFactory = new SubmodelAggregator(new MqttSubmodelAPIFactory(new VABSubmodelAPIFactory(), serverEndpoint, clientId));
+			MqttSubmodelAggregator submodelAggregator = new MqttSubmodelAggregator(submodelAPIFactory, serverEndpoint, clientId);
+
+			return new AASAggregator(aasApiFactory, submodelAggregator, registry);
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error " + e.getMessage());
 		}
