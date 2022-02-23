@@ -130,7 +130,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param config
 	 * @param serverEndpoint
 	 * @param clientId
-	 * @throws MqttException
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) {
 		this.setConfiguration(config);
@@ -192,7 +191,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param serverEndpoint
 	 * @param clientId
 	 * @param registry
-	 * @throws MqttException
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId,
 			IAASRegistry registry) {
