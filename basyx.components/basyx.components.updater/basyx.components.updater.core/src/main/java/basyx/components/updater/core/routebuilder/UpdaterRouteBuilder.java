@@ -69,19 +69,15 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		String timerEndpoint = createTimerEndpoint(configuration, routeConfig.getTimer());
 
 		if (Strings.isNullOrEmpty(routeConfig.getDelegator())) {
-		    if (Strings.isNullOrEmpty(timerEndpoint)) {
 				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
 					from(dataSourceEndpoint).to("log:updater").to(dataSinkEndpoints).to("log:updater");
 				} else {
-					from(dataSourceEndpoint).to("log:updater").to(dataTransformerEndpoints).to("log:updater").to(dataSinkEndpoints).to("log:updater");
+					if (dataSourceEndpoint.startsWith("timer") == true) {
+						from(dataSourceEndpoint).to("log:updater").to(dataSinkEndpoints[0]).to("log:updater").to(dataTransformerEndpoints).to("log:updater").to(dataSinkEndpoints[1]).to("log:updater");
+					} else {
+						from(dataSourceEndpoint).to("log:updater").to(dataTransformerEndpoints).to("log:updater").to(dataSinkEndpoints).to("log:updater");
+					}
 				}
-			} else {
-				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
-					from(timerEndpoint).to(dataSourceEndpoint).to("log:updater").to(dataSinkEndpoints).to("log:updater");
-				} else {
-					from(timerEndpoint).to(dataSourceEndpoint).to("log:updater").to(dataTransformerEndpoints).to("log:updater").to(dataSinkEndpoints).to("log:updater");
-				}
-			}
 		} else {
 			DelegatorServlet delegatorServlet = getDelegatorServlet(configuration, routeConfig.getDelegator());
 			if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {

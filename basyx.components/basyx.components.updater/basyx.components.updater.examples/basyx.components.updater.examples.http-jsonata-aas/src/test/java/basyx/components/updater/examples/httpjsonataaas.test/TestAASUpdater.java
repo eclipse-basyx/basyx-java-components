@@ -6,10 +6,6 @@ import java.io.IOException;
 
 import basyx.components.updater.camelhttp.configuration.factory.HttpDefaultConfigurationFactory;
 import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultConfigurationFactory;
-import basyx.components.updater.core.routebuilder.UpdaterRouteBuilder;
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
@@ -29,6 +25,10 @@ import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.HttpStatusCode;
 
 public class TestAASUpdater {
 	private static AASServerComponent aasServer;
@@ -47,12 +47,21 @@ public class TestAASUpdater {
 		aasServer = new AASServerComponent(aasContextConfig, aasConfig);
 		aasServer.setRegistry(registry);
 
-
+		//Create and start MockServer
+		ClientAndServer clientServer = ClientAndServer.startClientAndServer(2018);
+		System.out.println("MockServer running: " + clientServer.isRunning());      //running status: true
+		clientServer.when(new HttpRequest().withMethod("GET"))
+				.respond(new HttpResponse().withStatusCode(HttpStatusCode.OK_200.code())
+						.withBody("{\"objects\": \n" +
+								"      [\n" +
+								"        {\"name\":\"object1\", \"value\":858383},\n" +
+								"        {\"name\":\"object2\", \"value\":42}\n" +
+								"      ]\n" +
+								"    }"));
 	}
 
 	@Test
 	public void test() throws Exception {
-
 		aasServer.startComponent();
 		System.out.println("AAS STARTED");
 		System.out.println("START UPDATER");
@@ -74,59 +83,29 @@ public class TestAASUpdater {
 		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
 
 		// Extend configuration for Jsonata
-		//JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		//configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
+		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
 
 		// Extend configuration for Timer
 		TimerDefaultConfigurationFactory timerConfigFactory = new TimerDefaultConfigurationFactory(loader);
 		configuration.addDatasources(timerConfigFactory.getDataSourceConfigurations());
 
-
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();
 		System.out.println("UPDATER STARTED");
-		// System.out.println("PUBLISH EVENT");
-		// publishNewDatapoint();
-		// System.out.println("EVENT PUBLISHED");
-		// checkIfPropertyIsUpdated();
+		checkIfPropertyIsUpdated();
 		updater.stopComponent();
 		aasServer.stopComponent();
-
-		System.out.println("moin");
-	}
-	@Test
-	public void WrapperlessTest() throws Exception {
-		CamelContext context = new DefaultCamelContext();
-		context.addRoutes(new RouteBuilder() {
-			public void configure() {
-				from("timer://foo?fixedRate=true&delay=0&period=10000").to("https://08b33bff-279a-4879-a2e4-530b9cd21fb1.mock.pstmn.io/status");
-			}
-		});
-		context.start();
-		Thread.sleep(10000);
-		context.stop();
 	}
 
-
-	/**
-	 * public void startComponent() {
-		camelContext = new DefaultCamelContext();
-		try {
-			camelContext.addRoutes(new UpdaterRouteBuilder(configuration));
-			camelContext.start();
-			logger.info("Updater started");
-		} catch (Exception e) {
-			e.printStackTrace();
-			camelContext = null;
-		}
-	} */
 	private void checkIfPropertyIsUpdated() throws InterruptedException {
 		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry);
 		ConnectedAssetAdministrationShell aas = manager.retrieveAAS(deviceAAS);
 		ISubmodel sm = aas.getSubmodels().get("ConnectedSubmodel");
-		ISubmodelElement updatedProp = sm.getSubmodelElement("ConnectedPropertyB");
-		Object propValue = updatedProp.getValue();
-		System.out.println("UpdatedPROP" + propValue);
-		assertEquals("858383", propValue);
+
+		ISubmodelElement updatedProp2 = sm.getSubmodelElement("ConnectedPropertyB");
+		Object propValue2 = updatedProp2.getValue();
+		System.out.println("UpdatedPROPB: " + propValue2);
+		assertEquals("858383", propValue2);
 	}
 }

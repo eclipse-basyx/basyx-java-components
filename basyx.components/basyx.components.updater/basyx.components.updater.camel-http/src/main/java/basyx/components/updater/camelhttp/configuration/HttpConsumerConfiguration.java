@@ -12,10 +12,10 @@
 package basyx.components.updater.camelhttp.configuration;
 
 import basyx.components.updater.core.configuration.DataSinkConfiguration;
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
+
 /**
  * An implementation of http consumer configuration
- * @author n14s
+ * @author n14s - Niklas Mertens
  *
  */
 public class HttpConsumerConfiguration extends DataSinkConfiguration {

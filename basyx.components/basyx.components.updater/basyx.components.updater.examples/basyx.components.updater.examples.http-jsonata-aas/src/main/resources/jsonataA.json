@@ -1,1 +1,1 @@
-$sum(Account.Order.Product.(Price * Quantity))
+objects[0].value
