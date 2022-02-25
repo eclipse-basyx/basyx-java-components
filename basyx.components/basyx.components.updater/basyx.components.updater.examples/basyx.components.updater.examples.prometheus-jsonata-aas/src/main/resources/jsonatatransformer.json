@@ -1,0 +1,8 @@
+[
+	{
+		"uniqueId": "jsonataA",
+		"queryPath": "file://home/mrpeanutbutter/Documents/Projects/ipa/aas/src/basyx-java-components/basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.prometheus-jsonata-aas/src/main/resources/jsonataA.json",
+		"inputType": "JsonString",
+		"outputType": "JsonString"
+	}
+]
