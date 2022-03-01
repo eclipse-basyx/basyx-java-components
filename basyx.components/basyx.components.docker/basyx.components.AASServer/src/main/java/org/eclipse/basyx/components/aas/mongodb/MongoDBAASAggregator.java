@@ -29,7 +29,9 @@ import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregator;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -47,6 +49,7 @@ import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,16 +130,16 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param clientId
 	 * @throws MqttException
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) throws MqttException {
-		createMQTTSubmodelAggregator(config, serverEndpoint, clientId);
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
+		createMQTTSubmodelAggregator(config, client);
 		init();
 	}
 
-	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId)
-			throws MqttException {
+	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
-		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, serverEndpoint, clientId);
+		submodelAggregator = new SubmodelAggregator(new MqttDecoratingSubmodelAPIFactory(smApiProvider, client));
+		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, client);
+		this.aasApiProvider = new MqttDecoratingAASAPIFactory(aasApiProvider, client);
 	}
 
 	/**
@@ -196,10 +199,9 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param registry
 	 * @throws MqttException
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId,
-			IAASRegistry registry) throws MqttException {
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client, IAASRegistry registry) throws MqttException {
 		this.registry = registry;
-		createMQTTSubmodelAggregator(config, serverEndpoint, clientId);
+		createMQTTSubmodelAggregator(config, client);
 		init();
 	}
 

@@ -50,10 +50,10 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.AuthorizedAASAggregator;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregator;
-import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIFactory;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregator;
-import org.eclipse.basyx.extensions.submodel.mqtt.MqttSubmodelAPIFactory;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
+import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactory;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPIFactory;
@@ -62,6 +62,7 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,8 @@ public class AASServerComponent implements IComponent {
 
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
+
+	private MqttClient client;
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -153,6 +156,17 @@ public class AASServerComponent implements IComponent {
 	 */
 	public void setRegistry(IAASRegistry registry) {
 		this.registry = registry;
+	}
+
+	public void connectMqttClient() throws MqttException {
+		String serverEndpoint = mqttConfig.getServer();
+		String clientId = getMqttSubmodelClientId();
+		client = new MqttClient(serverEndpoint, clientId);
+		client.connect();
+	}
+
+	public MqttClient getMqttClient() {
+		return client;
 	}
 
 	/**
@@ -255,6 +269,13 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private IAASAggregator createAggregator() {
+		if (shouldDecorateWithMQTT()) {
+			try {
+				connectMqttClient();
+			} catch (MqttException e) {
+				e.printStackTrace();
+			}
+		}
 		final IAASAggregator aggregatorBackend = createAggregatorBackend();
 		return decorate(aggregatorBackend);
 	}
@@ -286,7 +307,7 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator decorateWithMQTT(IAASAggregator decoratedAggregator) {
 		try {
-			decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttAASClientId());
+			decoratedAggregator = new MqttAASAggregator(decoratedAggregator, getMqttClient());
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error" + e.getMessage());
 		}
@@ -317,6 +338,7 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator createInMemoryAggregatorBackend() {
 		logger.info("Using InMemory backend");
 		if (shouldDecorateWithMQTT()) {
+
 			return createAASAggregatorWithMqttSubmodelAggregator();
 		}
 		return new AASAggregator(registry);
@@ -324,14 +346,11 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
 		try {
-			String serverEndpoint = mqttConfig.getServer();
-			String clientId = getMqttSubmodelClientId();
-
-			MqttAASAPIFactory aasApiFactory = new MqttAASAPIFactory(new VABAASAPIFactory(), serverEndpoint, clientId);
-			SubmodelAggregator submodelAPIFactory = new SubmodelAggregator(new MqttSubmodelAPIFactory(new VABSubmodelAPIFactory(), serverEndpoint, clientId));
-			MqttSubmodelAggregator submodelAggregator = new MqttSubmodelAggregator(submodelAPIFactory, serverEndpoint, clientId);
-
-			return new AASAggregator(aasApiFactory, submodelAggregator, registry);
+			MqttDecoratingAASAPIFactory aasApiFactory = new MqttDecoratingAASAPIFactory(new VABAASAPIFactory(), getMqttClient());
+			MqttDecoratingSubmodelAPIFactory submodelAPIFactory = new MqttDecoratingSubmodelAPIFactory(new VABSubmodelAPIFactory(), getMqttClient());
+			SubmodelAggregatorFactory submodelAggregatorFactory = new SubmodelAggregatorFactory(submodelAPIFactory);
+			MqttDecoratingSubmodelAggregatorFactory mqttSubmodelAggregatorFactory = new MqttDecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client);
+			return new AASAggregator(aasApiFactory, mqttSubmodelAggregatorFactory, registry);
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error " + e.getMessage());
 		}
@@ -346,7 +365,7 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator createMongoDbAggregatorWithMqttSubmodelAggregator() {
 		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
 		try {
-			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId(), registry);
+			IAASAggregator aggregator = new MqttAASAggregator(new MongoDBAASAggregator(config, getMqttClient(), registry), getMqttClient());
 			return aggregator;
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error " + e.getMessage());
