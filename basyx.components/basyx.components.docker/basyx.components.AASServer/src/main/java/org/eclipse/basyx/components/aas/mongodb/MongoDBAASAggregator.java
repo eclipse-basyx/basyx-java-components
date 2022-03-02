@@ -98,9 +98,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected ISubmodelAggregator submodelAggregator;
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
+	 * MongoDB backend.
 	 *
 	 * @param config
+	 *            The MongoDB Configuration
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
 		this.setConfiguration(config);
@@ -109,11 +111,13 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file and the registry in
-	 * it's constructor.
+	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
+	 * MongoDB backend.
 	 *
 	 * @param config
+	 *            The MongoDB Configuration
 	 * @param registry
+	 *            The registry
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
 		this.setConfiguration(config);
@@ -123,11 +127,13 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives a BaSyxMongoDBConfiguration and a MqttClient to create a persistent
+	 * MongoDB backend with MQTT eventing.
 	 * 
 	 * @param config
-	 * @param serverEndpoint
-	 * @param clientId
+	 *            The MongoDB Configuration
+	 * @param client
+	 *            The Mqtt Client
 	 * @throws MqttException
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
@@ -191,11 +197,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives a BaSyxMongoDBConfiguration, a MqttClient and a IAASRegistry to
+	 * create a persistent MongoDB backend with MQTT eventing
 	 * 
 	 * @param config
-	 * @param serverEndpoint
-	 * @param clientId
+	 * @param client
 	 * @param registry
 	 * @throws MqttException
 	 */
@@ -224,8 +230,9 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Sets the db configuration for this Aggregator.
-	 *
+	 * 
 	 * @param config
+	 *            The MongoDB Configuration
 	 */
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
 		// set mongoDB configuration
