@@ -46,7 +46,16 @@ public class PrometheusConsumerConfiguration extends HttpPollingConsumerConfigur
 	}
 
 	private void addQueryMapEntries(){
-		queryMap.put("cpu-usage", "avg(rate(node_cpu_seconds_total{mode=\"idle\"}[3m])) * 100");
-		queryMap.put("memory-usage", "node_memory_Active_bytes/node_memory_MemTotal_bytes*100");
+
+		queryMap.put("cpu-arch", "node_uname_info");
+		queryMap.put("cpu-cores", "count(count(node_cpu_seconds_total) by (cpu))");
+		queryMap.put("cpu-usage", "(((count(count(node_cpu_seconds_total) by (cpu))) - avg(sum by (mode)(irate(node_cpu_seconds_total{mode='idle'}[1m])))) * 100) / count(count(node_cpu_seconds_total) by (cpu))");
+		queryMap.put("system-uptime", "node_time_seconds - node_boot_time_seconds");
+		queryMap.put("ram-installed", "node_memory_MemTotal_bytes");
+		queryMap.put("ram-usage", "100 - ((node_memory_MemAvailable_bytes * 100) / node_memory_MemTotal_bytes)");
+		queryMap.put("rootfs-type", "node_filesystem_size_bytes{mountpoint=\"/\"}");
+		queryMap.put("rootfs-usage", "100 - ((node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"rootfs\"} * 100) / node_filesystem_size_bytes{mountpoint=\"/\",fstype!=\"rootfs\"})");
+		queryMap.put("docker-version", "cadvisor_version_info");
+		queryMap.put("docker-runningContainers", "irate(container_network_transmit_bytes_total{image!=\"\"}[1m])");
 	}
 }
