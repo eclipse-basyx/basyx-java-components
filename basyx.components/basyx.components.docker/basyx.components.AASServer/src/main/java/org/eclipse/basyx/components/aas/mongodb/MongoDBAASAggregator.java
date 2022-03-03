@@ -30,9 +30,10 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregator;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactory;
 import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
@@ -144,7 +145,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
 		this.setConfiguration(config);
 		submodelAggregator = new SubmodelAggregator(new MqttDecoratingSubmodelAPIFactory(smApiProvider, client));
-		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, client);
+		submodelAggregator = new MqttDecoratingSubmodelAggregatorFactory(new SubmodelAggregatorFactory(), client).create();
 		this.aasApiProvider = new MqttDecoratingAASAPIFactory(aasApiProvider, client);
 	}
 

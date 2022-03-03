@@ -10,6 +10,7 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
@@ -66,7 +67,7 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 
 		component = new AASServerComponent(contextConfig, serverConfig);
-		component.enableMQTT(mqttConfig);
+		component.addAASServerFeature(new MqttAASServerFeature(mqttConfig, "MqttAASServerSuiteClientId"));
 		component.startComponent();
 	}
 
@@ -98,15 +99,15 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 		Submodel submodel = createSubmodel(submodelIdentifier.getId(), submodelIdentifier);
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
 
-		assertTrue(listener.topics.stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
-		assertTrue(listener.topics.stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_CREATESUBMODEL)));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_CREATESUBMODEL)));
 
 		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 
-		assertTrue(listener.topics.stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
-		assertTrue(listener.topics.stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL)));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL)));
 		try {
 			manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 			fail();
