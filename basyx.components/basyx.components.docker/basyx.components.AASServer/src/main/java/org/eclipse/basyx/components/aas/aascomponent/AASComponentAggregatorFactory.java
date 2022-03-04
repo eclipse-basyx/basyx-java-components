@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.basyx.aas.aggregator.AASAggregatorFactory;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.aas.restapi.vab.VABAASAPIFactory;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
@@ -33,6 +34,7 @@ public class AASComponentAggregatorFactory {
 
 	private List<IAASServerDecorator> aasServerDecorators;
 	private AASServerBackend aasServerBackend;
+	private IAASRegistry aasServerRegistry;
 
 	public void setAASServerDecorators(List<IAASServerDecorator> decorators) {
 		this.aasServerDecorators = decorators;
@@ -40,6 +42,10 @@ public class AASComponentAggregatorFactory {
 
 	public void setAASServerBackend(AASServerBackend aasServerBackend) {
 		this.aasServerBackend = aasServerBackend;
+	}
+
+	public void setAASServerRegistry(IAASRegistry aasServerRegistry) {
+		this.aasServerRegistry = aasServerRegistry;
 	}
 
 	public IAASAggregator create() {
@@ -107,6 +113,6 @@ public class AASComponentAggregatorFactory {
 
 	private IAASAggregatorFactory createAASAggregatorFactory(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		// TODO: take backend into account
-		return new AASAggregatorFactory(aasAPIFactory, submodelAggregatorFactory);
+		return new AASAggregatorFactory(aasAPIFactory, submodelAggregatorFactory, aasServerRegistry);
 	}
 }
