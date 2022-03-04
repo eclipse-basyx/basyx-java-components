@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.ProviderException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +22,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.eclipse.basyx.aas.aggregator.AASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
@@ -36,10 +35,14 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.components.IComponent;
+import org.eclipse.basyx.components.aas.aascomponent.AASComponentAggregatorFactory;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
+import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
@@ -47,8 +50,6 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
-import org.eclipse.basyx.extensions.aas.aggregator.authorization.AuthorizedAASAggregator;
-import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
@@ -56,7 +57,6 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
  * ${URL}/shells
  *
- * @author schnicke, espen
+ * @author schnicke, espen, fried, fischer
  *
  */
 public class AASServerComponent implements IComponent {
@@ -80,7 +80,8 @@ public class AASServerComponent implements IComponent {
 	private BaSyxContextConfiguration contextConfig;
 	private BaSyxAASServerConfiguration aasConfig;
 	private BaSyxMongoDBConfiguration mongoDBConfig;
-	private BaSyxMqttConfiguration mqttConfig;
+
+	private List<IAASServerFeature> aasServerFeatureList = new ArrayList<IAASServerFeature>();
 
 	// Initial AASBundle
 	protected Collection<AASBundle> aasBundles;
@@ -120,17 +121,27 @@ public class AASServerComponent implements IComponent {
 	 * backend.
 	 *
 	 * @param configuration
+	 * 
+	 * @deprecated Add MQTT via {@link MqttAASServerFeature} instead.
 	 */
+	@Deprecated
 	public void enableMQTT(BaSyxMqttConfiguration configuration) {
-		this.mqttConfig = configuration;
+		aasServerFeatureList.add(new MqttAASServerFeature(configuration, getMqttSubmodelClientId()));
 	}
 
 	/**
 	 * Disables mqtt configuration. Has to be called before the component is
 	 * started.
+	 * 
+	 * @deprecated remove MQTT from the feature list instead.
 	 */
+	@Deprecated
 	public void disableMQTT() {
-		this.mqttConfig = null;
+		aasServerFeatureList.forEach(f -> {
+			if (f instanceof MqttAASServerFeature) {
+				aasServerFeatureList.remove(f);
+			}
+		});
 	}
 
 	/**
@@ -159,6 +170,7 @@ public class AASServerComponent implements IComponent {
 		registry = createRegistryFromConfig(aasConfig);
 
 		// Init HTTP context and add an XMLAASServlet according to the configuration
+		initializeAASServerFeatures();
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createAggregatorServlet());
 
@@ -193,8 +205,25 @@ public class AASServerComponent implements IComponent {
 
 		// Remove all AASs/SMs that were registered on startup
 		AASBundleHelper.deregister(registry, aasBundles);
+		cleanUpAASServerFeatures();
 
 		server.shutdown();
+	}
+
+	public void addAASServerFeature(IAASServerFeature aasServerFeature) {
+		aasServerFeatureList.add(aasServerFeature);
+	}
+
+	private void initializeAASServerFeatures() {
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerFeature.initialize();
+		}
+	}
+
+	private void cleanUpAASServerFeatures() {
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerFeature.cleanUp();
+		}
 	}
 
 	private String loadBundleString(String filePath) throws IOException {
@@ -234,8 +263,8 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private VABHTTPInterface<?> createAggregatorServlet() {
+		IAASAggregator aggregator = createAASAggregator();
 		loadAASFromSource(aasConfig.getAASSource());
-		IAASAggregator aggregator = createAggregator();
 
 		if (aasBundles != null) {
 			AASBundleHelper.integrate(aggregator, aasBundles);
@@ -248,95 +277,16 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	private IAASAggregator createAggregator() {
-		final IAASAggregator aggregatorBackend = createAggregatorBackend();
-		return decorate(aggregatorBackend);
-	}
-
-	private IAASAggregator decorate(IAASAggregator aasAggregator) {
-		IAASAggregator decoratedAggregator = aasAggregator;
-		if (shouldDecorateWithMQTT()) {
-			decoratedAggregator = decorateWithMQTT(decoratedAggregator);
-		}
-		if (shouldDecoreateWithAuthorization()) {
-			decoratedAggregator = decorateWithAuthorization(decoratedAggregator);
-		}
-		return decoratedAggregator;
-	}
-
-	private boolean shouldDecoreateWithAuthorization() {
-		return this.aasConfig.isAuthorizationEnabled();
-	}
-
-	private boolean shouldDecorateWithMQTT() {
-		return this.mqttConfig != null;
-	}
-
-	private IAASAggregator decorateWithAuthorization(IAASAggregator decoratedAggregator) {
-		decoratedAggregator = new AuthorizedAASAggregator(decoratedAggregator);
-		logger.info("Enable Authorization for AASAggregator");
-		return decoratedAggregator;
-	}
-
-	private IAASAggregator decorateWithMQTT(IAASAggregator decoratedAggregator) {
-		try {
-			decoratedAggregator = new MqttAASAggregator(decoratedAggregator, mqttConfig.getServer(), getMqttAASClientId());
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error" + e.getMessage());
-		}
-		logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-		return decoratedAggregator;
-	}
-
-	private IAASAggregator createAggregatorBackend() {
-		final AASServerBackend backendType = aasConfig.getAASBackend();
-		switch (backendType) {
-		case MONGODB:
-			return createMongoDBAggregatorBackend();
-		case INMEMORY:
-			return createInMemoryAggregatorBackend();
-		default:
-			throw new RuntimeException("Unknown backend type " + backendType);
-		}
-	}
-
-	private IAASAggregator createMongoDBAggregatorBackend() {
-		logger.info("Using MongoDB backend");
-		if (shouldDecorateWithMQTT()) {
-			return createMongoDbAggregatorWithMqttSubmodelAggregator();
-		}
-		return createMongoDBAggregator();
-	}
-
-	private IAASAggregator createInMemoryAggregatorBackend() {
-		logger.info("Using InMemory backend");
-		if (shouldDecorateWithMQTT()) {
-			return createAASAggregatorWithMqttSubmodelAggregator();
-		}
-		return new AASAggregator(registry);
-	}
-
-	private IAASAggregator createAASAggregatorWithMqttSubmodelAggregator() {
-		try {
-			return new AASAggregator(registry, mqttConfig.getServer(), getMqttSubmodelClientId());
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error " + e.getMessage());
-		}
-	}
-
-	private IAASAggregator createMongoDBAggregator() {
-		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
-		return aggregator;
-	}
-
-	private IAASAggregator createMongoDbAggregatorWithMqttSubmodelAggregator() {
-		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
-		try {
-			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, mqttConfig.getServer(), getMqttSubmodelClientId(), registry);
+	private IAASAggregator createAASAggregator() {
+		if (mongoDBConfig != null) {
+			BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
+			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
 			return aggregator;
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error " + e.getMessage());
+		} else {
+			AASComponentAggregatorFactory aasComponentAggregatorFactory = new AASComponentAggregatorFactory();
+			aasComponentAggregatorFactory.setAASServerBackend(aasConfig.getAASBackend());
+			aasComponentAggregatorFactory.setAASServerDecorators(createAASServerDecoratorList());
+			return aasComponentAggregatorFactory.create();
 		}
 	}
 
@@ -349,6 +299,16 @@ public class AASServerComponent implements IComponent {
 			config = this.mongoDBConfig;
 		}
 		return config;
+	}
+
+	private List<IAASServerDecorator> createAASServerDecoratorList() {
+		List<IAASServerDecorator> aasServerDecoratorList = new ArrayList<IAASServerDecorator>();
+
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerDecoratorList.add(aasServerFeature.getDecorator());
+		}
+
+		return aasServerDecoratorList;
 	}
 
 	private void loadAASFromSource(String aasSource) {

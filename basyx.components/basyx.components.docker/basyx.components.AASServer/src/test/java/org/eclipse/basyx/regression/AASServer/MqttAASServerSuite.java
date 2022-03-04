@@ -1,6 +1,7 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -9,10 +10,12 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelper;
+import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIHelper;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregatorHelper;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -60,12 +63,11 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 
 	protected static void genericSetupClass(BaSyxAASServerConfiguration serverConfig) throws IOException {
 		startMqttBroker();
-
 		BaSyxContextConfiguration contextConfig = createBaSyxContextConfiguration();
 		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 
 		component = new AASServerComponent(contextConfig, serverConfig);
-		component.enableMQTT(mqttConfig);
+		component.addAASServerFeature(new MqttAASServerFeature(mqttConfig, "MqttAASServerSuiteClientId"));
 		component.startComponent();
 	}
 
@@ -74,6 +76,7 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 		AssetAdministrationShell shell = createShell(shellIdentifier.getId(), shellIdentifier);
 
 		manager.createAAS(shell, getURL());
+
 		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
@@ -95,11 +98,16 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 
 		Submodel submodel = createSubmodel(submodelIdentifier.getId(), submodelIdentifier);
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
-		assertEquals(MqttSubmodelAggregatorHelper.TOPIC_CREATESUBMODEL, listener.lastTopic);
+
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_CREATESUBMODEL)));
+
 		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
-		assertEquals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL, listener.lastTopic);
+
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL)));
 		try {
 			manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 			fail();
