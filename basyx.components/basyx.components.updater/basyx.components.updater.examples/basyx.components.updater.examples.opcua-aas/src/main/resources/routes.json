@@ -1,0 +1,12 @@
+[
+	{
+		"datasource": "randomdouble",
+		"transformers": ["dataValueToJson"],
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"]
+	},
+	{
+		"datasource": "randomint32",
+		"transformers": ["dataValueToJson"],
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"]
+	}
+]

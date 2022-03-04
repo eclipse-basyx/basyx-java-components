@@ -1,0 +1,20 @@
+[
+	{
+		"uniqueId": "randomdouble",
+		"serverUrl": "milo.digitalpetri.com",
+		"serverPort": 62541,
+		"pathToService": "milo",
+		"nodeInformation": "ns=2;s=Dynamic/RandomDouble",
+		"username": "user1",
+		"password": "password"
+	},
+	{
+		"uniqueId": "randomint32",
+		"serverUrl": "milo.digitalpetri.com",
+		"serverPort": 62541,
+		"pathToService": "milo",
+		"nodeInformation": "ns=2;s=Dynamic/RandomInt32",
+		"username": "user1",
+		"password": "password"
+	}
+]
