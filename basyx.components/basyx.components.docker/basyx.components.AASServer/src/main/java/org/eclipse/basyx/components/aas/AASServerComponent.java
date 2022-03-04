@@ -285,6 +285,7 @@ public class AASServerComponent implements IComponent {
 		} else {
 			AASComponentAggregatorFactory aasComponentAggregatorFactory = new AASComponentAggregatorFactory();
 			aasComponentAggregatorFactory.setAASServerBackend(aasConfig.getAASBackend());
+			aasComponentAggregatorFactory.setAASServerRegistry(registry);
 			aasComponentAggregatorFactory.setAASServerDecorators(createAASServerDecoratorList());
 			return aasComponentAggregatorFactory.create();
 		}
