@@ -41,11 +41,13 @@ public class AASServerComponentTest {
 	private static final String EMPTY_JSON_ARRAY = "[]";
 	
 	public static void setUp(String source) {
-		// Setup component's test configuration
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(8080, "");
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, source);
 		
-		// Create and start AASServer component
+		createAndStartAASServerComponent(contextConfig, aasConfig);
+	}
+
+	private static void createAndStartAASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig) {
 		component = new AASServerComponent(contextConfig, aasConfig);
 		registry = new InMemoryRegistry();
 		component.setRegistry(registry);
