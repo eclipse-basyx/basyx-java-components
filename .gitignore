@@ -65,3 +65,4 @@ Properties
 
 .idea
 *.iml
+*.jdbc

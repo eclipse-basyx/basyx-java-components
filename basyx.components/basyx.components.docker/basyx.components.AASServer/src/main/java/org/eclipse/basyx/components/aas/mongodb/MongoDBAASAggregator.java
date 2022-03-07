@@ -61,6 +61,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
+import jakarta.persistence.EntityManager;
+
 /**
  * An IAASAggregator for persistent storage in a MongoDB.
  *
@@ -80,6 +82,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected MongoOperations mongoOps;
 	protected String aasCollection;
 	protected String smCollection;
+	protected EntityManager entityManager;
 
 	private IAASRegistry registry;
 
@@ -231,7 +234,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Sets the db configuration for this Aggregator.
-	 * 
+	 *
 	 * @param config
 	 *            The MongoDB Configuration
 	 */
@@ -249,11 +252,19 @@ public class MongoDBAASAggregator implements IAASAggregator {
 			api.setAAS(aas);
 			return api;
 		};
-		this.smApiProvider = sm -> {
-			MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, sm.getIdentification().getId());
-			api.setSubmodel(sm);
-			return api;
-		};
+		if (this.entityManager == null) {
+			this.smApiProvider = sm -> {
+				MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, sm.getIdentification().getId());
+				api.setSubmodel(sm);
+				return api;
+			};
+		} else {
+			this.smApiProvider = sm -> {
+				MongoDBSubmodelAPI api = new StorageMongoDBSubmodelAPI(config, sm.getIdentification().getId());
+				api.setSubmodel(sm);
+				return api;
+			};
+		}
 	}
 
 	/**
@@ -329,7 +340,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	private void addSubmodelProvidersById(String smId, MultiSubmodelProvider provider) {
-		ISubmodelAPI smApi = new MongoDBSubmodelAPI(config, smId);
+		ISubmodelAPI smApi;
+		if (this.entityManager == null) {
+			smApi = new MongoDBSubmodelAPI(config, smId);
+		} else {
+			smApi = new StorageMongoDBSubmodelAPI(config, smId);
+		}
 		SubmodelProvider smProvider = new SubmodelProvider(smApi);
 		provider.addSubmodel(smProvider);
 	}

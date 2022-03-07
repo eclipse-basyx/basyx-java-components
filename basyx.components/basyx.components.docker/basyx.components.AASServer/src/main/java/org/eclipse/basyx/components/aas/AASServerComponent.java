@@ -61,6 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 /**
  * Component providing an empty AAS server that is able to receive AAS/SMs from
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
@@ -88,6 +92,8 @@ public class AASServerComponent implements IComponent {
 
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
+
+	private String submodelElementStorageOption = "";
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -149,6 +155,13 @@ public class AASServerComponent implements IComponent {
 	 */
 	public void enableAASXUpload() {
 		this.isAASXUploadEnabled = true;
+	}
+
+	/**
+	 * Enables AASX upload functionality
+	 */
+	public void enableSubmodelElementStorage(String submodelElementStorageOption) {
+		this.submodelElementStorageOption = submodelElementStorageOption;
 	}
 
 	/**
@@ -289,6 +302,15 @@ public class AASServerComponent implements IComponent {
 			aasComponentAggregatorFactory.setAASServerDecorators(createAASServerDecoratorList());
 			return aasComponentAggregatorFactory.create();
 		}
+	}
+
+	private IAASAggregator createMongoDBAggregatorWithStorage() {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(submodelElementStorageOption);
+		EntityManager entityManager = emf.createEntityManager();
+		BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, entityManager);
+		aggregator.setRegistry(registry);
+		return aggregator;
 	}
 
 	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {

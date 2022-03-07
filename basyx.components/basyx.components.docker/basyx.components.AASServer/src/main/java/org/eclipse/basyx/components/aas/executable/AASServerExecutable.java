@@ -71,6 +71,11 @@ public class AASServerExecutable {
 			component.enableAASXUpload();
 		}
 
+		// if enabled, set storage default
+		if (!aasConfig.getSubmodelElementStorageOption().isEmpty()) {
+			component.enableSubmodelElementStorage(aasConfig.getSubmodelElementStorageOption());
+		}
+
 		component.startComponent();
 
 		logger.info("BaSyx AAS Server component started");
