@@ -13,9 +13,11 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 import org.eclipse.basyx.components.aas.AASServerComponent;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASXUploadBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.slf4j.Logger;
@@ -56,7 +58,12 @@ public class AASServerExecutable {
 		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
 			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 			mqttConfig.loadFromDefaultSource();
-			component.enableMQTT(mqttConfig);
+			component.addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
+		}
+
+		// if enabled, activate authorization feature
+		if (aasConfig.isAuthorizationEnabled()) {
+			component.addAASServerFeature(new AuthorizedAASServerFeature());
 		}
 
 		// if enabled, load AASX uploader functionality

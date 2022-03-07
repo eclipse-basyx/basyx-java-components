@@ -29,8 +29,11 @@ import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregator;
+import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactory;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
@@ -47,6 +50,7 @@ import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,9 +102,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected ISubmodelAggregator submodelAggregator;
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
+	 * MongoDB backend.
 	 *
 	 * @param config
+	 *            The MongoDB Configuration
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
 		this.setConfiguration(config);
@@ -109,34 +115,49 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
+	 * MongoDB backend.
 	 *
 	 * @param config
-	 * @param entityManager
+	 *            The MongoDB Configuration
+	 * @param registry
+	 *            The registry
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, EntityManager entityManager) {
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
 		this.setConfiguration(config);
+		this.registry = registry;
 		submodelAggregator = new SubmodelAggregator(smApiProvider);
-		this.entityManager = entityManager;
 		init();
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
-	 *
+	 * Receives a BaSyxMongoDBConfiguration and a MqttClient to create a persistent
+	 * MongoDB backend with MQTT eventing.
+	 * 
 	 * @param config
+	 *            The MongoDB Configuration
+	 * @param client
+	 *            The Mqtt Client
 	 * @throws MqttException
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, String serverEndpoint, String clientId) throws MqttException {
-		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
-		submodelAggregator = new MqttSubmodelAggregator(submodelAggregator, serverEndpoint, clientId);
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
+		createMQTTSubmodelAggregator(config, client);
 		init();
+	}
+
+	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
+		this.setConfiguration(config);
+		submodelAggregator = new SubmodelAggregator(new MqttDecoratingSubmodelAPIFactory(smApiProvider, client));
+		submodelAggregator = new MqttDecoratingSubmodelAggregatorFactory(new SubmodelAggregatorFactory(), client).create();
+		this.aasApiProvider = new MqttDecoratingAASAPIFactory(aasApiProvider, client);
 	}
 
 	/**
 	 * Receives the path of the .properties file in it's constructor from a
 	 * resource.
+	 *
+	 * @param resourceConfigPath
+	 *            Path of the configuration file
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath) {
 		config = new BaSyxMongoDBConfiguration();
@@ -147,12 +168,66 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
+	 * Receives the path of the .properties file from a resource and the registry in
+	 * it's constructor.
+	 *
+	 * @param resourceConfigPath
+	 *            Path of the configuration file
+	 * @param registry
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		this.setConfiguration(config);
+		submodelAggregator = new SubmodelAggregator(smApiProvider);
+		this.registry = registry;
+		init();
+	}
+
+	/**
 	 * Constructor using default connections
 	 */
 	public MongoDBAASAggregator() {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH);
 	}
 
+	/**
+	 * Constructor using default connections with registry as a parameter
+	 *
+	 * @param registry
+	 */
+	public MongoDBAASAggregator(IAASRegistry registry) {
+		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, registry);
+	}
+
+	/**
+	 * Receives a BaSyxMongoDBConfiguration, a MqttClient and a IAASRegistry to
+	 * create a persistent MongoDB backend with MQTT eventing
+	 * 
+	 * @param config
+	 * @param client
+	 * @param registry
+	 * @throws MqttException
+	 */
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client, IAASRegistry registry) throws MqttException {
+		this.registry = registry;
+		createMQTTSubmodelAggregator(config, client);
+		init();
+	}
+
+	/**
+	 * Sets the IAASRegistry instance.
+	 *
+	 * @deprecated This method is deprecated due to a bug. Use constructors
+	 *             {@link #MongoDBAASAggregator(IAASRegistry) or
+	 *             #MongoDBAASAggregator(BaSyxMongoDBConfiguration, IAASRegistry) or
+	 *             #MongoDBAASAggregator(String, IAASRegistry) } to set the
+	 *             IAASRegistry instance.
+	 *
+	 * @param registry
+	 *            Asset Adminstration Shell's Registry
+	 */
+	@Deprecated
 	public void setRegistry(IAASRegistry registry) {
 		this.registry = registry;
 	}
@@ -161,6 +236,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * Sets the db configuration for this Aggregator.
 	 *
 	 * @param config
+	 *            The MongoDB Configuration
 	 */
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
 		// set mongoDB configuration
