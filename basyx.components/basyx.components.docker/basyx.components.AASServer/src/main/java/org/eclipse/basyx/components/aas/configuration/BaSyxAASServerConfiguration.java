@@ -39,6 +39,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
 	public static final String DEFAULT_AUTHORIZATION_ENABLED = "false";
 	public static final String DEFAULT_SUBMODELELEMENT_STORAGE_OPTION = "";
+	public static final String DEFAULT_SUBMODELELEMENT_STORAGE_BACKEND = "";
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -50,6 +51,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String AASX_UPLOAD = "aas.aasxUpload";
 	public static final String AUTHORIZATION_ENABLED = "aas.authorizationEnabled";
 	public static final String SUBMODELELEMENT_STORAGE_OPTION = "aas.submodelElementStorageOption";
+	public static final String SUBMODELELEMENT_STORAGE_BACKEND = "aas.submodelElementStorageBackend";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -68,6 +70,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
 		defaultProps.put(AUTHORIZATION_ENABLED, DEFAULT_AUTHORIZATION_ENABLED);
 		defaultProps.put(SUBMODELELEMENT_STORAGE_OPTION, DEFAULT_SUBMODELELEMENT_STORAGE_OPTION);
+		defaultProps.put(SUBMODELELEMENT_STORAGE_BACKEND, DEFAULT_SUBMODELELEMENT_STORAGE_BACKEND);
 		return defaultProps;
 	}
 
@@ -224,7 +227,15 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		return getProperty(SUBMODELELEMENT_STORAGE_OPTION);
 	}
 
-	public void setSubmodelElementStorageEnabled(String submodelElementStorageEnabled) {
+	public void setSubmodelElementStorageOption(String submodelElementStorageEnabled) {
 		setProperty(SUBMODELELEMENT_STORAGE_OPTION, submodelElementStorageEnabled);
+	}
+
+	public String getSubmodelElementStorageBackend() {
+		return getProperty(SUBMODELELEMENT_STORAGE_BACKEND);
+	}
+
+	public void setSubmodelElementStorageBackend(String submodelElementStorageBackend) {
+		setProperty(SUBMODELELEMENT_STORAGE_BACKEND, submodelElementStorageBackend);
 	}
 }
