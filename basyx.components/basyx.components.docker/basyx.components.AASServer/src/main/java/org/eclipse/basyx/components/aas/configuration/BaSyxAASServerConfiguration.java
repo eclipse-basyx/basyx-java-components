@@ -189,7 +189,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	/**
 	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
-	 *             {@link #setAASSourceAsList() } to get the list of
+	 *             {@link #setAASSourceAsList(String) } to get the list of
 	 *             source path/paths of serialized AAS.
 	 */
 	@Deprecated

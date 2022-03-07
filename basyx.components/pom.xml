@@ -155,9 +155,6 @@
 							<goals>
 								<goal>javadoc</goal>
 							</goals>
-							<configuration>
-                				<additionalJOption>-Xdoclint:none</additionalJOption>
-            				</configuration>
 							<id>generate-javadoc</id>
 							<phase>package</phase>
 						</execution>
