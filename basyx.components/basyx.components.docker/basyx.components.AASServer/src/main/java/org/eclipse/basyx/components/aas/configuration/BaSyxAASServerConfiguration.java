@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Arrays;
+import java.util.regex.Pattern;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
-
 import com.google.gson.Gson;
 
 /**
@@ -54,6 +54,8 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	// The default key for variables pointing to the configuration file
 	public static final String DEFAULT_FILE_KEY = "BASYX_AAS";
+	
+	public static final String PATTERN = "^\\[\\\".*\\\"\\]$";
 
 	public static Map<String, String> getDefaultProperties() {
 		Map<String, String> defaultProps = new HashMap<>();
@@ -86,7 +88,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public BaSyxAASServerConfiguration(AASServerBackend backend, String source) {
 		super(getDefaultProperties());
 		setAASBackend(backend);
-		setAASSource(source);
+		setAASSourceAsList(source);
 	}
 
 	/**
@@ -163,11 +165,39 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(AASX_UPLOAD, aasxUpload.toString());
 	}
 
+	/**
+	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
+	 *             {@link #getAASSourceAsList() } to get the list of
+	 *             source path/paths of serialized AAS.
+	 */
+	@Deprecated
 	public String getAASSource() {
 		return getProperty(SOURCE);
 	}
 
+	public List<String> getAASSourceAsList() {
+		if(!areMultipleAasSourcesProvided(getProperty(SOURCE))) {
+			return Arrays.asList(getProperty(SOURCE));
+		}
+		
+		return parseFromJson(getProperty(SOURCE));
+	}
+
+	private boolean areMultipleAasSourcesProvided(String property) {
+		return Pattern.matches(PATTERN, property);
+	}
+
+	/**
+	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
+	 *             {@link #setAASSourceAsList(String) } to get the list of
+	 *             source path/paths of serialized AAS.
+	 */
+	@Deprecated
 	public void setAASSource(String source) {
+		setProperty(SOURCE, source);
+	}
+	
+	public void setAASSourceAsList(String source) {
 		setProperty(SOURCE, source);
 	}
 
@@ -180,7 +210,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public List<String> getSubmodels() {
-		return parseSubmodels(getProperty(SUBMODELS));
+		return parseFromJson(getProperty(SUBMODELS));
 	}
 
 	public void setSubmodels(List<String> submodels) {
@@ -195,8 +225,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(HOSTPATH, hostPath);
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<String> parseSubmodels(String property) {
+	private List<String> parseFromJson(String property) {
 		List<String> fromJson = new Gson().fromJson(property, List.class);
 		if (fromJson == null) {
 			return new ArrayList<>();

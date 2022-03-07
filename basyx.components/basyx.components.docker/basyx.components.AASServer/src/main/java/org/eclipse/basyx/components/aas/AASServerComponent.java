@@ -11,22 +11,25 @@ package org.eclipse.basyx.components.aas;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
 import org.eclipse.basyx.aas.bundle.AASBundleHelper;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
+import org.eclipse.basyx.aas.factory.aasx.FileLoaderHelper;
 import org.eclipse.basyx.aas.factory.aasx.SubmodelFileEndpointLoader;
 import org.eclipse.basyx.aas.factory.json.JSONAASBundleFactory;
 import org.eclipse.basyx.aas.factory.xml.XMLAASBundleFactory;
@@ -229,42 +232,48 @@ public class AASServerComponent implements IComponent {
 	private String loadBundleString(String filePath) throws IOException {
 		String content;
 		try {
-			content = new String(Files.readAllBytes(Paths.get(filePath)));
+			content = IOUtils.toString(FileLoaderHelper.getInputStream(filePath), StandardCharsets.UTF_8.name());
 		} catch (IOException e) {
 			logger.info("Could not find a corresponding file. Loading from default resource.");
 			content = BaSyxConfiguration.getResourceString(filePath);
 		}
+
 		return content;
 	}
 
-	private void loadBundleFromXML(String xmlPath) throws IOException, ParserConfigurationException, SAXException {
+	private Set<AASBundle> loadBundleFromXML(String xmlPath)
+			throws IOException, ParserConfigurationException, SAXException {
 		logger.info("Loading aas from xml \"" + xmlPath + "\"");
 		String xmlContent = loadBundleString(xmlPath);
-		this.aasBundles = new XMLAASBundleFactory(xmlContent).create();
+
+		return new XMLAASBundleFactory(xmlContent).create();
 	}
 
-	private void loadBundleFromJSON(String jsonPath) throws IOException {
+	private Set<AASBundle> loadBundleFromJSON(String jsonPath) throws IOException {
 		logger.info("Loading aas from json \"" + jsonPath + "\"");
 		String jsonContent = loadBundleString(jsonPath);
-		this.aasBundles = new JSONAASBundleFactory(jsonContent).create();
+
+		return new JSONAASBundleFactory(jsonContent).create();
 	}
 
-	private void loadBundleFromAASX(String aasxPath) throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InvalidFormatException {
+	private static Set<AASBundle> loadBundleFromAASX(String aasxPath)
+			throws IOException, ParserConfigurationException, SAXException, InvalidFormatException, URISyntaxException {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
+		@SuppressWarnings("deprecation")
 		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
 
 		// Unpack the files referenced by the aas
 		packageManager.unzipRelatedFiles();
 
 		// Retrieve the aas from the package
-		this.aasBundles = packageManager.retrieveAASBundles();
+		return packageManager.retrieveAASBundles();
 	}
 
 	private VABHTTPInterface<?> createAggregatorServlet() {
 		IAASAggregator aggregator = createAASAggregator();
-		loadAASFromSource(aasConfig.getAASSource());
+		aasBundles = loadAASFromSource(aasConfig.getAASSourceAsList());
 
 		if (aasBundles != null) {
 			AASBundleHelper.integrate(aggregator, aasBundles);
@@ -312,23 +321,33 @@ public class AASServerComponent implements IComponent {
 		return aasServerDecoratorList;
 	}
 
-	private void loadAASFromSource(String aasSource) {
-		if (aasSource.isEmpty()) {
-			return;
+	private Set<AASBundle> loadAASFromSource(List<String> aasSources) {
+		if (aasSources.isEmpty()) {
+			return Collections.emptySet();
 		}
 
+		Set<AASBundle> aasBundlesSet = new HashSet<>();
+		
+		aasSources.stream().map(this::loadBundleFromFile).forEach(aasBundlesSet::addAll);
+		
+		return aasBundlesSet;
+	}
+
+	private Set<AASBundle> loadBundleFromFile(String aasSource) {
 		try {
 			if (aasSource.endsWith(".aasx")) {
-				loadBundleFromAASX(aasSource);
+				return loadBundleFromAASX(aasSource);
 			} else if (aasSource.endsWith(".json")) {
-				loadBundleFromJSON(aasSource);
+				return loadBundleFromJSON(aasSource);
 			} else if (aasSource.endsWith(".xml")) {
-				loadBundleFromXML(aasSource);
+				return loadBundleFromXML(aasSource);
 			}
-		} catch (IOException | ParserConfigurationException | SAXException | URISyntaxException | InvalidFormatException e) {
+		} catch (IOException | ParserConfigurationException | SAXException | URISyntaxException
+				| InvalidFormatException e) {
 			logger.error("Could not load initial AAS from source '" + aasSource + "'");
-			logger.info("Starting empty server instead");
 		}
+
+		return Collections.emptySet();
 	}
 
 	/**
