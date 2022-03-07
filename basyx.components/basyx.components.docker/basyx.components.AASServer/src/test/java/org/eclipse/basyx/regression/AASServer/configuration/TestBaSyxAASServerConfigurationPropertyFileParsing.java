@@ -7,7 +7,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
-package org.eclipse.basyx.regression.AASServer;
+package org.eclipse.basyx.regression.AASServer.configuration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -18,32 +18,34 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.components.aas.AASServerComponent;
-import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.junit.After;
 import org.junit.Test;
 
 /**
- * Tests if AASServerComponent correctly deregisteres automatically registered AASs/SMs
+ * Tests 
+ * Multiple serialization of AAS and
+ * if AASServerComponent correctly deregisters automatically registered AASs/SMs
  * 
  * @author conradi
  *
  */
-public class AASServerComponentTest {
+public class TestBaSyxAASServerConfigurationPropertyFileParsing {
+	private static final String MULTIPLE_DIFFERENT_AAS_SERIALIZATION = "aas_multiple_different_source.properties";
+	private static final String SINGLE_JSON_AAS_SERIALIZATION = "aas_single_json_source.properties";
+	private static final String SINGLE_AAS_SERIALIZATION = "aas_single_source.properties";
+
+	
 	private static AASServerComponent component;
 	private static InMemoryRegistry registry;
 	
-	private static final String XML_SOURCE = "xml/aas.xml";
-	
-	private static final String MULTIPLE_DIFFERENT_AAS_SERIALIZATION = "[\"json/aas.json\",\"aasx/01_Festo.aasx\",\"xml/aas.xml\"]";
-	private static final String SINGLE_JSON_AAS_SERIALIZATION = "[\"json/aas.json\"]";
-	private static final String EMPTY_JSON_ARRAY = "[]";
-	
-	public static void setUp(String source) {
+	private static void setUp(String resourcePath) {
 		// Setup component's test configuration
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(8080, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, source);
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration();
+		aasConfig.loadFromResource(resourcePath);
 		
 		// Create and start AASServer component
 		component = new AASServerComponent(contextConfig, aasConfig);
@@ -58,8 +60,6 @@ public class AASServerComponentTest {
 		
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(4, aasDescriptors.size());
-		
-		stopAASServerComponent();
 	}
 	
 	@Test
@@ -68,52 +68,17 @@ public class AASServerComponentTest {
 		
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(1, aasDescriptors.size());
-		
-		stopAASServerComponent();
 	}
 	
 	@Test
-	public void checkBehaviorWithEmptyJsonArray() {
-		setUp(EMPTY_JSON_ARRAY);
-		
-		List<AASDescriptor> aasDescriptors = registry.lookupAll();
-		System.out.println(aasDescriptors.size());
-		assertEquals(0, aasDescriptors.size());
-		
-		stopAASServerComponent();
-	}
-	
-	/**
-	 * Tests if AASServerComponent deregisters all AASs/SMs that it registered automatically on startup
-	 */
-	@Test
-	public void testServerCleanup() {
-		setUp(XML_SOURCE);
+	public void checkAasSerializedSouceDefinedWithoutJsonArray() {
+		setUp(SINGLE_AAS_SERIALIZATION);
 		
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(2, aasDescriptors.size());
-		
-		stopAASServerComponent();
-		
-		// Try to lookup all previously registered AASs
-		for(AASDescriptor aasDescriptor: aasDescriptors) {
-			try {
-				registry.lookupAAS(aasDescriptor.getIdentifier());
-				fail();
-			} catch (ResourceNotFoundException e) {
-			}
-			
-			// Try to lookup all previously registered SMs
-			for(SubmodelDescriptor smDescriptor: aasDescriptor.getSubmodelDescriptors()) {
-				try {
-					registry.lookupSubmodel(aasDescriptor.getIdentifier(), smDescriptor.getIdentifier());
-					fail();
-				} catch (ResourceNotFoundException e) {
-				}
-			}
-		}
 	}
 	
+	@After
 	public void stopAASServerComponent() {
 		component.stopComponent();
 	}
