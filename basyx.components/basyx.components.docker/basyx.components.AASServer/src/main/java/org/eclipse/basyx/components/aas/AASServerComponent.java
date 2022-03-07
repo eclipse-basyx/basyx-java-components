@@ -326,11 +326,11 @@ public class AASServerComponent implements IComponent {
 			return Collections.emptySet();
 		}
 
-		Set<AASBundle> set = new HashSet<>();
+		Set<AASBundle> aasBundlesSet = new HashSet<>();
 		
-		aasSources.stream().map(this::loadBundleFromFile).forEach(set::addAll);
+		aasSources.stream().map(this::loadBundleFromFile).forEach(aasBundlesSet::addAll);
 		
-		return set;
+		return aasBundlesSet;
 	}
 
 	private Set<AASBundle> loadBundleFromFile(String aasSource) {
