@@ -41,7 +41,6 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
@@ -278,17 +277,18 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private IAASAggregator createAASAggregator() {
-		if (mongoDBConfig != null) {
-			BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
-			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
-			return aggregator;
-		} else {
-			AASComponentAggregatorFactory aasComponentAggregatorFactory = new AASComponentAggregatorFactory();
-			aasComponentAggregatorFactory.setAASServerBackend(aasConfig.getAASBackend());
-			aasComponentAggregatorFactory.setAASServerRegistry(registry);
-			aasComponentAggregatorFactory.setAASServerDecorators(createAASServerDecoratorList());
-			return aasComponentAggregatorFactory.create();
+		AASComponentAggregatorFactory aasComponentAggregatorFactory = new AASComponentAggregatorFactory();
+		aasComponentAggregatorFactory.setAASServerBackend(aasConfig.getAASBackend());
+		aasComponentAggregatorFactory.setAASServerRegistry(registry);
+		if (isMongoDBBackend()) {
+			aasComponentAggregatorFactory.setMongoDBConfig(createMongoDbConfiguration());
 		}
+		aasComponentAggregatorFactory.setAASServerDecorators(createAASServerDecoratorList());
+		return aasComponentAggregatorFactory.create();
+	}
+
+	private boolean isMongoDBBackend() {
+		return aasConfig.getAASBackend().equals(AASServerBackend.MONGODB);
 	}
 
 	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {
