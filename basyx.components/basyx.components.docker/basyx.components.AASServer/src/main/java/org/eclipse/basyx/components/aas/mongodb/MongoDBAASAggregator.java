@@ -273,7 +273,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * Constructor using the default configuration, with the given IAASAPIFactory
 	 * and ISubmodelAggregatorFactory.
 	 * 
-	 * @param resourceConfigPath
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
 	 * 
