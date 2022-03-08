@@ -110,5 +110,18 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<dependency>
+    		<groupId>org.eclipse.milo</groupId>
+    		<artifactId>server-examples</artifactId>
+    		<version>0.3.3</version>
+    		<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.eclipse.basyx</groupId>
+			<artifactId>basyx.components.updater.transformer.camel-jsonata</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 </project>

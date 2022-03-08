@@ -2,8 +2,7 @@ package basyx.components.updater.examples.opcuaaas.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
@@ -16,8 +15,8 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import basyx.components.updater.camelopcua.configuration.factory.OpcuaDefaultConfigurationFactory;
@@ -26,23 +25,37 @@ import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonjacksonDefaultConfigurationFactory;
+import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
+import org.eclipse.milo.examples.server.ExampleServer;
 
 public class TestAASUpdater {
 	private static AASServerComponent aasServer;
 	private static UpdaterComponent updater;
 	private static InMemoryRegistry registry;
+	protected static ExampleServer opcUaServer;
 
 	protected static IIdentifier deviceAAS = new CustomId("TestUpdatedDeviceAAS");
 	private static BaSyxContextConfiguration aasContextConfig;
 
-	@BeforeClass
-	public static void setUp() throws IOException {
+	@Before
+	public void setUp() throws Exception {
+		System.out.println("Setting up env...");
+		startOpcUaServer();
 		registry = new InMemoryRegistry();
 
 		aasContextConfig = new BaSyxContextConfiguration(4001, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");		
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY,
+				"aasx/updatertest.aasx");
 		aasServer = new AASServerComponent(aasContextConfig, aasConfig);
 		aasServer.setRegistry(registry);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		System.out.println("Tearing down env...");
+		updater.stopComponent();
+		aasServer.stopComponent();
+		stopOpcUaServer();
 	}
 
 	@Test
@@ -52,7 +65,7 @@ public class TestAASUpdater {
 		System.out.println("START UPDATER");
 		ClassLoader loader = this.getClass().getClassLoader();
 		RoutesConfiguration configuration = new RoutesConfiguration();
-
+		
 		// Extend configutation for connections
 		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
 		configuration.addRoutes(routesFactory.getRouteConfigurations());
@@ -64,17 +77,41 @@ public class TestAASUpdater {
 		// Extend configuration for AAS
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
 		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
-		
-		// Extend configuration for Jsonata
-		JsonjacksonDefaultConfigurationFactory jsonJacksonConfigFactory = new JsonjacksonDefaultConfigurationFactory(loader);
+
+		JsonjacksonDefaultConfigurationFactory jsonJacksonConfigFactory = new JsonjacksonDefaultConfigurationFactory(
+				loader);
 		configuration.addTransformers(jsonJacksonConfigFactory.getDataTransformerConfigurations());
+
+		// Extend configuration for Jsonata
+		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
+		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();
 		System.out.println("UPDATER STARTED");
-		Thread.sleep(60000);
-		updater.stopComponent();
-		aasServer.stopComponent();
+		Thread.sleep(5000);
+		System.out.println("CHECK PROPERTY");
+		checkProperty();
 	}
-	
+
+	private void checkProperty() {
+		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry);
+		ConnectedAssetAdministrationShell aas = manager.retrieveAAS(deviceAAS);
+		ISubmodel sm = aas.getSubmodels().get("ConnectedSubmodel");
+		ISubmodelElement propertyA = sm.getSubmodelElement("ConnectedPropertyA");
+		Object propAValue = propertyA.getValue();
+		ISubmodelElement propertyB = sm.getSubmodelElement("ConnectedPropertyB");
+		Object propBValue = propertyB.getValue();
+		assertEquals("3.14", propAValue);
+		assertEquals("32", propBValue);
+	}
+
+	private static void startOpcUaServer() throws Exception {
+		opcUaServer = new ExampleServer();
+		opcUaServer.startup().get();
+	}
+
+	private static void stopOpcUaServer() throws InterruptedException, ExecutionException {
+		opcUaServer.shutdown().get();
+	}
 }

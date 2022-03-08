@@ -15,6 +15,7 @@ import basyx.components.updater.core.configuration.DataSourceConfiguration;
 
 /**
  * An implementation of OpcUa consumer configuration
+ * 
  * @author Daniele Rossi
  *
  */
@@ -23,10 +24,11 @@ public class OpcuaConsumerConfiguration extends DataSourceConfiguration {
 	private String nodeInformation;
 	private String username;
 	private String password;
-	
-	public OpcuaConsumerConfiguration() {}
-	
-	public OpcuaConsumerConfiguration(String uniqueId, String serverUrl, int serverPort, String pathToService, 
+
+	public OpcuaConsumerConfiguration() {
+	}
+
+	public OpcuaConsumerConfiguration(String uniqueId, String serverUrl, int serverPort, String pathToService,
 			String nodeInformation, String username, String password) {
 		super(uniqueId, serverUrl, serverPort);
 		this.pathToService = pathToService;
@@ -34,7 +36,7 @@ public class OpcuaConsumerConfiguration extends DataSourceConfiguration {
 		this.username = username;
 		this.password = password;
 	}
-	
+
 	public String getPathToService() {
 		return pathToService;
 	}
@@ -42,7 +44,7 @@ public class OpcuaConsumerConfiguration extends DataSourceConfiguration {
 	public void setPathToService(String pathToService) {
 		this.pathToService = pathToService;
 	}
-	
+
 	public String getNodeInformation() {
 		return nodeInformation;
 	}
@@ -50,7 +52,7 @@ public class OpcuaConsumerConfiguration extends DataSourceConfiguration {
 	public void setNodeInformation(String nodeInformation) {
 		this.nodeInformation = nodeInformation;
 	}
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -58,7 +60,7 @@ public class OpcuaConsumerConfiguration extends DataSourceConfiguration {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
@@ -66,8 +68,10 @@ public class OpcuaConsumerConfiguration extends DataSourceConfiguration {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public String getConnectionURI() {
-		return "milo-client:opc.tcp://"+getUsername()+":"+getPassword()+"@"+getServerUrl()+":"+getServerPort()+"/"+getPathToService()+"?allowedSecurityPolicies=None&node=RAW("+getNodeInformation()+")";
+		String credentials = username == null || password == null ? "" : username + ":" + password + "@";
+		return "milo-client:opc.tcp://" + credentials + getServerUrl() + ":" + getServerPort() + "/" + pathToService
+				+ "?allowedSecurityPolicies=None&node=RAW(" + nodeInformation + ")";
 	}
 }

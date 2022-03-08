@@ -16,16 +16,17 @@ import basyx.components.updater.transformer.cameljsonjackson.configuration.Jsonj
 
 /**
  * JsonJackson default configuration factory from default path
+ * 
  * @author Daniele Rossi
  *
  */
 public class JsonjacksonDefaultConfigurationFactory extends DataTransformerConfigurationFactory {
 	private static final String FILE_PATH = "jsonjacksontransformer.json";
-	
+
 	public JsonjacksonDefaultConfigurationFactory(ClassLoader loader) {
 		super(FILE_PATH, loader, JsonjacksonTransformerConfiguration.class);
 	}
-	
+
 	public JsonjacksonDefaultConfigurationFactory(String filePath, ClassLoader loader) {
 		super(filePath, loader, JsonjacksonTransformerConfiguration.class);
 	}

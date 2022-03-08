@@ -1,0 +1,20 @@
+[
+	{
+		"uniqueId": "doublescalar",
+		"serverUrl": "127.0.0.1",
+		"serverPort": 12686,
+		"pathToService": "milo",
+		"nodeInformation": "ns=2;s=HelloWorld/ScalarTypes/Double"
+#		"username": "user",
+#		"password": "password1"
+	},
+	{
+		"uniqueId": "integerscalar",
+		"serverUrl": "127.0.0.1",
+		"serverPort": 12686,
+		"pathToService": "milo",
+		"nodeInformation": "ns=2;s=HelloWorld/ScalarTypes/Integer"
+#		"username": "user",
+#		"password": "password1"
+	}
+]

@@ -16,16 +16,17 @@ import basyx.components.updater.core.configuration.factory.DataSourceConfigurati
 
 /**
  * A default configuration factory for OpcUa from a default file location
+ * 
  * @author Daniele Rossi
  *
  */
 public class OpcuaDefaultConfigurationFactory extends DataSourceConfigurationFactory {
 	private static final String FILE_PATH = "opcuaconsumer.json";
-	
+
 	public OpcuaDefaultConfigurationFactory(ClassLoader loader) {
 		super(FILE_PATH, loader, OpcuaConsumerConfiguration.class);
 	}
-	
+
 	public OpcuaDefaultConfigurationFactory(String filePath, ClassLoader loader) {
 		super(filePath, loader, OpcuaConsumerConfiguration.class);
 	}

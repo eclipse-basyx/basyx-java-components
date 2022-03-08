@@ -14,8 +14,8 @@ package basyx.components.updater.transformer.cameljsonjackson.configuration;
 import basyx.components.updater.core.configuration.DataTransformerConfiguration;
 
 /**
- * An implementation of JsonJackson transformer configuration
- * using camel jsonjackson component
+ * An implementation of JsonJackson transformer configuration using camel
+ * jsonjackson component
  * 
  * @author Daniele Rossi
  *
@@ -24,21 +24,22 @@ public class JsonjacksonTransformerConfiguration extends DataTransformerConfigur
 	private String operation;
 	private String jacksonModules;
 
-	public JsonjacksonTransformerConfiguration() {}
-	
+	public JsonjacksonTransformerConfiguration() {
+	}
+
 	public JsonjacksonTransformerConfiguration(String uniqueId, String operation) {
 		super(uniqueId);
 		this.operation = operation;
 	}
-	
+
 	public String getOperation() {
 		return operation;
 	}
-	
+
 	public void setOperation(String operation) {
 		this.operation = operation;
 	}
-	
+
 	public String getJacksonModules() {
 		return jacksonModules;
 	}
@@ -46,10 +47,10 @@ public class JsonjacksonTransformerConfiguration extends DataTransformerConfigur
 	public void setJacksonModules(String jacksonModules) {
 		this.jacksonModules = jacksonModules;
 	}
-	
+
 	public String getConnectionURI() {
-		String url = "dataformat:jackson:" + getOperation()+"?moduleClassNames="+getJacksonModules();
+		String url = "dataformat:jackson:" + getOperation() + "?moduleClassNames=" + getJacksonModules();
 		return url;
 	}
-	
+
 }
