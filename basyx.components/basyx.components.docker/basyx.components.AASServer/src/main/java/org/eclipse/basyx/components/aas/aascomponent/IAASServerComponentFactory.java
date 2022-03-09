@@ -12,11 +12,11 @@ package org.eclipse.basyx.components.aas.aascomponent;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 
 /**
- * Interface for providing an AASAggregator to the AASServerComponent
+ * Interface for providing a configured and constructed AASAggregator to the AASServerComponent
  * 
  * @author fried
  *
  */
-public interface IAASServerComponentAggregatorFactory {
+public interface IAASServerComponentFactory {
 	public IAASAggregator create();
 }
