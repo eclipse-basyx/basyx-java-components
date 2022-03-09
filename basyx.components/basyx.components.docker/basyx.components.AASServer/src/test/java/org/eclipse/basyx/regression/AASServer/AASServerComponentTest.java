@@ -22,7 +22,6 @@ import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -32,22 +31,58 @@ import org.junit.Test;
  *
  */
 public class AASServerComponentTest {
-
-	
 	private static AASServerComponent component;
 	private static InMemoryRegistry registry;
 	
-	@BeforeClass
-	public static void setUp() {
-		// Setup component's test configuration
+	private static final String XML_SOURCE = "xml/aas.xml";
+	
+	private static final String MULTIPLE_DIFFERENT_AAS_SERIALIZATION = "[\"json/aas.json\",\"aasx/01_Festo.aasx\",\"xml/aas.xml\"]";
+	private static final String SINGLE_JSON_AAS_SERIALIZATION = "[\"json/aas.json\"]";
+	private static final String EMPTY_JSON_ARRAY = "[]";
+	
+	public static void setUp(String source) {
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(8080, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "xml/aas.xml");
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, source);
 		
-		// Create and start AASServer component
+		createAndStartAASServerComponent(contextConfig, aasConfig);
+	}
+
+	private static void createAndStartAASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig) {
 		component = new AASServerComponent(contextConfig, aasConfig);
 		registry = new InMemoryRegistry();
 		component.setRegistry(registry);
 		component.startComponent();
+	}
+	
+	@Test
+	public void checkMultipleSerializedAasSourceOfDifferentTypes() {
+		setUp(MULTIPLE_DIFFERENT_AAS_SERIALIZATION);
+		
+		List<AASDescriptor> aasDescriptors = registry.lookupAll();
+		assertEquals(4, aasDescriptors.size());
+		
+		stopAASServerComponent();
+	}
+	
+	@Test
+	public void checkSingleSerializedAasJsonSource() {
+		setUp(SINGLE_JSON_AAS_SERIALIZATION);
+		
+		List<AASDescriptor> aasDescriptors = registry.lookupAll();
+		assertEquals(1, aasDescriptors.size());
+		
+		stopAASServerComponent();
+	}
+	
+	@Test
+	public void checkBehaviorWithEmptyJsonArray() {
+		setUp(EMPTY_JSON_ARRAY);
+		
+		List<AASDescriptor> aasDescriptors = registry.lookupAll();
+		System.out.println(aasDescriptors.size());
+		assertEquals(0, aasDescriptors.size());
+		
+		stopAASServerComponent();
 	}
 	
 	/**
@@ -55,11 +90,12 @@ public class AASServerComponentTest {
 	 */
 	@Test
 	public void testServerCleanup() {
+		setUp(XML_SOURCE);
 		
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(2, aasDescriptors.size());
 		
-		component.stopComponent();
+		stopAASServerComponent();
 		
 		// Try to lookup all previously registered AASs
 		for(AASDescriptor aasDescriptor: aasDescriptors) {
@@ -78,6 +114,9 @@ public class AASServerComponentTest {
 				}
 			}
 		}
-		
+	}
+	
+	public void stopAASServerComponent() {
+		component.stopComponent();
 	}
 }
