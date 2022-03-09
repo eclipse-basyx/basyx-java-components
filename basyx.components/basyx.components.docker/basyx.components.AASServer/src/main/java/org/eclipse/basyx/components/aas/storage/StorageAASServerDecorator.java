@@ -26,16 +26,14 @@ public class StorageAASServerDecorator implements IAASServerDecorator {
 		this.submodelElementStorageOption = submodelElementStorageOption;
 	}
 
-	// TODO: add option to api and aggregator!
-
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new StorageDecoratingSubmodelAPIFactory(submodelAPIFactory, entityManager);
+		return new StorageDecoratingSubmodelAPIFactory(submodelAPIFactory, entityManager, submodelElementStorageOption);
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new StorageDecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, entityManager);
+		return new StorageDecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, entityManager, submodelElementStorageOption);
 	}
 
 	@Override
