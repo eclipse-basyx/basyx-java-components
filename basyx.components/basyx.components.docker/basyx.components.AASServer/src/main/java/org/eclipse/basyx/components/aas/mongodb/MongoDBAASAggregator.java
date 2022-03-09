@@ -28,13 +28,11 @@ import org.eclipse.basyx.aas.restapi.AASModelProvider;
 import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
+import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactory;
-import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
@@ -50,8 +48,6 @@ import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -104,7 +100,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *
 	 * @param config
 	 *            The MongoDB Configuration
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link InMemoryAASServerComponentFactory}.
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
 		this.setConfiguration(config);
 		submodelAggregator = new SubmodelAggregator(smApiProvider);
@@ -119,7 +119,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            The MongoDB Configuration
 	 * @param registry
 	 *            The registry
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link InMemoryAASServerComponentFactory}.
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
 		this.setConfiguration(config);
 		this.registry = registry;
@@ -128,34 +132,16 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives a BaSyxMongoDBConfiguration and a MqttClient to create a persistent
-	 * MongoDB backend with MQTT eventing.
-	 * 
-	 * @param config
-	 *            The MongoDB Configuration
-	 * @param client
-	 *            The Mqtt Client
-	 * @throws MqttException
-	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
-		createMQTTSubmodelAggregator(config, client);
-		init();
-	}
-
-	private void createMQTTSubmodelAggregator(BaSyxMongoDBConfiguration config, MqttClient client) throws MqttException {
-		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(new MqttDecoratingSubmodelAPIFactory(smApiProvider, client));
-		submodelAggregator = new MqttDecoratingSubmodelAggregatorFactory(new SubmodelAggregatorFactory(), client).create();
-		this.aasApiProvider = new MqttDecoratingAASAPIFactory(aasApiProvider, client);
-	}
-
-	/**
 	 * Receives the path of the .properties file in it's constructor from a
 	 * resource.
 	 *
 	 * @param resourceConfigPath
 	 *            Path of the configuration file
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link InMemoryAASServerComponentFactory}
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
@@ -171,7 +157,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param resourceConfigPath
 	 *            Path of the configuration file
 	 * @param registry
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link InMemoryAASServerComponentFactory}
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
@@ -183,7 +173,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Constructor using default connections
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link InMemoryAASServerComponentFactory}
 	 */
+	@Deprecated
 	public MongoDBAASAggregator() {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH);
 	}
@@ -192,24 +186,99 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * Constructor using default connections with registry as a parameter
 	 *
 	 * @param registry
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link InMemoryAASServerComponentFactory}
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(IAASRegistry registry) {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, registry);
 	}
 
 	/**
-	 * Receives a BaSyxMongoDBConfiguration, a MqttClient and a IAASRegistry to
-	 * create a persistent MongoDB backend with MQTT eventing
+	 * Receives a BaSyxMongoDBConfiguration, IAASRegistry, IAASAPIFactory and a
+	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
 	 * 
 	 * @param config
-	 * @param client
 	 * @param registry
-	 * @throws MqttException
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * 
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, MqttClient client, IAASRegistry registry) throws MqttException {
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		setMongoDBConfiguration(config);
+		this.config = config;
 		this.registry = registry;
-		createMQTTSubmodelAggregator(config, client);
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregator = submodelAggregatorFactory.create();
 		init();
+	}
+
+	/**
+	 * Receives a BaSyxMongoDBConfiguration, IAASAPIFactory and a
+	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
+	 * 
+	 * @param config
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * 
+	 */
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		setMongoDBConfiguration(config);
+		this.config = config;
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregator = submodelAggregatorFactory.create();
+		init();
+	}
+
+	/**
+	 * Receives a resourceConfigPath, IAASRegistry, IAASAPIFactory and a
+	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
+	 * 
+	 * @param resourceConfigPath
+	 * @param registry
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * 
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		setMongoDBConfiguration(config);
+		this.registry = registry;
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregator = submodelAggregatorFactory.create();
+		init();
+	}
+
+	/**
+	 * Receives a resourceConfigPath, IAASAPIFactory and a
+	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
+	 * 
+	 * @param resourceConfigPath
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * 
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		setMongoDBConfiguration(config);
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregator = submodelAggregatorFactory.create();
+		init();
+	}
+
+	/**
+	 * Constructor using the default configuration, with the given IAASAPIFactory
+	 * and ISubmodelAggregatorFactory.
+	 * 
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * 
+	 */
+	public MongoDBAASAggregator(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory);
 	}
 
 	/**
@@ -234,7 +303,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * 
 	 * @param config
 	 *            The MongoDB Configuration
+	 * 
+	 * @deprecated This method is used with the old, deprecated Constructors. Use
+	 *             {@link InMemoryAASServerComponentFactory} instead
 	 */
+	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
 		// set mongoDB configuration
 		this.config = config;
@@ -254,6 +327,14 @@ public class MongoDBAASAggregator implements IAASAggregator {
 			api.setSubmodel(sm);
 			return api;
 		};
+	}
+
+	private void setMongoDBConfiguration(BaSyxMongoDBConfiguration config) {
+		this.config = config;
+		MongoClient client = MongoClients.create(config.getConnectionUrl());
+		this.mongoOps = new MongoTemplate(client, config.getDatabase());
+		this.aasCollection = config.getAASCollection();
+		this.smCollection = config.getSubmodelCollection();
 	}
 
 	/**
@@ -370,7 +451,14 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	@Override
 	public void updateAAS(AssetAdministrationShell aas) {
-		createAAS(aas);
+		MultiSubmodelProvider oldProvider = (MultiSubmodelProvider) getAASProvider(aas.getIdentification());
+		IAASAPI aasApi = aasApiProvider.getAASApi(aas);
+		AASModelProvider contentProvider = new AASModelProvider(aasApi);
+		IConnectorFactory connectorFactory = oldProvider.getConnectorFactory();
+
+		MultiSubmodelProvider updatedProvider = new MultiSubmodelProvider(contentProvider, registry, connectorFactory, aasApiProvider, oldProvider.getSmAggregator());
+
+		aasProviderMap.put(aas.getIdentification().getId(), updatedProvider);
 	}
 
 	@Override

@@ -38,13 +38,13 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.components.IComponent;
-import org.eclipse.basyx.components.aas.aascomponent.AASComponentAggregatorFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
+import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
+import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
@@ -287,17 +287,14 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private IAASAggregator createAASAggregator() {
-		if (mongoDBConfig != null) {
-			BaSyxMongoDBConfiguration config = createMongoDbConfiguration();
-			MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
-			return aggregator;
-		} else {
-			AASComponentAggregatorFactory aasComponentAggregatorFactory = new AASComponentAggregatorFactory();
-			aasComponentAggregatorFactory.setAASServerBackend(aasConfig.getAASBackend());
-			aasComponentAggregatorFactory.setAASServerRegistry(registry);
-			aasComponentAggregatorFactory.setAASServerDecorators(createAASServerDecoratorList());
-			return aasComponentAggregatorFactory.create();
+		if (isMongoDBBackend()) {
+			return new MongoDBAASServerComponentFactory(createMongoDbConfiguration(), createAASServerDecoratorList(), registry).create();
 		}
+		return new InMemoryAASServerComponentFactory(createAASServerDecoratorList(), registry).create();
+	}
+
+	private boolean isMongoDBBackend() {
+		return aasConfig.getAASBackend().equals(AASServerBackend.MONGODB);
 	}
 
 	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {
