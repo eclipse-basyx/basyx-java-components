@@ -16,10 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import basyx.components.updater.core.configuration.DataSinkConfiguration;
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
-import basyx.components.updater.core.configuration.DataTransformerConfiguration;
-import basyx.components.updater.core.configuration.DelegatorConfiguration;
+import basyx.components.updater.core.configuration.*;
 
 /**
  * An implementation of configurations of all the routes 
@@ -31,6 +28,7 @@ public class RoutesConfiguration {
 	private Map<String, DataSourceConfiguration> datasources = new HashMap<>();
 	private Map<String, DataTransformerConfiguration> transformers = new HashMap<>();
 	private Map<String, DataSinkConfiguration> datasinks = new HashMap<>();
+	private Map<String, TimerConfiguration> timers = new HashMap<>();
 	private Map<String, DelegatorConfiguration> delegators = new HashMap<>();
 	private List<RouteConfiguration> routes = new ArrayList<>();
 
@@ -40,11 +38,13 @@ public class RoutesConfiguration {
 			List<DataSourceConfiguration> datasources,
 			List<DataTransformerConfiguration> transformers,
 			List<DataSinkConfiguration> datasinks,
+			List<TimerConfiguration> timers,
 			List<DelegatorConfiguration> delegators,
 			List<RouteConfiguration> routes) {
 		addDatasources(datasources);
 		addTransformers(transformers);
 		addDatasinks(datasinks);
+		addTimers(timers);
 		addRoutes(routes);
 		addDelegators(delegators);
 	}
@@ -53,11 +53,13 @@ public class RoutesConfiguration {
 			Map<String, DataSourceConfiguration> datasources,
 			Map<String, DataTransformerConfiguration> transformers,
 			Map<String, DataSinkConfiguration> datasinks,
+			Map<String, TimerConfiguration> timers,
 			Map<String, DelegatorConfiguration> delegators,
 			List<RouteConfiguration> routes) {
 		setDatasources(datasources);
 		setTransformers(transformers);
 		setDatasinks(datasinks);
+		setTimers(timers);
 		addRoutes(routes);
 		setDelegators(delegators);
 	}
@@ -115,7 +117,25 @@ public class RoutesConfiguration {
 	public void addDatasink(DataSinkConfiguration datasink) {
 		this.datasinks.put(datasink.getUniqueId(), datasink);
 	}
-	
+
+	public Map<String, TimerConfiguration>	getTimers() {
+		return timers;
+	}
+
+	public void setTimers(Map<String, TimerConfiguration> timer) {
+		this.timers = timers;
+	}
+
+	public void addTimers(List<TimerConfiguration> timers) {
+		for (TimerConfiguration timer : timers) {
+			addTimer(timer);
+		}
+	}
+
+	public void addTimer(TimerConfiguration timer) {
+		this.timers.put(timer.getUniqueId(), timer);
+	}
+
 	public Map<String, DelegatorConfiguration> getDelegators() {
 		return delegators;
 	}

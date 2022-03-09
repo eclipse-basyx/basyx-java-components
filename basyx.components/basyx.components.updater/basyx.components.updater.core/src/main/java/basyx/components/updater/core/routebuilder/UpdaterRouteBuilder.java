@@ -14,13 +14,10 @@ package basyx.components.updater.core.routebuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import basyx.components.updater.core.configuration.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.tooling.model.Strings;
 
-import basyx.components.updater.core.configuration.DataSinkConfiguration;
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
-import basyx.components.updater.core.configuration.DataTransformerConfiguration;
-import basyx.components.updater.core.configuration.DelegatorConfiguration;
 import basyx.components.updater.core.configuration.route.RouteConfiguration;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.core.delegator.servlet.DelegatorServlet;
@@ -71,12 +68,22 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		String dataSourceEndpoint = createDatasourceEndpoint(configuration, routeConfig.getDatasource());
 		String[] dataSinkEndpoints = createDatasinkEndpoint(configuration, routeConfig.getDatasinks());
 		String[] dataTransformerEndpoints = createDataTransformerEndpoint(configuration, routeConfig.getTransformers());
+		String timerEndpoint = createTimerEndpoint(configuration, routeConfig.getTimer());
 		String routeId = routeConfig.getRouteId();
+
 		if (Strings.isNullOrEmpty(routeConfig.getDelegator())) {
-			if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
-				from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+		    if (Strings.isNullOrEmpty(timerEndpoint)) {
+				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
+                    from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+				} else {
+                    from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+				}
 			} else {
-				from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
+					from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+				} else {
+					from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+				}
 			}
 		} else {
 			DelegatorServlet delegatorServlet = getDelegatorServlet(configuration, routeConfig.getDelegator());
@@ -162,6 +169,15 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		DataTransformerConfiguration dtConfig = routesConfig.getTransformers().get(dataTransformerId);
 		if (dtConfig != null) {
 			return dtConfig.getConnectionURI();	
+		} else {
+			return null;
+		}
+	}
+
+	private String createTimerEndpoint(RoutesConfiguration routesConfig, String TimerId){
+		TimerConfiguration tConfig = routesConfig.getTimers().get(TimerId);
+		if (tConfig != null) {
+			return tConfig.getConnectionURI();
 		} else {
 			return null;
 		}
