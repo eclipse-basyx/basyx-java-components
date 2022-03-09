@@ -24,7 +24,7 @@ import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConf
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
-import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonjacksonDefaultConfigurationFactory;
+import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonJacksonDefaultConfigurationFactory;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 import org.eclipse.milo.examples.server.ExampleServer;
 
@@ -78,7 +78,7 @@ public class TestAASUpdater {
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
 		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
 
-		JsonjacksonDefaultConfigurationFactory jsonJacksonConfigFactory = new JsonjacksonDefaultConfigurationFactory(
+		JsonJacksonDefaultConfigurationFactory jsonJacksonConfigFactory = new JsonJacksonDefaultConfigurationFactory(
 				loader);
 		configuration.addTransformers(jsonJacksonConfigFactory.getDataTransformerConfigurations());
 

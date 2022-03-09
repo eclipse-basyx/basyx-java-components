@@ -20,14 +20,14 @@ import basyx.components.updater.core.configuration.DataTransformerConfiguration;
  * @author Daniele Rossi
  *
  */
-public class JsonjacksonTransformerConfiguration extends DataTransformerConfiguration {
+public class JsonJacksonTransformerConfiguration extends DataTransformerConfiguration {
 	private String operation;
 	private String jacksonModules;
 
-	public JsonjacksonTransformerConfiguration() {
+	public JsonJacksonTransformerConfiguration() {
 	}
 
-	public JsonjacksonTransformerConfiguration(String uniqueId, String operation) {
+	public JsonJacksonTransformerConfiguration(String uniqueId, String operation) {
 		super(uniqueId);
 		this.operation = operation;
 	}

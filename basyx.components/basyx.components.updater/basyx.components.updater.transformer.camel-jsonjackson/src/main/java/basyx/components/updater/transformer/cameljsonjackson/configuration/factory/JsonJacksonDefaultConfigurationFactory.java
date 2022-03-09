@@ -12,7 +12,7 @@
 package basyx.components.updater.transformer.cameljsonjackson.configuration.factory;
 
 import basyx.components.updater.core.configuration.factory.DataTransformerConfigurationFactory;
-import basyx.components.updater.transformer.cameljsonjackson.configuration.JsonjacksonTransformerConfiguration;
+import basyx.components.updater.transformer.cameljsonjackson.configuration.JsonJacksonTransformerConfiguration;
 
 /**
  * JsonJackson default configuration factory from default path
@@ -20,14 +20,14 @@ import basyx.components.updater.transformer.cameljsonjackson.configuration.Jsonj
  * @author Daniele Rossi
  *
  */
-public class JsonjacksonDefaultConfigurationFactory extends DataTransformerConfigurationFactory {
+public class JsonJacksonDefaultConfigurationFactory extends DataTransformerConfigurationFactory {
 	private static final String FILE_PATH = "jsonjacksontransformer.json";
 
-	public JsonjacksonDefaultConfigurationFactory(ClassLoader loader) {
-		super(FILE_PATH, loader, JsonjacksonTransformerConfiguration.class);
+	public JsonJacksonDefaultConfigurationFactory(ClassLoader loader) {
+		super(FILE_PATH, loader, JsonJacksonTransformerConfiguration.class);
 	}
 
-	public JsonjacksonDefaultConfigurationFactory(String filePath, ClassLoader loader) {
-		super(filePath, loader, JsonjacksonTransformerConfiguration.class);
+	public JsonJacksonDefaultConfigurationFactory(String filePath, ClassLoader loader) {
+		super(filePath, loader, JsonJacksonTransformerConfiguration.class);
 	}
 }
