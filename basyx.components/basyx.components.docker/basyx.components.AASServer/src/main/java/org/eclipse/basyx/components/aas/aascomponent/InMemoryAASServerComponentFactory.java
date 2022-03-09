@@ -17,11 +17,6 @@ import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.aas.restapi.vab.VABAASAPIFactory;
-import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPIFactory;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregatorFactory;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPIFactory;
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
@@ -30,33 +25,26 @@ import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPIFactory;
 /**
  * 
  * Factory building the AASAggregator for the AASComponent with given decorators
+ * for the InMemory backend
  * 
  * @author fischer, fried
  *
  */
-public class AASComponentAggregatorFactory {
+public class InMemoryAASServerComponentFactory implements IAASServerComponentAggregatorFactory {
 
 	private List<IAASServerDecorator> aasServerDecorators;
-	private AASServerBackend aasServerBackend;
 	private IAASRegistry aasServerRegistry;
-	private BaSyxMongoDBConfiguration mongoDBConfig;
 
-	public void setAASServerDecorators(List<IAASServerDecorator> decorators) {
+	public InMemoryAASServerComponentFactory(List<IAASServerDecorator> decorators, IAASRegistry aasServerRegistry) {
+		this.aasServerRegistry = aasServerRegistry;
 		this.aasServerDecorators = decorators;
 	}
 
-	public void setAASServerBackend(AASServerBackend aasServerBackend) {
-		this.aasServerBackend = aasServerBackend;
-	}
-
-	public void setAASServerRegistry(IAASRegistry aasServerRegistry) {
+	public InMemoryAASServerComponentFactory(IAASRegistry aasServerRegistry) {
 		this.aasServerRegistry = aasServerRegistry;
 	}
 
-	public void setMongoDBConfig(BaSyxMongoDBConfiguration mongoDBConfig) {
-		this.mongoDBConfig = mongoDBConfig;
-	}
-
+	@Override
 	public IAASAggregator create() {
 		ISubmodelAPIFactory submodelAPIFactory = createAndDecorateSubmodelAPIFactory();
 
@@ -106,9 +94,6 @@ public class AASComponentAggregatorFactory {
 	}
 
 	private ISubmodelAPIFactory createSubmodelAPIFactory() {
-		if (aasServerBackend.equals(AASServerBackend.MONGODB)) {
-			return new MongoDBSubmodelAPIFactory(mongoDBConfig);
-		}
 		return new VABSubmodelAPIFactory();
 	}
 
@@ -117,16 +102,10 @@ public class AASComponentAggregatorFactory {
 	}
 
 	private IAASAPIFactory createAASAPIFactory() {
-		if (aasServerBackend.equals(AASServerBackend.MONGODB)) {
-			return new MongoDBAASAPIFactory(mongoDBConfig);
-		}
 		return new VABAASAPIFactory();
 	}
 
 	private IAASAggregatorFactory createAASAggregatorFactory(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		if (aasServerBackend.equals(AASServerBackend.MONGODB)) {
-			return new MongoDBAASAggregatorFactory(mongoDBConfig, aasServerRegistry, aasAPIFactory, submodelAggregatorFactory);
-		}
 		return new AASAggregatorFactory(aasAPIFactory, submodelAggregatorFactory, aasServerRegistry);
 	}
 }
