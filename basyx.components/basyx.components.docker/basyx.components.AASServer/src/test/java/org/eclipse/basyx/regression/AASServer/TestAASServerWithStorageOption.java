@@ -115,7 +115,7 @@ public class TestAASServerWithStorageOption {
 
 		IStorageSubmodelElement updatedElement = getSingleStorageElementWithIdShort(submodelIdentifier.getId(), propertyIdShort);
 		assertEquals(property.getValue().toString(), updatedElement.getSerializedElementValue());
-		assertEquals(StorageSubmodelElementOperations.CREATE, updatedElement.getOperation());
+		assertEquals(StorageSubmodelElementOperations.OVERWRITE, updatedElement.getOperation());
 	}
 
 	@Test
