@@ -18,6 +18,7 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 
@@ -40,16 +41,21 @@ public class MqttAASServerFeature implements IAASServerFeature {
 	public void initialize() {
 		try {
 			String serverEndpoint = mqttConfig.getServer();
-			MqttConnectOptions options = new MqttConnectOptions();
-			if (!Strings.isNullOrEmpty(mqttConfig.getUser())) {
-				options.setUserName(mqttConfig.getUser());
-				options.setPassword(mqttConfig.getPass().toCharArray());
-			}
+			MqttConnectOptions options = createMqttConnectOptions();
 			client = new MqttClient(serverEndpoint, clientId);
 			client.connect(options);
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error ", e);
 		}
+	}
+
+	protected MqttConnectOptions createMqttConnectOptions() {
+		MqttConnectOptions options = new MqttConnectOptions();
+		if (!Strings.isNullOrEmpty(mqttConfig.getUser())) {
+			options.setUserName(mqttConfig.getUser());
+			options.setPassword(mqttConfig.getPass().toCharArray());
+		}
+		return options;
 	}
 
 	@Override
