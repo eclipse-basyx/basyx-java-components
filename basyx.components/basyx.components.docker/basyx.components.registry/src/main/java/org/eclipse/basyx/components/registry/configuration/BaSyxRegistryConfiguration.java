@@ -25,16 +25,25 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	// Prefix for environment variables
 	public static final String ENV_PREFIX = "BaSyxRegistry_";
 
+	// Authorization configuration
+	private static final String AUTHORIZATION_ENABLED = "Enabled";
+	private static final String AUTHORIZATION_DISABLED = "Disabled";
+
+	// TaggedDirectory configuration
+	private static final String TAGGED_DIRECTORY_ENABLED = "Enabled";
+	private static final String TAGGED_DIRECTORY_DISABLED = "Disabled";
+
 	// Default BaSyx Context configuration
 	public static final String DEFAULT_BACKEND = RegistryBackend.INMEMORY.toString();
 	public static final String DEFAULT_EVENTS = RegistryEventBackend.NONE.toString();
-	public static final String DEFAULT_AUTHORIZATION_ENABLED = "false";
+	public static final String DEFAULT_AUTHORIZATION = AUTHORIZATION_DISABLED;
+	public static final String DEFAULT_TAGGED_DIRECTORY = TAGGED_DIRECTORY_DISABLED;
 
 	// Configuration keys
 	public static final String BACKEND = "registry.backend";
 	public static final String EVENTS = "registry.events";
-	public static final String AUTHORIZATION_ENABLED = "registry.authorizationEnabled";
-	private static final String TAGGED_DIRECTORY_ENABLED = "registry.taggedDirectoryEnabled";
+	public static final String AUTHORIZATION = "registry.authorization";
+	private static final String TAGGED_DIRECTORY = "registry.taggedDirectory";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "registry.properties";
@@ -46,7 +55,8 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 		Map<String, String> defaultProps = new HashMap<>();
 		defaultProps.put(BACKEND, DEFAULT_BACKEND);
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
-		defaultProps.put(AUTHORIZATION_ENABLED, DEFAULT_AUTHORIZATION_ENABLED);
+		defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
+		defaultProps.put(TAGGED_DIRECTORY, DEFAULT_TAGGED_DIRECTORY);
 		return defaultProps;
 	}
 
@@ -64,7 +74,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		loadFromEnvironmentVariables(ENV_PREFIX, BACKEND, EVENTS, AUTHORIZATION_ENABLED, TAGGED_DIRECTORY_ENABLED);
+		loadFromEnvironmentVariables(ENV_PREFIX, BACKEND, EVENTS, AUTHORIZATION, TAGGED_DIRECTORY);
 	}
 
 	public void loadFromDefaultSource() {
@@ -89,18 +99,18 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public boolean isAuthorizationEnabled() {
-		return Boolean.parseBoolean(getProperty(AUTHORIZATION_ENABLED));
+		return getProperty(AUTHORIZATION).equals(AUTHORIZATION_ENABLED);
 	}
 
-	public void setAuthorizationEnabled(boolean authorizationEnabled) {
-		setProperty(AUTHORIZATION_ENABLED, Boolean.toString(authorizationEnabled));
+	public void enableAuthorization(boolean authorizationEnabled) {
+		setProperty(AUTHORIZATION, authorizationEnabled ? AUTHORIZATION_ENABLED : AUTHORIZATION_DISABLED);
 	}
 
 	public boolean isTaggedDirectoryEnabled() {
-		return Boolean.parseBoolean(getProperty(TAGGED_DIRECTORY_ENABLED));
+		return getProperty(TAGGED_DIRECTORY).equals(TAGGED_DIRECTORY_ENABLED);
 	}
 
-	public void setTaggedDirectoryEnabled(boolean taggedDirectoryEnabled) {
-		setProperty(TAGGED_DIRECTORY_ENABLED, Boolean.toString(taggedDirectoryEnabled));
+	public void enableTaggedDirectory(boolean taggedDirectoryEnabled) {
+		setProperty(TAGGED_DIRECTORY, taggedDirectoryEnabled ? TAGGED_DIRECTORY_ENABLED : TAGGED_DIRECTORY_DISABLED);
 	}
 }

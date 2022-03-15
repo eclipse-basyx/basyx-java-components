@@ -45,7 +45,7 @@ public class TestTaggedDirectoryComponent extends TestTaggedDirectorySuite {
 	private static RegistryComponent createTaggedDirectoryComponent() {
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		BaSyxRegistryConfiguration taggedDirectoryConfig = new BaSyxRegistryConfiguration();
-		taggedDirectoryConfig.setTaggedDirectoryEnabled(true);
+		taggedDirectoryConfig.enableTaggedDirectory(true);
 
 		return new RegistryComponent(contextConfig, taggedDirectoryConfig);
 	}
