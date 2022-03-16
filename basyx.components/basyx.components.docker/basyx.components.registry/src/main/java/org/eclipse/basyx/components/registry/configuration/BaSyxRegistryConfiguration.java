@@ -25,19 +25,15 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	// Prefix for environment variables
 	public static final String ENV_PREFIX = "BaSyxRegistry_";
 
-	// Authorization configuration
-	private static final String AUTHORIZATION_ENABLED = "Enabled";
-	private static final String AUTHORIZATION_DISABLED = "Disabled";
-
-	// TaggedDirectory configuration
-	private static final String TAGGED_DIRECTORY_ENABLED = "Enabled";
-	private static final String TAGGED_DIRECTORY_DISABLED = "Disabled";
+	// Feature enabling options
+	private static final String FEATURE_ENABLED = "Enabled";
+	private static final String FEATURE_DISABLED = "Disabled";
 
 	// Default BaSyx Context configuration
 	public static final String DEFAULT_BACKEND = RegistryBackend.INMEMORY.toString();
 	public static final String DEFAULT_EVENTS = RegistryEventBackend.NONE.toString();
-	public static final String DEFAULT_AUTHORIZATION = AUTHORIZATION_DISABLED;
-	public static final String DEFAULT_TAGGED_DIRECTORY = TAGGED_DIRECTORY_DISABLED;
+	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
+	public static final String DEFAULT_TAGGED_DIRECTORY = FEATURE_DISABLED;
 
 	// Configuration keys
 	public static final String BACKEND = "registry.backend";
@@ -99,18 +95,18 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public boolean isAuthorizationEnabled() {
-		return getProperty(AUTHORIZATION).equals(AUTHORIZATION_ENABLED);
+		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
 	}
 
 	public void enableAuthorization(boolean authorizationEnabled) {
-		setProperty(AUTHORIZATION, authorizationEnabled ? AUTHORIZATION_ENABLED : AUTHORIZATION_DISABLED);
+		setProperty(AUTHORIZATION, authorizationEnabled ? FEATURE_ENABLED : FEATURE_DISABLED);
 	}
 
 	public boolean isTaggedDirectoryEnabled() {
-		return getProperty(TAGGED_DIRECTORY).equals(TAGGED_DIRECTORY_ENABLED);
+		return getProperty(TAGGED_DIRECTORY).equals(FEATURE_ENABLED);
 	}
 
 	public void enableTaggedDirectory(boolean taggedDirectoryEnabled) {
-		setProperty(TAGGED_DIRECTORY, taggedDirectoryEnabled ? TAGGED_DIRECTORY_ENABLED : TAGGED_DIRECTORY_DISABLED);
+		setProperty(TAGGED_DIRECTORY, taggedDirectoryEnabled ? FEATURE_ENABLED : FEATURE_DISABLED);
 	}
 }

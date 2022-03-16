@@ -29,9 +29,9 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	// Prefix for environment variables
 	public static final String ENV_PREFIX = "BaSyxAAS_";
 
-	// Authorization configuration
-	private static final String AUTHORIZATION_ENABLED = "Enabled";
-	private static final String AUTHORIZATION_DISABLED = "Disabled";
+	// Feature enabling options
+	private static final String FEATURE_ENABLED = "Enabled";
+	private static final String FEATURE_DISABLED = "Disabled";
 
 	// Default BaSyx AAS configuration
 	public static final String DEFAULT_BACKEND = AASServerBackend.INMEMORY.toString();
@@ -41,7 +41,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_REGISTRY = "";
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
 	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
-	public static final String DEFAULT_AUTHORIZATION=AUTHORIZATION_DISABLED;
+	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -243,10 +243,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public boolean isAuthorizationEnabled() {
-		return getProperty(AUTHORIZATION).equals(AUTHORIZATION_ENABLED);
+		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
 	}
 
 	public void enableAuthorization(boolean authorizationEnabled) {
-		setProperty(AUTHORIZATION, authorizationEnabled ? AUTHORIZATION_ENABLED : AUTHORIZATION_DISABLED);
+		setProperty(AUTHORIZATION, authorizationEnabled ? FEATURE_ENABLED : FEATURE_DISABLED);
 	}
 }
