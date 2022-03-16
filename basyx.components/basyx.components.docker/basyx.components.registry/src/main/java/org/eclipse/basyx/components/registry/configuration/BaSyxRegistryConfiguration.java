@@ -64,7 +64,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		loadFromEnvironmentVariables(ENV_PREFIX, BACKEND, EVENTS, AUTHORIZATION_ENABLED);
+		loadFromEnvironmentVariables(ENV_PREFIX, BACKEND, EVENTS, AUTHORIZATION_ENABLED, TAGGED_DIRECTORY_ENABLED);
 	}
 
 	public void loadFromDefaultSource() {

@@ -460,7 +460,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	@Override
 	public void createAAS(AssetAdministrationShell aas) {
-		IAASAPI aasApi = this.aasApiProvider.getAASApi(aas);
+		IAASAPI aasApi = this.aasApiProvider.create(aas);
 		MultiSubmodelProvider provider = createMultiSubmodelProvider(aasApi);
 		aasProviderMap.put(aas.getIdentification().getId(), provider);
 	}
@@ -468,7 +468,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	@Override
 	public void updateAAS(AssetAdministrationShell aas) {
 		MultiSubmodelProvider oldProvider = (MultiSubmodelProvider) getAASProvider(aas.getIdentification());
-		IAASAPI aasApi = aasApiProvider.getAASApi(aas);
+		IAASAPI aasApi = aasApiProvider.create(aas);
 		AASModelProvider contentProvider = new AASModelProvider(aasApi);
 		IConnectorFactory connectorFactory = oldProvider.getConnectorFactory();
 
