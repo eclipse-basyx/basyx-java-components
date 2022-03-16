@@ -98,15 +98,23 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
 	}
 
-	public void enableAuthorization(boolean authorizationEnabled) {
-		setProperty(AUTHORIZATION, authorizationEnabled ? FEATURE_ENABLED : FEATURE_DISABLED);
+	public void enableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_ENABLED);
+	}
+
+	public void disableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_DISABLED);
 	}
 
 	public boolean isTaggedDirectoryEnabled() {
 		return getProperty(TAGGED_DIRECTORY).equals(FEATURE_ENABLED);
 	}
 
-	public void enableTaggedDirectory(boolean taggedDirectoryEnabled) {
-		setProperty(TAGGED_DIRECTORY, taggedDirectoryEnabled ? FEATURE_ENABLED : FEATURE_DISABLED);
+	public void enableTaggedDirectory() {
+		setProperty(TAGGED_DIRECTORY, FEATURE_ENABLED);
+	}
+
+	public void disableTaggedDirectory() {
+		setProperty(TAGGED_DIRECTORY, FEATURE_DISABLED);
 	}
 }

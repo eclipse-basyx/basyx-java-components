@@ -246,7 +246,11 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
 	}
 
-	public void enableAuthorization(boolean authorizationEnabled) {
-		setProperty(AUTHORIZATION, authorizationEnabled ? FEATURE_ENABLED : FEATURE_DISABLED);
+	public void enableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_ENABLED);
+	}
+
+	public void disableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_DISABLED);
 	}
 }
