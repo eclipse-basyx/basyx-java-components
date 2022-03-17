@@ -43,7 +43,10 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
+import org.eclipse.basyx.components.aas.configuration.AASXUploadBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
@@ -169,11 +172,11 @@ public class AASServerComponent implements IComponent {
 	@Override
 	public void startComponent() {
 		logger.info("Create the server...");
-		// Load the aggregator servlet
 		registry = createRegistryFromConfig(aasConfig);
 
-		// Init HTTP context and add an XMLAASServlet according to the configuration
+		loadAASServerFeaturesFromConfig();
 		initializeAASServerFeatures();
+
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createAggregatorServlet());
 
@@ -192,6 +195,22 @@ public class AASServerComponent implements IComponent {
 		logger.info("Start the server");
 		server = new BaSyxHTTPServer(context);
 		server.start();
+	}
+
+	private void loadAASServerFeaturesFromConfig() {
+		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
+			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
+			mqttConfig.loadFromDefaultSource();
+			addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
+		}
+
+		if (aasConfig.isAuthorizationEnabled()) {
+			addAASServerFeature(new AuthorizedAASServerFeature());
+		}
+
+		if (aasConfig.getAASXUpload().equals(AASXUploadBackend.ENABLED)) {
+			enableAASXUpload();
+		}
 	}
 
 	/**
