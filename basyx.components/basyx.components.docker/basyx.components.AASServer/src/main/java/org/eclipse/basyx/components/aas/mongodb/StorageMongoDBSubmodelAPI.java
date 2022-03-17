@@ -10,7 +10,7 @@
 package org.eclipse.basyx.components.aas.mongodb;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.extensions.submodel.storage.elements.StorageSubmodelElementComponent;
+import org.eclipse.basyx.extensions.submodel.storage.StorageSubmodelElementComponent;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 
