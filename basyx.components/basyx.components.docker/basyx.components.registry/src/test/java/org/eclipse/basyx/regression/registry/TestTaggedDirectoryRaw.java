@@ -30,7 +30,7 @@ public class TestTaggedDirectoryRaw {
 	public static void setUpClass() {
 		contextConfig = new BaSyxContextConfiguration();
 		registryConfig = new BaSyxRegistryConfiguration();
-		registryConfig.setTaggedDirectoryEnabled(true);
+		registryConfig.enableTaggedDirectory();
 	}
 
 	@Test
@@ -46,7 +46,7 @@ public class TestTaggedDirectoryRaw {
 	@Test
 	public void directedDirectoryWithAuthorization() {
 		try {
-			registryConfig.setAuthorizationEnabled(true);
+			registryConfig.enableAuthorization();
 			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
