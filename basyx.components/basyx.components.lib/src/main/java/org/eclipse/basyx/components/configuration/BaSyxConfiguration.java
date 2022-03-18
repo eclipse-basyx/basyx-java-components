@@ -146,16 +146,93 @@ public class BaSyxConfiguration {
 	 */
 	protected void loadFromEnvironmentVariables(String prefix, String... properties) {
 		try {
+			Map<String, String> allEnvironmentVariables = System.getenv();
+
+			boolean usesLowerCaseNamingConvention = usesLowerCaseNamingConvention(allEnvironmentVariables, prefix);
+			boolean usesDeprecatedNamingConvention = usesDeprecatedNamingConvention(allEnvironmentVariables, prefix);
+
+			if (usesDeprecatedNamingConvention && usesLowerCaseNamingConvention) {
+				throw createEnvironmentVariableWrongUsageException();
+			}
+
 			for (String propName : properties) {
-				String result = System.getenv(prefix + propName);
+				String result = getEnvironmentVariable(prefix, propName, usesDeprecatedNamingConvention);
 				if (result != null) {
 					logger.info("Environment - " + propName + ": " + result);
 					setProperty(propName, result);
 				}
 			}
 		} catch (SecurityException e) {
-			logger.info("Reading configs from environment is not permitted");
+			logger.info("Reading configs from environment is not permitted: " + e);
 		}
+	}
+
+	private String getEnvironmentVariable(String prefix, String propName, boolean usesDeprecatedNamingConvention) {
+		if (usesDeprecatedNamingConvention) {
+			return getEnvironmentVariableDeprecatedNamingConvention(prefix, propName);
+		} else {
+			return getEnvironmentVariableLowerCaseNamingConvention(prefix, propName);
+		}
+	}
+
+	private String getEnvironmentVariableLowerCaseNamingConvention(String prefix, String propName) {
+		return System.getenv(changeToUnderscoreAndLowerCase(prefix + propName));
+	}
+
+	private String getEnvironmentVariableDeprecatedNamingConvention(String prefix, String propName) {
+		return System.getenv(prefix + propName);
+	}
+
+	private boolean usesLowerCaseNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		List<String> variableWithLowercasePrefix = getEnvironmentVariablesLowerCaseNamingConvention(allEnvironmentVariables, prefix);
+
+		if (containsUpperCasePrefixVariables(variableWithLowercasePrefix)) {
+			throw createEnvironmentVariableWrongUsageException();
+		}
+
+		return !variableWithLowercasePrefix.isEmpty();
+	}
+
+	private boolean containsUpperCasePrefixVariables(List<String> variableWithLowercasePrefix) {
+		return variableWithLowercasePrefix.stream().anyMatch(varName -> nameContainsUppercase(varName));
+	}
+
+	private boolean usesDeprecatedNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		List<String> variableWithPrefix = getEnvironmentVariablesDeprecatedNamingConvention(allEnvironmentVariables, prefix);
+
+		if (containsDotAndUnderscoreInDeprecatedNamingConvention(variableWithPrefix, prefix)) {
+			throw createEnvironmentVariableWrongUsageException();
+		}
+
+		return !variableWithPrefix.isEmpty();
+	}
+
+	private boolean containsDotAndUnderscoreInDeprecatedNamingConvention(List<String> variableWithLowercasePrefix, String prefix) {
+		return variableWithLowercasePrefix.stream().anyMatch(varName -> nameWihoutPrefixContainsUnderscore(varName, prefix));
+	}
+
+	private boolean nameWihoutPrefixContainsUnderscore(String varName, String prefix) {
+		return varName.replace(prefix, "").contains("_");
+	}
+
+	private List<String> getEnvironmentVariablesLowerCaseNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		return allEnvironmentVariables.keySet().stream().filter(x -> x.startsWith(changeToUnderscoreAndLowerCase(prefix))).collect(Collectors.toList());
+	}
+
+	private List<String> getEnvironmentVariablesDeprecatedNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		return allEnvironmentVariables.keySet().stream().filter(x -> x.startsWith(prefix)).collect(Collectors.toList());
+	}
+
+	private RuntimeException createEnvironmentVariableWrongUsageException() {
+		return new RuntimeException("BaSyx environment variables should either use '.' or '_' as the separator, not both at the same time.");
+	}
+
+	private boolean nameContainsUppercase(String varName) {
+		return varName.chars().anyMatch(c -> Character.isUpperCase(c));
+	}
+
+	private String changeToUnderscoreAndLowerCase(String variableName) {
+		return variableName.toLowerCase().replace('.', '_');
 	}
 
 	/**
