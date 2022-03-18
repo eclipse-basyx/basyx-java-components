@@ -46,7 +46,6 @@ import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
-import org.eclipse.basyx.components.aas.configuration.AASXUploadBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
@@ -208,7 +207,7 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new AuthorizedAASServerFeature());
 		}
 
-		if (aasConfig.getAASXUpload().equals(AASXUploadBackend.ENABLED)) {
+		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
 	}
