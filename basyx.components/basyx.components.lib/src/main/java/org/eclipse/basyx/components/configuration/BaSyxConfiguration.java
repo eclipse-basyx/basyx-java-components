@@ -146,8 +146,16 @@ public class BaSyxConfiguration {
 	 */
 	protected void loadFromEnvironmentVariables(String prefix, String... properties) {
 		try {
+			Map<String, String> allEnvironmentVariables = System.getenv();
+			boolean usesLowerCaseNamingConvention = usesLowerCaseNamingConvention(allEnvironmentVariables, prefix);
+			boolean usesDeprecatedNamingConvention = usesDeprecatedNamingConvention(allEnvironmentVariables, prefix);
 			for (String propName : properties) {
-				String result = System.getenv(prefix + propName);
+				String result = null;
+				if (usesDeprecatedNamingConvention) {
+					result = System.getenv(prefix + propName);
+				} else if (usesLowerCaseNamingConvention) {
+					result = System.getenv(changeToUnderscoreAndLowerCase(prefix + propName));
+				}
 				if (result != null) {
 					logger.info("Environment - " + propName + ": " + result);
 					setProperty(propName, result);
@@ -156,6 +164,41 @@ public class BaSyxConfiguration {
 		} catch (SecurityException e) {
 			logger.info("Reading configs from environment is not permitted");
 		}
+	}
+
+	private boolean usesLowerCaseNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		List<String> variableWithLowercasePrefix = allEnvironmentVariables.keySet().stream().filter(x -> x.startsWith(changeToUnderscoreAndLowerCase(prefix))).collect(Collectors.toList());
+		boolean uppercaseFlag = variableWithLowercasePrefix.stream().anyMatch(varName -> nameContainsUppercase(varName));
+		if(!variableWithLowercasePrefix.isEmpty()) {
+			if (uppercaseFlag) {
+				throw new RuntimeException("BaSyx environment variables should either use '.' or '_' as the separator, not both at the same time.");
+			} 
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean nameContainsUppercase(String varName) {
+		return varName.chars().anyMatch(c -> Character.isUpperCase(c));
+	}
+
+	private boolean usesDeprecatedNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		List<String> variableWithPrefix = allEnvironmentVariables.keySet().stream().filter(x -> x.startsWith(prefix)).collect(Collectors.toList());
+		boolean underScoreFlag = variableWithPrefix.stream().anyMatch(varName -> varName.replace(prefix, "").contains("_"));
+		if (!variableWithPrefix.isEmpty()) {
+			if (underScoreFlag) {
+				throw new RuntimeException("BaSyx environment variables should either use '.' or '_' as the separator, not both at the same time.");
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	private String changeToUnderscoreAndLowerCase(String variableName) {
+		return variableName.toLowerCase().replace('.', '_');
 	}
 
 	/**
