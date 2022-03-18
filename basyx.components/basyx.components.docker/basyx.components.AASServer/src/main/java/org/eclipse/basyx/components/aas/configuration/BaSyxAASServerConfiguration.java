@@ -10,12 +10,14 @@
 package org.eclipse.basyx.components.aas.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.regex.Pattern;
+
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
+
 import com.google.gson.Gson;
 
 /**
@@ -40,7 +42,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_SOURCE = "";
 	public static final String DEFAULT_REGISTRY = "";
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
-	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
+	public static final String DEFAULT_AASX_UPLOAD = FEATURE_ENABLED;
 	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
 
 	// Configuration keys
@@ -161,12 +163,16 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(EVENTS, events.toString());
 	}
 
-	public AASXUploadBackend getAASXUpload() {
-		return AASXUploadBackend.fromString(getProperty(AASX_UPLOAD));
+	public boolean isAASXUploadEnabled() {
+		return getProperty(AASX_UPLOAD).equals(FEATURE_ENABLED);
 	}
 
-	public void setAASXUpload(AASXUploadBackend aasxUpload) {
-		setProperty(AASX_UPLOAD, aasxUpload.toString());
+	public void enableAASXUpload() {
+		setProperty(AASX_UPLOAD, FEATURE_ENABLED);
+	}
+
+	public void disableAASXUpload() {
+		setProperty(AASX_UPLOAD, FEATURE_DISABLED);
 	}
 
 	/**
