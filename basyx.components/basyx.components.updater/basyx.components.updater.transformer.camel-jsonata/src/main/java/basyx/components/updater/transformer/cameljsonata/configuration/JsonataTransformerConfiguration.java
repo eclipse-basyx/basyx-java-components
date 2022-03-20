@@ -43,7 +43,7 @@ public class JsonataTransformerConfiguration extends DataTransformerConfiguratio
 	}
 
 	public String getConnectionURI() {
-		String url = "jsonata:" + getQueryPath() + "?inputType=" + getInputType() + "&outputType=" + getOutputType();
+		String url = "jsonata:" + "file:./"  + getQueryPath() + "?inputType=" + getInputType() + "&outputType=" + getOutputType();
 		return url;
 	}
 
