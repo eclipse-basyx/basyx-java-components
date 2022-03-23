@@ -1,0 +1,10 @@
+[
+  {
+    "uniqueId": "timer1",
+    "host": "placeholder",
+    "port": 1234,
+    "fixedRate": true,
+    "delay": 0,
+    "period": 1000
+  }
+]
