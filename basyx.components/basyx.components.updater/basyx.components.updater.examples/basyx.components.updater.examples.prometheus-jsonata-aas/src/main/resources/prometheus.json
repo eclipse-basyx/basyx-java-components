@@ -1,0 +1,8 @@
+[
+  {
+    uniqueId: "prometheussource",
+    serverUrl: "http://localhost",
+    serverPort: 9090,
+    query: "cpu-usage"
+  }
+]

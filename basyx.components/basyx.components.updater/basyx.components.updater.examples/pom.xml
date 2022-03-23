@@ -27,6 +27,7 @@
 		<module>basyx.components.updater.examples.http-jsonata-delegator</module>
 		<module>basyx.components.updater.examples.opcua-jsonata-aas</module>
 		<module>basyx.components.updater.examples.httppolling-jsonata-aas</module>
+		<module>basyx.components.updater.examples.prometheus-jsonata-aas</module>
 	</modules>
 
 	<packaging>pom</packaging>
