@@ -3,12 +3,6 @@
     uniqueId: "jsonataA",
     queryPath: "jsonataA.json",
     inputType: "JsonString",
-    outputType: "JsonString",
-  },
-  {
-    uniqueId: "jsonataB",
-    queryPath: "jsonataB.json",
-    inputType: "JsonString",
-    outputType: "JsonString",
-  },
-];
+    outputType: "JsonString"
+  }
+]
