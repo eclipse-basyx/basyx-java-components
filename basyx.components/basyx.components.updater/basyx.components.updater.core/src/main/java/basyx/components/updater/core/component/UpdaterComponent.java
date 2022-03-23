@@ -143,7 +143,6 @@ public class UpdaterComponent {
 				configuration.getDatasources(), 
 				configuration.getTransformers(), 
 				configuration.getDatasinks(),
-				configuration.getTimers(),
 				configuration.getDelegators(),
 				new ArrayList<RouteConfiguration>()
 			);

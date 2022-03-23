@@ -68,21 +68,20 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		String dataSourceEndpoint = createDatasourceEndpoint(configuration, routeConfig.getDatasource());
 		String[] dataSinkEndpoints = createDatasinkEndpoint(configuration, routeConfig.getDatasinks());
 		String[] dataTransformerEndpoints = createDataTransformerEndpoint(configuration, routeConfig.getTransformers());
-		String timerEndpoint = createTimerEndpoint(configuration, routeConfig.getTimer());
 		String routeId = routeConfig.getRouteId();
 
 		if (Strings.isNullOrEmpty(routeConfig.getDelegator())) {
-		    if (Strings.isNullOrEmpty(timerEndpoint)) {
+			if (dataSourceEndpoint.startsWith("timer") == true) {
 				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
-                    from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+					from(dataSourceEndpoint).to(dataSinkEndpoints[0]).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints[1]).to("log:" + routeId);
 				} else {
-                    from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+					from(dataSourceEndpoint).to(dataSinkEndpoints[0]).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints[1]).to("log:" + routeId);
 				}
 			} else {
 				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
-					from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+					from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
 				} else {
-					from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
+					from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId);
 				}
 			}
 		} else {
@@ -92,10 +91,10 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 				from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId).bean(delegatorServlet, "processMessage");
 			} else {
 				from(timerEndpoint).to(dataSourceEndpoint).routeId(routeId).to("log:" + routeId).to(dataTransformerEndpoints).to("log:" + routeId).to(dataSinkEndpoints).to("log:" + routeId).bean(delegatorServlet, "processMessage");
-			}	
+			}
 		}
 	}
-	
+
 	/**
 	 * Creates data sink endpoint for each sink
 	 * @param routesConfig
@@ -174,15 +173,7 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		}
 	}
 
-	private String createTimerEndpoint(RoutesConfiguration routesConfig, String TimerId){
-		TimerConfiguration tConfig = routesConfig.getTimers().get(TimerId);
-		if (tConfig != null) {
-			return tConfig.getConnectionURI();
-		} else {
-			return null;
-		}
-	}
-	
+
 	/**
 	 * Gets the delegator servlet of the {@link DataSourceConfiguration}
 	 * @param routesConfig
