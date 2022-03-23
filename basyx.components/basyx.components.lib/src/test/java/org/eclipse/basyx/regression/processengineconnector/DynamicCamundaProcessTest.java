@@ -49,7 +49,7 @@ import org.junit.Test;
  * @author zhangzai
  *
  */
-public class DynamicActivitiProcessTest {
+public class DynamicCamundaProcessTest {
 	
 	/**
 	 * Process instance to be executed
