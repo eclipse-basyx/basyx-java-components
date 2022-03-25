@@ -1,5 +1,5 @@
 #!/bin/bash
-for row in $(echo "${WAITING_FOR}" | jq -r '.[] | @base64'); do
+for row in $(echo "${waiting_for}" | jq -r '.[] | @base64'); do
     _jq() {
      echo ${row} | base64 -d | jq -r ${1}
     }
