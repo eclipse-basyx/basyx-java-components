@@ -8,6 +8,7 @@ import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
 import org.junit.BeforeClass;
 
 public class TestAASServerWithMongoDbAndMqtt extends MqttAASServerSuite {
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		new MongoDBAASAggregator().reset();

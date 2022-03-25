@@ -1,14 +1,28 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.regression.processengineconnector;
-
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +55,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-
 /**
  * Test the BPMN-Model created using Bpmn model API, verify the execution
  * sequence of the tasks
@@ -50,17 +63,17 @@ import org.junit.Test;
  *
  */
 public class DynamicCamundaProcessTest {
-	
+
 	/**
 	 * Process instance to be executed
 	 */
 	ProcessInstance processInstance;
-	
+
 	/**
-	 * Deployment of the process engine 
+	 * Deployment of the process engine
 	 */
 	Deployment deployment;
-	
+
 	/**
 	 * The bpmn model instance created by the BPMNModelFactory
 	 */
@@ -69,35 +82,28 @@ public class DynamicCamundaProcessTest {
 	/**
 	 * configure the process engine before execution
 	 */
-	  @Rule
-	public ProcessEngineRule camundaRule = new ProcessEngineRule(
-			new StandaloneProcessEngineConfiguration()
-				.setJdbcUrl("jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000").setJdbcUsername("test").setJdbcPassword("test")
-				.setJdbcDriver("org.h2.Driver")
-				.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
-					.setJobExecutorActivate(false)
-				.buildProcessEngine());
-	  
-	  /**
+	@Rule
+	public ProcessEngineRule camundaRule = new ProcessEngineRule(new StandaloneProcessEngineConfiguration().setJdbcUrl("jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000").setJdbcUsername("test").setJdbcPassword("test")
+			.setJdbcDriver("org.h2.Driver").setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE).setJobExecutorActivate(false).buildProcessEngine());
+
+	/**
 	 * Deploy the process
 	 */
-	  @Before
-	  public void deploy() {
+	@Before
+	public void deploy() {
 		// 1. Build up the model from scratch
 		modelInstance = new BPMNModelFactory().create("my-process");
 		DeviceServiceDelegate.setDeviceServiceExecutor(new DeviceServiceExecutorStub());
-		  
-		    
+
 		// 2. Deploy the process to the engine
-		deployment = camundaRule.getRepositoryService().createDeployment()
-				.addModelInstance("dynamic-model.bpmn", modelInstance).name("Dynamic process deployment").deploy();
-	  }
-	  
-  /**
-   * Test the first branch of the BPMN-process, verify the execution sequence
-   * 	  
-   * @throws Exception
-   */
+		deployment = camundaRule.getRepositoryService().createDeployment().addModelInstance("dynamic-model.bpmn", modelInstance).name("Dynamic process deployment").deploy();
+	}
+
+	/**
+	 * Test the first branch of the BPMN-process, verify the execution sequence
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void testDynamicDeployPath1() throws Exception {
 
@@ -143,7 +149,7 @@ public class DynamicCamundaProcessTest {
 		});
 
 	}
-	  
+
 	@Test
 	public void testDynamicDeployPath2() throws Exception {
 		// 3. Start a process instance
@@ -179,14 +185,12 @@ public class DynamicCamundaProcessTest {
 		assertEquals(0, camundaRule.getRuntimeService().createProcessInstanceQuery().count());
 
 	}
-  
 
-    
 	@After
 	public void generateOutputFiles() throws IOException {
 		OutputStream output = new FileOutputStream(new File("target/process.bpmn20.xml"));
 		Bpmn.writeModelToStream(output, modelInstance);
 		output.close();
 	}
- 
+
 }
