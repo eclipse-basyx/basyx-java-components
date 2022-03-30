@@ -1,13 +1,13 @@
 [
 	{
 		"uniqueId": "jsonataA",
-		"queryPath": "file://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.updater.examples/basyx.components.updater.examples.kafka-jsonatamultiple-aas/src/main/resources/jsonataA.json",
+		"queryPath": "jsonataA.json",
 		"inputType": "JsonString",
 		"outputType": "JsonString"
 	},
 	{
 		"uniqueId": "jsonataB",
-		"queryPath": "file://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.updater.examples/basyx.components.updater.examples.kafka-jsonatamultiple-aas/src/main/resources/jsonataB.json",
+		"queryPath": "jsonataB.json",
 		"inputType": "JsonString",
 		"outputType": "JsonString"
 	}
