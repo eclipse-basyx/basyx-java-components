@@ -34,9 +34,23 @@ public class AASProducer extends DefaultProducer {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		LOG.info("Got msg for property: " + exchange.getMessage().getBody(String.class));
-    	connectedProperty.setValue(exchange.getMessage().getBody(String.class));
+    	String messageBody = exchange.getMessage().getBody(String.class);
+		String fixedMessageBody = "";
+    	fixedMessageBody = fixMessage(messageBody);
+
+		LOG.info("Got msg for property: " + fixedMessageBody);
+    	connectedProperty.setValue(fixedMessageBody);
     }
+
+    String fixMessage(String messageBody) {
+		String fixedMessageBody = "";
+		if (messageBody.contains("\"") && messageBody != null && messageBody.isEmpty() == false) {
+			fixedMessageBody = messageBody.substring(1,messageBody.length() - 1);
+		} else {
+			fixedMessageBody = messageBody;
+		}
+		return fixedMessageBody;
+	}
 	
 	/**
 	 * Connect the the Submodel Element for data dumping
