@@ -44,10 +44,12 @@ public class AASProducer extends DefaultProducer {
 
     String fixMessage(String messageBody) {
 		String fixedMessageBody = "";
-		if (messageBody.contains("\"") && messageBody != null && messageBody.isEmpty() == false) {
-			fixedMessageBody = messageBody.substring(1,messageBody.length() - 1);
-		} else {
-			fixedMessageBody = messageBody;
+		if (messageBody != null) {
+			if (messageBody.startsWith("\"") && messageBody.endsWith("\"")) {
+				fixedMessageBody = messageBody.substring(1,messageBody.length() - 1);
+			} else {
+				fixedMessageBody = messageBody;
+			}
 		}
 		return fixedMessageBody;
 	}
