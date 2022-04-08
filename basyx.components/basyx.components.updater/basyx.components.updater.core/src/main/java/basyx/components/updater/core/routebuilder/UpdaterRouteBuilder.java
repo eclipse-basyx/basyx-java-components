@@ -71,7 +71,7 @@ public class UpdaterRouteBuilder extends RouteBuilder {
 		String routeId = routeConfig.getRouteId();
 
 		if (Strings.isNullOrEmpty(routeConfig.getDelegator())) {
-			if (dataSourceEndpoint.startsWith("timer") == true) {
+			if (dataSourceEndpoint.startsWith("timer")) {
 				if (dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0) {
 					from(dataSourceEndpoint).to(dataSinkEndpoints[0]).routeId(routeId).to("log:" + routeId).to(dataSinkEndpoints[1]).to("log:" + routeId);
 				} else {
