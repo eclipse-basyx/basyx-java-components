@@ -49,6 +49,7 @@ public class UpdaterComponent implements IComponent {
 	/**
 	 * Starts the Camel component
 	 */
+	@Override
 	public void startComponent() {
 		startRoutesWithoutDelegator();
 		startDelegatoRoutes();
@@ -97,6 +98,7 @@ public class UpdaterComponent implements IComponent {
 	/**
 	 * Stops the Camel component
 	 */
+	@Override
 	public void stopComponent() {
 		if (camelContext != null && !camelContext.isStopped()) {
 			camelContext.stop();

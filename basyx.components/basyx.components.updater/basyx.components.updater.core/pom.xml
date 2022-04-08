@@ -79,7 +79,6 @@
             <groupId>org.eclipse.basyx</groupId>
             <artifactId>basyx.components.lib</artifactId>
             <version>1.0.2</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
