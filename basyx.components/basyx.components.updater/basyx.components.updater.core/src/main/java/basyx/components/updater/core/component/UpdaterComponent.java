@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.tooling.model.Strings;
+import org.eclipse.basyx.components.IComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ import basyx.components.updater.core.routebuilder.UpdaterRouteBuilder;
  * @author haque
  *
  */
-public class UpdaterComponent {
+public class UpdaterComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(UpdaterComponent.class);
 	private RoutesConfiguration routesWithoutDelegator;
 	private RoutesConfiguration delegatorRoutes;
@@ -48,6 +49,7 @@ public class UpdaterComponent {
 	/**
 	 * Starts the Camel component
 	 */
+	@Override
 	public void startComponent() {
 		startRoutesWithoutDelegator();
 		startDelegatoRoutes();
@@ -96,6 +98,7 @@ public class UpdaterComponent {
 	/**
 	 * Stops the Camel component
 	 */
+	@Override
 	public void stopComponent() {
 		if (camelContext != null && !camelContext.isStopped()) {
 			camelContext.stop();
