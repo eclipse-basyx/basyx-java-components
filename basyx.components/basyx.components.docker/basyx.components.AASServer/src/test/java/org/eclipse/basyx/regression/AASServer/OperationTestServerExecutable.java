@@ -81,7 +81,7 @@ public class OperationTestServerExecutable {
 		Collection<OperationVariable> in = new ArrayList<>();
 
 		Property inProp = new Property("in", i);
-		inProp.setModelingKind(ModelingKind.TEMPLATE);
+		inProp.setKind(ModelingKind.TEMPLATE);
 		in.add(new OperationVariable(inProp));
 		return in;
 	}
@@ -90,7 +90,7 @@ public class OperationTestServerExecutable {
 		Collection<OperationVariable> out = new ArrayList<>();
 
 		Property outProp = new Property("out", bool);
-		outProp.setModelingKind(ModelingKind.TEMPLATE);
+		outProp.setKind(ModelingKind.TEMPLATE);
 		out.add(new OperationVariable(outProp));
 		return out;
 	}

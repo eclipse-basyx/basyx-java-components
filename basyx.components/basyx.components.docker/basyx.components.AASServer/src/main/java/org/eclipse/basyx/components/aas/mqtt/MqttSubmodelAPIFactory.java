@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author espen
  */
+@Deprecated
 public class MqttSubmodelAPIFactory implements ISubmodelAPIFactory {
 	private static Logger logger = LoggerFactory.getLogger(MqttSubmodelAPIFactory.class);
 

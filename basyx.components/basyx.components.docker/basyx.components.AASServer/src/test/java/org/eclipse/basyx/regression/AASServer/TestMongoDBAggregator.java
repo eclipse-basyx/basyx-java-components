@@ -120,6 +120,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.MONGODB, "");
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void resetMongoDBTestData() {
 		new MongoDBAASAggregator(mongoDBConfig).reset();
 	}
@@ -189,6 +190,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected IAASAggregator getAggregator() {
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH);
@@ -197,6 +199,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		return aggregator;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void checkInitialSetupAfterCreatingAndRegisteringAasAndSubmodel() {
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
@@ -222,6 +225,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		aasProvider.removeProvider(SM_IDSHORT);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test(expected = ResourceNotFoundException.class)
 	public void checkForResourceNotFoundExceptionWhileNotPassingRegistryAfterServerRestart() {
 		restartAasServer();
@@ -233,7 +237,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		aasProvider.getValue(PREFIX_SUBMODEL_PATH + SM_IDSHORT + SUFFIX_SUBMODEL_PATH);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Test
 	public void checkNoExceptionIsObservedAfterPassingRegistry() {
 		restartAasServer();

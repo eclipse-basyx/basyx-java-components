@@ -250,6 +250,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(HOSTPATH, hostPath);
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<String> parseFromJson(String property) {
 		List<String> fromJson = new Gson().fromJson(property, List.class);
 		if (fromJson == null) {

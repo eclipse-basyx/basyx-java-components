@@ -24,7 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mqtt;
 
-import com.google.common.base.Strings;
 import java.security.ProviderException;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
@@ -33,7 +32,8 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.jetbrains.annotations.NotNull;
+
+import com.google.common.base.Strings;
 
 /**
  * 

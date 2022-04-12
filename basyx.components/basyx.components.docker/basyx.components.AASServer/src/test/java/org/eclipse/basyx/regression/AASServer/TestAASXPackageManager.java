@@ -76,6 +76,7 @@ import org.xml.sax.SAXException;
  * @author zhangzai, conradi
  *
  */
+@SuppressWarnings("deprecation")
 public class TestAASXPackageManager {
 	/**
 	 * path to the aasx package

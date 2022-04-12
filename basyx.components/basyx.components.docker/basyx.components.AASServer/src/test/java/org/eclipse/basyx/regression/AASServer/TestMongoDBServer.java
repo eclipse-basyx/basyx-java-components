@@ -94,6 +94,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		component.startComponent();
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void resetMongoDBTestData() {
 		new MongoDBAASAggregator(mongoDBConfig).reset();
 	}
@@ -123,6 +124,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		checkSubmodelReferencesSize(0);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testAggregatorPersistency() throws Exception {
 		createAssetAdministrationShell();

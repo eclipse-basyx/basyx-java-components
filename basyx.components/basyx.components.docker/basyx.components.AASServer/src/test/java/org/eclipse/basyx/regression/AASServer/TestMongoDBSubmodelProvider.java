@@ -48,6 +48,7 @@ import org.junit.Test;
 public class TestMongoDBSubmodelProvider extends SubmodelProviderTest {
 	private VABConnectionManager connManager;
 
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void setUpClass() {
 		// just reset the data with this default db configuration

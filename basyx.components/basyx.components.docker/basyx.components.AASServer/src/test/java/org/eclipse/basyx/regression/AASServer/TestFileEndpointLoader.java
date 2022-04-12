@@ -45,6 +45,7 @@ import org.junit.Test;
  * @author espen
  *
  */
+@SuppressWarnings("deprecation")
 public class TestFileEndpointLoader {
 	private Submodel submodel;
 	private final String relativePath = "/file/root/text.txt";

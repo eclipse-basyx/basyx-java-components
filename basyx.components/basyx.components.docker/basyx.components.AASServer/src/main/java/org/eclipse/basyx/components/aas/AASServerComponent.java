@@ -89,6 +89,7 @@ import org.xml.sax.SAXException;
  * @author schnicke, espen, fried, fischer
  *
  */
+@SuppressWarnings("deprecation")
 public class AASServerComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(AASServerComponent.class);
 
@@ -294,7 +295,6 @@ public class AASServerComponent implements IComponent {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
-		@SuppressWarnings("deprecation")
 		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
 
 		// Unpack the files referenced by the aas
