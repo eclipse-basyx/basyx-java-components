@@ -36,7 +36,7 @@ import com.google.common.base.Strings;
  */
 public enum AASEventBackend {
 	NONE("NONE"), MQTT("MQTT");
-	
+
 	private String literal;
 
 	private AASEventBackend(String literal) {

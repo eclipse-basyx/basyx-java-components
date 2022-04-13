@@ -67,8 +67,7 @@ public class TestAASXRegistration {
 	protected AASServerComponent component;
 
 	@Before
-	public void setUp()
-			throws ParserConfigurationException, SAXException, IOException, URISyntaxException, ServletException {
+	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException, ServletException {
 		BaSyxContextConfiguration contextConfig = createContextConfig();
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, AASXPATH, "", deployedEndpoint);
 		startAASServerComponent(contextConfig, aasConfig);
@@ -101,9 +100,7 @@ public class TestAASXRegistration {
 		AASDescriptor aasDescriptor = registry.lookupAAS(AAS_ID);
 		String descAASEndpoint = aasDescriptor.getFirstEndpoint();
 
-		String expectedEndpoint = VABPathTools.concatenatePaths(deployedEndpoint, AASAggregatorProvider.PREFIX,
-				AAS_ID.getEncodedURN(),
-				MultiSubmodelProvider.AAS);
+		String expectedEndpoint = VABPathTools.concatenatePaths(deployedEndpoint, AASAggregatorProvider.PREFIX, AAS_ID.getEncodedURN(), MultiSubmodelProvider.AAS);
 		System.out.println(expectedEndpoint);
 		System.out.println(descAASEndpoint);
 		assertEquals(expectedEndpoint, descAASEndpoint);
@@ -114,5 +111,3 @@ public class TestAASXRegistration {
 		component.stopComponent();
 	}
 }
-
-

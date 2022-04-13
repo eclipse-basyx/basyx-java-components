@@ -86,7 +86,7 @@ public class ProcessInstanceStub extends ExecutionImpl {
 	@Override
 	public String getCurrentActivityName() {
 		return "test-activity-01";
-	  }
+	}
 
 	/**
 	 * Unused functions

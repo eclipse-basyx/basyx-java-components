@@ -29,8 +29,6 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.basyx.tools.sqlproxy.SQLRootElement;
 import org.junit.Test;
 
-
-
 /**
  * Test SQL root element implementation, its creation, and dropping
  * 
@@ -39,35 +37,31 @@ import org.junit.Test;
  */
 public class SQLProxyTestRootElement {
 
-	
 	/**
-	 * Store SQL root element reference
-	 * - An SQL root element is the main gateway to a SQL database
+	 * Store SQL root element reference - An SQL root element is the main gateway to
+	 * a SQL database
 	 */
 	protected SQLRootElement sqlRootElement = null;
 
-	
-	
 	/**
 	 * Test basic operations
 	 */
 	@Test
 	public void test() throws Exception {
 		// Create SQL root element
-		sqlRootElement = new SQLRootElement(SQLConfig.SQLUSER, SQLConfig.SQLPW,  "//localhost/basyx-map?", "org.postgresql.Driver", "jdbc:postgresql:", "root_el_01");
+		sqlRootElement = new SQLRootElement(SQLConfig.SQLUSER, SQLConfig.SQLPW, "//localhost/basyx-map?", "org.postgresql.Driver", "jdbc:postgresql:", "root_el_01");
 		// - Create new table in database for root element
 		sqlRootElement.createRootTableIfNotExists();
-		
+
 		// Get element IDs
 		assertTrue(sqlRootElement.getNextIdentifier() == 1);
 		assertTrue(sqlRootElement.getNextIdentifier() == 2);
-		
+
 		// Create map
 		sqlRootElement.createMap(0);
-		
+
 		// Create collection
 		sqlRootElement.createCollection(1);
-		
 
 		// Drop tables
 		sqlRootElement.dropTable(0);

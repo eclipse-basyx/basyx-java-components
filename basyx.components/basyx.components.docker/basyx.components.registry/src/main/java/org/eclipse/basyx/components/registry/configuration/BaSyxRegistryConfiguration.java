@@ -30,8 +30,8 @@ import java.util.Map;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
 
 /**
- * Represents a BaSyx registry configuration for a BaSyx Registry with any backend,
- * that can be loaded from a properties file.
+ * Represents a BaSyx registry configuration for a BaSyx Registry with any
+ * backend, that can be loaded from a properties file.
  * 
  * @author espen
  *

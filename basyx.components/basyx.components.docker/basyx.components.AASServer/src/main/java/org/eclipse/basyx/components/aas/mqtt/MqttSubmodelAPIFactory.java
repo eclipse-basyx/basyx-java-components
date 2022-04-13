@@ -66,7 +66,7 @@ public class MqttSubmodelAPIFactory implements ISubmodelAPIFactory {
 	public ISubmodelAPI getSubmodelAPI(Submodel sm) {
 		// Get the submodel's id from the given provider
 		String smId = sm.getIdentification().getId();
-		
+
 		// Create the API
 		IModelProvider provider = new VABLambdaProvider(sm);
 		VABSubmodelAPI observedApi = new VABSubmodelAPI(provider);

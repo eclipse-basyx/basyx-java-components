@@ -43,7 +43,8 @@ public class ITRegistry extends TestRegistryProviderSuite {
 		logger.info("Running integration test...");
 
 		logger.info("Loading servlet configuration");
-		// Load the servlet configuration inside of the docker configuration from properties file
+		// Load the servlet configuration inside of the docker configuration from
+		// properties file
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
 

@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.regression.components.factory.propertymap;
 
 import static org.junit.Assert.assertEquals;

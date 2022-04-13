@@ -33,34 +33,40 @@ import java.util.stream.Collectors;
 import org.eclipse.basyx.tools.sql.query.DynamicSQLQuery;
 import org.eclipse.basyx.tools.sql.query.DynamicSQLUpdate;
 
-
-
 /**
- * Create a root element that connects to SQL database and that contains other maps and collections
+ * Create a root element that connects to SQL database and that contains other
+ * maps and collections
  * 
  * @author kuhn
  *
  */
 public class SQLRootElement extends SQLConnector {
 
-	
 	/**
 	 * Constructor
 	 * 
-	 * @param user        SQL user name
-	 * @param pass        SQL password
-	 * @param url         SQL server URL
-	 * @param driver      SQL driver
-	 * @param prefix      JDBC SQL driver prefix
-	 * @param tableID     ID of table for this element in database. Every element needs a unique ID
+	 * @param user
+	 *            SQL user name
+	 * @param pass
+	 *            SQL password
+	 * @param url
+	 *            SQL server URL
+	 * @param driver
+	 *            SQL driver
+	 * @param prefix
+	 *            JDBC SQL driver prefix
+	 * @param tableID
+	 *            ID of table for this element in database. Every element needs a
+	 *            unique ID
 	 */
 	public SQLRootElement(String user, String pass, String url, String driver, String prefix, String tableID) {
 		// Base constructor
 		super(user, pass, url, driver, prefix, tableID);
 	}
-	
+
 	/**
-	 * Creates the root table if it does not exist (including a possibly missing schema)
+	 * Creates the root table if it does not exist (including a possibly missing
+	 * schema)
 	 */
 	public void createRootTableIfNotExists() {
 		createSchema();
@@ -68,7 +74,8 @@ public class SQLRootElement extends SQLConnector {
 	}
 
 	/**
-	 * Removes the root table if it exists (including its schema if it is empty afterwards)
+	 * Removes the root table if it exists (including its schema if it is empty
+	 * afterwards)
 	 */
 	public void drop() {
 		dropRootTable();
@@ -85,8 +92,7 @@ public class SQLRootElement extends SQLConnector {
 		int elementId = (int) sqlResult.get("NextElementID");
 
 		// SQL update statement
-		String updateString = "UPDATE elements." + getSqlTableID() + " SET NextElementID=" + (elementId + 1)
-				+ ", ElementPrefix='" + sqlResult.get("ElementPrefix") + "'";
+		String updateString = "UPDATE elements." + getSqlTableID() + " SET NextElementID=" + (elementId + 1) + ", ElementPrefix='" + sqlResult.get("ElementPrefix") + "'";
 		DynamicSQLUpdate dynUpdate = new DynamicSQLUpdate(getDriver(), updateString);
 
 		// Empty parameter set
@@ -103,15 +109,13 @@ public class SQLRootElement extends SQLConnector {
 	private Map<String, Object> readCurrentElementPointer() {
 		// SQL query string
 		String queryString = "SELECT * FROM elements." + getSqlTableID();
-		DynamicSQLQuery dynQuery = new DynamicSQLQuery(getDriver(), queryString,
-				"mapArray(NextElementID:Integer,ElementPrefix:String)");
-		
+		DynamicSQLQuery dynQuery = new DynamicSQLQuery(getDriver(), queryString, "mapArray(NextElementID:Integer,ElementPrefix:String)");
+
 		// Empty parameter set
 		Map<String, Object> parameter = new HashMap<>();
 		// - Execute query, return the column as
 		return (Map<String, Object>) dynQuery.get(parameter);
 	}
-	
 
 	/**
 	 * Creates a schema for the root element
@@ -127,7 +131,7 @@ public class SQLRootElement extends SQLConnector {
 		// Execute SQL statement
 		dynCmd.accept(parameter);
 	}
-	
+
 	/**
 	 * Removes the schema of the root element if it is empty
 	 */
@@ -148,22 +152,20 @@ public class SQLRootElement extends SQLConnector {
 	 */
 	protected void createRootTable() {
 		// SQL command
-		String sqlCommandString = "CREATE TABLE IF NOT EXISTS elements." + getSqlTableID()
-				+ " (NextElementID int, ElementPrefix varchar(255));";
+		String sqlCommandString = "CREATE TABLE IF NOT EXISTS elements." + getSqlTableID() + " (NextElementID int, ElementPrefix varchar(255));";
 		DynamicSQLUpdate dynCmd = new DynamicSQLUpdate(getDriver(), sqlCommandString);
-		
+
 		// Parameter for SQL command statement
 		Map<String, Object> parameter = new HashMap<>();
 
 		// Execute SQL statement
 		dynCmd.accept(parameter);
-		
+
 		Map<String, Object> currentPointer = readCurrentElementPointer();
-		
+
 		if (!currentPointer.containsKey("NextElementID")) {
 			// Initially fill table if it is empty
-			String sqlInsertString = "INSERT INTO elements." + getSqlTableID()
-					+ " (NextElementID, ElementPrefix) VALUES (1, '" + getSqlTableID() + ":')";
+			String sqlInsertString = "INSERT INTO elements." + getSqlTableID() + " (NextElementID, ElementPrefix) VALUES (1, '" + getSqlTableID() + ":')";
 			DynamicSQLUpdate dynUpdate = new DynamicSQLUpdate(getDriver(), sqlInsertString);
 
 			// Clear parameter
@@ -174,43 +176,38 @@ public class SQLRootElement extends SQLConnector {
 		}
 	}
 
-	
-	
 	/**
 	 * Create a new map element table in SQL database
 	 */
 	public SQLMap createMap(int elementID) {
 		// SQL command
-		String sqlCommandString = "CREATE TABLE IF NOT EXISTS elements." + getSqlTableID() + "__" + elementID
-				+ " (name text, type int, value text);";
+		String sqlCommandString = "CREATE TABLE IF NOT EXISTS elements." + getSqlTableID() + "__" + elementID + " (name text, type int, value text);";
 		DynamicSQLUpdate dynCmd = new DynamicSQLUpdate(getDriver(), sqlCommandString);
-		
+
 		// Parameter for SQL command statement
 		Map<String, Object> parameter = new HashMap<>();
 
 		// Execute SQL statement
 		dynCmd.accept(parameter);
-		
+
 		// Return created map
 		return new SQLMap(this, elementID);
 	}
 
-	
 	/**
 	 * Create a new collection element table in SQL database
 	 */
 	public SQLCollection createCollection(int elementID) {
 		// SQL command
-		String sqlCommandString = "CREATE TABLE IF NOT EXISTS elements." + getSqlTableID() + "__" + elementID
-				+ " (type int, value text);";
+		String sqlCommandString = "CREATE TABLE IF NOT EXISTS elements." + getSqlTableID() + "__" + elementID + " (type int, value text);";
 		DynamicSQLUpdate dynCmd = new DynamicSQLUpdate(getDriver(), sqlCommandString);
-		
+
 		// Parameter for SQL command statement
 		Map<String, Object> parameter = new HashMap<>();
 
 		// Execute SQL statement
 		dynCmd.accept(parameter);
-		
+
 		// Return created collection
 		return new SQLCollection(this, elementID);
 	}
@@ -221,17 +218,14 @@ public class SQLRootElement extends SQLConnector {
 	@SuppressWarnings("unchecked")
 	private Set<String> getContainedTables() {
 		// SQL query string
-		String queryString = "SELECT table_name FROM information_schema.tables "
-				+ "WHERE table_type = 'BASE TABLE' AND table_schema = 'elements' "
-				+ "AND table_name LIKE '" + getSqlTableID() + "__%';";
-		DynamicSQLQuery dynQuery = new DynamicSQLQuery(getDriver(), queryString,
-				"stringArray(table_name:String)");
-		
+		String queryString = "SELECT table_name FROM information_schema.tables " + "WHERE table_type = 'BASE TABLE' AND table_schema = 'elements' " + "AND table_name LIKE '" + getSqlTableID() + "__%';";
+		DynamicSQLQuery dynQuery = new DynamicSQLQuery(getDriver(), queryString, "stringArray(table_name:String)");
+
 		// Get table row using no parameters
 		Collection<String> tableNames = (Collection<String>) dynQuery.get(new HashMap<>());
 		return tableNames.stream().map(name -> "elements." + name).collect(Collectors.toSet());
 	}
-	
+
 	/**
 	 * Drop the root table and remove all contained elements
 	 */
@@ -246,8 +240,7 @@ public class SQLRootElement extends SQLConnector {
 		// Execute SQL statement without parameters
 		dynCmd.accept(new HashMap<>());
 	}
-	
-	
+
 	/**
 	 * Drop a root table
 	 */
@@ -255,17 +248,17 @@ public class SQLRootElement extends SQLConnector {
 		// SQL command
 		String sqlCommandString = "DROP TABLE IF EXISTS elements." + getSqlTableID() + "__" + elementID + ";";
 		DynamicSQLUpdate dynCmd = new DynamicSQLUpdate(getDriver(), sqlCommandString);
-		
+
 		// Parameter for SQL command statement
 		Map<String, Object> parameter = new HashMap<>();
 
 		// Execute SQL statement
-		dynCmd.accept(parameter);		
+		dynCmd.accept(parameter);
 	}
 
 	/**
-	 * Creates a new root map, if it does not exist. Otherwise, returns
-	 * the first map within this root element.
+	 * Creates a new root map, if it does not exist. Otherwise, returns the first
+	 * map within this root element.
 	 * 
 	 * @return
 	 */
@@ -281,4 +274,3 @@ public class SQLRootElement extends SQLConnector {
 		}
 	}
 }
-

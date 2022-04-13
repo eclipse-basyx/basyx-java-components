@@ -40,7 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the SubmodelFileEndpointLoader 
+ * Tests the SubmodelFileEndpointLoader
  * 
  * @author espen
  *
@@ -51,7 +51,7 @@ public class TestFileEndpointLoader {
 	private final String relativePath = "/file/root/text.txt";
 	private final String absolutePath = "http://localhost:1234/file/root/text.txt";
 	private final String relativeTargetPath = "http://localhost:4321/new/file/root/text.txt";
-	
+
 	@Before
 	public void setup() {
 		File fRel = new File(relativePath, "application/json");
@@ -68,9 +68,10 @@ public class TestFileEndpointLoader {
 		submodel.addSubmodelElement(fAbs);
 		submodel.addSubmodelElement(col);
 	}
-	
+
 	/**
-	 * Tests setting a static string endpoint (relative to the given path in the existing value)
+	 * Tests setting a static string endpoint (relative to the given path in the
+	 * existing value)
 	 */
 	@Test
 	public void testRelativePaths1() {
@@ -79,7 +80,8 @@ public class TestFileEndpointLoader {
 	}
 
 	/**
-	 * Tests setting a endpoint via host, port and root path (relative to the given path in the existing value)
+	 * Tests setting a endpoint via host, port and root path (relative to the given
+	 * path in the existing value)
 	 */
 	@Test
 	public void testRelativePaths2() {

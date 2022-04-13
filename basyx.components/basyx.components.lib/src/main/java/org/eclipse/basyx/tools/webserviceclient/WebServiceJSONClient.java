@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class WebServiceJSONClient {
-	
+
 	/**
 	 * Initiates a logger using the current class
 	 */

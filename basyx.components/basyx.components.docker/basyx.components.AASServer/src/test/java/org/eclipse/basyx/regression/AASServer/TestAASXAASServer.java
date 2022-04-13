@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
 /**
  * Test accessing to AAS using basys aas SDK
  * 
@@ -58,7 +59,7 @@ public class TestAASXAASServer extends AASXSuite {
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/01_Festo.aasx");
-		
+
 		// Load the additional file path relative to the executed jar file
 		String rootPath = new File(AASServerExecutable.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
 		String docBasePath = rootPath;
@@ -67,7 +68,7 @@ public class TestAASXAASServer extends AASXSuite {
 		// Start the component
 		component = new AASServerComponent(contextConfig, aasConfig);
 		component.startComponent();
-		
+
 		rootEndpoint = contextConfig.getUrl() + "/";
 		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
 		smEndpoint = aasEndpoint + "/submodels/" + smShortId + "/submodel";
@@ -79,5 +80,3 @@ public class TestAASXAASServer extends AASXSuite {
 		component.stopComponent();
 	}
 }
-
-

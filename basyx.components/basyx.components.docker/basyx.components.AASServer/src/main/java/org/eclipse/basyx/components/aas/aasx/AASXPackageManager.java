@@ -61,8 +61,7 @@ public class AASXPackageManager extends AASXToMetamodelConverter {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<org.eclipse.basyx.support.bundle.AASBundle> retrieveAASBundles()
-			throws IOException, ParserConfigurationException, SAXException, InvalidFormatException {
+	public Set<org.eclipse.basyx.support.bundle.AASBundle> retrieveAASBundles() throws IOException, ParserConfigurationException, SAXException, InvalidFormatException {
 		Set<? extends AASBundle> bundles = super.retrieveAASBundles();
 		return repackAASBundle(bundles);
 	}
@@ -72,7 +71,6 @@ public class AASXPackageManager extends AASXToMetamodelConverter {
 	 * @return
 	 */
 	private Set<org.eclipse.basyx.support.bundle.AASBundle> repackAASBundle(Set<? extends AASBundle> bundles) {
-		return bundles.stream().map(b -> new org.eclipse.basyx.support.bundle.AASBundle(b.getAAS(), b.getSubmodels()))
-				.collect(Collectors.toSet());
+		return bundles.stream().map(b -> new org.eclipse.basyx.support.bundle.AASBundle(b.getAAS(), b.getSubmodels())).collect(Collectors.toSet());
 	}
 }

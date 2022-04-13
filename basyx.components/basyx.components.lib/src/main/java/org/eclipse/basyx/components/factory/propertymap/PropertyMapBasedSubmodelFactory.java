@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.components.factory.propertymap;
 
 import java.util.ArrayList;
@@ -63,6 +62,7 @@ public class PropertyMapBasedSubmodelFactory {
 	 * <br>
 	 * <br>
 	 * Example:
+	 * 
 	 * <pre>
 	 * { 
 	 * 		"id": "SMId", 
@@ -77,7 +77,7 @@ public class PropertyMapBasedSubmodelFactory {
 	public Submodel create(Map<String, String> submodelMap) {
 		String smId = PropertyMapConstantsHelper.getIdValue(submodelMap);
 		String smIdShort = PropertyMapConstantsHelper.getIdShort(submodelMap);
-		
+
 		List<Property> properties = getProperties(submodelMap);
 
 		Submodel sm = new Submodel(smIdShort, new CustomId(smId));
@@ -102,16 +102,15 @@ public class PropertyMapBasedSubmodelFactory {
 			Property toAdd = getProperty(propName);
 			ret.add(toAdd);
 		}
-		
+
 		return ret;
 	}
 
-
 	private Property getProperty(String propName) throws RuntimeException {
-		if(!propertyMap.containsKey(propName)) {
+		if (!propertyMap.containsKey(propName)) {
 			throw new RuntimeException("Property with name " + propName + " could not be resolved");
 		}
-		
+
 		return propertyMap.get(propName);
 	}
 

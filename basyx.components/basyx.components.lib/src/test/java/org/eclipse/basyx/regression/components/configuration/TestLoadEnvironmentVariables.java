@@ -81,8 +81,6 @@ public class TestLoadEnvironmentVariables {
 		setEnvironmentVariablesForTesting(variables);
 	}
 
-
-
 	private void compareProperties() {
 		basyxServerConfig.loadFromEnvironmentVariables();
 		String backendProperty = basyxServerConfig.getProperty("aas.backend");

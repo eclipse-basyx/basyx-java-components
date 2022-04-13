@@ -52,7 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for providers that receiver their configuration through a configuration properties object
+ * Base class for providers that receiver their configuration through a
+ * configuration properties object
  * 
  * @author kuhn
  *
@@ -60,7 +61,7 @@ import org.slf4j.LoggerFactory;
 
 @Deprecated
 public class BaseConfiguredProvider extends SubmodelProvider {
-	
+
 	/**
 	 * Initiates a logger using the current class
 	 */
@@ -70,13 +71,12 @@ public class BaseConfiguredProvider extends SubmodelProvider {
 	 * This is a sub model
 	 */
 	protected Submodel submodelData = null;
-	
+
 	public static final String SUBMODELSEMANTICS = "submodelSemantics";
 	public static final String TYPE = "type";
 	public static final String SEMANTICSINTERNAL = "semanticsInternal";
-	
+
 	public static final String SUBMODELID = "submodelID";
-	
 
 	/**
 	 * Constructor
@@ -165,7 +165,8 @@ public class BaseConfiguredProvider extends SubmodelProvider {
 		// Create sub model
 		Submodel submodel = null;
 
-		// Try to load and convert configuration values. Keep value null if any error occurs
+		// Try to load and convert configuration values. Keep value null if any error
+		// occurs
 		String basyx_submodelSemantics = null;
 		try {
 			basyx_submodelSemantics = cfgValues.get(buildBasyxCfgName(SUBMODELSEMANTICS)).toString().toLowerCase();
@@ -235,17 +236,13 @@ public class BaseConfiguredProvider extends SubmodelProvider {
 			basyx_submodelSemantics = IdentifierType.CUSTOM.toString().toLowerCase();
 		if (basyx_submodelSemantics.equals(IdentifierType.IRDI.toString().toLowerCase())) {
 			// Create sub model from template
-			submodel = new SubmodelFacadeIRDISemantics(basyx_submodelSemantics, idType, basyx_id,
-					basyx_idShort, basyx_category, new LangStrings("", basyx_description),
-					new Qualifier(basyx_qualifierType, basyx_qualifier, "", null), null, ModelingKind.INSTANCE, basyx_version,
-					basyx_revision);
+			submodel = new SubmodelFacadeIRDISemantics(basyx_submodelSemantics, idType, basyx_id, basyx_idShort, basyx_category, new LangStrings("", basyx_description), new Qualifier(basyx_qualifierType, basyx_qualifier, "", null), null,
+					ModelingKind.INSTANCE, basyx_version, basyx_revision);
 		}
 		if (basyx_submodelSemantics.equals(IdentifierType.CUSTOM.toString().toLowerCase())) {
 			// Create sub model from template
-			submodel = new SubmodelFacadeCustomSemantics(basyx_submodelSemantics, idType, basyx_id,
-					basyx_idShort, basyx_category, new LangStrings("", basyx_description),
-					new Qualifier(basyx_qualifierType, basyx_qualifier, "", null), new HasDataSpecification(),
-					ModelingKind.INSTANCE, basyx_version, basyx_revision);
+			submodel = new SubmodelFacadeCustomSemantics(basyx_submodelSemantics, idType, basyx_id, basyx_idShort, basyx_category, new LangStrings("", basyx_description), new Qualifier(basyx_qualifierType, basyx_qualifier, "", null),
+					new HasDataSpecification(), ModelingKind.INSTANCE, basyx_version, basyx_revision);
 		}
 
 		// If no sub model was created, create an empty one
@@ -314,23 +311,20 @@ public class BaseConfiguredProvider extends SubmodelProvider {
 		}
 
 		// Create and return single valued property
-		Property prop = new Property(
-				propertyValue, 
-				new Referable(propertyName, "", new LangStrings("", property_description)),
-				new Reference(new Key(KeyElements.PROPERTY, true, property_semanticsInternal, IdentifierType.CUSTOM)), 
+		Property prop = new Property(propertyValue, new Referable(propertyName, "", new LangStrings("", property_description)), new Reference(new Key(KeyElements.PROPERTY, true, property_semanticsInternal, IdentifierType.CUSTOM)),
 				new Qualifiable(new Qualifier(property_qualifierType, property_qualifier, "", null)));
 		return prop;
 	}
-	
+
 	public static String buildBasyxCfgName(String... valueName) {
 		return buildCfgName("basyx", valueName);
 	}
-	
+
 	public static String buildCfgName(String propertyName, String... valueName) {
 		String result = propertyName;
-		for(String s: valueName)
+		for (String s : valueName)
 			result += "." + s;
 		return result;
 	}
-	
+
 }

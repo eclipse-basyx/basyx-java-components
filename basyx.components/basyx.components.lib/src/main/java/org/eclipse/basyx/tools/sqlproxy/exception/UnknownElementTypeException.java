@@ -24,9 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.tools.sqlproxy.exception;
 
-
-
-
 /**
  * Indicate an unknown element type
  * 
@@ -35,21 +32,16 @@ package org.eclipse.basyx.tools.sqlproxy.exception;
  */
 public class UnknownElementTypeException extends RuntimeException {
 
-	
 	/**
 	 * Version number support for serialized instances
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
 	/**
 	 * Error message
 	 */
 	protected String errorMessage = null;
-	
-	
-	
-	
+
 	/**
 	 * Constructor
 	 */
@@ -57,4 +49,3 @@ public class UnknownElementTypeException extends RuntimeException {
 		errorMessage = errorMsg;
 	}
 }
-

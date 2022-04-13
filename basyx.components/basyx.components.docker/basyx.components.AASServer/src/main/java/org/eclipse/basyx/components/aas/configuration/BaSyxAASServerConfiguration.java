@@ -75,7 +75,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	// The default key for variables pointing to the configuration file
 	public static final String DEFAULT_FILE_KEY = "BASYX_AAS";
-	
+
 	public static final String PATTERN = "^\\[\\\".*\\\"\\]$";
 
 	public static Map<String, String> getDefaultProperties() {
@@ -191,9 +191,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
-	 *             {@link #getAASSourceAsList() } to get the list of
-	 *             source path/paths of serialized AAS.
+	 * @deprecated This method is deprecated due to a new implementation to support
+	 *             multiple serialized AAS. Use new method
+	 *             {@link #getAASSourceAsList() } to get the list of source
+	 *             path/paths of serialized AAS.
 	 */
 	@Deprecated
 	public String getAASSource() {
@@ -201,10 +202,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public List<String> getAASSourceAsList() {
-		if(!areMultipleAasSourcesProvided(getProperty(SOURCE))) {
+		if (!areMultipleAasSourcesProvided(getProperty(SOURCE))) {
 			return Arrays.asList(getProperty(SOURCE));
 		}
-		
+
 		return parseFromJson(getProperty(SOURCE));
 	}
 
@@ -213,15 +214,16 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
-	 *             {@link #setAASSourceAsList(String) } to get the list of
-	 *             source path/paths of serialized AAS.
+	 * @deprecated This method is deprecated due to a new implementation to support
+	 *             multiple serialized AAS. Use new method
+	 *             {@link #setAASSourceAsList(String) } to get the list of source
+	 *             path/paths of serialized AAS.
 	 */
 	@Deprecated
 	public void setAASSource(String source) {
 		setProperty(SOURCE, source);
 	}
-	
+
 	public void setAASSourceAsList(String source) {
 		setProperty(SOURCE, source);
 	}

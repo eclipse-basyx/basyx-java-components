@@ -90,7 +90,6 @@ public class PropertyMapBasedSubmodelFactoryTest {
 		return prop1.getIdShort() + ", " + prop2.getIdShort();
 	}
 
-
 	private static Submodel buildSubmodel(String idShort, String id, List<Property> properties) {
 		Submodel sm = new Submodel(idShort, new CustomId(id));
 		properties.forEach(p -> sm.addSubmodelElement(p));

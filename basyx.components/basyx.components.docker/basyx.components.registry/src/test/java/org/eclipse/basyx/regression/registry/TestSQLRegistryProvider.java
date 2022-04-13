@@ -76,7 +76,8 @@ public class TestSQLRegistryProvider extends TestRegistryProviderSuite {
 	}
 
 	/**
-	 * Tests, if the data has been persisted by creating a new registry with the same settings
+	 * Tests, if the data has been persisted by creating a new registry with the
+	 * same settings
 	 */
 	@Test
 	public void testPersistency() {
@@ -84,7 +85,7 @@ public class TestSQLRegistryProvider extends TestRegistryProviderSuite {
 		BaSyxSQLConfiguration sqlConfig = new BaSyxSQLConfiguration();
 		sqlConfig.loadFromResource("sql.properties");
 		IAASRegistry registry = new SQLRegistry(sqlConfig);
-		
+
 		// Try to "overwrite" data
 		AASDescriptor aasDesc2 = new AASDescriptor(aasIdShort2, aasId2, asset2, aasEndpoint2);
 		proxy.register(aasDesc2);

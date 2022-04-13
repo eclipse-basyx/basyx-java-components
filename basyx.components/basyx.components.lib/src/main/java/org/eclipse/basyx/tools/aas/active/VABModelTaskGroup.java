@@ -52,7 +52,8 @@ public class VABModelTaskGroup {
 	}
 
 	/**
-	 * Changes the associated model provider. The contained tasks refer to this new provider from now on
+	 * Changes the associated model provider. The contained tasks refer to this new
+	 * provider from now on
 	 * 
 	 * @param newProvider
 	 *            A reference to a model provider the scheduled task shall refer to
@@ -88,19 +89,19 @@ public class VABModelTaskGroup {
 	}
 
 	/**
-	 * Starts scheduling the contained tasks at the configured update rate. If no update rate has been set before, it
-	 * assumes a default rate of one execution per second. Does nothing if already started.
+	 * Starts scheduling the contained tasks at the configured update rate. If no
+	 * update rate has been set before, it assumes a default rate of one execution
+	 * per second. Does nothing if already started.
 	 */
 	public synchronized void start() {
 		if (!isRunning()) {
-			currentSchedule = executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval,
-					TimeUnit.MILLISECONDS);
+			currentSchedule = executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
 		}
 	}
 
 	/**
-	 * Stops the groups' current task schedules. Does nothing if the group has been stopped before or has not been
-	 * started yet.
+	 * Stops the groups' current task schedules. Does nothing if the group has been
+	 * stopped before or has not been started yet.
 	 */
 	public synchronized void stop() {
 		if (isRunning()) {
@@ -112,7 +113,8 @@ public class VABModelTaskGroup {
 	/**
 	 * Checks, whether this group is currently running or not.
 	 * 
-	 * @return True, if the tasks of this group are currently scheduled. False, if not.
+	 * @return True, if the tasks of this group are currently scheduled. False, if
+	 *         not.
 	 */
 	public synchronized boolean isRunning() {
 		return currentSchedule != null;
@@ -129,7 +131,8 @@ public class VABModelTaskGroup {
 	}
 
 	/**
-	 * Stops the groups' tasks and frees its resources, so that no tasks can be scheduled after calling this method
+	 * Stops the groups' tasks and frees its resources, so that no tasks can be
+	 * scheduled after calling this method
 	 */
 	public synchronized void clear() {
 		executor.shutdown();

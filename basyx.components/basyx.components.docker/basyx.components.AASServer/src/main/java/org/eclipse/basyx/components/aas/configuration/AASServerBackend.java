@@ -38,9 +38,8 @@ public enum AASServerBackend {
 	/**
 	 * Enum values of KeyElements
 	 */
-	INMEMORY("InMemory"),
-	MONGODB("MongoDB");
-	
+	INMEMORY("InMemory"), MONGODB("MongoDB");
+
 	private String literal;
 
 	private AASServerBackend(String literal) {

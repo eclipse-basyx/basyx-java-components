@@ -26,8 +26,6 @@ package org.eclipse.basyx.tools.sql.driver;
 
 import java.sql.ResultSet;
 
-
-
 /**
  * Database access interface
  * 
@@ -36,13 +34,11 @@ import java.sql.ResultSet;
  */
 public interface ISQLDriver {
 
-	
 	/**
 	 * Execute a SQL query
 	 */
 	public ResultSet sqlQuery(String queryString);
 
-	
 	/**
 	 * Execute a SQL update
 	 */

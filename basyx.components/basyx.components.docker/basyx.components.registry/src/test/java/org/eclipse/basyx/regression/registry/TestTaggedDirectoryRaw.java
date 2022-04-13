@@ -55,7 +55,8 @@ public class TestTaggedDirectoryRaw {
 			taggedDirectoryComponent.enableMQTT(new BaSyxMqttConfiguration());
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException expected) {}
+		} catch (RuntimeException expected) {
+		}
 	}
 
 	@Test
@@ -65,7 +66,8 @@ public class TestTaggedDirectoryRaw {
 			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException expected) {}
+		} catch (RuntimeException expected) {
+		}
 	}
 
 	@Test
@@ -75,7 +77,8 @@ public class TestTaggedDirectoryRaw {
 			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException expected) {}
+		} catch (RuntimeException expected) {
+		}
 	}
 
 	@Test
@@ -85,6 +88,7 @@ public class TestTaggedDirectoryRaw {
 			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 			taggedDirectoryComponent.startComponent();
 			fail();
-		} catch (RuntimeException expected) {}
+		} catch (RuntimeException expected) {
+		}
 	}
 }

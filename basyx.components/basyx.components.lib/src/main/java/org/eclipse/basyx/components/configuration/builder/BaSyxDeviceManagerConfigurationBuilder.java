@@ -34,8 +34,6 @@ import org.eclipse.basyx.components.configuration.ConfigurableComponent;
  */
 public class BaSyxDeviceManagerConfigurationBuilder<T extends BaSyxDeviceManagerConfigurationBuilder<T>> extends BaSyxServiceConfigurationBuilder<T> {
 
-	
-	
 	/**
 	 * Constructor
 	 */
@@ -44,4 +42,3 @@ public class BaSyxDeviceManagerConfigurationBuilder<T extends BaSyxDeviceManager
 		super(component);
 	}
 }
-

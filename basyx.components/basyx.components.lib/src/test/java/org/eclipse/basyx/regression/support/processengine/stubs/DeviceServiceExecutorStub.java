@@ -30,24 +30,22 @@ import org.eclipse.basyx.components.processengine.connector.IDeviceServiceExecut
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+public class DeviceServiceExecutorStub implements IDeviceServiceExecutor {
 
-public class DeviceServiceExecutorStub implements IDeviceServiceExecutor{
-	
 	/**
 	 * Initiates a logger using the current class
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(DeviceServiceExecutorStub.class);
-	
+
 	private String serviceName;
 	private String serviceProvider;
 	@SuppressWarnings("unused")
 	private String serviceSubmodelid;
 	private List<Object> params;
-	
-	
+
 	// whether the right service is invoked
 	@Override
-	public Object executeService(String servicename, String serviceProvider, String submodelid,  List<Object> params){
+	public Object executeService(String servicename, String serviceProvider, String submodelid, List<Object> params) {
 		this.serviceName = servicename;
 		this.serviceProvider = serviceProvider;
 		this.serviceSubmodelid = submodelid;
@@ -60,7 +58,7 @@ public class DeviceServiceExecutorStub implements IDeviceServiceExecutor{
 				logger.debug("%s, ", p);
 			}
 		}
-		
+
 		return 1;
 	}
 

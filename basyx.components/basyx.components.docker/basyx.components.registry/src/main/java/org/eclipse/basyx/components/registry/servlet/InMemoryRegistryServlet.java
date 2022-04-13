@@ -29,10 +29,12 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 
 /**
- * A registry servlet based on an InMemory Registry. The servlet therefore provides an implementation
- * for the IAASRegistryService interface without a permanent storage capability.
+ * A registry servlet based on an InMemory Registry. The servlet therefore
+ * provides an implementation for the IAASRegistryService interface without a
+ * permanent storage capability.
  * 
- * Do not use this registry in a productive environment - the entries are not persistent!
+ * Do not use this registry in a productive environment - the entries are not
+ * persistent!
  * 
  * @author espen
  */

@@ -32,8 +32,9 @@ import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistryHandler;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 
 /**
- * A registry servlet based on an SQL database. The servlet therefore provides an implementation
- * for the IAASRegistryService interface with a permanent storage solution.
+ * A registry servlet based on an SQL database. The servlet therefore provides
+ * an implementation for the IAASRegistryService interface with a permanent
+ * storage solution.
  * 
  * @author espen
  */

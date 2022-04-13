@@ -33,8 +33,6 @@ import org.eclipse.basyx.models.controlcomponent.OccupationState;
 import org.eclipse.basyx.models.controlcomponent.SimpleControlComponent;
 import org.junit.Test;
 
-
-
 /**
  * Test cases for basic control component testing
  * 
@@ -43,7 +41,6 @@ import org.junit.Test;
  */
 public class TestSimpleControlComponent {
 
-	
 	/**
 	 * Execution state assignment tests
 	 */
@@ -51,14 +48,12 @@ public class TestSimpleControlComponent {
 	public void executionStateAssignmentTests() {
 		// Instantiate simple control component
 		SimpleControlComponent ctrlComponent = new SimpleControlComponent();
-		
+
 		// Change state, read state back
 		ctrlComponent.setExecutionState("idle");
 		assertTrue(ctrlComponent.getExecutionState().equals("idle"));
 	}
-	
-	
-	
+
 	/**
 	 * Test simple proxy control component
 	 */
@@ -77,9 +72,7 @@ public class TestSimpleControlComponent {
 		// - Error state
 		assertTrue(ctrlComponent.getErrorState().equals(""));
 	}
-	
-	
-	
+
 	/**
 	 * Run a normal sequence
 	 */
@@ -100,12 +93,12 @@ public class TestSimpleControlComponent {
 		ctrlComponent.setCommand(ControlComponent.OPERATION_START);
 		// - Check execution state
 		assertTrue(ctrlComponent.getExecutionState().equals(ExecutionState.EXECUTE.getValue()));
-		
+
 		// Machine finishes service
 		ctrlComponent.finishState();
 		// - Check execution state
 		assertTrue(ctrlComponent.getExecutionState().equals(ExecutionState.COMPLETE.getValue()));
-		
+
 		// Reset device
 		ctrlComponent.setCommand(ControlComponent.OPERATION_RESET);
 		// - Check execution state
@@ -115,8 +108,7 @@ public class TestSimpleControlComponent {
 		// - Check execution state
 		assertTrue(ctrlComponent.getExecutionState().equals(ExecutionState.IDLE.getValue()));
 	}
-	
-	
+
 	/**
 	 * Run a sequence that is aborted by device
 	 */
@@ -137,12 +129,12 @@ public class TestSimpleControlComponent {
 		ctrlComponent.setCommand(ControlComponent.OPERATION_START);
 		// - Check execution state
 		assertTrue(ctrlComponent.getExecutionState().equals(ExecutionState.EXECUTE.getValue()));
-		
+
 		// Machine aborts service
 		ctrlComponent.setCommand(ControlComponent.OPERATION_ABORT);
 		// - Check execution state
 		assertTrue(ctrlComponent.getExecutionState().equals(ExecutionState.ABORTED.getValue()));
-		
+
 		// Operator clears machine state
 		ctrlComponent.setCommand(ControlComponent.OPERATION_CLEAR);
 		// - Check execution state
@@ -158,5 +150,3 @@ public class TestSimpleControlComponent {
 		assertTrue(ctrlComponent.getExecutionState().equals(ExecutionState.IDLE.getValue()));
 	}
 }
-
-

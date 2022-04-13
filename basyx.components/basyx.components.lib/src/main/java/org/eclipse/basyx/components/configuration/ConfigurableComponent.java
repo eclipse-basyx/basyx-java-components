@@ -34,13 +34,12 @@ import org.eclipse.basyx.components.configuration.builder.BaSyxConfigurationBuil
  */
 public interface ConfigurableComponent<T extends BaSyxConfigurationBuilder<?>> {
 
-	
 	/**
-	 * Create a component builder for this component that is used for configurating the component
+	 * Create a component builder for this component that is used for configurating
+	 * the component
 	 */
 	public T configure();
-	
-	
+
 	/**
 	 * Configure the component
 	 */

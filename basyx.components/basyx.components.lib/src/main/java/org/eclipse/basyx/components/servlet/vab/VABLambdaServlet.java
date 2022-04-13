@@ -30,7 +30,8 @@ import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
 /**
- * Empty VAB provider servlet. It realizes a VAB lambda provider on its endpoint.
+ * Empty VAB provider servlet. It realizes a VAB lambda provider on its
+ * endpoint.
  * 
  * @author kuhn
  *

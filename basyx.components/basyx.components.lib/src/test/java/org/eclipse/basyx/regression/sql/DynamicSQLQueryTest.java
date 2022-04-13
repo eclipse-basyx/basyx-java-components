@@ -58,9 +58,7 @@ public class DynamicSQLQueryTest {
 	@SuppressWarnings("unchecked")
 	private List<Map<String, Object>> queryTestData() {
 		String sqlQueryString = "SELECT * FROM " + FULL_TABLE_NAME + ";";
-		String colTypeList = getExpectedColumnTypes().entrySet().stream()
-				.map(e -> e.getKey() + ":" + e.getValue())
-				.collect(Collectors.joining(","));
+		String colTypeList = getExpectedColumnTypes().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.joining(","));
 		String sqlResultFilter = "listOfMaps(" + colTypeList + ")";
 		DynamicSQLQuery query = new DynamicSQLQuery(driver, sqlQueryString, sqlResultFilter);
 		return (List<Map<String, Object>>) query.get();
@@ -83,9 +81,7 @@ public class DynamicSQLQueryTest {
 	}
 
 	private static String getSQLColumnTypes() {
-		return getColumnSQLTypes().entrySet().stream()
-				.map(e -> e.getKey() + " " + e.getValue())
-				.collect(Collectors.joining(",", "(", ")"));
+		return getColumnSQLTypes().entrySet().stream().map(e -> e.getKey() + " " + e.getValue()).collect(Collectors.joining(",", "(", ")"));
 	}
 
 	private static Map<String, Object> getExpectedData() {
@@ -111,9 +107,7 @@ public class DynamicSQLQueryTest {
 
 	private String generateUpdateTestDataSQLString(Map<String, String> colSQLTypes) {
 		String colList = colSQLTypes.keySet().stream().collect(Collectors.joining(",", "(", ")"));
-		String typeList = colSQLTypes.entrySet().stream()
-				.map(e -> "?::" + e.getValue())
-				.collect(Collectors.joining(", ", "(", ")"));
+		String typeList = colSQLTypes.entrySet().stream().map(e -> "?::" + e.getValue()).collect(Collectors.joining(", ", "(", ")"));
 		return "INSERT INTO " + FULL_TABLE_NAME + " " + colList + " VALUES " + typeList + ";";
 
 	}
@@ -138,4 +132,3 @@ public class DynamicSQLQueryTest {
 		driver.sqlUpdate(sqlCommandString);
 	}
 }
-

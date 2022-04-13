@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * Represents a BaSyx mqtt configuration for an mqtt connection.
  * 
@@ -92,10 +91,14 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	/**
 	 * Constructor with initial configuration
 	 * 
-	 * @param user   Username for MQTT connection
-	 * @param pass   Password for MQTT connection
-	 * @param server MQTT broker address
-	 * @param qos    MQTT quality of service level
+	 * @param user
+	 *            Username for MQTT connection
+	 * @param pass
+	 *            Password for MQTT connection
+	 * @param server
+	 *            MQTT broker address
+	 * @param qos
+	 *            MQTT quality of service level
 	 */
 	public BaSyxMqttConfiguration(String user, String pass, String server, int qos) {
 		this();
@@ -183,9 +186,9 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 		Set<String> whitelist = new HashSet<>();
 		String fullPrefix = WHITELIST_ELEMENT_PREFIX + submodelId;
 		List<String> properties = getProperties(fullPrefix);
-		
-		for ( String prop : properties ) {
-			if ( getProperty(prop).equals("true") ) {
+
+		for (String prop : properties) {
+			if (getProperty(prop).equals("true")) {
 				// Removes submodel prefix (+ one separator) => whitelist.elements.smid.
 				String elementId = prop.substring(fullPrefix.length() + 1);
 				whitelist.add(elementId);

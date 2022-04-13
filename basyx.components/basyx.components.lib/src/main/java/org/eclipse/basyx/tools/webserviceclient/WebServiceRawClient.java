@@ -37,31 +37,26 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 
-
-
 /**
- * Helper class that supports invocation of remote web services. The class sets up JSON parameter types for input and output parameter, but does not implement the coding.
+ * Helper class that supports invocation of remote web services. The class sets
+ * up JSON parameter types for input and output parameter, but does not
+ * implement the coding.
  * 
  * @author kuhn
  *
  */
 public class WebServiceRawClient implements Serializable {
 
-	
 	/**
 	 * Version of serialized instances
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	
+
 	/**
 	 * Web service client instance for invoking service calls via web services
 	 */
 	protected Client client = ClientBuilder.newClient();
 
-	
-	
-	
 	/**
 	 * Execute a web service, return JSON string
 	 */
@@ -77,7 +72,6 @@ public class WebServiceRawClient implements Serializable {
 		return request;
 	}
 
-	
 	/**
 	 * Execute a web service, return deserialized object
 	 */
@@ -92,7 +86,6 @@ public class WebServiceRawClient implements Serializable {
 		return result;
 	}
 
-	
 	/**
 	 * Execute a web service put operation, return JSON string
 	 */
@@ -104,14 +97,13 @@ public class WebServiceRawClient implements Serializable {
 		Response rsp = request.put(Entity.entity(jsonParameter.toString(), MediaType.APPLICATION_JSON));
 
 		// Throw exception that indicates an error
-		if (!((rsp.getStatus() == 0) || (rsp.getStatus() == 200)  || (rsp.getStatus() == 201))) throw new ServerErrorException(rsp);
+		if (!((rsp.getStatus() == 0) || (rsp.getStatus() == 200) || (rsp.getStatus() == 201)))
+			throw new ServerErrorException(rsp);
 
 		// Return result
 		return rsp.readEntity(String.class);
 	}
-	
-	
-	
+
 	/**
 	 * Execute a web service post operation, return JSON string
 	 */
@@ -123,14 +115,13 @@ public class WebServiceRawClient implements Serializable {
 		Response rsp = request.post(Entity.entity(jsonParameter, MediaType.APPLICATION_JSON));
 
 		// Throw exception that indicates an error
-		if (!((rsp.getStatus() == 0) || (rsp.getStatus() == 200) || (rsp.getStatus() == 201))) throw new ServerErrorException(rsp);
-		
+		if (!((rsp.getStatus() == 0) || (rsp.getStatus() == 200) || (rsp.getStatus() == 201)))
+			throw new ServerErrorException(rsp);
+
 		// Return result
 		return rsp.readEntity(String.class);
 	}
 
-	
-	
 	/**
 	 * Execute a web service post operation, return JSON string
 	 */
@@ -139,14 +130,13 @@ public class WebServiceRawClient implements Serializable {
 		Response rsp = client.target(wsURL).queryParam("action", action).request().build("PATCH", Entity.text(jsonParameter.toString())).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true).invoke();
 
 		// Throw exception that indicates an error
-		if (!((rsp.getStatus() == 0) || (rsp.getStatus() == 200)  || (rsp.getStatus() == 201))) throw new ServerErrorException(rsp);
+		if (!((rsp.getStatus() == 0) || (rsp.getStatus() == 200) || (rsp.getStatus() == 201)))
+			throw new ServerErrorException(rsp);
 
 		// Return result
 		return rsp.readEntity(String.class);
 	}
 
-	
-	
 	/**
 	 * Execute a web service delete operation, return JSON string
 	 */

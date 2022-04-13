@@ -275,8 +275,7 @@ public class AASServerComponent implements IComponent {
 		return content;
 	}
 
-	private Set<AASBundle> loadBundleFromXML(String xmlPath)
-			throws IOException, ParserConfigurationException, SAXException {
+	private Set<AASBundle> loadBundleFromXML(String xmlPath) throws IOException, ParserConfigurationException, SAXException {
 		logger.info("Loading aas from xml \"" + xmlPath + "\"");
 		String xmlContent = loadBundleString(xmlPath);
 
@@ -290,8 +289,7 @@ public class AASServerComponent implements IComponent {
 		return new JSONAASBundleFactory(jsonContent).create();
 	}
 
-	private static Set<AASBundle> loadBundleFromAASX(String aasxPath)
-			throws IOException, ParserConfigurationException, SAXException, InvalidFormatException, URISyntaxException {
+	private static Set<AASBundle> loadBundleFromAASX(String aasxPath) throws IOException, ParserConfigurationException, SAXException, InvalidFormatException, URISyntaxException {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
@@ -357,9 +355,9 @@ public class AASServerComponent implements IComponent {
 		}
 
 		Set<AASBundle> aasBundlesSet = new HashSet<>();
-		
+
 		aasSources.stream().map(this::loadBundleFromFile).forEach(aasBundlesSet::addAll);
-		
+
 		return aasBundlesSet;
 	}
 
@@ -372,8 +370,7 @@ public class AASServerComponent implements IComponent {
 			} else if (aasSource.endsWith(".xml")) {
 				return loadBundleFromXML(aasSource);
 			}
-		} catch (IOException | ParserConfigurationException | SAXException | URISyntaxException
-				| InvalidFormatException e) {
+		} catch (IOException | ParserConfigurationException | SAXException | URISyntaxException | InvalidFormatException e) {
 			logger.error("Could not load initial AAS from source '" + aasSource + "'");
 		}
 

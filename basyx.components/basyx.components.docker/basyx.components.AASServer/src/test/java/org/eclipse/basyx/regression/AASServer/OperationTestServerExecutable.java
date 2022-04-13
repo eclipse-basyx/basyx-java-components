@@ -103,7 +103,6 @@ public class OperationTestServerExecutable {
 		return operation;
 	}
 
-
 	/**
 	 * Execute this, to externally test the operation delegation functionality.
 	 * 

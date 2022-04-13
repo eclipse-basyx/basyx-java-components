@@ -24,9 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.regression.support.processengine.stubs;
 
-
 public class CoilcarStub implements ICoilcar {
-	
+
 	private String serviceCalled;
 	private Object parameter;
 

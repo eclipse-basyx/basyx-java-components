@@ -38,10 +38,8 @@ public enum RegistryBackend {
 	/**
 	 * Enum values of KeyElements
 	 */
-	INMEMORY("InMemory"),
-	SQL("SQL"),
-	MONGODB("MongoDB");
-	
+	INMEMORY("InMemory"), SQL("SQL"), MONGODB("MongoDB");
+
 	private String literal;
 
 	private RegistryBackend(String literal) {

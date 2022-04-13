@@ -37,35 +37,34 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.prop
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
 
-
 public class DeviceSubmodelFactory {
 	public Submodel create(String id, ICoilcar coilcar) {
 		// create a single value property
 		Property property1 = new Property(0);
 		property1.setIdShort("currentPosition");
-		
+
 		Property property2 = new Property(0);
 		property2.setIdShort("lifterPosition");
-		
+
 		Property property3 = new Property(false);
 		property3.setIdShort("physicalSpeed");
-		
+
 		// create 2 opertations
 		Operation op1 = new Operation((Function<Object[], Object>) obj -> {
-			return coilcar.liftTo((int)obj[0]);
+			return coilcar.liftTo((int) obj[0]);
 		});
 		op1.setInputVariables(Collections.singletonList(new OperationVariable(new Property("position", 0))));
 		op1.setOutputVariables(Collections.singletonList(new OperationVariable(new Property("result", 0))));
 		op1.setIdShort("liftTo");
-		
+
 		Operation op2 = new Operation((Function<Object[], Object>) obj -> {
-			coilcar.moveTo((int)obj[0]);
+			coilcar.moveTo((int) obj[0]);
 			return true;
 		});
 		op2.setInputVariables(Collections.singletonList(new OperationVariable(new Property("position", 0))));
 		op2.setOutputVariables(Collections.singletonList(new OperationVariable(new Property("result", 0))));
 		op2.setIdShort("moveTo");
-		
+
 		// create a list for defined operations
 		List<Operation> opList = new ArrayList<>();
 		opList.add(op1);

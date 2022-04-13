@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-
 /**
  * Access SQL database
  * 
@@ -48,12 +47,11 @@ import com.zaxxer.hikari.HikariDataSource;
 public class SQLDriver implements ISQLDriver {
 	private static Logger logger = LoggerFactory.getLogger(SQLDriver.class);
 
-	
 	/**
 	 * Store user name
 	 */
 	protected String userName = null;
-	
+
 	/**
 	 * Store password
 	 */
@@ -63,44 +61,38 @@ public class SQLDriver implements ISQLDriver {
 	 * Store path to database server
 	 */
 	protected String dbPath = null;
-	
-	
+
 	/**
 	 * Store query prefix
 	 */
 	protected String queryPrefix = null;
-	
-	
+
 	/**
 	 * Store driver class (with package name)
 	 */
 	protected String qualDriverClass = null;
-	
-	
+
 	/**
 	 * JDBC connection
 	 */
 	protected Connection connect = null;
-	
+
 	/**
 	 * Data source
 	 */
 	protected HikariDataSource ds = null;
 
-	
-	
-	
 	/**
 	 * Create a SQL driver and a SQL connection
 	 */
 	public SQLDriver(String path, String user, String pass, String qryPfx, String qDrvCls) {
 		// Store parameter
-		userName        = user;
-		password        = pass;
-		dbPath          = path;
-		queryPrefix     = qryPfx;
+		userName = user;
+		password = pass;
+		dbPath = path;
+		queryPrefix = qryPfx;
 		qualDriverClass = qDrvCls;
-		
+
 		// This will load the MySQL driver, each DB has its own driver
 		try {
 			Class.forName(qualDriverClass);
@@ -108,20 +100,18 @@ public class SQLDriver implements ISQLDriver {
 			logger.error("Could not init SQLDriver", e);
 		}
 	}
-	
-	
-	
+
 	/**
 	 * Execute a SQL query
 	 */
 	@Override
 	public CachedRowSet sqlQuery(String queryString) {
-		// Store SQL statement, flag that indicates whether the connection was created by this 
+		// Store SQL statement, flag that indicates whether the connection was created
+		// by this
 		// operation (and needs to be closed), and result
-		Statement statement              = null;
-		CachedRowSet rowSet              = null;
-		
-		
+		Statement statement = null;
+		CachedRowSet rowSet = null;
+
 		// Access database
 		try {
 			// Open a connection with data source
@@ -129,33 +119,31 @@ public class SQLDriver implements ISQLDriver {
 
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
-			
+
 			// ResultSet gets the result of the SQL query
 			ResultSet resultSet = statement.executeQuery(queryString);
-			
+
 			// Convert DB data to memory cache
 			rowSet = getCachedRowSet(resultSet);
-			
+
 			// Close connection with data source
 			closeConnection();
 		} catch (SQLException e) {
 			logger.error("sqlQuery failed", e);
 		}
-		
+
 		// Return result of query
 		return rowSet;
 	}
-	
-	
-	
+
 	/**
 	 * Execute a SQL update
 	 */
 	@Override
 	public void sqlUpdate(String updateString) {
 		// Store SQL statement
-		Statement statement              = null;
-		
+		Statement statement = null;
+
 		// Access database
 		try {
 			// Open a connection with data source
@@ -173,9 +161,7 @@ public class SQLDriver implements ISQLDriver {
 			logger.error("sqlUpdate failed", e);
 		}
 	}
-	
-	
-	
+
 	/**
 	 * Open connection
 	 */
@@ -191,8 +177,7 @@ public class SQLDriver implements ISQLDriver {
 			logger.error("Failed to open sql driver connection", e);
 		}
 	}
-	
-	
+
 	/**
 	 * Close connection
 	 */
@@ -208,36 +193,34 @@ public class SQLDriver implements ISQLDriver {
 			logger.error("Failed to close sql driver connection", e);
 		}
 	}
-	
-	
+
 	/**
 	 * Get connection
 	 */
 	public Connection getConnection() {
 		return connect;
 	}
-	
-	
+
 	/**
 	 * Indicate if driver has open connection
 	 */
 	public boolean hasOpenConnection() {
 		return (connect == null);
 	}
-	
+
 	/**
 	 * Open Data source
-	*/
+	 */
 	private void openDataSource() {
 		if (ds == null) {
 			ds = new HikariDataSource();
-			ds.setJdbcUrl(queryPrefix+dbPath);
+			ds.setJdbcUrl(queryPrefix + dbPath);
 			ds.setUsername(userName);
 			ds.setPassword(password);
 			ds.setMaximumPoolSize(5);
 		}
 	}
-	
+
 	private CachedRowSet getCachedRowSet(ResultSet resultSet) throws SQLException {
 		RowSetFactory factory = RowSetProvider.newFactory();
 		CachedRowSet rowset = factory.createCachedRowSet();
@@ -245,4 +228,3 @@ public class SQLDriver implements ISQLDriver {
 		return rowset;
 	}
 }
-

@@ -77,8 +77,7 @@ public class TestXMLAASServer {
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "xml/aas.xml");
 
 		// Setup endpoints
-		String rootEndpoint = "http://" + contextConfig.getHostname() + ":" + contextConfig.getPort() + "/"
-				+ contextConfig.getContextPath() + "/";
+		String rootEndpoint = "http://" + contextConfig.getHostname() + ":" + contextConfig.getPort() + "/" + contextConfig.getContextPath() + "/";
 		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
 		smEndpoint = aasEndpoint + "/submodels/" + smShortId + "/submodel";
 		logger.info("AAS URL for servlet test: " + aasEndpoint);
@@ -94,7 +93,6 @@ public class TestXMLAASServer {
 		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
 		manager = new ConnectedAssetAdministrationShellManager(registry, connectorFactory);
 	}
-
 
 	@AfterClass
 	public static void tearDown() {

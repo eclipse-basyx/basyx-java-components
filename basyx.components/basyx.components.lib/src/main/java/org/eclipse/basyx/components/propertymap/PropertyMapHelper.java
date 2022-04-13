@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.components.propertymap;
 
 import java.util.Arrays;

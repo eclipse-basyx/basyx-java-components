@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.regression.components.propertymap;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +45,7 @@ public class PropertyMapHelperTest {
 		String testData = "a, b, c";
 		List<String> expected = Arrays.asList("a", "b", "c");
 		List<String> actual = PropertyMapHelper.getListFromStringList(testData);
-		
+
 		assertEquals(expected, actual);
 	}
 

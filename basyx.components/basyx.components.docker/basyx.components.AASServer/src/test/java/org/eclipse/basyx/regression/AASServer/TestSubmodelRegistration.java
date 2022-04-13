@@ -53,13 +53,14 @@ import org.junit.Test;
 public class TestSubmodelRegistration {
 	private static AASServerComponent component;
 	private static InMemoryRegistry registry;
-	
+
 	private static final IIdentifier SM_ID = new Identifier(IdentifierType.IRI, "http://www.zvei.de/demo/submodel/12345679");
 	private static final String SM_IDSHORT = "submodel1";
 	private static final IIdentifier AAS_ID = new Identifier(IdentifierType.IRI, "www.admin-shell.io/aas-sample/2/0");
 
 	/**
-	 * Tests if AASServerComponent registers only the submodels that are listed on the whitelist
+	 * Tests if AASServerComponent registers only the submodels that are listed on
+	 * the whitelist
 	 */
 	@Test
 	public void testSubmodelRegistration() {

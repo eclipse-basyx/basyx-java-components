@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.components.registry.mqtt;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
@@ -58,8 +57,7 @@ public class MqttRegistryFactory {
 		String brokerEndpoint = mqttConfig.getServer();
 		MqttClientPersistence mqttPersistence = getMqttPersistenceFromConfig(mqttConfig);
 		try {
-			MqttAASRegistryServiceObserver mqttObserver = new MqttAASRegistryServiceObserver(brokerEndpoint,
-					REGISTRY_CLIENT_ID, mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
+			MqttAASRegistryServiceObserver mqttObserver = new MqttAASRegistryServiceObserver(brokerEndpoint, REGISTRY_CLIENT_ID, mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
 			observedAPI.addObserver(mqttObserver);
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);

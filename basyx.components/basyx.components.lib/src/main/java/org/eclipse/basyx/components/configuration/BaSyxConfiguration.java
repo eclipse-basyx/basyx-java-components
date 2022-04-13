@@ -45,8 +45,9 @@ public class BaSyxConfiguration {
 	private Map<String, String> values;
 
 	/**
-	 * Constructor that takes the configuration's default values.
-	 * All the keys in the map are the name of the properties that are stored and loaded in this configuration.
+	 * Constructor that takes the configuration's default values. All the keys in
+	 * the map are the name of the properties that are stored and loaded in this
+	 * configuration.
 	 */
 	public BaSyxConfiguration(Map<String, String> defaultValues) {
 		this.values = defaultValues;
@@ -65,7 +66,8 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from a path relative to the current folder
 	 * 
-	 * @param filePath Path to the resource in the application folder
+	 * @param filePath
+	 *            Path to the resource in the application folder
 	 */
 	public void loadFromFile(String filePath) {
 		try (InputStream fileStream = new FileInputStream(filePath)) {
@@ -81,12 +83,14 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from a path relative to the current folder
 	 * 
-	 * @param fileKey key where the file path to the resource in the application folder
+	 * @param fileKey
+	 *            key where the file path to the resource in the application folder
 	 */
 	public void loadFileOrDefaultResource(String fileKey, String defaultResource) {
-		// Try to load property that points to the configuration file (e.g. java -DfileKey=yx.properties [...])
+		// Try to load property that points to the configuration file (e.g. java
+		// -DfileKey=yx.properties [...])
 		String configFilePath = System.getProperty(fileKey);
-		if ( configFilePath == null || configFilePath.isEmpty() ) {
+		if (configFilePath == null || configFilePath.isEmpty()) {
 			// Try to load environment variable that points to the configuration file
 			configFilePath = System.getenv(fileKey);
 		}
@@ -104,7 +108,8 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from an input stream
 	 * 
-	 * @param input the input stream containing the properties
+	 * @param input
+	 *            the input stream containing the properties
 	 */
 	public void loadFromStream(InputStream input) {
 		logger.info("Loading from inputStream: " + input);
@@ -120,8 +125,9 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from a path relative to the current resource folder
 	 * 
-	 * @param relativeResourcePath Path to the resource in the resource folder. In a maven project, the resources
-	 *                             are located at /src/main/resources by default.
+	 * @param relativeResourcePath
+	 *            Path to the resource in the resource folder. In a maven project,
+	 *            the resources are located at /src/main/resources by default.
 	 */
 	public void loadFromResource(String relativeResourcePath) {
 		logger.info("Loading properties from resource '" + relativeResourcePath + "'");
@@ -156,8 +162,11 @@ public class BaSyxConfiguration {
 	/**
 	 * Method for subclasses to read specific environment variables
 	 * 
-	 * @param prefix     The prefix of each of the environment variables
-	 * @param properties The name of the properties in the config and environment (with prefix)
+	 * @param prefix
+	 *            The prefix of each of the environment variables
+	 * @param properties
+	 *            The name of the properties in the config and environment (with
+	 *            prefix)
 	 */
 	protected void loadFromEnvironmentVariables(String prefix, String... properties) {
 		try {
@@ -253,8 +262,10 @@ public class BaSyxConfiguration {
 	/**
 	 * Sets a property, if it is contained in this configuration
 	 * 
-	 * @param name  The name of the property
-	 * @param value The new value of the property
+	 * @param name
+	 *            The name of the property
+	 * @param value
+	 *            The new value of the property
 	 */
 	public void setProperty(String name, String value) {
 		values.put(name, value);
@@ -263,7 +274,8 @@ public class BaSyxConfiguration {
 	/**
 	 * Returns all contained properties that begin with a specific prefix
 	 * 
-	 * @param prefix The filtered prefix (e.g. "aas.")
+	 * @param prefix
+	 *            The filtered prefix (e.g. "aas.")
 	 * @return The list of all contained properties that begin with the prefix
 	 */
 	public List<String> getProperties(String prefix) {

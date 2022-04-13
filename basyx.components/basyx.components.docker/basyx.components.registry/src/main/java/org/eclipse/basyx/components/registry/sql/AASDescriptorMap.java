@@ -32,9 +32,10 @@ import java.util.stream.Collectors;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 
 /**
- * This is a map implementation for a {@literal <String, AASDescriptor>} map which is needed
- * by map registries. It is based on an arbitrary {@literal <String, Object>} map and provides a proxy
- * access to that map by assuming AASDescriptor entries.
+ * This is a map implementation for a {@literal <String, AASDescriptor>} map
+ * which is needed by map registries. It is based on an arbitrary
+ * {@literal <String, Object>} map and provides a proxy access to that map by
+ * assuming AASDescriptor entries.
  * 
  * @author espen
  *
@@ -119,35 +120,32 @@ public class AASDescriptorMap implements Map<String, AASDescriptor> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<AASDescriptor> values() {
-		return baseMap.values().stream()
-				.map(o -> new AASDescriptor((Map<String, Object>) o))
-				.collect(Collectors.toList());
+		return baseMap.values().stream().map(o -> new AASDescriptor((Map<String, Object>) o)).collect(Collectors.toList());
 	}
 
 	@Override
 	public Set<Entry<String, AASDescriptor>> entrySet() {
-		return baseMap.entrySet().stream()
-				.map(e -> new Entry<String, AASDescriptor>() {
-					@Override
-					public AASDescriptor setValue(AASDescriptor value) {
-						return (AASDescriptor) e.setValue(value);
-					}
+		return baseMap.entrySet().stream().map(e -> new Entry<String, AASDescriptor>() {
+			@Override
+			public AASDescriptor setValue(AASDescriptor value) {
+				return (AASDescriptor) e.setValue(value);
+			}
 
-					@SuppressWarnings("unchecked")
-					@Override
-					public AASDescriptor getValue() {
-						if (e.getValue() == null) {
-							return null;
-						} else {
-							return new AASDescriptor((Map<String, Object>) e.getValue());
-						}
-					}
+			@SuppressWarnings("unchecked")
+			@Override
+			public AASDescriptor getValue() {
+				if (e.getValue() == null) {
+					return null;
+				} else {
+					return new AASDescriptor((Map<String, Object>) e.getValue());
+				}
+			}
 
-					@Override
-					public String getKey() {
-						return e.getKey();
-					}
-				}).collect(Collectors.toSet());
+			@Override
+			public String getKey() {
+				return e.getKey();
+			}
+		}).collect(Collectors.toSet());
 	}
 
 }

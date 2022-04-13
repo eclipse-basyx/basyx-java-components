@@ -27,38 +27,30 @@ package org.eclipse.basyx.components.devicemanager;
 import org.eclipse.basyx.components.netcomm.NetworkReceiver;
 import org.eclipse.basyx.components.netcomm.TCPServer;
 
-
-
 /**
- * Base class for device managers that communicate via TCP with the connected device
+ * Base class for device managers that communicate via TCP with the connected
+ * device
  * 
  * @author kuhn
  *
  */
 public abstract class TCPDeviceManagerComponent extends DeviceManagerComponent implements NetworkReceiver {
 
-	
 	/**
 	 * TCP port number
 	 */
 	protected int tcpPortNumber = -1;
-	
-	
+
 	/**
 	 * TCP server reference
 	 */
 	protected TCPServer tcpServer = null;
-	
-	
+
 	/**
 	 * TCP server thread
 	 */
 	protected Thread tcpServerThread = null;
-	
-	
-	
-	
-	
+
 	/**
 	 * Constructor
 	 */
@@ -66,8 +58,7 @@ public abstract class TCPDeviceManagerComponent extends DeviceManagerComponent i
 		// Store port number
 		tcpPortNumber = portNumber;
 	}
-	
-	
+
 	/**
 	 * Run this service
 	 */
@@ -75,20 +66,18 @@ public abstract class TCPDeviceManagerComponent extends DeviceManagerComponent i
 	public void start() {
 		// Base implementation
 		super.start();
-		
-		
+
 		// Create TCP thread (or any other connection) to legacy device
 		tcpServer = new TCPServer(tcpPortNumber);
-		
+
 		// Register this component as network receiver
 		tcpServer.addTCPMessageListener(this);
-		
+
 		// Start TCP server
 		tcpServerThread = new Thread(tcpServer);
 		tcpServerThread.start();
 	}
-	
-	
+
 	/**
 	 * Stop this service
 	 */
@@ -102,7 +91,6 @@ public abstract class TCPDeviceManagerComponent extends DeviceManagerComponent i
 		tcpServer.close();
 	}
 
-	
 	/**
 	 * Wait for completion of all servers
 	 */
@@ -110,9 +98,12 @@ public abstract class TCPDeviceManagerComponent extends DeviceManagerComponent i
 	public void waitFor() {
 		// Base implementation
 		super.waitFor();
-		
+
 		// Wait for server
-		try {tcpServerThread.join();} catch (InterruptedException e) {e.printStackTrace();}
+		try {
+			tcpServerThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
-

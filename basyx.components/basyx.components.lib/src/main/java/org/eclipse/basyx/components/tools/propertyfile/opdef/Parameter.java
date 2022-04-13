@@ -24,8 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.tools.propertyfile.opdef;
 
-
-
 /**
  * Define a parameter tuple (name/type)
  * 
@@ -34,30 +32,28 @@ package org.eclipse.basyx.components.tools.propertyfile.opdef;
  */
 public class Parameter {
 
-
 	/**
 	 * Parameter name
 	 */
 	protected String name;
-	
-	
+
 	/**
 	 * Parameter type
 	 */
 	protected String type;
 
-
 	/**
-	 * Constructor 
+	 * Constructor
 	 * 
-	 * @param name  Parameter name
-	 * @param type  Parameter type
+	 * @param name
+	 *            Parameter name
+	 * @param type
+	 *            Parameter type
 	 */
 	public Parameter(String name, String type) {
 		this.name = name;
 		this.type = type;
 	}
-
 
 	/**
 	 * Return parameter name
@@ -67,7 +63,6 @@ public class Parameter {
 	public String getName() {
 		return name;
 	}
-
 
 	/**
 	 * Return parameter type

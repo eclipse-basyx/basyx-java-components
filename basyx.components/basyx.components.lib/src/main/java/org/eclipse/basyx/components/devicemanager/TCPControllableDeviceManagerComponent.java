@@ -33,84 +33,72 @@ import org.eclipse.basyx.models.controlcomponent.SimpleControlComponent;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
 
-
-
-
 /**
- * Base class for device managers that communicate via TCP with the connected controllable device
+ * Base class for device managers that communicate via TCP with the connected
+ * controllable device
  * 
  * @author kuhn
  *
  */
 public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceManagerComponent implements NetworkReceiver, ControlComponentChangeListener {
 
-		
 	/**
 	 * Store control component server port
 	 */
 	protected int controlComponentServerPort = -1;
-	
-	
+
 	/**
 	 * BaSyx/TCP Server that exports the control component
 	 */
 	protected BaSyxTCPServer<VABMapProvider> server = null;
 
-	
 	/**
 	 * Device control component
 	 */
 	protected SimpleControlComponent simpleControlComponent = null;
 
-	
-	
 	/**
 	 * Constructor
 	 */
 	public TCPControllableDeviceManagerComponent(int portNumber, int ctrlComponentServerPort) {
 		// Base constructor
 		super(portNumber);
-		
+
 		// Store control component server port
 		controlComponentServerPort = ctrlComponentServerPort;
-		
+
 		// Create control component
 		simpleControlComponent = new SimpleControlComponent(true);
 		// - Register this component as event listener
 		simpleControlComponent.addControlComponentChangeListener(this);
 	}
-	
-	
-	
-	
+
 	/**
 	 * Received a string from network
 	 */
 	@Override
 	public void onReceive(byte[] rxData) {
 		// Do not process null values
-		if (rxData == null) return;
-		
+		if (rxData == null)
+			return;
+
 		// Convert received data to string
-		String rxStr = new String(rxData); 
+		String rxStr = new String(rxData);
 		// - Trim string to remove possibly trailing and leading white spaces
 		rxStr = rxStr.trim();
-		
-		// Check what was being received. This check is performed based on a prefix that he device has to provide);
+
+		// Check what was being received. This check is performed based on a prefix that
+		// he device has to provide);
 		// - Device indicates completion of service
 		if (hasPrefix(rxStr, "invocation:end")) {
 			// Update control component with status
 			simpleControlComponent.setExecutionState(ExecutionState.COMPLETE.getValue());
-			
+
 			// End processing
 			return;
 		}
 	}
 
-	
-	
-	
-	
 	/**
 	 * Device control component indicates a variable change
 	 */
@@ -118,7 +106,6 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 	public void onVariableChange(String varName, Object newValue) {
 		// Do nothing
 	}
-
 
 	/**
 	 * Device control component indicates an occupier change
@@ -128,7 +115,6 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 		// Do nothing
 	}
 
-
 	/**
 	 * Device control component indicates an occupation state change
 	 */
@@ -136,7 +122,6 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 	public void onNewOccupationState(OccupationState state) {
 		// Do nothing
 	}
-
 
 	/**
 	 * Device control component indicates an execution mode change
@@ -146,19 +131,20 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 		// Do nothing
 	}
 
-
 	/**
 	 * Device control component indicates an execution state change
 	 */
 	@Override
 	public void onChangedExecutionState(ExecutionState newExecutionState) {
-		// Do not communicate "COMPLETE" execution state, as it is communicated from device via invocationEnd signal
-		if (newExecutionState == ExecutionState.COMPLETE) return;
-		
-		// Communicate new execution state to device
-		if (tcpServer != null) tcpServer.sendMessage("state:"+newExecutionState.getValue());
-	}
+		// Do not communicate "COMPLETE" execution state, as it is communicated from
+		// device via invocationEnd signal
+		if (newExecutionState == ExecutionState.COMPLETE)
+			return;
 
+		// Communicate new execution state to device
+		if (tcpServer != null)
+			tcpServer.sendMessage("state:" + newExecutionState.getValue());
+	}
 
 	/**
 	 * Device control component indicates an operation mode change
@@ -166,9 +152,9 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 	@Override
 	public void onChangedOperationMode(String newOperationMode) {
 		// Communicate new operation mode to device
-		if (tcpServer != null) tcpServer.sendMessage("opMode:"+newOperationMode);
+		if (tcpServer != null)
+			tcpServer.sendMessage("opMode:" + newOperationMode);
 	}
-
 
 	/**
 	 * Device control component indicates a work state change
@@ -178,7 +164,6 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 		// Do nothing
 	}
 
-
 	/**
 	 * Device control component indicates an error state change
 	 */
@@ -187,4 +172,3 @@ public abstract class TCPControllableDeviceManagerComponent extends TCPDeviceMan
 		// Do nothing
 	}
 }
-

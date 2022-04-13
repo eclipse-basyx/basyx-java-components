@@ -93,7 +93,8 @@ public class ITRegistryRaw {
 		logger.info("Running integration test...");
 
 		logger.info("Loading servlet configuration");
-		// Load the servlet configuration inside of the docker configuration from properties file
+		// Load the servlet configuration inside of the docker configuration from
+		// properties file
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
 
@@ -102,8 +103,7 @@ public class ITRegistryRaw {
 		BaSyxDockerConfiguration dockerConfig = new BaSyxDockerConfiguration();
 		dockerConfig.loadFromResource(BaSyxDockerConfiguration.DEFAULT_CONFIG_PATH);
 
-		registryUrl = "http://localhost:" + dockerConfig.getHostPort() + contextConfig.getContextPath()
-				+ "/api/v1/registry/";
+		registryUrl = "http://localhost:" + dockerConfig.getHostPort() + contextConfig.getContextPath() + "/api/v1/registry/";
 		logger.info("Registry URL for integration test: " + registryUrl);
 		aasUrl1 = registryUrl + URLEncoder.encode(id1.getId(), "UTF-8");
 		aasUrl2 = registryUrl + URLEncoder.encode(id2.getId(), "UTF-8");
@@ -123,11 +123,13 @@ public class ITRegistryRaw {
 	public void tearDown() throws UnsupportedEncodingException {
 		// Delete AAS registration
 		try {
-			client.delete(aasUrl1);			
-		} catch(NotFoundException e) {}
+			client.delete(aasUrl1);
+		} catch (NotFoundException e) {
+		}
 		try {
-			client.delete(aasUrl2);			
-		} catch(NotFoundException e) {}
+			client.delete(aasUrl2);
+		} catch (NotFoundException e) {
+		}
 	}
 
 	/**
@@ -203,7 +205,8 @@ public class ITRegistryRaw {
 		try {
 			getResult(client.get(aasUrl2));
 			fail();
-		} catch(NotFoundException e) {}
+		} catch (NotFoundException e) {
+		}
 
 		// Create new AAS registration
 		client.put(aasUrl2, serializedDescriptor2);
@@ -220,7 +223,8 @@ public class ITRegistryRaw {
 		try {
 			getResult(client.get(aasUrl2));
 			fail();
-		} catch(NotFoundException e) {}
+		} catch (NotFoundException e) {
+		}
 	}
 
 	/**

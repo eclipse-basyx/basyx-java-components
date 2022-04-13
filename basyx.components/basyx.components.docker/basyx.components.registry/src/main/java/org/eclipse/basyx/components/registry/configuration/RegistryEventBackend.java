@@ -36,7 +36,7 @@ import com.google.common.base.Strings;
  */
 public enum RegistryEventBackend {
 	NONE("NONE"), MQTT("MQTT");
-	
+
 	private String literal;
 
 	private RegistryEventBackend(String literal) {

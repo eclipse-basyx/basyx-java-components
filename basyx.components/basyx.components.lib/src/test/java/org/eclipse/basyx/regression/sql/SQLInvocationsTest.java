@@ -37,8 +37,6 @@ import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
-
 /**
  * Test SQL invocations
  * 
@@ -47,45 +45,41 @@ import org.junit.Test;
  */
 public class SQLInvocationsTest {
 
-	
 	/**
 	 * Store HTTP asset administration shell manager backend
 	 */
 	protected VABConnectionManager connManager = new VABConnectionManager(new ComponentsTestsuiteDirectory(), new HTTPConnectorFactory());
 
-	/** 
+	/**
 	 * Makes sure Tomcat Server is started
 	 */
 	@ClassRule
 	public static AASHTTPServerResource res = new AASHTTPServerResource(new ComponentsRegressionContext());
-	
+
 	/**
 	 * Test basic queries
 	 */
 	@SuppressWarnings("unused")
 	@Test
-	@Ignore //FIXME the SQLTestSubmodel does not contain any operations
+	@Ignore // FIXME the SQLTestSubmodel does not contain any operations
 	public void test() throws Exception {
 
 		// Connect to sub model "CfgFileTestAAS"
 		VABElementProxy connSubmodel = this.connManager.connectToVABElement("SQLTestSubmodel");
 
-		
 		// Get property value (1)
 		Object value1 = connSubmodel.invokeOperation("/aas/submodels/SQLTestSubmodel/operations/sensorIDForName", "VS_0001");
-		
+
 		// Get property value (2)
 		Object value2 = connSubmodel.invokeOperation("/aas/submodels/SQLTestSubmodel/operations/sensorIDForName", "VS_0002");
 
-		
 		// Call operation that inserts a value into the database
 		// - Insert line into table
 		connSubmodel.invokeOperation("/aas/submodels/SQLTestSubmodel/operations/addSensorID", "sensorname, sensorid", "'VS_0005', '321'");
 
 		// Get property value (3)
 		Object value3 = connSubmodel.invokeOperation("/aas/submodels/SQLTestSubmodel/operations/sensorIDForName", "VS_0005");
-		
-		
+
 		// Delete property 'VS_0005'
 		// - Collection that contains call values
 		Collection<String> callValues4 = new LinkedList<>();
@@ -97,4 +91,3 @@ public class SQLInvocationsTest {
 		Object value4 = connSubmodel.invokeOperation("/aas/submodels/SQLTestSubmodel/operations/sensorIDForName", "VS_0005");
 	}
 }
-

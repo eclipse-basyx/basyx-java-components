@@ -29,25 +29,23 @@ import org.eclipse.basyx.models.controlcomponent.ExecutionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
-
 /**
  * Base class for integrating devices with BaSys
  * 
- * This base class provides a simple framework for integrating devices with BaSys/BaSyx. It defines callback 
- * functions that are invoked by native devices, and that are used to communicate the device status. 
- *  
+ * This base class provides a simple framework for integrating devices with
+ * BaSys/BaSyx. It defines callback functions that are invoked by native
+ * devices, and that are used to communicate the device status.
+ * 
  * @author kuhn
  *
  */
 public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativeDeviceStatus {
-	
+
 	/**
 	 * Initiates a logger using the current class
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(BaseDevice.class);
-	
+
 	/**
 	 * Device interface function: (usually native code) indicates that device has
 	 * been initialized
@@ -56,12 +54,11 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 	public void deviceInitialized() {
 		// Indicate initialization to device
 		onInitialize();
-		
+
 		// Change status
 		statusChange(ExecutionState.IDLE.getValue());
 	}
-	
-	
+
 	/**
 	 * Device interface function: (usually native code) indicates that device
 	 * service is running
@@ -70,12 +67,11 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 	public void serviceRunning() {
 		// Indicate service invocation to device
 		onServiceInvocation();
-		
+
 		// Change status
 		statusChange(ExecutionState.EXECUTE.getValue());
 	}
-	
-	
+
 	/**
 	 * Device interface function: (usually native code) indicates that device
 	 * service execution has completed
@@ -84,12 +80,11 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 	public void serviceCompleted() {
 		// Indicate service invocation to device
 		onServiceEnd();
-		
+
 		// Change status
-		statusChange(ExecutionState.COMPLETE.getValue());		
+		statusChange(ExecutionState.COMPLETE.getValue());
 	}
 
-	
 	/**
 	 * Device interface function: (usually native code) indicates that device is
 	 * ready again
@@ -98,21 +93,16 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 	public void resetCompleted() {
 		// Indicate reset to device
 		onReset();
-		
+
 		// Change status
-		statusChange(ExecutionState.IDLE.getValue());		
+		statusChange(ExecutionState.IDLE.getValue());
 	}
-
-
 
 	/**
 	 * Indicate device status change
 	 */
 	protected abstract void statusChange(String newStatus);
-	
-	
 
-	
 	/**
 	 * Indicate device initialization
 	 */
@@ -121,7 +111,6 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 		logger.debug("Device " + name + " status change: initialize");
 	}
 
-	
 	/**
 	 * Indicate device service invocation
 	 */
@@ -129,8 +118,7 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 		// Here: Invoke device service
 		logger.debug("Device " + name + " status change: invoke");
 	}
-	
-	
+
 	/**
 	 * Indicate device service end
 	 */
@@ -138,8 +126,7 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 		// Here: Perform device operation after device service end (if necessary)
 		logger.debug("Device " + name + " status change: end");
 	}
-	
-	
+
 	/**
 	 * Indicate device reset
 	 */
@@ -148,4 +135,3 @@ public abstract class BaseDevice extends BaseBaSyxService implements IBaSysNativ
 		logger.debug("Device " + name + " status change: reset");
 	}
 }
-

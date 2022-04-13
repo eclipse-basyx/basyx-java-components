@@ -41,21 +41,18 @@ import org.eclipse.basyx.vab.registry.api.IVABRegistryService;
  */
 public class BaSyxServiceConfigurationBuilder<T extends BaSyxServiceConfigurationBuilder<T>> extends BaSyxConfigurationBuilder<Void> {
 
-	
 	/**
 	 * BaSyx registry URL
 	 */
 	protected String registryURL = null;
-	
-	
+
 	/**
 	 * BaSyx connection manager type
 	 */
 	protected CFGBaSyxProtocolType protocoltype = null;
-	
+
 	protected IVABRegistryService vabDirectory = null;
-	
-	
+
 	/**
 	 * Constructor
 	 */
@@ -64,8 +61,6 @@ public class BaSyxServiceConfigurationBuilder<T extends BaSyxServiceConfiguratio
 		this.setConfiguredComponent(component);
 	}
 
-	
-	
 	/**
 	 * Set registry URL
 	 */
@@ -73,12 +68,11 @@ public class BaSyxServiceConfigurationBuilder<T extends BaSyxServiceConfiguratio
 	public T registryURL(String url) {
 		// Store registry URL
 		registryURL = url;
-		
+
 		// Return 'this' reference
 		return (T) this;
 	}
 
-	
 	/**
 	 * Create registry instance based on configuration
 	 */
@@ -86,9 +80,7 @@ public class BaSyxServiceConfigurationBuilder<T extends BaSyxServiceConfiguratio
 		// Create and return registry
 		return new AASRegistryProxy(registryURL);
 	}
-	
 
-	
 	/**
 	 * Set connection manager type
 	 */
@@ -96,7 +88,7 @@ public class BaSyxServiceConfigurationBuilder<T extends BaSyxServiceConfiguratio
 	public T connectionManagerType(CFGBaSyxProtocolType protocol) {
 		// Store protocol type
 		protocoltype = protocol;
-		
+
 		// Return 'this' reference
 		return (T) this;
 	}
@@ -129,4 +121,3 @@ public class BaSyxServiceConfigurationBuilder<T extends BaSyxServiceConfiguratio
 		return new ConnectedAssetAdministrationShellManager(getRegistry(), new HTTPConnectorFactory());
 	}
 }
-

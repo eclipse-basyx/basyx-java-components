@@ -72,7 +72,8 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a resource.
+	 * Receives the path of the .properties file in it's constructor from a
+	 * resource.
 	 */
 	public MongoDBAASAPI(String resourceConfigPath, String aasId) {
 		config = new BaSyxMongoDBConfiguration();
@@ -96,8 +97,8 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Sets the aas id, so that this API points to the aas with aasId. Can be changed
-	 * to point to a different aas in the database.
+	 * Sets the aas id, so that this API points to the aas with aasId. Can be
+	 * changed to point to a different aas in the database.
 	 * 
 	 * @param aasId
 	 */
@@ -106,15 +107,16 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Depending on whether the model is already in the db, this method inserts or replaces the existing data.
-	 * The new aas id for this API is taken from the given aas.
+	 * Depending on whether the model is already in the db, this method inserts or
+	 * replaces the existing data. The new aas id for this API is taken from the
+	 * given aas.
 	 * 
 	 * @param aas
 	 */
 	public void setAAS(AssetAdministrationShell aas) {
 		String id = aas.getIdentification().getId();
 		this.setAASId(id);
-		
+
 		Query hasId = query(where(AASIDPATH).is(aasId));
 		// Try to replace if already present - otherwise: insert it
 		Object replaced = mongoOps.findAndReplace(hasId, aas, collection);

@@ -26,39 +26,33 @@ package org.eclipse.basyx.components.device;
 
 import org.eclipse.basyx.components.netcomm.TCPClient;
 
-
-
-
 /**
  * Base class for integrating devices with BaSys
  * 
- * This base class provides a simple framework for integrating devices with BaSys/BaSyx. It implements a string
- * based communication and connects to a device manager. The class defines interface methods that need to be
- * called from sub classes or native code.
+ * This base class provides a simple framework for integrating devices with
+ * BaSys/BaSyx. It implements a string based communication and connects to a
+ * device manager. The class defines interface methods that need to be called
+ * from sub classes or native code.
  * 
- * The device has no control component; the device decides itself when its service is executed. This happens 
- * e.g. due to sensor inputs or MES system request
+ * The device has no control component; the device decides itself when its
+ * service is executed. This happens e.g. due to sensor inputs or MES system
+ * request
  * 
  * @author kuhn
  *
  */
 public abstract class BaseTCPDeviceAdapter extends BaseDevice implements IBaSysNativeDeviceStatus {
 
-	
 	/**
 	 * Communication client
 	 */
 	protected TCPClient communicationClient = null;
-	
-	
+
 	/**
 	 * Store server port
 	 */
 	protected int serverPort;
-	
-	
-	
-	
+
 	/**
 	 * Constructor
 	 */
@@ -66,10 +60,7 @@ public abstract class BaseTCPDeviceAdapter extends BaseDevice implements IBaSysN
 		// Store server port
 		serverPort = port;
 	}
-	
-	
-	
-	
+
 	/**
 	 * Indicate device service invocation to device manager
 	 */
@@ -81,31 +72,27 @@ public abstract class BaseTCPDeviceAdapter extends BaseDevice implements IBaSysN
 		// Write bytes to device manager
 		communicationClient.sendMessage("invocation:start\n");
 	}
-	
-	
+
 	/**
 	 * Indicate device service end
 	 */
 	protected void onServiceEnd() {
 		// Invoke base implementation
 		super.onServiceEnd();
-		
+
 		// Write bytes to device manager
 		communicationClient.sendMessage("invocation:end\n");
 	}
 
-
-	
 	/**
 	 * Indicate device status change to device manager
 	 */
 	@Override
 	protected void statusChange(String newStatus) {
 		// Write bytes to device manager
-		communicationClient.sendMessage("status:"+newStatus+"\n");
+		communicationClient.sendMessage("status:" + newStatus + "\n");
 	}
-	
-	
+
 	/**
 	 * Close device communication socket
 	 */
@@ -114,7 +101,6 @@ public abstract class BaseTCPDeviceAdapter extends BaseDevice implements IBaSysN
 		communicationClient.close();
 	}
 
-
 	/**
 	 * Start the device
 	 */
@@ -122,11 +108,10 @@ public abstract class BaseTCPDeviceAdapter extends BaseDevice implements IBaSysN
 	public void start() {
 		// Invoke base implementation
 		super.start();
-		
+
 		// Create connection
 		communicationClient = new TCPClient("localhost", serverPort);
 	}
-
 
 	/**
 	 * Stop the device
@@ -135,11 +120,10 @@ public abstract class BaseTCPDeviceAdapter extends BaseDevice implements IBaSysN
 	public void stop() {
 		// Invoke base implementation
 		super.stop();
-		
+
 		// Close communication socket
 		closeSocket();
 	}
-
 
 	/**
 	 * Wait for completion of server

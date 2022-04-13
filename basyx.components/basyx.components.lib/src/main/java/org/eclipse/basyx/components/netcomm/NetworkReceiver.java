@@ -24,9 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.netcomm;
 
-
-
-
 /**
  * Interface for TCP receiver components
  * 
@@ -35,9 +32,8 @@ package org.eclipse.basyx.components.netcomm;
  */
 public interface NetworkReceiver {
 
-	
 	/**
-	 * Received a string from network connection 
+	 * Received a string from network connection
 	 */
 	public void onReceive(byte[] rxData);
 }

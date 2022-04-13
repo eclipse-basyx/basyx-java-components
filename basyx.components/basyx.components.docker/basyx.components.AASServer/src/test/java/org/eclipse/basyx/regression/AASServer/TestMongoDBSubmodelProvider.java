@@ -107,7 +107,7 @@ public class TestMongoDBSubmodelProvider extends SubmodelProviderTest {
 	@Test
 	public void testInvokeOperation() {
 	}
-	
+
 	/**
 	 * Operations are not supported
 	 */
@@ -140,8 +140,7 @@ public class TestMongoDBSubmodelProvider extends SubmodelProviderTest {
 	@Test
 	public void testReadSubmodelElements() {
 		VABElementProxy submodel = getConnectionManager().connectToVABElement(submodelAddr);
-		Collection<Map<String, Object>> set = (Collection<Map<String, Object>>) submodel
-				.getValue("/submodel/submodelElements");
+		Collection<Map<String, Object>> set = (Collection<Map<String, Object>>) submodel.getValue("/submodel/submodelElements");
 		assertEquals(5, set.size());
 	}
 

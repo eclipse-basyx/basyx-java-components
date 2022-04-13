@@ -44,15 +44,15 @@ public class TestBaSyxAASServerConfigurationPropertyFileParsing {
 	private static final String MULTIPLE_DIFFERENT_AAS_SERIALIZATION = "aas_multiple_different_source.properties";
 	private static final String SINGLE_JSON_AAS_SERIALIZATION = "aas_single_json_source.properties";
 	private static final String SINGLE_AAS_SERIALIZATION = "aas_single_source.properties";
-	
+
 	private static AASServerComponent component;
 	private static InMemoryRegistry registry;
-	
+
 	private static void setUp(String resourcePath) {
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(8080, "");
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration();
 		aasConfig.loadFromResource(resourcePath);
-		
+
 		createAndStartAASServerComponent(contextConfig, aasConfig);
 	}
 
@@ -62,31 +62,31 @@ public class TestBaSyxAASServerConfigurationPropertyFileParsing {
 		component.setRegistry(registry);
 		component.startComponent();
 	}
-	
+
 	@Test
 	public void checkMultipleSerializedAasSourceOfDifferentTypes() {
 		setUp(MULTIPLE_DIFFERENT_AAS_SERIALIZATION);
-		
+
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(4, aasDescriptors.size());
 	}
-	
+
 	@Test
 	public void checkSingleSerializedAasJsonSource() {
 		setUp(SINGLE_JSON_AAS_SERIALIZATION);
-		
+
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(1, aasDescriptors.size());
 	}
-	
+
 	@Test
 	public void checkAasSerializedSouceDefinedWithoutJsonArray() {
 		setUp(SINGLE_AAS_SERIALIZATION);
-		
+
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(2, aasDescriptors.size());
 	}
-	
+
 	@After
 	public void stopAASServerComponent() {
 		component.stopComponent();

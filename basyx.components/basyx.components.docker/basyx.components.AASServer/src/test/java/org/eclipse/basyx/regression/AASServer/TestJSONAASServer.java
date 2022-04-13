@@ -48,8 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Suite for testing that the JSONAAS servlet is set up correctly. The tests here
- * can be used by the servlet test itself and the integration test
+ * Suite for testing that the JSONAAS servlet is set up correctly. The tests
+ * here can be used by the servlet test itself and the integration test
  * 
  * @author JSON
  *
@@ -78,12 +78,10 @@ public class TestJSONAASServer {
 		// Setup component's test configuration
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY,
-				"json/aas.json");
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "json/aas.json");
 
 		// Setup endpoints
-		String rootEndpoint = "http://" + contextConfig.getHostname() + ":" + contextConfig.getPort() + "/"
-				+ contextConfig.getContextPath() + "/";
+		String rootEndpoint = "http://" + contextConfig.getHostname() + ":" + contextConfig.getPort() + "/" + contextConfig.getContextPath() + "/";
 		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
 		smEndpoint = aasEndpoint + "/submodels/" + smShortId + "/submodel";
 		logger.info("AAS URL for servlet test: " + aasEndpoint);
@@ -99,7 +97,6 @@ public class TestJSONAASServer {
 		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
 		manager = new ConnectedAssetAdministrationShellManager(registry, connectorFactory);
 	}
-
 
 	@AfterClass
 	public static void tearDown() {

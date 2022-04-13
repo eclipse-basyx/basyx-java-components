@@ -69,16 +69,16 @@ import org.xml.sax.SAXException;
 public class TestMongoDBServer extends AASServerSuite {
 	private static final Identifier SM_IDENTIFICATION = new Identifier(IdentifierType.CUSTOM, "MongoDBId");
 	private static final String SM_IDSHORT = "MongoDB";
-	
+
 	private static final String DELEGATE_OP_ID_SHORT = "delegateOp";
 	private static final String DELEGATE_OP_INVOKE_PATH = "delegateOp/invoke";
 	private static final String OP_ID_SHORT = "op";
-	
+
 	private static AASServerComponent component;
 	private static BaSyxMongoDBConfiguration mongoDBConfig;
 	private static BaSyxContextConfiguration contextConfig;
 	private static BaSyxAASServerConfiguration aasConfig;
-	
+
 	private boolean executed = false;
 
 	@Override
@@ -135,27 +135,26 @@ public class TestMongoDBServer extends AASServerSuite {
 
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
 	}
-	
+
 	@Test
 	public void testInvokeDelegatedOperation() {
 		createAssetAdministrationShell();
 		createSubmodel();
-		
+
 		Operation op = new Operation(OP_ID_SHORT);
 		op.setInvokable((Runnable) -> {
 			executed = true;
 		});
 		OperationProvider opProvider = new OperationProvider(new VABMapProvider(op));
-		
-		
+
 		ConnectorProviderStub connector = new ConnectorProviderStub();
 		connector.addMapping(OP_ID_SHORT, opProvider);
-		
+
 		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(mongoDBConfig, SM_IDENTIFICATION.getId(), new DelegatedInvocationManager(connector));
-		
+
 		executed = false;
 		api.invokeOperation(DELEGATE_OP_INVOKE_PATH);
-		
+
 		assertTrue(executed);
 	}
 
@@ -185,7 +184,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		Qualifier qualifier = DelegatedInvocationManager.createDelegationQualifier(OP_ID_SHORT);
 		delegateOp.setQualifiers(Arrays.asList(qualifier));
 		sm.addSubmodelElement(delegateOp);
-		
+
 		manager.createSubmodel(shellIdentifier, sm);
 	}
 

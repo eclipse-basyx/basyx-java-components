@@ -29,9 +29,6 @@ import java.util.function.Consumer;
 
 import org.eclipse.basyx.tools.webserviceclient.WebServiceRawClient;
 
-
-
-
 /**
  * Implement a setter (supplier) function that posts a value to a HTTP server.
  * 
@@ -40,19 +37,15 @@ import org.eclipse.basyx.tools.webserviceclient.WebServiceRawClient;
  */
 public class HTTPSupplier implements Consumer<String>, Serializable {
 
-	
 	/**
 	 * Version number of serialized instances
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
 	/**
 	 * URL of server that provides the requested information
 	 */
 	protected String serverURL = null;
-	
-	
 
 	/**
 	 * Constructor
@@ -61,9 +54,7 @@ public class HTTPSupplier implements Consumer<String>, Serializable {
 		// Store URL
 		serverURL = url;
 	}
-	
-	
-	
+
 	/**
 	 * Return value
 	 */
@@ -71,9 +62,8 @@ public class HTTPSupplier implements Consumer<String>, Serializable {
 	public void accept(String value) {
 		// Create web service client
 		WebServiceRawClient rawClient = new WebServiceRawClient();
-		
+
 		// Delegate call to WebService RAW client
 		rawClient.post(serverURL, value);
 	}
 }
-

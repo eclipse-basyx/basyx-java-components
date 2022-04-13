@@ -37,28 +37,27 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * A service executor that invokes services defined in the administration shells.
- * The service executor is called by the Java-delegate class of the process-engine
- * All necessary parameters are delivered through field injections
+ * A service executor that invokes services defined in the administration
+ * shells. The service executor is called by the Java-delegate class of the
+ * process-engine All necessary parameters are delivered through field
+ * injections
  * 
  * @author Zhang, Zai
- * */
+ */
 public class DeviceServiceExecutor implements IDeviceServiceExecutor {
-	
+
 	/**
 	 * Initiates a logger using the current class
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(DeviceServiceExecutor.class);
-	
+
 	protected IAssetAdministrationShellManager manager;
-	protected String  serviceName;
+	protected String serviceName;
 	protected String serviceProvider;
 	protected String serviceSubmodelId;
 	protected List<Object> parameters = new ArrayList<>();
-	
-	
+
 	public DeviceServiceExecutor(IAssetAdministrationShellManager manager) {
 		// set-up the administration shell manager to create connected aas
 		this.manager = manager;
@@ -66,9 +65,9 @@ public class DeviceServiceExecutor implements IDeviceServiceExecutor {
 
 	/**
 	 * Synchronous invocation the expected service specified by the BPMN-model
-	 * */
+	 */
 	@Override
-	public Object executeService( String servicename, String serviceProvider, String submodelid, List<Object> params) {
+	public Object executeService(String servicename, String serviceProvider, String submodelid, List<Object> params) {
 		try {
 			// create ids
 			IIdentifier aasId = new Identifier(IdentifierType.CUSTOM, serviceProvider);
@@ -77,16 +76,16 @@ public class DeviceServiceExecutor implements IDeviceServiceExecutor {
 			// create the submodel of the corresponding aas
 			ISubmodel serviceSubmodel = manager.retrieveSubmodel(aasId, smId);
 
-			// navigate to the expected service 
+			// navigate to the expected service
 			Map<String, IOperation> operations = serviceSubmodel.getOperations();
 			IOperation op = operations.get(servicename);
-			
+
 			// invoke the service
-			logger.debug("#Service Executor#--Call service: %s with parameter: %s \n", servicename,  params);
+			logger.debug("#Service Executor#--Call service: %s with parameter: %s \n", servicename, params);
 			Object position = op.invokeSimple(params.toArray());
-			
+
 			return position;
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return 1;
@@ -95,5 +94,5 @@ public class DeviceServiceExecutor implements IDeviceServiceExecutor {
 	public String getServiceSubmodelId() {
 		return serviceSubmodelId;
 	}
-	
+
 }

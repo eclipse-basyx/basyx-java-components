@@ -67,7 +67,8 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a resource.
+	 * Receives the path of the .properties file in it's constructor from a
+	 * resource.
 	 */
 	public MongoDBRegistryHandler(String resourceConfigPath) {
 		config = new BaSyxMongoDBConfiguration();

@@ -30,8 +30,9 @@ import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
 
 /**
- * A registry servlet based on an SQL database. The servlet therefore provides an implementation
- * for the IAASRegistryService interface with a permanent storage solution.
+ * A registry servlet based on an SQL database. The servlet therefore provides
+ * an implementation for the IAASRegistryService interface with a permanent
+ * storage solution.
  * 
  * @author kuhn, pschorn, espen
  */

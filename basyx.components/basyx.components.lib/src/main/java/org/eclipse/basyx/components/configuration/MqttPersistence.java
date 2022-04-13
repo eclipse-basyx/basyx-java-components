@@ -38,9 +38,8 @@ public enum MqttPersistence {
 	/**
 	 * Enum values of KeyElements
 	 */
-	INMEMORY("InMemory"),
-	FILE("File");
-	
+	INMEMORY("InMemory"), FILE("File");
+
 	private String literal;
 
 	private MqttPersistence(String literal) {
