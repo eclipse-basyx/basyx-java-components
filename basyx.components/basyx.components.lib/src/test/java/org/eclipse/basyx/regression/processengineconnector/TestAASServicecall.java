@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.regression.processengineconnector;
 
@@ -47,113 +62,118 @@ public class TestAASServicecall {
 	 * Service Executor to be tested, used by the process engine
 	 */
 	private DeviceServiceExecutor serviceExecutor;
-	
+
 	/**
-	 * A stub for the service sub-model 
+	 * A stub for the service sub-model
 	 */
 	private CoilcarStub coilcar;
-	
+
 	/**
 	 * Id of the device (coilcar) aas
 	 */
 	private static final String AAS_ID = "coilcar";
-	
+
 	/**
 	 * Id of the service submodel
 	 */
 	private static final String SUBMODEL_ID = "submodel1";
-	
+
 	/**
 	 * Name of the service "liftTo"
 	 */
 	private static final String SERVICE_LIFTTO = "liftTo";
-	
+
 	/**
 	 * Name of the service "moveTo"
 	 */
 	private static final String SERVICE_MOVETO = "moveTo";
-	
+
 	/**
 	 * Setup the test environment, create aas and submodels, setup VAB connection
 	 */
 	@Before
 	public void setupDeviceServiceExecutor() {
-		// Create a device-aas for coilcar device with id "coilcar" and submodelid "submodel1"
-		AssetAdministrationShell aas = new DeviceAdministrationShellFactory().create( AAS_ID, SUBMODEL_ID);
-		
+		// Create a device-aas for coilcar device with id "coilcar" and submodelid
+		// "submodel1"
+		AssetAdministrationShell aas = new DeviceAdministrationShellFactory().create(AAS_ID, SUBMODEL_ID);
+
 		// Create service stub instead of real coilcar services
 		coilcar = new CoilcarStub();
-		
+
 		// Create the submodel of services provided by the coilcar with id "submodel1"
 		Submodel sm = new DeviceSubmodelFactory().create(SUBMODEL_ID, coilcar);
-		
+
 		// Create VAB multi-submodel provider for holding the sub-models
 		MultiSubmodelProvider provider = new MultiSubmodelProvider();
-		
+
 		// Add sub-model to the provider
 		provider.addSubmodel(new SubmodelProvider(sm));
-		
+
 		// Add aas to the provider
 		provider.setAssetAdministrationShell(new AASModelProvider(aas));
-		
+
 		// Create registry for aas
 		IAASRegistry registry = new InMemoryRegistry();
-		
+
 		// Create aas descriptor
 		IIdentifier id = new Identifier(IdentifierType.CUSTOM, AAS_ID);
 		AASDescriptor aasDescriptor = new AASDescriptor(id, "/aas");
-		
+
 		// create submodel descriptor
 		IIdentifier smId = new Identifier(IdentifierType.CUSTOM, SUBMODEL_ID);
 		SubmodelDescriptor smDescriptor = new SubmodelDescriptor("submodel1Name", smId, "/aas/submodels/" + SUBMODEL_ID + "/submodel");
-		
+
 		// Add submodel descriptor to aas descriptor
 		aasDescriptor.addSubmodelDescriptor(smDescriptor);
-		
+
 		// register this aas
 		registry.register(aasDescriptor);
 
 		// setup the connection-manager with the model-provider
 		ConnectorProviderStub connectorProvider = new ConnectorProviderStub();
 		connectorProvider.addMapping("", provider);
-		
+
 		// create the service executor that calls the services using aas
-		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry,
-				connectorProvider);
+		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry, connectorProvider);
 		serviceExecutor = new DeviceServiceExecutor(manager);
-		
+
 	}
-	
-	
+
 	/**
-	 * Test the service invocation of the service-executor 
+	 * Test the service invocation of the service-executor
 	 */
 	@Test
 	public void testServicecall() {
-		/* Execute the service "moveTo" on the device "coilcar", 
-		 * the service is located in sub-model "submodel1" 
-		 * and has a parameter 123*/
-		serviceExecutor.executeService(SERVICE_MOVETO, AAS_ID, SUBMODEL_ID, new ArrayList<>(Arrays.asList( new Object[] {123})));
-		
-		// Validate the parameter and service name is delivered successfully to the device stub
+		/*
+		 * Execute the service "moveTo" on the device "coilcar", the service is located
+		 * in sub-model "submodel1" and has a parameter 123
+		 */
+		serviceExecutor.executeService(SERVICE_MOVETO, AAS_ID, SUBMODEL_ID, new ArrayList<>(Arrays.asList(new Object[] { 123 })));
+
+		// Validate the parameter and service name is delivered successfully to the
+		// device stub
 		assertEquals(123, coilcar.getParameter());
 		assertTrue(coilcar.getServiceCalled().equals(SERVICE_MOVETO));
-		
-		/* Execute the service "liftTo" on the device "coilcar", 
-		 * the service is located in sub-model "submodel1" 
-		 * and has a parameter 456*/
-		serviceExecutor.executeService(SERVICE_LIFTTO, AAS_ID, SUBMODEL_ID, new ArrayList<>(Arrays.asList( new Object[] {456})));
-		
-		// Validate the parameter and service name is delivered successfully to the device stub
+
+		/*
+		 * Execute the service "liftTo" on the device "coilcar", the service is located
+		 * in sub-model "submodel1" and has a parameter 456
+		 */
+		serviceExecutor.executeService(SERVICE_LIFTTO, AAS_ID, SUBMODEL_ID, new ArrayList<>(Arrays.asList(new Object[] { 456 })));
+
+		// Validate the parameter and service name is delivered successfully to the
+		// device stub
 		assertEquals(456, coilcar.getParameter());
 		assertTrue(coilcar.getServiceCalled().equals(SERVICE_LIFTTO));
-		
-		/* Execute the service "moveTo" on the device "coilcar", 
-		 * the service is located in sub-model "submodel1" 
-		 * and has a parameter 789*/
-		serviceExecutor.executeService(SERVICE_MOVETO,  AAS_ID, SUBMODEL_ID, new ArrayList<>(Arrays.asList( new Object[] {789})));
-		
-		// Validate the parameter and service name is delivered successfully to the device stub
+
+		/*
+		 * Execute the service "moveTo" on the device "coilcar", the service is located
+		 * in sub-model "submodel1" and has a parameter 789
+		 */
+		serviceExecutor.executeService(SERVICE_MOVETO, AAS_ID, SUBMODEL_ID, new ArrayList<>(Arrays.asList(new Object[] { 789 })));
+
+		// Validate the parameter and service name is delivered successfully to the
+		// device stub
 		assertEquals(789, coilcar.getParameter());
 		assertTrue(coilcar.getServiceCalled().equals(SERVICE_MOVETO));
 	}
