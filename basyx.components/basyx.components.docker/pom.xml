@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components</artifactId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>1.1.0RC01</version>
 	</parent>
 
 	<artifactId>basyx.components.docker</artifactId>
@@ -214,7 +214,7 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.1.0RC01</version>
 		</dependency>
 	</dependencies>
 
