@@ -14,6 +14,8 @@ package basyx.components.updater.aas;
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultProducer;
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.dataelement.ConnectedProperty;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueTypeHelper;
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
@@ -34,13 +36,16 @@ public class AASProducer extends DefaultProducer {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-    	String messageBody = exchange.getMessage().getBody(String.class);
-		String fixedMessageBody = "";
-    	fixedMessageBody = fixMessage(messageBody);
-
-		LOG.info("Got msg for property: " + fixedMessageBody);
-    	connectedProperty.setValue(fixedMessageBody);
-    }
+		// Evaluate exchange message as String
+		Object messageBody = exchange.getMessage().getBody(String.class);
+		// if valueType of Property is String, fix double quotes, else infer Object by given Type
+		if (connectedProperty.getValueType().equals(ValueType.String)) {
+			connectedProperty.setValue(fixMessage(messageBody.toString()));
+		} else {
+			connectedProperty.setValue(ValueTypeHelper.getJavaObject(messageBody, connectedProperty.getValueType()));
+		}
+		LOG.info("Transferred message={} with valueType={}", messageBody, connectedProperty.getValueType());
+	};
 
     String fixMessage(String messageBody) {
 		String fixedMessageBody = "";
@@ -53,7 +58,7 @@ public class AASProducer extends DefaultProducer {
 		}
 		return fixedMessageBody;
 	}
-	
+
 	/**
 	 * Connect the the Submodel Element for data dumping
 	 */
