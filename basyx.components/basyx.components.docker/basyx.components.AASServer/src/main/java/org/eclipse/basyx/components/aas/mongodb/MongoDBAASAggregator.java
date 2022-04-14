@@ -46,6 +46,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -380,6 +381,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	private MultiSubmodelProvider createMultiSubmodelProvider(IAASAPI aasApi) {
 		AASModelProvider aasProvider = new AASModelProvider(aasApi);
 		IConnectorFactory connProvider = new HTTPConnectorFactory();
+
+		// quick-fix: init submodel aggregator per aas provider
+		//MongoDBSubmodelAPIFactory submodelAPIFactory = new MongoDBSubmodelAPIFactory(this.config);
+		//submodelAggregator = new SubmodelAggregatorFactory(submodelAPIFactory).create();
+
 		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, submodelAggregator);
 	}
 
