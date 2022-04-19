@@ -50,7 +50,6 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistryHandler;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
-import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -88,7 +87,6 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 
 	protected static final String AAS_ID_2 = "testId2";
 	private static final Identifier SM_IDENTIFICATION_2 = new Identifier(IdentifierType.CUSTOM, "MongoDBId2");
-	private static final String SM_IDSHORT_2 = SM_IDSHORT;
 
 	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
 	private static final String SUFFIX_SUBMODEL_PATH = "/submodel";
@@ -226,10 +224,6 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		Object submodelObject = aasProvider.getValue(PREFIX_SUBMODEL_PATH + smIdShort + SUFFIX_SUBMODEL_PATH);
 
 		ISubmodel persistentSubmodel = Submodel.createAsFacade((Map<String, Object>) submodelObject);
-
-		//TODO: Reacitvate this commented out line after fixing https://github.com/eclipse-basyx/basyx-java-sdk/issues/47
-		//removeProviderFromMultiSubmodelProviderHashMap(aasProvider, smIdShort);
-
 		return persistentSubmodel;
 	}
 
@@ -239,26 +233,35 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 
 	@Test
 	public void checkSupportForMultipleAasAndSameSubmodelIdShort() {
-		// create AAS 2 (AAS_ID_2)
-		// create submodel for AAS 2 with same smIdShort as submodel of AAS 1
-		createAssetAdministrationShell(AAS_ID_2);
-		createSubmodel(SM_IDSHORT_2, SM_IDENTIFICATION_2, AAS_ID_2);
+		createAASWithSubmodelWithCollidingIdShort();
 
-		// init aggregator using factory classes
+		MongoDBAASAggregator aggregator = createTestAggregator();
+
+		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator, AAS_ID, SM_IDSHORT);
+		ISubmodel persistentSubmodel2 = getSubmodelFromAggregator(aggregator, AAS_ID_2, SM_IDSHORT);
+
+		assertSubmodelsAreResolvedCorrectly(persistentSubmodel, persistentSubmodel2);
+	}
+
+	private void assertSubmodelsAreResolvedCorrectly(ISubmodel persistentSubmodel, ISubmodel persistentSubmodel2) {
+		assertEquals(SM_IDSHORT, persistentSubmodel.getIdShort());
+		assertEquals(SM_IDENTIFICATION, persistentSubmodel.getIdentification());
+
+		assertEquals(SM_IDSHORT, persistentSubmodel2.getIdShort());
+		assertEquals(SM_IDENTIFICATION_2, persistentSubmodel2.getIdentification());
+	}
+
+	private void createAASWithSubmodelWithCollidingIdShort() {
+		createAssetAdministrationShell(AAS_ID_2);
+		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION_2, AAS_ID_2);
+	}
+
+	private MongoDBAASAggregator createTestAggregator() {
 		IAASAPIFactory aasApiProvider = new MongoDBAASAPIFactory(mongoDBConfig);
 		MongoDBSubmodelAPIFactory submodelAPIFactory = new MongoDBSubmodelAPIFactory(mongoDBConfig);
 		ISubmodelAggregatorFactory submodelAggregatorFactory = new SubmodelAggregatorFactory(submodelAPIFactory);
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, aasApiProvider, submodelAggregatorFactory);
-
-		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator, AAS_ID, SM_IDSHORT);
-		ISubmodel persistentSubmodel2 = getSubmodelFromAggregator(aggregator, AAS_ID_2, SM_IDSHORT_2);
-
-		// check if aggregator server multiple submodels with same idShort
-		assertEquals(SM_IDSHORT, persistentSubmodel.getIdShort());
-		assertEquals(SM_IDENTIFICATION, persistentSubmodel.getIdentification());
-
-		assertEquals(SM_IDSHORT_2, persistentSubmodel2.getIdShort());
-		assertEquals(SM_IDENTIFICATION_2, persistentSubmodel2.getIdentification());
+		return aggregator;
 	}
 
 	@SuppressWarnings("deprecation")

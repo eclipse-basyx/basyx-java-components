@@ -46,7 +46,6 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -109,6 +108,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * Store SubmodelAggregator. By default, uses standard SubmodelAggregator
 	 */
 	protected ISubmodelAggregator submodelAggregator;
+	protected ISubmodelAggregatorFactory submodelAggregatorFactory;
 
 	/**
 	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
@@ -226,7 +226,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this.config = config;
 		this.registry = registry;
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -243,7 +243,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		setMongoDBConfiguration(config);
 		this.config = config;
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -263,7 +263,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		setMongoDBConfiguration(config);
 		this.registry = registry;
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -281,7 +281,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config.loadFromResource(resourceConfigPath);
 		setMongoDBConfiguration(config);
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -382,11 +382,17 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		AASModelProvider aasProvider = new AASModelProvider(aasApi);
 		IConnectorFactory connProvider = new HTTPConnectorFactory();
 
-		// quick-fix: init submodel aggregator per aas provider
-		//MongoDBSubmodelAPIFactory submodelAPIFactory = new MongoDBSubmodelAPIFactory(this.config);
-		//submodelAggregator = new SubmodelAggregatorFactory(submodelAPIFactory).create();
+		ISubmodelAggregator usedAggregator = getSubmodelAggregatorInstance();
 
-		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, submodelAggregator);
+		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, usedAggregator);
+	}
+
+	private ISubmodelAggregator getSubmodelAggregatorInstance() {
+		if (submodelAggregatorFactory == null) {
+			return submodelAggregator;
+		}
+
+		return submodelAggregatorFactory.create();
 	}
 
 	/**
