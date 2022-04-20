@@ -33,24 +33,20 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
+import org.eclipse.basyx.aas.aggregator.proxy.AASAggregatorProxy;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.AASRegistry;
 import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPIFactory;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistryHandler;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
-import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
@@ -218,8 +214,8 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	}
 
 	@SuppressWarnings("unchecked")
-	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator, String aasId, String smIdShort) {
-		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(new ModelUrn(aasId));
+	private ISubmodel getSubmodelFromAggregator(IAASAggregator aggregator, String aasId, String smIdShort) {
+		IModelProvider aasProvider = aggregator.getAASProvider(new ModelUrn(aasId));
 
 		Object submodelObject = aasProvider.getValue(PREFIX_SUBMODEL_PATH + smIdShort + SUFFIX_SUBMODEL_PATH);
 
@@ -233,9 +229,9 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 
 	@Test
 	public void checkSupportForMultipleAasAndSameSubmodelIdShort() {
-		createAASWithSubmodelWithCollidingIdShort();
+		IAASAggregator aggregator = new AASAggregatorProxy(getURL());
 
-		MongoDBAASAggregator aggregator = createTestAggregator();
+		createAASWithSubmodelWithCollidingIdShort();
 
 		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator, AAS_ID, SM_IDSHORT);
 		ISubmodel persistentSubmodel2 = getSubmodelFromAggregator(aggregator, AAS_ID_2, SM_IDSHORT);
@@ -252,16 +248,11 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	}
 
 	private void createAASWithSubmodelWithCollidingIdShort() {
+		createAssetAdministrationShell(AAS_ID);
+		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
+
 		createAssetAdministrationShell(AAS_ID_2);
 		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION_2, AAS_ID_2);
-	}
-
-	private MongoDBAASAggregator createTestAggregator() {
-		IAASAPIFactory aasApiProvider = new MongoDBAASAPIFactory(mongoDBConfig);
-		MongoDBSubmodelAPIFactory submodelAPIFactory = new MongoDBSubmodelAPIFactory(mongoDBConfig);
-		ISubmodelAggregatorFactory submodelAggregatorFactory = new SubmodelAggregatorFactory(submodelAPIFactory);
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, aasApiProvider, submodelAggregatorFactory);
-		return aggregator;
 	}
 
 	@SuppressWarnings("deprecation")
