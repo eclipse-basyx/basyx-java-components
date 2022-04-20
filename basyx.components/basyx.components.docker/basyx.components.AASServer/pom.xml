@@ -12,6 +12,7 @@
 
 	<artifactId>basyx.components.AASServer</artifactId>
 	<name>AAS Server</name>
+	<version>1.1.0RC02</version>
 
 	<properties>
 		<!-- basyx.components.executable is the executable class with the definition 
