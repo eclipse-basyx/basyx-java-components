@@ -12,6 +12,8 @@
 package basyx.components.updater.transformer.cameljsonata.configuration;
 
 import basyx.components.updater.core.configuration.DataTransformerConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -23,6 +25,7 @@ import java.io.File;
  *
  */
 public class JsonataTransformerConfiguration extends DataTransformerConfiguration {
+	private static final Logger logger = LoggerFactory.getLogger(JsonataTransformerConfiguration.class);
 	private String queryPath;
 	private String inputType;
 	private String outputType;
@@ -49,10 +52,10 @@ public class JsonataTransformerConfiguration extends DataTransformerConfiguratio
 		File jsonataFile = new File(getQueryPath());
 
 		if (jsonataFile.exists()) {
-		    System.out.println("Looking for jsonata config as configured in jsonatatransformer.json...");
+			logger.info("Looking for jsonata config as configured in jsonatatransformer.json...");
 			url = "jsonata:" + "file:./" + getQueryPath() + "?inputType=" + getInputType() + "&outputType=" + getOutputType();
 		} else {
-			System.out.println("Couldn't find jsonata config as configured in jsonatatransformer.json. Looking in classpath...");
+			logger.info("Couldn't find jsonata config as configured in jsonatatransformer.json. Looking in classpath...");
 			url = "jsonata:" + getQueryPath() + "?inputType=" + getInputType() + "&outputType=" + getOutputType();
 		}
 		return url;
