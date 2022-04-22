@@ -12,10 +12,7 @@
 
 package basyx.components.updater.core.configuration.loader;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +74,21 @@ public class FileConfigurationLoader {
 	 * @return
 	 */
 	private InputStreamReader getJsonReader() {
-		InputStream stream = loader.getResourceAsStream(filePath);
+
+		InputStream stream = null;
+	    try {
+			stream = new FileInputStream(filePath);
+		} catch (Exception e1) {
+	        logger.warn("No exterior config file found in defined path. Trying to load config file from classpath...");
+	        try {
+				stream = loader.getResourceAsStream(filePath);
+			} catch (Exception e2) {
+				logger.error("No exterior config file found in defined path and no config file found in classpath");
+				e2.printStackTrace();
+			}
+		}
+
+
 		InputStreamReader reader = null;
 		try {
 			reader = new InputStreamReader(stream, "UTF-8");
