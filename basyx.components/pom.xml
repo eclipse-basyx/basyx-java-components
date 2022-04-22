@@ -25,10 +25,6 @@
 
 	<repositories>
 		<repository>
-			<id>Eclipse BaSyx SDK GitHub Packages</id>
-			<url>https://maven.pkg.github.com/eclipse-basyx/basyx-java-sdk</url>
-		</repository>
-		<repository>
 			<id>central</id>
 			<name>Maven Central</name>
 			<layout>default</layout>
@@ -36,6 +32,10 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>Eclipse BaSyx SDK GitHub Packages</id>
+			<url>https://maven.pkg.github.com/eclipse-basyx/basyx-java-sdk</url>
 		</repository>
 	</repositories>
 
