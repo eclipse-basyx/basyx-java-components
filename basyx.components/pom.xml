@@ -33,10 +33,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>Eclipse BaSyx SDK GitHub Packages</id>
-			<url>https://maven.pkg.github.com/eclipse-basyx/basyx-java-sdk</url>
-		</repository>
 	</repositories>
 
 	<licenses>
