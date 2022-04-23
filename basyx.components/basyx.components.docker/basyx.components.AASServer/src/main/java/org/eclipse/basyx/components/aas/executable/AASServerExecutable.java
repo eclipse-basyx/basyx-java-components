@@ -68,10 +68,10 @@ public class AASServerExecutable {
 
 		logger.info("BaSyx AAS Server component started");
 		
-		shutdownComponent(component);
+		addShutdownHook(component);
 	}
 
-	private static void shutdownComponent(AASServerComponent component) {
+	private static void addShutdownHook(AASServerComponent component) {
 		Thread shutdownListener = new Thread(){
 		    public void run(){
 		    	component.stopComponent();

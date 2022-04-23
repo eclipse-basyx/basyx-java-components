@@ -229,15 +229,19 @@ public class AASServerComponent implements IComponent {
 		server = new BaSyxHTTPServer(context);
 		server.start();
 		
-		registerAASAndSMFromDBIfBackendIsMongoDB();
+		registerPreexistingAASAndSMIfPossible();
 	}
 	
-	private void registerAASAndSMFromDBIfBackendIsMongoDB() {
-		if(!isMongoDBBackend()) {
+	private void registerPreexistingAASAndSMIfPossible() {
+		if(!shouldRegisterPreexistingAASAndSM()) {
 			return;
 		}
 		
 		aggregator.getAASList().stream().forEach(this::registerAASAndSubmodels);
+	}
+
+	private boolean shouldRegisterPreexistingAASAndSM() {
+		return isMongoDBBackend() && registry != null;
 	}
 	
 	private List<ISubmodel> registerAASAndSubmodels(IAssetAdministrationShell aas) {
@@ -261,7 +265,7 @@ public class AASServerComponent implements IComponent {
 		List<ISubmodel> submodels = getSubmodelFromAggregator(aggregator, aas.getIdentification());
 		try {
 			submodels.stream().forEach(submodel -> manager.createSubmodel(aas.getIdentification(), (Submodel) submodel));
-			logger.info("The submodels from AAS " + aas.getIdShort() + " are Registered Successfully from DB");
+			logger.info("The submodels from AAS " + aas.getIdShort() + " are Successfully Registered from DB");
 		} catch(Exception e) {
 			logger.info("The submodel from AAS " + aas.getIdShort() + " could not be Registered from DB " + e);
 		}
@@ -329,20 +333,57 @@ public class AASServerComponent implements IComponent {
 		}
 		
 		registry.lookupAll().stream().forEach(this::deregisterAASAndAccompanyingSM);
-
 	}
 	
 	private void deregisterAASAndAccompanyingSM(AASDescriptor aasDescriptor) {
-		getSubmodelDescriptors(aasDescriptor).stream().forEach(submodelDescriptor -> deregisterSubmodel(aasDescriptor, submodelDescriptor));
+		if(!shouldDeregisterAAS(aasDescriptor.getIdentifier())) {
+			return;
+		}
+		
+		Set<String> set = addSubmodelIdToSet(aasDescriptor);
+		
+		getSubmodelDescriptors(aasDescriptor).stream().forEach(submodelDescriptor -> deregisterSubmodel(aasDescriptor, submodelDescriptor, set));
 		
 		deregisterAAS(aasDescriptor);
 	}
+
+	private boolean shouldDeregisterAAS(IIdentifier identifier) {
+		try {
+			aggregator.getAAS(identifier);
+			return true;
+		} catch(ResourceNotFoundException e) {
+			logger.info("The AAS '" + identifier.getId() + "' is not found in Aggregator");
+			return false;
+		}
+	}
 	
+	private Set<String> addSubmodelIdToSet(AASDescriptor aasDescriptor) {
+		List<ISubmodel> submodels = getSubmodelFromAggregator(aggregator, aasDescriptor.getIdentifier());
+		
+		return putSubmodelId(submodels);
+	}
+	
+	private Set<String> putSubmodelId(List<ISubmodel> submodels) {
+		Set<String> set = new HashSet<>();
+		
+		submodels.stream().forEach(submodel -> addToSet(submodel, set));
+		
+		return set;
+	}
+
+	private void addToSet(ISubmodel submodel, Set<String> set) {
+		set.add(submodel.getIdentification().getId());
+	}
+
 	private List<SubmodelDescriptor> getSubmodelDescriptors(AASDescriptor aasDesc) {
 		return registry.lookupSubmodels(aasDesc.getIdentifier());
 	}
 	
-	private void deregisterSubmodel(AASDescriptor aasDescriptor, SubmodelDescriptor submodelDescriptor) {
+	private void deregisterSubmodel(AASDescriptor aasDescriptor, SubmodelDescriptor submodelDescriptor, Set<String> set) {
+		if(!shouldDeregisterSubmodel(submodelDescriptor, set)) {
+			return;
+		}
+		
 		try {
 			registry.delete(aasDescriptor.getIdentifier(), submodelDescriptor.getIdentifier());
 			logger.info("The SM '" + submodelDescriptor.getIdShort() + "' successfully deregistered.");
@@ -350,7 +391,11 @@ public class AASServerComponent implements IComponent {
 			logger.info("The SM '" + submodelDescriptor.getIdShort() + "' can't be deregistered. It was not found in registry.");
 		}
 	}
-	
+
+	private boolean shouldDeregisterSubmodel(SubmodelDescriptor submodelDescriptor, Set<String> set) {
+		return set.contains(submodelDescriptor.getIdentifier().getId());
+	}
+
 	private void deregisterAAS(AASDescriptor aasDescriptor) {
 		try {
 			registry.delete(aasDescriptor.getIdentifier());
