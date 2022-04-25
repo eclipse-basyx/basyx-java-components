@@ -1,0 +1,7 @@
+[
+  {
+    "datasource": "timer1",
+    "transformers": ["jsonataA"],
+    "datasinks": ["prometheussource", "ConnectedSubmodel/ConnectedPropertyB"]
+  }
+]

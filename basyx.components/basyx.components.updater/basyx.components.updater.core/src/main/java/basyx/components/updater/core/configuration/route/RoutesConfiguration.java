@@ -16,10 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import basyx.components.updater.core.configuration.DataSinkConfiguration;
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
-import basyx.components.updater.core.configuration.DataTransformerConfiguration;
-import basyx.components.updater.core.configuration.DelegatorConfiguration;
+import basyx.components.updater.core.configuration.*;
 
 /**
  * An implementation of configurations of all the routes 
@@ -115,7 +112,7 @@ public class RoutesConfiguration {
 	public void addDatasink(DataSinkConfiguration datasink) {
 		this.datasinks.put(datasink.getUniqueId(), datasink);
 	}
-	
+
 	public Map<String, DelegatorConfiguration> getDelegators() {
 		return delegators;
 	}

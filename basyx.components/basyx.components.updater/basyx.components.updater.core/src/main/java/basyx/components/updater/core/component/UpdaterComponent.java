@@ -145,7 +145,7 @@ public class UpdaterComponent implements IComponent {
 		return new RoutesConfiguration(
 				configuration.getDatasources(), 
 				configuration.getTransformers(), 
-				configuration.getDatasinks(), 
+				configuration.getDatasinks(),
 				configuration.getDelegators(),
 				new ArrayList<RouteConfiguration>()
 			);
