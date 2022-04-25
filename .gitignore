@@ -62,3 +62,6 @@ launchSettings.json
 .project
 *.pubxml
 Properties
+
+.idea
+*.iml

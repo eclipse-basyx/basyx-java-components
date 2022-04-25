@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.sql;
 
@@ -17,9 +32,10 @@ import java.util.stream.Collectors;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 
 /**
- * This is a map implementation for a {@literal <String, AASDescriptor>} map which is needed
- * by map registries. It is based on an arbitrary {@literal <String, Object>} map and provides a proxy
- * access to that map by assuming AASDescriptor entries.
+ * This is a map implementation for a {@literal <String, AASDescriptor>} map
+ * which is needed by map registries. It is based on an arbitrary
+ * {@literal <String, Object>} map and provides a proxy access to that map by
+ * assuming AASDescriptor entries.
  * 
  * @author espen
  *
@@ -104,35 +120,32 @@ public class AASDescriptorMap implements Map<String, AASDescriptor> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<AASDescriptor> values() {
-		return baseMap.values().stream()
-				.map(o -> new AASDescriptor((Map<String, Object>) o))
-				.collect(Collectors.toList());
+		return baseMap.values().stream().map(o -> new AASDescriptor((Map<String, Object>) o)).collect(Collectors.toList());
 	}
 
 	@Override
 	public Set<Entry<String, AASDescriptor>> entrySet() {
-		return baseMap.entrySet().stream()
-				.map(e -> new Entry<String, AASDescriptor>() {
-					@Override
-					public AASDescriptor setValue(AASDescriptor value) {
-						return (AASDescriptor) e.setValue(value);
-					}
+		return baseMap.entrySet().stream().map(e -> new Entry<String, AASDescriptor>() {
+			@Override
+			public AASDescriptor setValue(AASDescriptor value) {
+				return (AASDescriptor) e.setValue(value);
+			}
 
-					@SuppressWarnings("unchecked")
-					@Override
-					public AASDescriptor getValue() {
-						if (e.getValue() == null) {
-							return null;
-						} else {
-							return new AASDescriptor((Map<String, Object>) e.getValue());
-						}
-					}
+			@SuppressWarnings("unchecked")
+			@Override
+			public AASDescriptor getValue() {
+				if (e.getValue() == null) {
+					return null;
+				} else {
+					return new AASDescriptor((Map<String, Object>) e.getValue());
+				}
+			}
 
-					@Override
-					public String getKey() {
-						return e.getKey();
-					}
-				}).collect(Collectors.toSet());
+			@Override
+			public String getKey() {
+				return e.getKey();
+			}
+		}).collect(Collectors.toSet());
 	}
 
 }

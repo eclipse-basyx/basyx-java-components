@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components.docker</artifactId>
-		<version>1.0.2</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<artifactId>basyx.components.AASServer</artifactId>
 	<name>AAS Server</name>
-  
-  	<properties>
-		<!--  
-			basyx.components.executable is the executable class with the definition of the public void main(String[]).
-			It is needed when building the jar in the maven-jar-plugin (see basyx.components.docker/pom.xml) 
-		-->
+
+	<properties>
+		<!-- basyx.components.executable is the executable class with the definition 
+			of the public void main(String[]). It is needed when building the jar in 
+			the maven-jar-plugin (see basyx.components.docker/pom.xml) -->
 		<basyx.components.executable>org.eclipse.basyx.components.aas.executable.AASServerExecutable</basyx.components.executable>
 	</properties>
-  
+
 	<packaging>jar</packaging>
-	
+
 	<!-- Define additional plugins that are not included by default -->
 	<!-- Plugin configuration is done in parent project(s) -->
 	<build>
@@ -36,23 +36,24 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
-			
-			<!-- Generate separate jar for tests and exclude logback.xml from generated jars -->
+
+			<!-- Generate separate jar for tests and exclude logback.xml from generated 
+				jars -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
-	
-			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java excluding HTTP and TCP tests) -->
+
+			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java 
+				excluding HTTP and TCP tests) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
 				<configuration>
 					<source>8</source>
 				</configuration>
@@ -68,29 +69,29 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<!-- Use MongoDB Java Drivers for db connections -->
-	    <dependency>
-	        <groupId>org.mongodb</groupId>
-	        <artifactId>mongodb-driver-sync</artifactId>
-	        <version>4.0.5</version>
-	    </dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-sync</artifactId>
+			<version>4.2.3</version>
+		</dependency>
 
-		<!-- Use Spring Data MongoDB for db data management -->		
+		<!-- Use Spring Data MongoDB for db data management -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.0.1.RELEASE</version>
+			<version>3.2.6</version>
 		</dependency>
-		
+
 		<!-- Adds additional classes of the BaSys SDK for tests -->
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.sdk</artifactId>
 			<classifier>tests</classifier>
 		</dependency>
-		
+
 		<!-- Used for reading .aasx files -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -98,20 +99,32 @@
 			<version>4.1.2</version>
 		</dependency>
 
+		<!-- Moquette MQTT broker for testing MQTT events -->
+		<dependency>
+			<groupId>io.moquette</groupId>
+			<artifactId>moquette-broker</artifactId>
+			<version>0.15</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.registry</artifactId>
-			<version>1.0.3</version>
+			<version>1.1.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<profiles>
 		<profile>
-			<!-- 
-				"Docker" profile - do not build & install docker images by default
-				Run "mvn install -Pdocker" in order to include docker  
-			-->
+			<!-- "Docker" profile - do not build & install docker images by default 
+				Run "mvn install -Pdocker" in order to include docker -->
 			<id>docker</id>
 			<build>
 				<plugins>
@@ -120,34 +133,34 @@
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>properties-maven-plugin</artifactId>
 					</plugin>
-				
+
 					<!-- Copy the dependencies necessary to run the jar -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 					</plugin>
-				
+
 					<!-- Build the docker image -->
 					<plugin>
 						<groupId>com.spotify</groupId>
 						<artifactId>dockerfile-maven-plugin</artifactId>
 					</plugin>
-				
+
 					<!-- Create integration test environment -->
 					<plugin>
 						<groupId>com.dkanejs.maven.plugins</groupId>
 						<artifactId>docker-compose-maven-plugin</artifactId>
 					</plugin>
-					
+
 					<!-- Run integration tests -->
-					<plugin>    
+					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>MavenCentral</id>
 			<build>
@@ -157,7 +170,7 @@
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 					</plugin>
-					
+
 					<!-- Signing the artifacts -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>

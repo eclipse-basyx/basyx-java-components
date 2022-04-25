@@ -1,24 +1,40 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -28,12 +44,17 @@ import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
+import org.eclipse.basyx.submodel.metamodel.map.qualifier.qualifiable.Qualifier;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
+import org.eclipse.basyx.submodel.restapi.OperationProvider;
+import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
+import org.eclipse.basyx.testsuite.regression.vab.gateway.ConnectorProviderStub;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
+import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,17 +67,23 @@ import org.xml.sax.SAXException;
  *
  */
 public class TestMongoDBServer extends AASServerSuite {
-
 	private static final Identifier SM_IDENTIFICATION = new Identifier(IdentifierType.CUSTOM, "MongoDBId");
 	private static final String SM_IDSHORT = "MongoDB";
+
+	private static final String DELEGATE_OP_ID_SHORT = "delegateOp";
+	private static final String DELEGATE_OP_INVOKE_PATH = "delegateOp/invoke";
+	private static final String OP_ID_SHORT = "op";
+
 	private static AASServerComponent component;
 	private static BaSyxMongoDBConfiguration mongoDBConfig;
 	private static BaSyxContextConfiguration contextConfig;
 	private static BaSyxAASServerConfiguration aasConfig;
 
+	private boolean executed = false;
+
 	@Override
 	protected String getURL() {
-		return component.getURL() + "/shells";
+		return component.getURL();
 	}
 
 	@BeforeClass
@@ -67,6 +94,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		component.startComponent();
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void resetMongoDBTestData() {
 		new MongoDBAASAggregator(mongoDBConfig).reset();
 	}
@@ -84,11 +112,19 @@ public class TestMongoDBServer extends AASServerSuite {
 	public void testAddSubmodelPersistency() throws Exception {
 		createAssetAdministrationShell();
 		createSubmodel();
-
 		checkIfSubmodelHasBeenPersisted(SM_IDENTIFICATION);
 		checkSubmodelReferencesSize(1);
 	}
 
+	@Test
+	public void testDeleteSubmodelPersistency() {
+		createAssetAdministrationShell();
+		createSubmodel();
+		deleteSubmodel();
+		checkSubmodelReferencesSize(0);
+	}
+
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testAggregatorPersistency() throws Exception {
 		createAssetAdministrationShell();
@@ -101,12 +137,25 @@ public class TestMongoDBServer extends AASServerSuite {
 	}
 
 	@Test
-	public void testDeleteSubmodelPersistency() {
+	public void testInvokeDelegatedOperation() {
 		createAssetAdministrationShell();
 		createSubmodel();
 
-		deleteSubmodel();
-		checkSubmodelReferencesSize(0);
+		Operation op = new Operation(OP_ID_SHORT);
+		op.setInvokable((Runnable) -> {
+			executed = true;
+		});
+		OperationProvider opProvider = new OperationProvider(new VABMapProvider(op));
+
+		ConnectorProviderStub connector = new ConnectorProviderStub();
+		connector.addMapping(OP_ID_SHORT, opProvider);
+
+		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(mongoDBConfig, SM_IDENTIFICATION.getId(), new DelegatedInvocationManager(connector));
+
+		executed = false;
+		api.invokeOperation(DELEGATE_OP_INVOKE_PATH);
+
+		assertTrue(executed);
 	}
 
 	private void checkIfSubmodelHasBeenPersisted(Identifier smIdentification) {
@@ -116,14 +165,14 @@ public class TestMongoDBServer extends AASServerSuite {
 	}
 
 	private void checkSubmodelReferencesSize(int expectedSize) {
-		MongoDBAASAPI aasAPI = new MongoDBAASAPI(mongoDBConfig, aasId);
+		MongoDBAASAPI aasAPI = new MongoDBAASAPI(mongoDBConfig, shellIdentifier.getId());
 		Collection<IReference> submodelReferences = aasAPI.getAAS().getSubmodelReferences();
 		assertEquals(expectedSize, submodelReferences.size());
 	}
 
 	@SuppressWarnings("unchecked")
 	private ISubmodel getSubmodelFromAggregator(MongoDBAASAggregator aggregator) {
-		IModelProvider aasProvider = aggregator.getAASProvider(new ModelUrn(aasId));
+		IModelProvider aasProvider = aggregator.getAASProvider(shellIdentifier);
 		Object smObject = aasProvider.getValue("/aas/submodels/MongoDB/submodel");
 		ISubmodel persistentSM = Submodel.createAsFacade((Map<String, Object>) smObject);
 		return persistentSM;
@@ -131,17 +180,21 @@ public class TestMongoDBServer extends AASServerSuite {
 
 	private void createSubmodel() {
 		Submodel sm = new Submodel(SM_IDSHORT, SM_IDENTIFICATION);
-		manager.createSubmodel(new ModelUrn(aasId), sm);
+		Operation delegateOp = new Operation(DELEGATE_OP_ID_SHORT);
+		Qualifier qualifier = DelegatedInvocationManager.createDelegationQualifier(OP_ID_SHORT);
+		delegateOp.setQualifiers(Arrays.asList(qualifier));
+		sm.addSubmodelElement(delegateOp);
+
+		manager.createSubmodel(shellIdentifier, sm);
 	}
 
 	private void deleteSubmodel() {
-		manager.deleteSubmodel(new ModelUrn(aasId), SM_IDENTIFICATION);
+		manager.deleteSubmodel(shellIdentifier, SM_IDENTIFICATION);
 	}
 
 	private void createAssetAdministrationShell() {
 		AssetAdministrationShell shell = new AssetAdministrationShell();
-		IIdentifier identifier = new ModelUrn(aasId);
-		shell.setIdentification(identifier);
+		shell.setIdentification(shellIdentifier);
 		shell.setIdShort("aasIdShort");
 		manager.createAAS(shell, getURL());
 	}

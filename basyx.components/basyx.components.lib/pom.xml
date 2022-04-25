@@ -1,18 +1,19 @@
-	<project xmlns="http://maven.apache.org/POM/4.0.0"
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components</artifactId>
-		<version>1.0.2</version>
-    </parent>
-	
+		<version>1.1.0</version>
+	</parent>
+
 	<artifactId>basyx.components.lib</artifactId>
 	<name>BaSyx Components Library</name>
-	
+
 	<packaging>jar</packaging>
-	
+
 	<!-- Define additional plugins that are not included by default -->
 	<build>
 		<plugins>
@@ -26,14 +27,16 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
-			
-			<!-- Generate separate jar for tests and exclude logback.xml from generated jars -->
+
+			<!-- Generate separate jar for tests and exclude logback.xml from generated 
+				jars -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
-	
-			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java excluding HTTP and TCP tests) -->
+
+			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java 
+				excluding HTTP and TCP tests) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -44,11 +47,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
 				<configuration>
 					<source>8</source>
 				</configuration>
@@ -64,31 +66,25 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<!-- PostgreSQL SQL Database -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.2</version>
+			<version>42.2.23</version>
 		</dependency>
-		
+
 		<dependency>
-  			<groupId>org.camunda.bpm</groupId>
-  			<artifactId>camunda-engine</artifactId>
-  			<version>7.15.0</version>
+			<groupId>org.camunda.bpm</groupId>
+			<artifactId>camunda-engine</artifactId>
+			<version>7.15.0</version>
 		</dependency>
-		
+
 		<dependency>
-      		<groupId>org.camunda.bpm.model</groupId>
-      		<artifactId>camunda-bpmn-model</artifactId>
-      		<version>7.15.0</version>
-    	</dependency>
-		<!-- Handles resources & files -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.6</version>
+			<groupId>org.camunda.bpm.model</groupId>
+			<artifactId>camunda-bpmn-model</artifactId>
+			<version>7.15.0</version>
 		</dependency>
 
 		<dependency>
@@ -98,17 +94,17 @@
 		</dependency>
 
 		<dependency>
-	        <groupId>com.zaxxer</groupId>
-	        <artifactId>HikariCP</artifactId>
-	        <version>3.4.5</version>
-	    </dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>3.4.5</version>
+		</dependency>
 
 		<!-- Add BaSys SDK -->
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.sdk</artifactId>
 		</dependency>
-		
+
 		<!-- Adds additional classes of the BaSys SDK for tests -->
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
@@ -116,8 +112,8 @@
 			<classifier>tests</classifier>
 		</dependency>
 	</dependencies>
-	
-	
+
+
 	<profiles>
 		<profile>
 			<id>MavenCentral</id>
@@ -128,7 +124,7 @@
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 					</plugin>
-					
+
 					<!-- Signing the artifacts -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>

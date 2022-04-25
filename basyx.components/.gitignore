@@ -67,3 +67,5 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+
+basyx.components.docker/basyx.components.AASServer/test.aasx

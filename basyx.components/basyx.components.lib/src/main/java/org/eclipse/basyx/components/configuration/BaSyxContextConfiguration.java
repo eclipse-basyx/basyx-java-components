@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
@@ -14,10 +29,11 @@ import java.util.Map;
 
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
- * Represents a BaSyx http servlet configuration for a BaSyxContext,
- * that can be loaded from a properties file.
+ * Represents a BaSyx http servlet configuration for a BaSyxContext, that can be
+ * loaded from a properties file.
  * 
  * @author espen
  *
@@ -37,6 +53,13 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public static final String HOSTNAME = "contextHostname";
 	public static final String PORT = "contextPort";
 
+	public static final String SSL_KEY_STORE_LOCATION = "sslKeyStoreLocation";
+	public static final String SSL_KEY_PASSWORD = "sslKeyPass";
+
+	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI = "jwtBearerTokenAuthenticationIssuerUri";
+	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI = "jwtBearerTokenAuthenticationJwkSetUri";
+	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD = "jwtBearerTokenAuthenticationRequiredAud";
+
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "context.properties";
 
@@ -49,6 +72,9 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		defaultProps.put(DOCBASE, DEFAULT_DOCBASE);
 		defaultProps.put(HOSTNAME, DEFAULT_HOSTNAME);
 		defaultProps.put(PORT, Integer.toString(DEFAULT_PORT));
+		defaultProps.put(SSL_KEY_STORE_LOCATION, null);
+		defaultProps.put(SSL_KEY_PASSWORD, null);
+
 		return defaultProps;
 	}
 
@@ -67,10 +93,13 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * Constructor with initial configuration - docBasePath and hostname are default values
+	 * Constructor with initial configuration - docBasePath and hostname are default
+	 * values
 	 * 
-	 * @param port        The port that will be occupied
-	 * @param contextPath The subpath for this context
+	 * @param port
+	 *            The port that will be occupied
+	 * @param contextPath
+	 *            The subpath for this context
 	 */
 	public BaSyxContextConfiguration(int port, String contextPath) {
 		this();
@@ -79,12 +108,17 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * Constructor with initial configuration - docBasePath and hostname are default values
+	 * Constructor with initial configuration - docBasePath and hostname are default
+	 * values
 	 * 
-	 * @param contextPath The subpath for this context
-	 * @param docBasePath The local base path for the documents
-	 * @param hostname    The hostname
-	 * @param port        The port that will be occupied
+	 * @param contextPath
+	 *            The subpath for this context
+	 * @param docBasePath
+	 *            The local base path for the documents
+	 * @param hostname
+	 *            The hostname
+	 * @param port
+	 *            The port that will be occupied
 	 */
 	public BaSyxContextConfiguration(String contextPath, String docBasePath, String hostname, int port) {
 		this();
@@ -95,7 +129,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { CONTEXTPATH, DOCBASE, HOSTNAME, PORT };
+		String[] properties = { CONTEXTPATH, DOCBASE, HOSTNAME, PORT, JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI, JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI, JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -108,8 +142,36 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		String reqContextPath = getContextPath();
 		String reqDocBasePath = getDocBasePath();
 		String hostName = getHostname();
+		Boolean isSecuredCon = isSecureConnection();
+		String sslKeyStoreLocation = getSSLKeyStoreLocation();
+		String sslKeyPass = getSSLKeyPassword();
 		int reqPort = getPort();
-		return new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
+
+		final BaSyxContext baSyxContext;
+		if (!isSecuredCon) {
+			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort);
+		} else {
+			baSyxContext = new BaSyxContext(reqContextPath, reqDocBasePath, hostName, reqPort, isSecuredCon, sslKeyStoreLocation, sslKeyPass);
+		}
+
+		if (atLeastOneJwtPropertyIsSet()) {
+			configureJwtAuthentication(baSyxContext);
+		}
+
+		return baSyxContext;
+	}
+
+	private Boolean isSecureConnection() {
+		return (getSSLKeyStoreLocation() != null && getSSLKeyPassword() != null);
+	}
+
+	private boolean atLeastOneJwtPropertyIsSet() {
+		return getJwtBearerTokenAuthenticationIssuerUri() != null || getJwtBearerTokenAuthenticationJwkSetUri() != null || getJwtBearerTokenAuthenticationRequiredAud() != null;
+	}
+
+	private void configureJwtAuthentication(final BaSyxContext baSyxContext) {
+		baSyxContext.setJwtBearerTokenAuthenticationConfiguration(
+				JwtBearerTokenAuthenticationConfiguration.of(getJwtBearerTokenAuthenticationIssuerUri(), getJwtBearerTokenAuthenticationJwkSetUri(), getJwtBearerTokenAuthenticationRequiredAud()));
 	}
 
 	public String getContextPath() {
@@ -144,13 +206,60 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		setProperty(PORT, Integer.toString(port));
 	}
 
+	public String getSSLKeyPassword() {
+		return getProperty(SSL_KEY_PASSWORD);
+	}
+
+	public void setSSLKeyPassword(String sslKeyPass) {
+		setProperty(SSL_KEY_PASSWORD, sslKeyPass);
+	}
+
+	public String getSSLKeyStoreLocation() {
+		return getProperty(SSL_KEY_STORE_LOCATION);
+	}
+
+	public void setSSLKeyStoreLocation(String sslKeyStoreLocation) {
+		setProperty(SSL_KEY_STORE_LOCATION, sslKeyStoreLocation);
+	}
+
+	public String getJwtBearerTokenAuthenticationIssuerUri() {
+		return getProperty(JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI);
+	}
+
+	public void setJwtBearerTokenAuthenticationIssuerUri(String jwtBearerAuthIssuerUri) {
+		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI, jwtBearerAuthIssuerUri);
+	}
+
+	public String getJwtBearerTokenAuthenticationJwkSetUri() {
+		return getProperty(JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI);
+	}
+
+	public void setJwtBearerTokenAuthenticationJwkSetUri(String jwtBearerAuthJwkSetUri) {
+		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI, jwtBearerAuthJwkSetUri);
+	}
+
+	public String getJwtBearerTokenAuthenticationRequiredAud() {
+		return getProperty(JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD);
+	}
+
+	public void setJwtBearerTokenAuthenticationRequiredAud(String jwtBearerAuthRequiredAud) {
+		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD, jwtBearerAuthRequiredAud);
+	}
+
 	public String getUrl() {
 		String contextPath = getContextPath();
-		String base = "http://" + getHostname() + ":" + getPort();
+		String base = getProtocol() + getHostname() + ":" + getPort();
 		if (contextPath.isEmpty()) {
 			return base;
 		} else {
 			return VABPathTools.concatenatePaths(base, contextPath);
 		}
+	}
+
+	private String getProtocol() {
+		if (isSecureConnection()) {
+			return "https://";
+		}
+		return "http://";
 	}
 }

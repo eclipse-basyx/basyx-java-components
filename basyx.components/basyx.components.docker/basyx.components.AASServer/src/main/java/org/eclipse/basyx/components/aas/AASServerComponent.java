@@ -1,55 +1,82 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.aas;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.eclipse.basyx.aas.aggregator.AASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
+import org.eclipse.basyx.aas.bundle.AASBundle;
+import org.eclipse.basyx.aas.bundle.AASBundleHelper;
+import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
+import org.eclipse.basyx.aas.factory.aasx.FileLoaderHelper;
+import org.eclipse.basyx.aas.factory.aasx.SubmodelFileEndpointLoader;
+import org.eclipse.basyx.aas.factory.json.JSONAASBundleFactory;
+import org.eclipse.basyx.aas.factory.xml.XMLAASBundleFactory;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.aas.restapi.vab.VABAASAPIFactory;
 import org.eclipse.basyx.components.IComponent;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
+import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
+import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
-import org.eclipse.basyx.components.aas.aasx.SubmodelFileEndpointLoader;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
-import org.eclipse.basyx.components.aas.mqtt.MqttSubmodelAPIFactory;
+import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
+import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
-import org.eclipse.basyx.components.json.JSONAASBundleFactory;
-import org.eclipse.basyx.components.xml.XMLAASBundleFactory;
+import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
-import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
-import org.eclipse.basyx.support.bundle.AASBundle;
-import org.eclipse.basyx.support.bundle.AASBundleDescriptorFactory;
-import org.eclipse.basyx.support.bundle.AASBundleHelper;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
+import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -58,10 +85,11 @@ import org.xml.sax.SAXException;
  * Component providing an empty AAS server that is able to receive AAS/SMs from
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
  * ${URL}/shells
- * 
- * @author schnicke, espen
+ *
+ * @author schnicke, espen, fried, fischer
  *
  */
+@SuppressWarnings("deprecation")
 public class AASServerComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(AASServerComponent.class);
 
@@ -73,10 +101,14 @@ public class AASServerComponent implements IComponent {
 	private BaSyxContextConfiguration contextConfig;
 	private BaSyxAASServerConfiguration aasConfig;
 	private BaSyxMongoDBConfiguration mongoDBConfig;
-	private BaSyxMqttConfiguration mqttConfig;
+
+	private List<IAASServerFeature> aasServerFeatureList = new ArrayList<IAASServerFeature>();
 
 	// Initial AASBundle
 	protected Collection<AASBundle> aasBundles;
+
+	// Watcher for AAS Aggregator functionality
+	private boolean isAASXUploadEnabled = false;
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -97,8 +129,7 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Constructs an empty AAS server using the passed configuration
 	 */
-	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig,
-			BaSyxMongoDBConfiguration mongoDBConfig) {
+	public AASServerComponent(BaSyxContextConfiguration contextConfig, BaSyxAASServerConfiguration aasConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
 		this.aasConfig = aasConfig;
 		this.aasConfig.setAASBackend(AASServerBackend.MONGODB);
@@ -106,25 +137,44 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
-	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is
-	 * started. Currently only works for InMemory backend.
-	 * 
+	 * Sets and enables mqtt connection configuration for this component. Has to be
+	 * called before the component is started. Currently only works for InMemory
+	 * backend.
+	 *
 	 * @param configuration
+	 * 
+	 * @deprecated Add MQTT via {@link MqttAASServerFeature} instead.
 	 */
+	@Deprecated
 	public void enableMQTT(BaSyxMqttConfiguration configuration) {
-		this.mqttConfig = configuration;
+		aasServerFeatureList.add(new MqttAASServerFeature(configuration, getMqttSubmodelClientId()));
 	}
 
 	/**
-	 * Disables mqtt configuration. Has to be called before the component is started.
+	 * Disables mqtt configuration. Has to be called before the component is
+	 * started.
+	 * 
+	 * @deprecated remove MQTT from the feature list instead.
 	 */
+	@Deprecated
 	public void disableMQTT() {
-		this.mqttConfig = null;
+		aasServerFeatureList.forEach(f -> {
+			if (f instanceof MqttAASServerFeature) {
+				aasServerFeatureList.remove(f);
+			}
+		});
+	}
+
+	/**
+	 * Enables AASX upload functionality
+	 */
+	public void enableAASXUpload() {
+		this.isAASXUploadEnabled = true;
 	}
 
 	/**
 	 * Sets a registry service for registering AAS that are created during startup
-	 * 
+	 *
 	 * @param registry
 	 */
 	public void setRegistry(IAASRegistry registry) {
@@ -137,14 +187,13 @@ public class AASServerComponent implements IComponent {
 	@Override
 	public void startComponent() {
 		logger.info("Create the server...");
-		// Load the aggregator servlet
-		createRegistryFromUrl();
-		AASAggregatorServlet aggregatorServlet = loadAggregatorServlet();
+		registry = createRegistryFromConfig(aasConfig);
 
-		// Init HTTP context and add an XMLAASServlet according to the configuration
+		loadAASServerFeaturesFromConfig();
+		initializeAASServerFeatures();
+
 		BaSyxContext context = contextConfig.createBaSyxContext();
-		context.addServletMapping("/*", aggregatorServlet);
-
+		context.addServletMapping("/*", createAggregatorServlet());
 
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
@@ -155,7 +204,7 @@ public class AASServerComponent implements IComponent {
 			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
 
 			// 3. Register the initial AAS
-			registerAAS();
+			registerEnvironment();
 		}
 
 		logger.info("Start the server");
@@ -163,9 +212,25 @@ public class AASServerComponent implements IComponent {
 		server.start();
 	}
 
+	private void loadAASServerFeaturesFromConfig() {
+		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
+			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
+			mqttConfig.loadFromDefaultSource();
+			addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
+		}
+
+		if (aasConfig.isAuthorizationEnabled()) {
+			addAASServerFeature(new AuthorizedAASServerFeature());
+		}
+
+		if (aasConfig.isAASXUploadEnabled()) {
+			enableAASXUpload();
+		}
+	}
+
 	/**
 	 * Retrieves the URL on which the component is providing its HTTP server
-	 * 
+	 *
 	 * @return
 	 */
 	public String getURL() {
@@ -174,128 +239,260 @@ public class AASServerComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
-		
+
 		// Remove all AASs/SMs that were registered on startup
 		AASBundleHelper.deregister(registry, aasBundles);
-		
+		cleanUpAASServerFeatures();
+
 		server.shutdown();
+	}
+
+	public void addAASServerFeature(IAASServerFeature aasServerFeature) {
+		aasServerFeatureList.add(aasServerFeature);
+	}
+
+	private void initializeAASServerFeatures() {
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerFeature.initialize();
+		}
+	}
+
+	private void cleanUpAASServerFeatures() {
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerFeature.cleanUp();
+		}
 	}
 
 	private String loadBundleString(String filePath) throws IOException {
 		String content;
 		try {
-			content = new String(Files.readAllBytes(Paths.get(filePath)));
+			content = IOUtils.toString(FileLoaderHelper.getInputStream(filePath), StandardCharsets.UTF_8.name());
 		} catch (IOException e) {
 			logger.info("Could not find a corresponding file. Loading from default resource.");
 			content = BaSyxConfiguration.getResourceString(filePath);
 		}
+
 		return content;
 	}
 
-	private void loadBundleFromXML(String xmlPath) throws IOException, ParserConfigurationException, SAXException {
+	private Set<AASBundle> loadBundleFromXML(String xmlPath) throws IOException, ParserConfigurationException, SAXException {
 		logger.info("Loading aas from xml \"" + xmlPath + "\"");
 		String xmlContent = loadBundleString(xmlPath);
-		this.aasBundles = new XMLAASBundleFactory(xmlContent).create();
+
+		return new XMLAASBundleFactory(xmlContent).create();
 	}
 
-	private void loadBundleFromJSON(String jsonPath) throws IOException {
+	private Set<AASBundle> loadBundleFromJSON(String jsonPath) throws IOException {
 		logger.info("Loading aas from json \"" + jsonPath + "\"");
 		String jsonContent = loadBundleString(jsonPath);
-		this.aasBundles = new JSONAASBundleFactory(jsonContent).create();
+
+		return new JSONAASBundleFactory(jsonContent).create();
 	}
 
-	private void loadBundleFromAASX(String aasxPath)
-			throws IOException, ParserConfigurationException, SAXException, URISyntaxException, InvalidFormatException {
+	private static Set<AASBundle> loadBundleFromAASX(String aasxPath) throws IOException, ParserConfigurationException, SAXException, InvalidFormatException, URISyntaxException {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
-		AASXPackageManager packageManager = new AASXPackageManager(aasxPath);
+		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
 
 		// Unpack the files referenced by the aas
 		packageManager.unzipRelatedFiles();
 
 		// Retrieve the aas from the package
-		this.aasBundles = packageManager.retrieveAASBundles();
+		return packageManager.retrieveAASBundles();
 	}
 
-	private AASAggregatorServlet loadAggregatorServlet() {
-		// Load the initial AAS bundles from given source
-		loadAASFromSource(aasConfig.getAASSource());
+	private VABHTTPInterface<?> createAggregatorServlet() {
+		IAASAggregator aggregator = createAASAggregator();
+		aasBundles = loadAASFromSource(aasConfig.getAASSourceAsList());
 
-		// Load the aggregator
-		IAASAggregator aggregator = loadAASAggregator();
-
-		// Integrate the loaded bundles into the aggregator
 		if (aasBundles != null) {
 			AASBundleHelper.integrate(aggregator, aasBundles);
 		}
 
-		// Return the servlet for the resulting aggregator
-		return new AASAggregatorServlet(aggregator);
+		if (isAASXUploadEnabled) {
+			return new AASAggregatorAASXUploadServlet(new AASAggregatorAASXUpload(aggregator));
+		} else {
+			return new AASAggregatorServlet(aggregator);
+		}
 	}
 
-	private void loadAASFromSource(String aasSource) {
-		if (aasSource.isEmpty()) {
-			return;
+	private IAASAggregator createAASAggregator() {
+		if (isMongoDBBackend()) {
+			return new MongoDBAASServerComponentFactory(createMongoDbConfiguration(), createAASServerDecoratorList(), registry).create();
+		}
+		return new InMemoryAASServerComponentFactory(createAASServerDecoratorList(), registry).create();
+	}
+
+	private boolean isMongoDBBackend() {
+		return aasConfig.getAASBackend().equals(AASServerBackend.MONGODB);
+	}
+
+	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {
+		BaSyxMongoDBConfiguration config;
+		if (this.mongoDBConfig == null) {
+			config = new BaSyxMongoDBConfiguration();
+			config.loadFromDefaultSource();
+		} else {
+			config = this.mongoDBConfig;
+		}
+		return config;
+	}
+
+	private List<IAASServerDecorator> createAASServerDecoratorList() {
+		List<IAASServerDecorator> aasServerDecoratorList = new ArrayList<IAASServerDecorator>();
+
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerDecoratorList.add(aasServerFeature.getDecorator());
 		}
 
+		return aasServerDecoratorList;
+	}
+
+	private Set<AASBundle> loadAASFromSource(List<String> aasSources) {
+		if (aasSources.isEmpty()) {
+			return Collections.emptySet();
+		}
+
+		Set<AASBundle> aasBundlesSet = new HashSet<>();
+
+		aasSources.stream().map(this::loadBundleFromFile).forEach(aasBundlesSet::addAll);
+
+		return aasBundlesSet;
+	}
+
+	private Set<AASBundle> loadBundleFromFile(String aasSource) {
 		try {
 			if (aasSource.endsWith(".aasx")) {
-				loadBundleFromAASX(aasSource);
+				return loadBundleFromAASX(aasSource);
 			} else if (aasSource.endsWith(".json")) {
-				loadBundleFromJSON(aasSource);
+				return loadBundleFromJSON(aasSource);
 			} else if (aasSource.endsWith(".xml")) {
-				loadBundleFromXML(aasSource);
+				return loadBundleFromXML(aasSource);
 			}
 		} catch (IOException | ParserConfigurationException | SAXException | URISyntaxException | InvalidFormatException e) {
 			logger.error("Could not load initial AAS from source '" + aasSource + "'");
-			logger.info("Starting empty server instead");
 		}
+
+		return Collections.emptySet();
 	}
 
 	/**
 	 * Only creates the registry, if it hasn't been set explicitly before
 	 */
-	private void createRegistryFromUrl() {
+	private IAASRegistry createRegistryFromConfig(BaSyxAASServerConfiguration aasConfig) {
 		if (this.registry != null) {
 			// Do not overwrite an explicitly set registry
-			return;
+			return this.registry;
+		}
+		String registryUrl = aasConfig.getRegistry();
+		if (registryUrl == null || registryUrl.isEmpty()) {
+			return null;
 		}
 		// Load registry url from config
-		String registryUrl = this.aasConfig.getRegistry();
-		if (registryUrl != null && !registryUrl.isEmpty()) {
-			registry = new AASRegistryProxy(registryUrl);
-			logger.info("Registry loaded at \"" + registryUrl + "\"");
-		}
+		logger.info("Registry loaded at \"" + registryUrl + "\"");
+		return new AASRegistryProxy(registryUrl);
+
 	}
 
-	private void registerAAS() {
-		if (registry != null) {
-			Set<AASDescriptor> descriptors = retrieveDescriptors(contextConfig.getUrl());
-			descriptors.stream().forEach(registry::register);
+	private void registerEnvironment() {
+		if (aasConfig.getSubmodels().isEmpty()) {
+			registerFullAAS();
 		} else {
-			logger.info("No registry specified, skipped registration");
+			registerSubmodelsFromWhitelist();
 		}
 	}
 
-	/**
-	 * Returns the set of AAS descriptors for the AAS contained in the AASX
-	 * 
-	 * @param hostBasePath
-	 *                     the path to the server; helper method for e.g. virtualization
-	 *                     environments
-	 * @return
-	 */
-	private Set<AASDescriptor> retrieveDescriptors(String hostBasePath) {
-		// Base path + aggregator accessor
-		final String fullBasePath = hostBasePath + "/" + AASAggregatorProvider.PREFIX;
+	private void registerSubmodelsFromWhitelist() {
+		logger.info("Register from whitelist");
+		List<AASDescriptor> descriptors = registry.lookupAll();
+		List<String> smWhitelist = aasConfig.getSubmodels();
+		for (String s : smWhitelist) {
+			updateSMEndpoint(s, descriptors);
+		}
+	}
 
-		return aasBundles.stream().map(b -> AASBundleDescriptorFactory.createAASDescriptor(b, fullBasePath))
-				.collect(Collectors.toSet());
+	private void registerFullAAS() {
+		if (registry == null) {
+			logger.info("No registry specified, skipped registration");
+			return;
+		}
+
+		String baseUrl = getComponentBasePath();
+		String aggregatorPath = VABPathTools.concatenatePaths(baseUrl, AASAggregatorProvider.PREFIX);
+		AASBundleHelper.register(registry, aasBundles, aggregatorPath);
+	}
+
+	private void updateSMEndpoint(String smId, List<AASDescriptor> descriptors) {
+		descriptors.forEach(desc -> {
+			Collection<SubmodelDescriptor> smDescriptors = desc.getSubmodelDescriptors();
+			SubmodelDescriptor smDescriptor = findSMDescriptor(smId, smDescriptors);
+			updateSMEndpoint(smDescriptor);
+			registry.register(desc.getIdentifier(), smDescriptor);
+		});
+	}
+
+	private void updateSMEndpoint(SubmodelDescriptor smDescriptor) {
+		String smEndpoint = getSMEndpoint(smDescriptor.getIdentifier());
+		String firstEndpoint = smDescriptor.getFirstEndpoint();
+		if (firstEndpoint.isEmpty()) {
+			smDescriptor.removeEndpoint("");
+		} else if (firstEndpoint.equals("/submodel")) {
+			smDescriptor.removeEndpoint("/submodel");
+		}
+		smDescriptor.addEndpoint(smEndpoint);
+	}
+
+	private SubmodelDescriptor findSMDescriptor(String smId, Collection<SubmodelDescriptor> smDescriptors) {
+		for (SubmodelDescriptor smDesc : smDescriptors) {
+			if (smDesc.getIdentifier().getId().equals(smId)) {
+				return smDesc;
+			}
+		}
+		return null;
+	}
+
+	private String getSMEndpoint(IIdentifier smId) {
+		String aasId = getAASIdFromSMId(smId);
+		String encodedAASId = VABPathTools.encodePathElement(aasId);
+		String aasBasePath = VABPathTools.concatenatePaths(getComponentBasePath(), encodedAASId, "aas");
+		String smIdShort = getSMIdShortFromSMId(smId);
+		return VABPathTools.concatenatePaths(aasBasePath, "submodels", smIdShort, "submodel");
+	}
+
+	private String getSMIdShortFromSMId(IIdentifier smId) {
+		for (AASBundle bundle : aasBundles) {
+			for (ISubmodel sm : bundle.getSubmodels()) {
+				if (smId.getId().equals(sm.getIdentification().getId())) {
+					return sm.getIdShort();
+				}
+			}
+		}
+		throw new ResourceNotFoundException("Submodel in registry whitelist not found in AASBundle");
+	}
+
+	private String getAASIdFromSMId(IIdentifier smId) {
+		for (AASBundle bundle : aasBundles) {
+			for (ISubmodel sm : bundle.getSubmodels()) {
+				if (smId.getId().equals(sm.getIdentification().getId())) {
+					return bundle.getAAS().getIdentification().getId();
+				}
+			}
+		}
+		throw new ResourceNotFoundException("Submodel in registry whitelist does not belong to any AAS in AASBundle");
+	}
+
+	private String getComponentBasePath() {
+		String basePath = aasConfig.getHostpath();
+		if (basePath.isEmpty()) {
+			return contextConfig.getUrl();
+		}
+		return basePath;
 	}
 
 	/**
-	 * Fixes the File submodel element value paths according to the given endpoint configuration
+	 * Fixes the File submodel element value paths according to the given endpoint
+	 * configuration
 	 */
 	private void modifyFilePaths(String hostName, int port, String rootPath) {
 		rootPath = rootPath + "/files";
@@ -307,40 +504,14 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	/**
-	 * Loads a aas aggregator servlet with a backend according to the configuration
-	 * 
-	 * @return
-	 */
-	private IAASAggregator loadAASAggregator() {
-		// Get aggregator according to backend config
-		AASServerBackend backendType = aasConfig.getAASBackend();
-		IAASAggregator aggregator = null;
-		if (backendType == AASServerBackend.INMEMORY && mqttConfig == null) {
-			logger.info("Using InMemory backend");
-			aggregator = new AASAggregator(registry);
-		} else if (backendType == AASServerBackend.INMEMORY && mqttConfig != null) {
-			logger.info("Using InMemory backend with MQTT providers");
-			IAASAPIFactory aasApiProvider = new VABAASAPIFactory();
-			ISubmodelAPIFactory smApiProvider = new MqttSubmodelAPIFactory(mqttConfig);
-			aggregator = new AASAggregator(aasApiProvider, smApiProvider, registry);
-		} else if ( backendType == AASServerBackend.MONGODB ) {
-			logger.info("Using MongoDB backend");
-			aggregator = loadMongoDBAggregator();
+	private String getMqttAASClientId() {
+		if (aasBundles == null || aasBundles.isEmpty()) {
+			return "defaultNoShellId";
 		}
-
-		return aggregator;
+		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
 	}
 
-	private IAASAggregator loadMongoDBAggregator() {
-		BaSyxMongoDBConfiguration config;
-		if (this.mongoDBConfig == null) {
-			config = new BaSyxMongoDBConfiguration();
-			config.loadFromDefaultSource();
-		} else {
-			config = this.mongoDBConfig;
-		}
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(config, registry);
-		return aggregator;
+	private String getMqttSubmodelClientId() {
+		return getMqttAASClientId() + "/submodelAggregator";
 	}
 }

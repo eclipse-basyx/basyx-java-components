@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.eclipse.basyx</groupId>
   <artifactId>basyx.tck</artifactId>
-  <version>1.0.2</version>
+  <version>1.1.0</version> 
   
   
   <packaging>pom</packaging>
@@ -111,13 +111,13 @@
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.0.2</version>
+				<version>1.1.0</version>
 			</dependency>
 			<!-- BaSyx SDK tests -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.0.2</version>
+				<version>1.1.0</version>
 				<classifier>tests</classifier>
 				<scope>test</scope>
 			</dependency>

@@ -2,50 +2,73 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>org.eclipse.basyx</groupId>
 	<artifactId>basyx.components</artifactId>
-	<version>1.0.2</version>
+	<version>1.1.0</version>
 	<name>BaSyx Components</name>
 	<description>BaSyx Off-the-Shelf Components</description>
 	<url>https://www.eclipse.org/basyx/</url>
 
 	<packaging>pom</packaging>
-	
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Eclipse BaSyx Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/eclipse-basyx/basyx-java-components</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<layout>default</layout>
+			<url>https://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<licenses>
 		<license>
-			<name>Eclipse Public License 2.0</name>
-			<url>https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt</url>
+			<name>MIT</name>
+			<url>https://opensource.org/licenses/MIT</url>
 		</license>
 	</licenses>
-	
+
 	<developers>
-        <developer>
-            <organization>Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V.</organization>
-            <id>fschnicke</id>
+		<developer>
+			<organization>Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V.</organization>
+			<id>fschnicke</id>
 			<name>Frank Schnicke</name>
 			<email>frank.schnicke@iese.fraunhofer.de</email>
-        </developer>
-    </developers>
-	
+		</developer>
+	</developers>
+
 	<scm>
 		<connection>scm:https://github.com/eclipse-basyx/basyx-java-components.git</connection>
 		<developerConnection>scm:https://github.com/eclipse-basyx/basyx-java-components.git</developerConnection>
 		<tag>HEAD</tag>
 		<url>https://github.com/eclipse-basyx/basyx-java-components</url>
 	</scm>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-	
+
 	<!-- Includes all components in this project as separated modules -->
 	<modules>
 		<module>basyx.components.lib</module>
 		<module>basyx.components.docker</module>
 	</modules>
-	
+
 	<build>
 		<!-- Specifies plugin settings that are common for all submodules -->
 		<pluginManagement>
@@ -60,7 +83,7 @@
 						<target>1.8</target>
 					</configuration>
 				</plugin>
-	
+
 				<!-- Attach sources to jar file -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -75,8 +98,9 @@
 						</execution>
 					</executions>
 				</plugin>
-				
-				<!-- Generate separate jar for tests and exclude logback.xml from generated jars -->
+
+				<!-- Generate separate jar for tests and exclude logback.xml from generated 
+					jars -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
@@ -94,8 +118,9 @@
 						</execution>
 					</executions>
 				</plugin>
-		
-				<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java excluding HTTP and TCP tests) -->
+
+				<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java 
+					excluding HTTP and TCP tests) -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
@@ -107,7 +132,7 @@
 						</excludes>
 					</configuration>
 				</plugin>
-	
+
 				<!-- Run integration tests (IT*.java, *IT.java and *ITCase.java) -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -122,7 +147,7 @@
 						</execution>
 					</executions>
 				</plugin>
-				
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
@@ -140,29 +165,29 @@
 						</execution>
 					</executions>
 				</plugin>
-				
+
 				<!-- Signing the artifacts -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
 					<version>1.6</version>
 					<executions>
-					  <execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-						  <goal>sign</goal>
-						</goals>
-						<configuration>
-						  <gpgArguments>
-							<arg>--pinentry-mode</arg>
-							<arg>loopback</arg>
-						  </gpgArguments>
-						</configuration>
-					  </execution>
+						<execution>
+							<id>sign-artifacts</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+							<configuration>
+								<gpgArguments>
+									<arg>--pinentry-mode</arg>
+									<arg>loopback</arg>
+								</gpgArguments>
+							</configuration>
+						</execution>
 					</executions>
 				</plugin>
-				
+
 				<!-- Upload to Maven Central -->
 				<plugin>
 					<groupId>org.sonatype.plugins</groupId>
@@ -175,10 +200,10 @@
 						<autoReleaseAfterClose>true</autoReleaseAfterClose>
 					</configuration>
 				</plugin>
-				
+
 			</plugins>
 		</pluginManagement>
-		
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -190,26 +215,40 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
-			
-			<!-- Generate separate jar for tests and exclude logback.xml from generated jars -->
+
+			<!-- Generate separate jar for tests and exclude logback.xml from generated 
+				jars -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
 
-			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java excluding HTTP and TCP tests) -->
+			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java 
+				excluding HTTP and TCP tests) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<source>8</source>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>javadoc</goal>
+						</goals>
+						<id>generate-javadoc</id>
+						<phase>package</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- Every submodule depends on these dependencies -->
 	<dependencies>
 		<!-- JUnit 4 for running JUnit tests -->
@@ -220,7 +259,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<!-- Specifies dependency settings for all submodules using these dependencies -->
 	<dependencyManagement>
 		<dependencies>
@@ -228,20 +267,20 @@
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.0.2</version>
+				<version>1.1.0</version>
 			</dependency>
-		
+
 			<!-- BaSyx SDK tests -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.0.2</version>
+				<version>1.1.0</version>
 				<classifier>tests</classifier>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<profiles>
 		<profile>
 			<id>MavenCentral</id>
@@ -262,7 +301,7 @@
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 					</plugin>
-					
+
 					<!-- Signing the artifacts -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -272,5 +311,5 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 </project>

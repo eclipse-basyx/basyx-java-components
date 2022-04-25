@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    
+
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components</artifactId>
-		<version>1.0.2</version>
-    </parent>
-	
+		<version>1.1.0</version>
+	</parent>
+
 	<artifactId>basyx.components.docker</artifactId>
 	<name>BaSyx Docker Base</name>
-	
+
 	<packaging>pom</packaging>
 
 	<!-- Includes all components in this project as separated modules -->
 	<modules>
 		<module>basyx.components.registry</module>
-    	<module>basyx.components.AASServer</module>
+		<module>basyx.components.AASServer</module>
 	</modules>
-	
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -42,7 +44,8 @@
 					</executions>
 				</plugin>
 
-				<!-- Generate separate jar for tests and exclude logback.xml from generated jars -->
+				<!-- Generate separate jar for tests and exclude logback.xml from generated 
+					jars -->
 				<!-- + create the executable jar -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -68,7 +71,7 @@
 						</executions>
 					</configuration>
 				</plugin>
-				
+
 				<!-- Copy the dependencies necessary to run the jar -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -87,7 +90,7 @@
 						</execution>
 					</executions>
 				</plugin>
-			
+
 				<!-- Build the docker image -->
 				<plugin>
 					<groupId>com.spotify</groupId>
@@ -117,7 +120,7 @@
 						</buildArgs>
 					</configuration>
 				</plugin>
-			
+
 				<!-- Create integration test environment -->
 				<plugin>
 					<groupId>com.dkanejs.maven.plugins</groupId>
@@ -152,10 +155,10 @@
 						</execution>
 					</executions>
 				</plugin>
-				
-				
+
+
 				<!-- Run integration tests -->
-				<plugin>    
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>2.20.1</version>
@@ -170,8 +173,8 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		
-		
+
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -183,37 +186,39 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
-			
-			<!-- Generate separate jar for tests and exclude logback.xml from generated jars -->
+
+			<!-- Generate separate jar for tests and exclude logback.xml from generated 
+				jars -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
-	
-			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java excluding HTTP and TCP tests) -->
+
+			<!-- Run unit tests (Test*.java, *Test.java, *Tests.java and *TestCase.java 
+				excluding HTTP and TCP tests) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
-	
-	<!--  Defines common dependencies for all docker components -->
+
+	<!-- Defines common dependencies for all docker components -->
 	<dependencies>
 		<!-- Depends on the components library -->
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>
-			<version>1.0.2</version>
+			<version>1.1.0</version>
 		</dependency>
 	</dependencies>
-	
-	
+
+
 	<profiles>
 		<profile>
 			<id>MavenCentral</id>
@@ -224,7 +229,7 @@
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 					</plugin>
-					
+
 					<!-- Signing the artifacts -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -235,5 +240,5 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 </project>
