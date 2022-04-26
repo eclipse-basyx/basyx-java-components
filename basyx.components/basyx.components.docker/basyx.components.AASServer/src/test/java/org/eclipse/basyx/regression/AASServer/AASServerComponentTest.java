@@ -298,26 +298,6 @@ public class AASServerComponentTest {
 		
 		stopAASServerComponent();
 	}
-	
-	@Rule
-	public ExpectedException exceptionRule = ExpectedException.none();
-	
-	@Test
-	public void checkIfAASandSMRegisteredAfterStartingAASServerComponentIsDeregisteredAfterComponentStop() {
-		setUp(EMPTY_STRING);
-		
-		doPresetting();
-		
-		startAASServerComponent();
-		
-		List<AASDescriptor> aasDescriptors = registry.lookupAll();
-		assertEquals(1, aasDescriptors.size());
-		
-		stopAASServerComponent();
-		
-		exceptionRule.expect(ResourceNotFoundException.class);
-		registry.lookupAAS(aasIdentifier);
-	}
 
 	public void stopAASServerComponent() {
 		component.stopComponent();
