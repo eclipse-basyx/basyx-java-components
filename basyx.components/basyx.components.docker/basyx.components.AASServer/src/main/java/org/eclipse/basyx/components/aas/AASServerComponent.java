@@ -244,12 +244,10 @@ public class AASServerComponent implements IComponent {
 		return isMongoDBBackend() && registry != null;
 	}
 	
-	private List<ISubmodel> registerAASAndSubmodels(IAssetAdministrationShell aas) {
+	private void registerAASAndSubmodels(IAssetAdministrationShell aas) {
 		registerAAS(aas);
 		
 		registerSubmodels(aas);
-		
-		return getSubmodelFromAggregator(aggregator, aas.getIdentification());
 	}
 
 	private void registerAAS(IAssetAdministrationShell aas) {
@@ -316,10 +314,6 @@ public class AASServerComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
-
-		// Remove all AASs/SMs that were registered on startup
-		AASBundleHelper.deregister(registry, aasBundles);
-		
 		deregisterAASAndSmAddedDuringRuntime();
 		
 		cleanUpAASServerFeatures();
