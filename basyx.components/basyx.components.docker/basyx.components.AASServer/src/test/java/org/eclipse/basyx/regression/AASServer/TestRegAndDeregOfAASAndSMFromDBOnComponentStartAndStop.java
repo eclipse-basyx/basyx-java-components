@@ -70,7 +70,7 @@ import org.xml.sax.SAXException;
  * @author danish
  *
  */
-public class TestAASServerComponentWithMongoDB {
+public class TestRegAndDeregOfAASAndSMFromDBOnComponentStartAndStop {
 	private static AASServerComponent component;
 	
 	private static IAASRegistry registry;

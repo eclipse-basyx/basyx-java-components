@@ -332,76 +332,43 @@ public class AASServerComponent implements IComponent {
 			return;
 		}
 		
-		registry.lookupAll().stream().forEach(this::deregisterAASAndAccompanyingSM);
-	}
-	
-	private void deregisterAASAndAccompanyingSM(AASDescriptor aasDescriptor) {
-		if(!shouldDeregisterAAS(aasDescriptor.getIdentifier())) {
-			return;
+		try {
+			aggregator.getAASList().stream().forEach(this::deregisterAASAndAccompanyingSM);
+		} catch(RuntimeException e) {
+			logger.info("The resource could not be found in the aggregator " + e);
 		}
 		
-		Set<String> set = addSubmodelIdToSet(aasDescriptor);
+	}
+	
+	private void deregisterAASAndAccompanyingSM(IAssetAdministrationShell aas) {	
+		getSubmodelDescriptors(aas.getIdentification()).stream().forEach(submodelDescriptor -> deregisterSubmodel(aas.getIdentification(), submodelDescriptor));
 		
-		getSubmodelDescriptors(aasDescriptor).stream().forEach(submodelDescriptor -> deregisterSubmodel(aasDescriptor, submodelDescriptor, set));
-		
-		deregisterAAS(aasDescriptor);
+		deregisterAAS(aas.getIdentification());
 	}
 
-	private boolean shouldDeregisterAAS(IIdentifier identifier) {
+	private List<SubmodelDescriptor> getSubmodelDescriptors(IIdentifier aasIdentifier) {
 		try {
-			aggregator.getAAS(identifier);
-			return true;
+			return registry.lookupSubmodels(aasIdentifier);
 		} catch(ResourceNotFoundException e) {
-			logger.info("The AAS '" + identifier.getId() + "' is not found in Aggregator");
-			return false;
+			return Collections.emptyList();
 		}
 	}
 	
-	private Set<String> addSubmodelIdToSet(AASDescriptor aasDescriptor) {
-		List<ISubmodel> submodels = getSubmodelFromAggregator(aggregator, aasDescriptor.getIdentifier());
-		
-		return putSubmodelId(submodels);
-	}
-	
-	private Set<String> putSubmodelId(List<ISubmodel> submodels) {
-		Set<String> set = new HashSet<>();
-		
-		submodels.stream().forEach(submodel -> addToSet(submodel, set));
-		
-		return set;
-	}
-
-	private void addToSet(ISubmodel submodel, Set<String> set) {
-		set.add(submodel.getIdentification().getId());
-	}
-
-	private List<SubmodelDescriptor> getSubmodelDescriptors(AASDescriptor aasDesc) {
-		return registry.lookupSubmodels(aasDesc.getIdentifier());
-	}
-	
-	private void deregisterSubmodel(AASDescriptor aasDescriptor, SubmodelDescriptor submodelDescriptor, Set<String> set) {
-		if(!shouldDeregisterSubmodel(submodelDescriptor, set)) {
-			return;
-		}
-		
+	private void deregisterSubmodel(IIdentifier aasIdentifier, SubmodelDescriptor submodelDescriptor) {
 		try {
-			registry.delete(aasDescriptor.getIdentifier(), submodelDescriptor.getIdentifier());
+			registry.delete(aasIdentifier, submodelDescriptor.getIdentifier());
 			logger.info("The SM '" + submodelDescriptor.getIdShort() + "' successfully deregistered.");
 		} catch (ProviderException e) {
 			logger.info("The SM '" + submodelDescriptor.getIdShort() + "' can't be deregistered. It was not found in registry.");
 		}
 	}
 
-	private boolean shouldDeregisterSubmodel(SubmodelDescriptor submodelDescriptor, Set<String> set) {
-		return set.contains(submodelDescriptor.getIdentifier().getId());
-	}
-
-	private void deregisterAAS(AASDescriptor aasDescriptor) {
+	private void deregisterAAS(IIdentifier aasIdentifier) {
 		try {
-			registry.delete(aasDescriptor.getIdentifier());
-			logger.info("The AAS '" + aasDescriptor.getIdShort() + "' successfully deregistered.");
+			registry.delete(aasIdentifier);
+			logger.info("The AAS '" + aasIdentifier.getId() + "' successfully deregistered.");
 		} catch (ProviderException e) {
-			logger.info("The AAS '" + aasDescriptor.getIdShort() + "' can't be deregistered. It was not found in registry.");
+			logger.info("The AAS '" + aasIdentifier.getId() + "' can't be deregistered. It was not found in registry.");
 		}
 	}
 
