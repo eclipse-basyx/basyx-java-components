@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.tools.aas.active;
 
@@ -37,7 +52,8 @@ public class VABModelTaskGroup {
 	}
 
 	/**
-	 * Changes the associated model provider. The contained tasks refer to this new provider from now on
+	 * Changes the associated model provider. The contained tasks refer to this new
+	 * provider from now on
 	 * 
 	 * @param newProvider
 	 *            A reference to a model provider the scheduled task shall refer to
@@ -73,19 +89,19 @@ public class VABModelTaskGroup {
 	}
 
 	/**
-	 * Starts scheduling the contained tasks at the configured update rate. If no update rate has been set before, it
-	 * assumes a default rate of one execution per second. Does nothing if already started.
+	 * Starts scheduling the contained tasks at the configured update rate. If no
+	 * update rate has been set before, it assumes a default rate of one execution
+	 * per second. Does nothing if already started.
 	 */
 	public synchronized void start() {
 		if (!isRunning()) {
-			currentSchedule = executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval,
-					TimeUnit.MILLISECONDS);
+			currentSchedule = executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
 		}
 	}
 
 	/**
-	 * Stops the groups' current task schedules. Does nothing if the group has been stopped before or has not been
-	 * started yet.
+	 * Stops the groups' current task schedules. Does nothing if the group has been
+	 * stopped before or has not been started yet.
 	 */
 	public synchronized void stop() {
 		if (isRunning()) {
@@ -97,7 +113,8 @@ public class VABModelTaskGroup {
 	/**
 	 * Checks, whether this group is currently running or not.
 	 * 
-	 * @return True, if the tasks of this group are currently scheduled. False, if not.
+	 * @return True, if the tasks of this group are currently scheduled. False, if
+	 *         not.
 	 */
 	public synchronized boolean isRunning() {
 		return currentSchedule != null;
@@ -114,7 +131,8 @@ public class VABModelTaskGroup {
 	}
 
 	/**
-	 * Stops the groups' tasks and frees its resources, so that no tasks can be scheduled after calling this method
+	 * Stops the groups' tasks and frees its resources, so that no tasks can be
+	 * scheduled after calling this method
 	 */
 	public synchronized void clear() {
 		executor.shutdown();

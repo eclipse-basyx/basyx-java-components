@@ -1,21 +1,38 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.regex.Pattern;
+
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
+
 import com.google.gson.Gson;
 
 /**
@@ -29,6 +46,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	// Prefix for environment variables
 	public static final String ENV_PREFIX = "BaSyxAAS_";
 
+	// Feature enabling options
+	private static final String FEATURE_ENABLED = "Enabled";
+	private static final String FEATURE_DISABLED = "Disabled";
+
 	// Default BaSyx AAS configuration
 	public static final String DEFAULT_BACKEND = AASServerBackend.INMEMORY.toString();
 	public static final String DEFAULT_HOSTPATH = "";
@@ -36,8 +57,8 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_SOURCE = "";
 	public static final String DEFAULT_REGISTRY = "";
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
-	public static final String DEFAULT_AASX_UPLOAD = AASXUploadBackend.ENABLED.toString();
-	public static final String DEFAULT_AUTHORIZATION_ENABLED = "false";
+	public static final String DEFAULT_AASX_UPLOAD = FEATURE_ENABLED;
+	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
 	public static final String DEFAULT_SUBMODELELEMENT_STORAGE_OPTION = "";
 	public static final String DEFAULT_SUBMODELELEMENT_STORAGE_BACKEND = "";
 
@@ -49,7 +70,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String SOURCE = "aas.source";
 	public static final String EVENTS = "aas.events";
 	public static final String AASX_UPLOAD = "aas.aasxUpload";
-	public static final String AUTHORIZATION_ENABLED = "aas.authorizationEnabled";
+	public static final String AUTHORIZATION = "aas.authorization";
 	public static final String SUBMODELELEMENT_STORAGE_OPTION = "aas.submodelElementStorageOption";
 	public static final String SUBMODELELEMENT_STORAGE_BACKEND = "aas.submodelElementStorageBackend";
 
@@ -58,7 +79,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	// The default key for variables pointing to the configuration file
 	public static final String DEFAULT_FILE_KEY = "BASYX_AAS";
-	
+
 	public static final String PATTERN = "^\\[\\\".*\\\"\\]$";
 
 	public static Map<String, String> getDefaultProperties() {
@@ -70,7 +91,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(SUBMODELS, DEFAULT_SUBMODELS);
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
-		defaultProps.put(AUTHORIZATION_ENABLED, DEFAULT_AUTHORIZATION_ENABLED);
+		defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
 		defaultProps.put(SUBMODELELEMENT_STORAGE_OPTION, DEFAULT_SUBMODELELEMENT_STORAGE_OPTION);
 		defaultProps.put(SUBMODELELEMENT_STORAGE_BACKEND, DEFAULT_SUBMODELELEMENT_STORAGE_BACKEND);
 		return defaultProps;
@@ -138,7 +159,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION_ENABLED };
+		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -163,18 +184,23 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(EVENTS, events.toString());
 	}
 
-	public AASXUploadBackend getAASXUpload() {
-		return AASXUploadBackend.fromString(getProperty(AASX_UPLOAD));
+	public boolean isAASXUploadEnabled() {
+		return getProperty(AASX_UPLOAD).equals(FEATURE_ENABLED);
 	}
 
-	public void setAASXUpload(AASXUploadBackend aasxUpload) {
-		setProperty(AASX_UPLOAD, aasxUpload.toString());
+	public void enableAASXUpload() {
+		setProperty(AASX_UPLOAD, FEATURE_ENABLED);
+	}
+
+	public void disableAASXUpload() {
+		setProperty(AASX_UPLOAD, FEATURE_DISABLED);
 	}
 
 	/**
-	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
-	 *             {@link #getAASSourceAsList() } to get the list of
-	 *             source path/paths of serialized AAS.
+	 * @deprecated This method is deprecated due to a new implementation to support
+	 *             multiple serialized AAS. Use new method
+	 *             {@link #getAASSourceAsList() } to get the list of source
+	 *             path/paths of serialized AAS.
 	 */
 	@Deprecated
 	public String getAASSource() {
@@ -182,10 +208,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public List<String> getAASSourceAsList() {
-		if(!areMultipleAasSourcesProvided(getProperty(SOURCE))) {
+		if (!areMultipleAasSourcesProvided(getProperty(SOURCE))) {
 			return Arrays.asList(getProperty(SOURCE));
 		}
-		
+
 		return parseFromJson(getProperty(SOURCE));
 	}
 
@@ -194,15 +220,16 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method
-	 *             {@link #setAASSourceAsList(String) } to get the list of
-	 *             source path/paths of serialized AAS.
+	 * @deprecated This method is deprecated due to a new implementation to support
+	 *             multiple serialized AAS. Use new method
+	 *             {@link #setAASSourceAsList(String) } to get the list of source
+	 *             path/paths of serialized AAS.
 	 */
 	@Deprecated
 	public void setAASSource(String source) {
 		setProperty(SOURCE, source);
 	}
-	
+
 	public void setAASSourceAsList(String source) {
 		setProperty(SOURCE, source);
 	}
@@ -231,6 +258,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(HOSTPATH, hostPath);
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<String> parseFromJson(String property) {
 		List<String> fromJson = new Gson().fromJson(property, List.class);
 		if (fromJson == null) {
@@ -245,11 +273,15 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public boolean isAuthorizationEnabled() {
-		return Boolean.parseBoolean(getProperty(AUTHORIZATION_ENABLED));
+		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
 	}
 
-	public void setAuthorizationEnabled(boolean authorizationEnabled) {
-		setProperty(AUTHORIZATION_ENABLED, Boolean.toString(authorizationEnabled));
+	public void enableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_ENABLED);
+	}
+
+	public void disableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_DISABLED);
 	}
 
 	public String getSubmodelElementStorageOption() {

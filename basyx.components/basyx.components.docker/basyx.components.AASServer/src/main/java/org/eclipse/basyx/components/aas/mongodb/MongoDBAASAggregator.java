@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * SPDX-License-Identifier: EPL-2.0
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
 
@@ -30,7 +45,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -91,8 +106,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Store SubmodelAggregator. By default, uses standard SubmodelAggregator
+	 * 
+	 * @deprecated Please use {@link #submodelAggregatorFactory}
 	 */
+	@Deprecated
 	protected ISubmodelAggregator submodelAggregator;
+	protected ISubmodelAggregatorFactory submodelAggregatorFactory;
 
 	/**
 	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
@@ -107,7 +126,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
+		submodelAggregatorFactory = new SubmodelAggregatorFactory(smApiProvider);
 		init();
 	}
 
@@ -127,7 +146,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
 		this.setConfiguration(config);
 		this.registry = registry;
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
+		submodelAggregatorFactory = new SubmodelAggregatorFactory(smApiProvider);
 		init();
 	}
 
@@ -146,7 +165,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
+		submodelAggregatorFactory = new SubmodelAggregatorFactory(smApiProvider);
 		init();
 	}
 
@@ -166,7 +185,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
-		submodelAggregator = new SubmodelAggregator(smApiProvider);
+		submodelAggregatorFactory = new SubmodelAggregatorFactory(smApiProvider);
 		this.registry = registry;
 		init();
 	}
@@ -210,7 +229,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this.config = config;
 		this.registry = registry;
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -227,7 +246,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		setMongoDBConfiguration(config);
 		this.config = config;
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -247,7 +266,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		setMongoDBConfiguration(config);
 		this.registry = registry;
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -265,7 +284,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		config.loadFromResource(resourceConfigPath);
 		setMongoDBConfiguration(config);
 		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregator = submodelAggregatorFactory.create();
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
 	}
 
@@ -365,7 +384,18 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	private MultiSubmodelProvider createMultiSubmodelProvider(IAASAPI aasApi) {
 		AASModelProvider aasProvider = new AASModelProvider(aasApi);
 		IConnectorFactory connProvider = new HTTPConnectorFactory();
-		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, submodelAggregator);
+
+		ISubmodelAggregator usedAggregator = getSubmodelAggregatorInstance();
+
+		return new MultiSubmodelProvider(aasProvider, registry, connProvider, aasApiProvider, usedAggregator);
+	}
+
+	private ISubmodelAggregator getSubmodelAggregatorInstance() {
+		if (submodelAggregatorFactory == null) {
+			return submodelAggregator;
+		}
+
+		return submodelAggregatorFactory.create();
 	}
 
 	/**

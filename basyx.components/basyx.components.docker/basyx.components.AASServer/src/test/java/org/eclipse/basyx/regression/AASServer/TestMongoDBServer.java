@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.regression.AASServer;
 
@@ -54,16 +69,16 @@ import org.xml.sax.SAXException;
 public class TestMongoDBServer extends AASServerSuite {
 	private static final Identifier SM_IDENTIFICATION = new Identifier(IdentifierType.CUSTOM, "MongoDBId");
 	private static final String SM_IDSHORT = "MongoDB";
-	
+
 	private static final String DELEGATE_OP_ID_SHORT = "delegateOp";
 	private static final String DELEGATE_OP_INVOKE_PATH = "delegateOp/invoke";
 	private static final String OP_ID_SHORT = "op";
-	
+
 	private static AASServerComponent component;
 	private static BaSyxMongoDBConfiguration mongoDBConfig;
 	private static BaSyxContextConfiguration contextConfig;
 	private static BaSyxAASServerConfiguration aasConfig;
-	
+
 	private boolean executed = false;
 
 	@Override
@@ -79,6 +94,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		component.startComponent();
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void resetMongoDBTestData() {
 		new MongoDBAASAggregator(mongoDBConfig).reset();
 	}
@@ -108,6 +124,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		checkSubmodelReferencesSize(0);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testAggregatorPersistency() throws Exception {
 		createAssetAdministrationShell();
@@ -118,27 +135,26 @@ public class TestMongoDBServer extends AASServerSuite {
 
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
 	}
-	
+
 	@Test
 	public void testInvokeDelegatedOperation() {
 		createAssetAdministrationShell();
 		createSubmodel();
-		
+
 		Operation op = new Operation(OP_ID_SHORT);
 		op.setInvokable((Runnable) -> {
 			executed = true;
 		});
 		OperationProvider opProvider = new OperationProvider(new VABMapProvider(op));
-		
-		
+
 		ConnectorProviderStub connector = new ConnectorProviderStub();
 		connector.addMapping(OP_ID_SHORT, opProvider);
-		
+
 		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(mongoDBConfig, SM_IDENTIFICATION.getId(), new DelegatedInvocationManager(connector));
-		
+
 		executed = false;
 		api.invokeOperation(DELEGATE_OP_INVOKE_PATH);
-		
+
 		assertTrue(executed);
 	}
 
@@ -168,7 +184,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		Qualifier qualifier = DelegatedInvocationManager.createDelegationQualifier(OP_ID_SHORT);
 		delegateOp.setQualifiers(Arrays.asList(qualifier));
 		sm.addSubmodelElement(delegateOp);
-		
+
 		manager.createSubmodel(shellIdentifier, sm);
 	}
 

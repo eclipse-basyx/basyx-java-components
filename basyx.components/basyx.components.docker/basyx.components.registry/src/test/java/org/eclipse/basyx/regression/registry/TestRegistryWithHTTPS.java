@@ -12,12 +12,8 @@ import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TestRegistryWithHTTPS extends TestRegistryProviderSuite {
-	private static Logger logger = LoggerFactory.getLogger(TestRegistryWithHTTPS.class);
-
 	private static RegistryComponent component;
 	private static BaSyxContextConfiguration contextConfig;
 

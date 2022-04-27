@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  * 
- * SPDX-License-Identifier: EPL-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
@@ -30,8 +45,9 @@ public class BaSyxConfiguration {
 	private Map<String, String> values;
 
 	/**
-	 * Constructor that takes the configuration's default values.
-	 * All the keys in the map are the name of the properties that are stored and loaded in this configuration.
+	 * Constructor that takes the configuration's default values. All the keys in
+	 * the map are the name of the properties that are stored and loaded in this
+	 * configuration.
 	 */
 	public BaSyxConfiguration(Map<String, String> defaultValues) {
 		this.values = defaultValues;
@@ -50,7 +66,8 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from a path relative to the current folder
 	 * 
-	 * @param filePath Path to the resource in the application folder
+	 * @param filePath
+	 *            Path to the resource in the application folder
 	 */
 	public void loadFromFile(String filePath) {
 		try (InputStream fileStream = new FileInputStream(filePath)) {
@@ -66,12 +83,14 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from a path relative to the current folder
 	 * 
-	 * @param fileKey key where the file path to the resource in the application folder
+	 * @param fileKey
+	 *            key where the file path to the resource in the application folder
 	 */
 	public void loadFileOrDefaultResource(String fileKey, String defaultResource) {
-		// Try to load property that points to the configuration file (e.g. java -DfileKey=yx.properties [...])
+		// Try to load property that points to the configuration file (e.g. java
+		// -DfileKey=yx.properties [...])
 		String configFilePath = System.getProperty(fileKey);
-		if ( configFilePath == null || configFilePath.isEmpty() ) {
+		if (configFilePath == null || configFilePath.isEmpty()) {
 			// Try to load environment variable that points to the configuration file
 			configFilePath = System.getenv(fileKey);
 		}
@@ -89,7 +108,8 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from an input stream
 	 * 
-	 * @param input the input stream containing the properties
+	 * @param input
+	 *            the input stream containing the properties
 	 */
 	public void loadFromStream(InputStream input) {
 		logger.info("Loading from inputStream: " + input);
@@ -105,8 +125,9 @@ public class BaSyxConfiguration {
 	/**
 	 * Load the configuration from a path relative to the current resource folder
 	 * 
-	 * @param relativeResourcePath Path to the resource in the resource folder. In a maven project, the resources
-	 *                             are located at /src/main/resources by default.
+	 * @param relativeResourcePath
+	 *            Path to the resource in the resource folder. In a maven project,
+	 *            the resources are located at /src/main/resources by default.
 	 */
 	public void loadFromResource(String relativeResourcePath) {
 		logger.info("Loading properties from resource '" + relativeResourcePath + "'");
@@ -141,28 +162,110 @@ public class BaSyxConfiguration {
 	/**
 	 * Method for subclasses to read specific environment variables
 	 * 
-	 * @param prefix     The prefix of each of the environment variables
-	 * @param properties The name of the properties in the config and environment (with prefix)
+	 * @param prefix
+	 *            The prefix of each of the environment variables
+	 * @param properties
+	 *            The name of the properties in the config and environment (with
+	 *            prefix)
 	 */
 	protected void loadFromEnvironmentVariables(String prefix, String... properties) {
 		try {
+			Map<String, String> allEnvironmentVariables = System.getenv();
+
+			boolean usesLowerCaseNamingConvention = usesLowerCaseNamingConvention(allEnvironmentVariables, prefix);
+			boolean usesDeprecatedNamingConvention = usesDeprecatedNamingConvention(allEnvironmentVariables, prefix);
+
+			if (usesDeprecatedNamingConvention && usesLowerCaseNamingConvention) {
+				throw createEnvironmentVariableWrongUsageException();
+			}
+
 			for (String propName : properties) {
-				String result = System.getenv(prefix + propName);
+				String result = getEnvironmentVariable(prefix, propName, usesDeprecatedNamingConvention);
 				if (result != null) {
 					logger.info("Environment - " + propName + ": " + result);
 					setProperty(propName, result);
 				}
 			}
 		} catch (SecurityException e) {
-			logger.info("Reading configs from environment is not permitted");
+			logger.info("Reading configs from environment is not permitted: " + e);
 		}
+	}
+
+	private String getEnvironmentVariable(String prefix, String propName, boolean usesDeprecatedNamingConvention) {
+		if (usesDeprecatedNamingConvention) {
+			return getEnvironmentVariableDeprecatedNamingConvention(prefix, propName);
+		} else {
+			return getEnvironmentVariableLowerCaseNamingConvention(prefix, propName);
+		}
+	}
+
+	private String getEnvironmentVariableLowerCaseNamingConvention(String prefix, String propName) {
+		return System.getenv(changeToUnderscoreAndLowerCase(prefix + propName));
+	}
+
+	private String getEnvironmentVariableDeprecatedNamingConvention(String prefix, String propName) {
+		return System.getenv(prefix + propName);
+	}
+
+	private boolean usesLowerCaseNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		List<String> variableWithLowercasePrefix = getEnvironmentVariablesLowerCaseNamingConvention(allEnvironmentVariables, prefix);
+
+		if (containsUpperCasePrefixVariables(variableWithLowercasePrefix)) {
+			throw createEnvironmentVariableWrongUsageException();
+		}
+
+		return !variableWithLowercasePrefix.isEmpty();
+	}
+
+	private boolean containsUpperCasePrefixVariables(List<String> variableWithLowercasePrefix) {
+		return variableWithLowercasePrefix.stream().anyMatch(varName -> nameContainsUppercase(varName));
+	}
+
+	private boolean usesDeprecatedNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		List<String> variableWithPrefix = getEnvironmentVariablesDeprecatedNamingConvention(allEnvironmentVariables, prefix);
+
+		if (containsDotAndUnderscoreInDeprecatedNamingConvention(variableWithPrefix, prefix)) {
+			throw createEnvironmentVariableWrongUsageException();
+		}
+
+		return !variableWithPrefix.isEmpty();
+	}
+
+	private boolean containsDotAndUnderscoreInDeprecatedNamingConvention(List<String> variableWithLowercasePrefix, String prefix) {
+		return variableWithLowercasePrefix.stream().anyMatch(varName -> nameWihoutPrefixContainsUnderscore(varName, prefix));
+	}
+
+	private boolean nameWihoutPrefixContainsUnderscore(String varName, String prefix) {
+		return varName.replace(prefix, "").contains("_");
+	}
+
+	private List<String> getEnvironmentVariablesLowerCaseNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		return allEnvironmentVariables.keySet().stream().filter(x -> x.startsWith(changeToUnderscoreAndLowerCase(prefix))).collect(Collectors.toList());
+	}
+
+	private List<String> getEnvironmentVariablesDeprecatedNamingConvention(Map<String, String> allEnvironmentVariables, String prefix) {
+		return allEnvironmentVariables.keySet().stream().filter(x -> x.startsWith(prefix)).collect(Collectors.toList());
+	}
+
+	private RuntimeException createEnvironmentVariableWrongUsageException() {
+		return new RuntimeException("BaSyx environment variables should either use '.' or '_' as the separator, not both at the same time.");
+	}
+
+	private boolean nameContainsUppercase(String varName) {
+		return varName.chars().anyMatch(c -> Character.isUpperCase(c));
+	}
+
+	private String changeToUnderscoreAndLowerCase(String variableName) {
+		return variableName.toLowerCase().replace('.', '_');
 	}
 
 	/**
 	 * Sets a property, if it is contained in this configuration
 	 * 
-	 * @param name  The name of the property
-	 * @param value The new value of the property
+	 * @param name
+	 *            The name of the property
+	 * @param value
+	 *            The new value of the property
 	 */
 	public void setProperty(String name, String value) {
 		values.put(name, value);
@@ -171,7 +274,8 @@ public class BaSyxConfiguration {
 	/**
 	 * Returns all contained properties that begin with a specific prefix
 	 * 
-	 * @param prefix The filtered prefix (e.g. "aas.")
+	 * @param prefix
+	 *            The filtered prefix (e.g. "aas.")
 	 * @return The list of all contained properties that begin with the prefix
 	 */
 	public List<String> getProperties(String prefix) {

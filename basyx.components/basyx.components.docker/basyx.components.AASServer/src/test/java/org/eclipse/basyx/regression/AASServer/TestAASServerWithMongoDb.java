@@ -28,7 +28,6 @@ public class TestAASServerWithMongoDb extends AASServerSuite {
 		component.startComponent();
 	}
 
-
 	@AfterClass
 	public static void tearDownClass() {
 		component.stopComponent();

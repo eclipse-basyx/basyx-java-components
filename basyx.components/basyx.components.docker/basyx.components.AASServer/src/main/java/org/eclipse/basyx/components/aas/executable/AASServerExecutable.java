@@ -1,11 +1,26 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
  *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * SPDX-License-Identifier: EPL-2.0
+ * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.executable;
 
@@ -13,14 +28,9 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 import org.eclipse.basyx.components.aas.AASServerComponent;
-import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
-import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
-import org.eclipse.basyx.components.aas.configuration.AASXUploadBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.storage.StorageAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * at
  * <i>localhost:4000/aasServer/shells/${aasId}/aas/submodels/${submodelId}/submodel</i><br>
  *
- * @author schnicke, espen
+ * @author schnicke, espen, danish
  */
 public class AASServerExecutable {
 	// Creates a Logger based on the current class
@@ -55,30 +65,19 @@ public class AASServerExecutable {
 
 		AASServerComponent component = new AASServerComponent(contextConfig, aasConfig);
 
-		// If enabled, load mqtt configuration
-		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
-			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
-			mqttConfig.loadFromDefaultSource();
-			component.addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
-		}
-
-		// if enabled, activate authorization feature
-		if (aasConfig.isAuthorizationEnabled()) {
-			component.addAASServerFeature(new AuthorizedAASServerFeature());
-		}
-
-		// if enabled, load AASX uploader functionality
-		if (aasConfig.getAASXUpload().equals(AASXUploadBackend.ENABLED)) {
-			component.enableAASXUpload();
-		}
-
-		// if enabled, set storage default
-		if (!aasConfig.getSubmodelElementStorageOption().isEmpty() && !aasConfig.getSubmodelElementStorageBackend().isEmpty()) {
-			component.addAASServerFeature(new StorageAASServerFeature(aasConfig.getSubmodelElementStorageOption(), aasConfig.getSubmodelElementStorageBackend()));
-		}
-
 		component.startComponent();
 
 		logger.info("BaSyx AAS Server component started");
+		
+		addShutdownHook(component);
+	}
+
+	private static void addShutdownHook(AASServerComponent component) {
+		Thread shutdownListener = new Thread(){
+		    public void run(){
+		    	component.stopComponent();
+		            }
+		        };
+		Runtime.getRuntime().addShutdownHook(shutdownListener);
 	}
 }
