@@ -156,7 +156,7 @@ public class AASServerComponent implements IComponent {
 	 * backend.
 	 *
 	 * @param configuration
-	 * 
+	 *
 	 * @deprecated Add MQTT via {@link MqttAASServerFeature} instead.
 	 */
 	@Deprecated
@@ -167,7 +167,7 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Disables mqtt configuration. Has to be called before the component is
 	 * started.
-	 * 
+	 *
 	 * @deprecated remove MQTT from the feature list instead.
 	 */
 	@Deprecated
