@@ -57,8 +57,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
-import jakarta.persistence.EntityManager;
-
 /**
  * An IAASAggregator for persistent storage in a MongoDB.
  *
@@ -78,7 +76,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected MongoOperations mongoOps;
 	protected String aasCollection;
 	protected String smCollection;
-	protected EntityManager entityManager;
 
 	private IAASRegistry registry;
 
@@ -103,7 +100,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *
 	 * @param config
 	 *            The MongoDB Configuration
-	 * 
+	 *
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link InMemoryAASServerComponentFactory}.
 	 */
@@ -122,7 +119,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            The MongoDB Configuration
 	 * @param registry
 	 *            The registry
-	 * 
+	 *
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link InMemoryAASServerComponentFactory}.
 	 */
@@ -140,7 +137,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *
 	 * @param resourceConfigPath
 	 *            Path of the configuration file
-	 * 
+	 *
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link InMemoryAASServerComponentFactory}
 	 */
@@ -160,7 +157,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param resourceConfigPath
 	 *            Path of the configuration file
 	 * @param registry
-	 * 
+	 *
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link InMemoryAASServerComponentFactory}
 	 */
@@ -176,7 +173,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	/**
 	 * Constructor using default connections
-	 * 
+	 *
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link InMemoryAASServerComponentFactory}
 	 */
@@ -189,7 +186,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * Constructor using default connections with registry as a parameter
 	 *
 	 * @param registry
-	 * 
+	 *
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link InMemoryAASServerComponentFactory}
 	 */
@@ -201,12 +198,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives a BaSyxMongoDBConfiguration, IAASRegistry, IAASAPIFactory and a
 	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
-	 * 
+	 *
 	 * @param config
 	 * @param registry
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 *
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		setMongoDBConfiguration(config);
@@ -220,11 +217,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives a BaSyxMongoDBConfiguration, IAASAPIFactory and a
 	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
-	 * 
+	 *
 	 * @param config
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 *
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		setMongoDBConfiguration(config);
@@ -237,12 +234,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives a resourceConfigPath, IAASRegistry, IAASAPIFactory and a
 	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
-	 * 
+	 *
 	 * @param resourceConfigPath
 	 * @param registry
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 *
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		config = new BaSyxMongoDBConfiguration();
@@ -257,11 +254,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Receives a resourceConfigPath, IAASAPIFactory and a
 	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
-	 * 
+	 *
 	 * @param resourceConfigPath
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 *
 	 */
 	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		config = new BaSyxMongoDBConfiguration();
@@ -275,10 +272,10 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Constructor using the default configuration, with the given IAASAPIFactory
 	 * and ISubmodelAggregatorFactory.
-	 * 
+	 *
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 *
 	 */
 	public MongoDBAASAggregator(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory);
@@ -306,7 +303,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *
 	 * @param config
 	 *            The MongoDB Configuration
-	 * 
+	 *
 	 * @deprecated This method is used with the old, deprecated Constructors. Use
 	 *             {@link InMemoryAASServerComponentFactory} instead
 	 */
@@ -325,19 +322,11 @@ public class MongoDBAASAggregator implements IAASAggregator {
 			api.setAAS(aas);
 			return api;
 		};
-		if (this.entityManager == null) {
-			this.smApiProvider = sm -> {
-				MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, sm.getIdentification().getId());
-				api.setSubmodel(sm);
-				return api;
-			};
-		} else {
-			this.smApiProvider = sm -> {
-				MongoDBSubmodelAPI api = new StorageMongoDBSubmodelAPI(config, sm.getIdentification().getId());
-				api.setSubmodel(sm);
-				return api;
-			};
-		}
+		this.smApiProvider = sm -> {
+			MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, sm.getIdentification().getId());
+			api.setSubmodel(sm);
+			return api;
+		};
 	}
 
 	private void setMongoDBConfiguration(BaSyxMongoDBConfiguration config) {
@@ -422,11 +411,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	private void addSubmodelProvidersById(String smId, MultiSubmodelProvider provider) {
 		ISubmodelAPI smApi;
-		if (this.entityManager == null) {
-			smApi = new MongoDBSubmodelAPI(config, smId);
-		} else {
-			smApi = new StorageMongoDBSubmodelAPI(config, smId);
-		}
+		smApi = new MongoDBSubmodelAPI(config, smId);
 		SubmodelProvider smProvider = new SubmodelProvider(smApi);
 		provider.addSubmodel(smProvider);
 	}
