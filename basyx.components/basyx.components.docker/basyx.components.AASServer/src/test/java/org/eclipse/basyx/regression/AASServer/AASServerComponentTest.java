@@ -268,7 +268,7 @@ public class AASServerComponentTest {
 	}
 	
 	@Test
-	public void checkIfAASPresentInDBIsRegisteredAfterStartingAASServerComponent() {
+	public void aasPresentInDBIsRegisteredAfterStartingAASServerComponent() {
 		setUp(EMPTY_STRING);
 		
 		doPresetting();
@@ -282,7 +282,7 @@ public class AASServerComponentTest {
 	}
 	
 	@Test
-	public void checkIfSMPresentInDBIsRegisteredAfterStartingAASServerComponent() {
+	public void submodelPresentInDBIsRegisteredAfterStartingAASServerComponent() {
 		setUp(EMPTY_STRING);
 		
 		doPresetting();
