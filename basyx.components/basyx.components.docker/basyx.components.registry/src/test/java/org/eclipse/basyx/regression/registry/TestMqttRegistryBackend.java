@@ -20,7 +20,7 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.components.registry.RegistryComponent;
-import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryServiceObserver;
+import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryHelper;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.testsuite.regression.extensions.shared.mqtt.MqttTestListener;
@@ -93,7 +93,7 @@ public class TestMqttRegistryBackend {
 		AASDescriptor aasDescriptor = createTestAASDescriptor();
 		aasRegistryProxy.register(aasDescriptor);
 
-		assertEquals(MqttAASRegistryServiceObserver.TOPIC_REGISTERAAS, listener.lastTopic);
+		assertEquals(MqttAASRegistryHelper.TOPIC_REGISTERAAS, listener.lastTopic);
 
 		registryComponent.stopComponent();
 	}

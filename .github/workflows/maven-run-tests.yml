@@ -44,4 +44,3 @@ jobs:
       run: mvn -B package --file basyx.components/pom.xml
       env:       
         GITHUB_TOKEN: ${{ github.token }}
-
