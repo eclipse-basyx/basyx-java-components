@@ -65,8 +65,8 @@ jobs:
     - name: Install Updater Component-Camel-Timer
       run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-timer/pom.xml -DskipTests
     - name: Install Updater Component-Camel-JSONata
-      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-jsonata/pom.xml -DskipTests
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.transformer.camel-jsonata/pom.xml -DskipTests
     - name: Install Updater Component-Camel-JSONJackson
-      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-jsonjackson/pom.xml -DskipTests
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.transformer.camel-jsonjackson/pom.xml -DskipTests
     - name: Compile Updater Component-Examples
       run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.examples/pom.xml
