@@ -42,6 +42,8 @@ jobs:
       run: psql -f ci/sql/setup_postgres.sql postgresql://postgres:admin@localhost:5432/postgres
     - name: Build with Maven
       run: mvn -B package -f basyx.components/pom.xml
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
     - name: Install Updater Component-Core
       run: mvn clean install -f basyx.components.updater.core/pom.xml
     - name: Compile Updater Component-Camel-AAS
@@ -70,5 +72,3 @@ jobs:
       run: mvn compile -f basyx.components.updater.camel-jsonjackson/pom.xml
     - name: Compile Updater Component-Examples
       run: mvn compile -f basyx.components.updater.examples/pom.xml
-      env:       
-        GITHUB_TOKEN: ${{ github.token }}
