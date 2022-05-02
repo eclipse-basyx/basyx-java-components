@@ -43,30 +43,30 @@ jobs:
     - name: Build with Maven
       run: mvn -B package -f basyx.components/pom.xml
     - name: Install Updater Component-Core
-      run: mvn clean install -f basyx.components/basyx.components.updater/basyx.components.updater.core/pom.xml
-    - name: Compile Updater Component-Camel-AAS
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-aas/pom.xml
-    - name: Compile Updater Component-Camel-ActiveMQ
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-activemq/pom.xml
-    - name: Compile Updater Component-Camel-Hono
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-hono/pom.xml
-    - name: Compile Updater Component-Camel-HTTP
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-http/pom.xml
-    - name: Compile Updater Component-Camel-HTTPppolling
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-httppolling/pom.xml
-    - name: Compile Updater Component-Camel-Kafka
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-kafka/pom.xml
-    - name: Compile Updater Component-Camel-OPCUA
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-opcua/pom.xml
-    - name: Compile Updater Component-Camel-Paho
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-paho/pom.xml
-    - name: Compile Updater Component-Camel-Prometheus
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-prometheus/pom.xml
-    - name: Compile Updater Component-Camel-Timer
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-timer/pom.xml
-    - name: Compile Updater Component-Camel-JSONata
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-jsonata/pom.xml
-    - name: Compile Updater Component-Camel-JSONJackson
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.camel-jsonjackson/pom.xml
+      run: mvn clean install -f basyx.components/basyx.components.updater/basyx.components.updater.core/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-AAS
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-aas/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-ActiveMQ
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-activemq/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-Hono
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-hono/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-HTTP
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-http/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-HTTPppolling
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-httppolling/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-Kafka
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-kafka/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-OPCUA
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-opcua/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-Paho
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-paho/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-Prometheus
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-prometheus/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-Timer
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-timer/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-JSONata
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-jsonata/pom.xml -DskipTests
+    - name: Install Updater Component-Camel-JSONJackson
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.camel-jsonjackson/pom.xml -DskipTests
     - name: Compile Updater Component-Examples
       run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.examples/pom.xml
