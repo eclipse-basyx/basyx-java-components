@@ -45,10 +45,8 @@ jobs:
       run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.transformer.camel-jsonata/pom.xml
     - name: Install Updater Component-Camel-JSONJackson
       run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.transformer.camel-jsonjackson/pom.xml
-    - name: Compile Updater Component-Examples
-      run: mvn compile -f basyx.components/basyx.components.updater/basyx.components.updater.examples/pom.xml
-    - name: Install Example HTTP Server
-      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.httpserver/pom.xml
+    - name: Install Updater Component-Examples
+      run: mvn install -f basyx.components/basyx.components.updater/basyx.components.updater.examples/pom.xml -DskipTests
     - name: Test AAS Qualifier configuration
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.aasinternal/pom.xml
     - name: Test Single AAS Kafka JSONata
