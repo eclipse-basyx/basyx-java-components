@@ -30,10 +30,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import basyx.components.updater.camelactivemq.configuration.factory.ActiveMQDefaultConfigurationFactory;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
+import basyx.components.updater.camelactivemq.configuration.factory.ActiveMQDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
@@ -54,7 +54,7 @@ public class TestAASUpdater {
 		registry = new InMemoryRegistry();
 
 		aasContextConfig = new BaSyxContextConfiguration(4001, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");		
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");
 		aasServer = new AASServerComponent(aasContextConfig, aasConfig);
 		aasServer.setRegistry(registry);
 	}
@@ -68,20 +68,20 @@ public class TestAASUpdater {
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
 		// Extend configutation for connections
-		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
-		configuration.addRoutes(routesFactory.getRouteConfigurations());
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for Kafka Source
 		ActiveMQDefaultConfigurationFactory activeMQConfigFactory = new ActiveMQDefaultConfigurationFactory(loader);
-		configuration.addDatasources(activeMQConfigFactory.getDataSourceConfigurations());
+		configuration.addDatasources(activeMQConfigFactory.create());
 
 		// Extend configuration for AAS
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
+		configuration.addDatasinks(aasConfigFactory.create());
 
 		// Extend configuration for Jsonata
 		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		configuration.addTransformers(jsonataConfigFactory.create());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();
@@ -103,7 +103,7 @@ public class TestAASUpdater {
 		Object propValue = updatedProp.getValue();
 		System.out.println("UpdatedPROPA: " + propValue);
 		assertEquals("336.36", propValue);
-		
+
 		ISubmodelElement updatedProp2 = sm.getSubmodelElement("ConnectedPropertyB");
 		Object propValue2 = updatedProp2.getValue();
 		System.out.println("UpdatedPROPB: " + propValue2);
@@ -134,7 +134,7 @@ public class TestAASUpdater {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void publishNewDatapoint2() {
 		// Create a MessageProducer from the Session to the Topic or Queue
 		try {
@@ -161,7 +161,7 @@ public class TestAASUpdater {
 
 	private static void startActiveMQBroker() {
 		try {
-			
+
 			BrokerService broker = new BrokerService();
 			broker.addConnector("tcp://localhost:61616");
 			broker.setPersistent(false);
@@ -175,7 +175,7 @@ public class TestAASUpdater {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@AfterClass
 	public static void tearDown() throws JMSException {
 		session.close();

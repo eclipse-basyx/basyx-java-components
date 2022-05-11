@@ -2,8 +2,6 @@ package basyx.components.updater.examples.prometheusjsonataaas.test;
 
 import java.io.IOException;
 
-import basyx.components.updater.camelprometheus.configuration.factory.PrometheusDefaultConfigurationFactory;
-import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultConfigurationFactory;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
@@ -19,8 +17,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
+import basyx.components.updater.camelprometheus.configuration.factory.PrometheusDefaultConfigurationFactory;
+import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
@@ -52,26 +52,25 @@ public class TestAASUpdater {
 
 		// Extend configuration for connections
 		// DefaultRoutesConfigFac takes default routes.json as to config
-		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
-		configuration.addRoutes(routesFactory.getRouteConfigurations());
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.create());
 
 		// Extend configuration for prometheus Source
 		PrometheusDefaultConfigurationFactory prometheusConfigFactory = new PrometheusDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(prometheusConfigFactory.getDataSinkConfigurations());
+		configuration.addDatasinks(prometheusConfigFactory.create());
 
 		// Extend configuration for AAS
 		// DefaultRoutesConfigFactory takes default aasserver.json as to config
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
+		configuration.addDatasinks(aasConfigFactory.create());
 
 		// Extend configuration for Jsonata
 		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		configuration.addTransformers(jsonataConfigFactory.create());
 
 		// Extend configuration for Timer
 		TimerDefaultConfigurationFactory timerConfigFactory = new TimerDefaultConfigurationFactory(loader);
-		configuration.addDatasources(timerConfigFactory.getDataSourceConfigurations());
-
+		configuration.addDatasources(timerConfigFactory.create());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();

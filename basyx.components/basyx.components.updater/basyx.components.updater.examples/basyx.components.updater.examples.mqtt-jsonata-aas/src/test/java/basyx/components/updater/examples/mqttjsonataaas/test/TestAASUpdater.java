@@ -24,10 +24,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import basyx.components.updater.camelpaho.configuration.factory.MqttDefaultConfigurationFactory;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
+import basyx.components.updater.camelpaho.configuration.factory.MqttDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 import io.moquette.broker.Server;
@@ -51,10 +51,9 @@ public class TestAASUpdater {
 		registry = new InMemoryRegistry();
 
 		aasContextConfig = new BaSyxContextConfiguration(4001, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");		
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");
 		aasServer = new AASServerComponent(aasContextConfig, aasConfig);
 		aasServer.setRegistry(registry);
-
 
 	}
 
@@ -67,21 +66,20 @@ public class TestAASUpdater {
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
 		// Extend configutation for connections
-		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
-		configuration.addRoutes(routesFactory.getRouteConfigurations());
-
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for MQTT Source
 		MqttDefaultConfigurationFactory mqttConfigFactory = new MqttDefaultConfigurationFactory(loader);
-		configuration.addDatasources(mqttConfigFactory.getDataSourceConfigurations());
+		configuration.addDatasources(mqttConfigFactory.create());
 
 		// Extend configuration for AAS
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
+		configuration.addDatasinks(aasConfigFactory.create());
 
 		// Extend configuration for Jsonata
 		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		configuration.addTransformers(jsonataConfigFactory.create());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();

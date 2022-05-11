@@ -16,8 +16,8 @@ import org.junit.Test;
 
 import basyx.components.updater.camelhttp.configuration.factory.HttpDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.factory.DefaultDelegatorsConfigurationFactory;
-import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.DelegatorsConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.examples.httpserver.HttpDataSource;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
@@ -39,20 +39,20 @@ public class TestAASUpdater {
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
 		// Extend configutation for connections
-		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
-		configuration.addRoutes(routesFactory.getRouteConfigurations());
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for Kafka Source
 		HttpDefaultConfigurationFactory httpConfigFactory = new HttpDefaultConfigurationFactory(loader);
-		configuration.addDatasources(httpConfigFactory.getDataSourceConfigurations());
+		configuration.addDatasources(httpConfigFactory.create());
 
 		// Extend configuration for Jsonata
 		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		configuration.addTransformers(jsonataConfigFactory.create());
 
 		// Extend configuration for Delegator
-		DefaultDelegatorsConfigurationFactory delegatorConfigFactory = new DefaultDelegatorsConfigurationFactory(loader);
-		configuration.addDelegators(delegatorConfigFactory.getDelegatorConfigurations());
+		DelegatorsConfigurationFactory delegatorConfigFactory = new DelegatorsConfigurationFactory(loader);
+		configuration.addDelegators(delegatorConfigFactory.create());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();
@@ -65,7 +65,7 @@ public class TestAASUpdater {
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpGet request = new HttpGet("http://localhost:8090/valueA");
 		CloseableHttpResponse resp = client.execute(request);
-	    String content = new String(resp.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
+		String content = new String(resp.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
 
 		System.out.println(content);
 		assertEquals("{\"value\":\"336.36\"}", content);

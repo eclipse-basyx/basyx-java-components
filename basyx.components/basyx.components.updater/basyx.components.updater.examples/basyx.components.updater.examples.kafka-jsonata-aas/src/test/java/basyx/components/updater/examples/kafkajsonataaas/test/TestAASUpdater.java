@@ -27,10 +27,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import basyx.components.updater.camelkafka.configuration.factory.KafkaDefaultConfigurationFactory;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
+import basyx.components.updater.camelkafka.configuration.factory.KafkaDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
@@ -47,7 +47,7 @@ public class TestAASUpdater {
 		registry = new InMemoryRegistry();
 
 		aasContextConfig = new BaSyxContextConfiguration(4001, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");		
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");
 		aasServer = new AASServerComponent(aasContextConfig, aasConfig);
 		aasServer.setRegistry(registry);
 	}
@@ -62,20 +62,20 @@ public class TestAASUpdater {
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
 		// Extend configutation for connections
-		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
-		configuration.addRoutes(routesFactory.getRouteConfigurations());
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for Kafka Source
 		KafkaDefaultConfigurationFactory kafkaConfigFactory = new KafkaDefaultConfigurationFactory(loader);
-		configuration.addDatasources(kafkaConfigFactory.getDataSourceConfigurations());
+		configuration.addDatasources(kafkaConfigFactory.create());
 
 		// Extend configuration for AAS
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
+		configuration.addDatasinks(aasConfigFactory.create());
 
 		// Extend configuration for Jsonata
 		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		configuration.addTransformers(jsonataConfigFactory.create());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();
@@ -86,7 +86,7 @@ public class TestAASUpdater {
 		updater.stopComponent();
 		aasServer.stopComponent();
 	}
-	
+
 	private void checkIfPropertyIsUpdated() throws InterruptedException {
 		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry);
 		ConnectedAssetAdministrationShell aas = manager.retrieveAAS(deviceAAS);
@@ -100,24 +100,24 @@ public class TestAASUpdater {
 
 	private void publishNewDatapoint() throws MqttException, MqttSecurityException, MqttPersistenceException {
 		String json = "{\"Account\":{\"Account Name\":\"Firefly\",\"Order\":[{\"OrderID\":\"order103\",\"Product\":[{\"Product Name\":\"Bowler Hat\",\"ProductID\":858383,\"SKU\":\"0406654608\",\"Description\":{\"Colour\":\"Purple\",\"Width\":300,\"Height\":200,\"Depth\":210,\"Weight\":0.75},\"Price\":34.45,\"Quantity\":2},{\"Product Name\":\"Trilby hat\",\"ProductID\":858236,\"SKU\":\"0406634348\",\"Description\":{\"Colour\":\"Orange\",\"Width\":300,\"Height\":200,\"Depth\":210,\"Weight\":0.6},\"Price\":21.67,\"Quantity\":1}]},{\"OrderID\":\"order104\",\"Product\":[{\"Product Name\":\"Bowler Hat\",\"ProductID\":858383,\"SKU\":\"040657863\",\"Description\":{\"Colour\":\"Purple\",\"Width\":300,\"Height\":200,\"Depth\":210,\"Weight\":0.75},\"Price\":34.45,\"Quantity\":4},{\"ProductID\":345664,\"SKU\":\"0406654603\",\"Product Name\":\"Cloak\",\"Description\":{\"Colour\":\"Black\",\"Width\":30,\"Height\":20,\"Depth\":210,\"Weight\":2},\"Price\":107.99,\"Quantity\":1}]}]}}";
-		
+
 		String bootstrapServer = "127.0.0.1:9092";
 
-        // create producer properties
-        Properties properties = new Properties();
-        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
-        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		// create producer properties
+		Properties properties = new Properties();
+		properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+		properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-        // create the producer
-        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
+		// create the producer
+		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
-        // create a producer record
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("first-topic", json);
+		// create a producer record
+		ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("first-topic", json);
 
-        // send data
-        producer.send(producerRecord);
-        producer.flush();
-        producer.close();
+		// send data
+		producer.send(producerRecord);
+		producer.flush();
+		producer.close();
 	}
 }
