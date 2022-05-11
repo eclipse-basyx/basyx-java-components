@@ -160,13 +160,14 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		if (atLeastOneJwtPropertyIsSet()) {
 			configureJwtAuthentication(baSyxContext);
 		}
-		
-		if(getAccessControlAllowOrigin() != null && !getAccessControlAllowOrigin().isEmpty()) {
-			System.out.println("#$#$ Not Empty : " + getAccessControlAllowOrigin());
-			baSyxContext.setAccessControlAllowOrigin(getAccessControlAllowOrigin());
-        }
-		
-		System.out.println("#$#$ Empty or Null");
+		try {
+			if(getAccessControlAllowOrigin() != null && !getAccessControlAllowOrigin().isEmpty()) {
+				System.out.println("#$#$ Not Empty : " + getAccessControlAllowOrigin());
+				baSyxContext.setAccessControlAllowOrigin(getAccessControlAllowOrigin());
+	        }
+		} catch(Exception e) {
+			System.out.println("Exception occurred");
+		}
 
 		return baSyxContext;
 	}
