@@ -37,4 +37,4 @@ ARG MONGODB_CONFIG_KEY
 ENV ${MONGODB_CONFIG_KEY} "/usr/share/config/mongodb.properties"
 
 # Start the jar
-CMD exec ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"
+CMD ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"
