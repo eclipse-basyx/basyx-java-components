@@ -72,14 +72,14 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.sdk</artifactId>
-			<version>1.0.1</version>
+			<version>1.1.0</version>
 		</dependency>
 
 		<!-- BaSyx SDK tests -->
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.sdk</artifactId>
-			<version>1.0.1</version>
+			<version>1.1.0</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -88,13 +88,13 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>
-			<version>1.0.1</version>
+			<version>1.1.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.AASServer</artifactId>
-			<version>1.0.1</version>
+			<version>1.1.0</version>
 		</dependency>
 
 		<!-- JUnit 4 for running JUnit tests -->
