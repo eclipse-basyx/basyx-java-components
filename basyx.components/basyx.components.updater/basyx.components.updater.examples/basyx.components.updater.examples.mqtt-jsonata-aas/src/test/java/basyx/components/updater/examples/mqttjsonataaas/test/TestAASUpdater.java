@@ -24,8 +24,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import basyx.components.updater.camelpaho.configuration.factory.MqttDefaultConfigurationFactory;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
+import basyx.components.updater.camelpaho.configuration.factory.MqttDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
@@ -89,9 +89,14 @@ public class TestAASUpdater {
 		System.out.println("PUBLISH EVENT");
 		publishNewDatapoint();
 		System.out.println("EVENT PUBLISHED");
+		waitForPropagation();
 		checkIfPropertyIsUpdated();
 		updater.stopComponent();
 		aasServer.stopComponent();
+	}
+
+	private void waitForPropagation() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	private void checkIfPropertyIsUpdated() throws InterruptedException {
