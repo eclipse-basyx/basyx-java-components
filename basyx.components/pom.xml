@@ -28,7 +28,6 @@
 	<modules>
 		<module>basyx.components.lib</module>
 		<module>basyx.components.docker</module>
-		<module>basyx.components.updater</module>
 	</modules>
 	
 	<build>

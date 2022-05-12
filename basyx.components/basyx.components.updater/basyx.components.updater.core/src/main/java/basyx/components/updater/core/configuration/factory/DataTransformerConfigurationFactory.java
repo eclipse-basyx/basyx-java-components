@@ -28,7 +28,7 @@ public class DataTransformerConfigurationFactory extends ConfigurationFactory {
 	}
 
 	/**
-	 * @deprecated this method is deprecated please use {@link #create()}
+	 * @deprecated use the {@link #create()} method instead
 	 */
 	@Deprecated
 	public List<DataTransformerConfiguration> getDataTransformerConfigurations() {
