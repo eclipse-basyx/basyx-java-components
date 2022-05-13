@@ -1,0 +1,25 @@
+{
+	"idShort": "identification_5",
+	"identification": "identification_5",
+	"administration": {
+		"revision": "identification_1.1"
+	},
+	"description": [
+		{
+			"language": "de-DE",
+			"text": "identification_5"
+		}
+	],
+	"submodelDescriptors": [
+		{
+			"idShort": "sm3",
+			"identification": "submodel3",
+			"description": [
+				{
+					"language": "de-DE",
+					"text": "G2"
+				}
+			]
+		}
+	]
+}

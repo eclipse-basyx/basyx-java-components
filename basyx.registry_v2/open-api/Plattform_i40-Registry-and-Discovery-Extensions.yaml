@@ -1,0 +1,149 @@
+---
+openapi: 3.0.3
+info:
+  title: DotAAS Part 2 | HTTP/REST | Registry and Discovery and Search
+  version: Final-Draft + Search
+paths:
+  /registry/shell-descriptors:
+    delete:
+      tags: [Registry and Discovery Interface]
+      summary: Deletes all Asset Administration Shell Descriptors
+      operationId: DeleteAllShellDescriptors
+      responses:
+        '204':
+          description: No content
+      x-semanticIds: ['https://admin-shell.io/aas/API/GetAllAssetAdministrationShellDescriptors/1/0/RC02']
+  /registry/shell-descriptors/{aasIdentifier}:
+    get:
+      responses:
+        "404":
+          description: Requested Asset Administration Shell Descriptor not found
+  /registry/shell-descriptors/{aasIdentifier}/submodel-descriptors:
+    get:
+      responses:
+        '404':
+          description: Asset Administration Shell Descriptor not found
+    post:
+       responses:
+         '404':
+            description: Asset Administration Shell Descriptor not found
+  /registry/shell-descriptors/{aasIdentifier}/submodel-descriptors/{submodelIdentifier}:
+    get:
+       responses: 
+          "404":
+             description: Asset Administration Shell Descriptor or submodel not found
+    put:
+       responses:
+         "404":
+             description: Asset Administration Shell Descriptor not found
+  /registry/search:
+    post:
+      operationId: SearchShellDescriptors
+      tags:
+        - Registry and Discovery Interface  
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShellDescriptorSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: Search response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShellDescriptorSearchResponse'
+components:
+  schemas:
+    Reference:
+      discriminator:
+        propertyName: type
+    GlobalReference:
+      required:
+      - value
+      - type
+      properties:
+        type:
+          type: string
+          default: GlobalReference
+          readOnly: true
+    ModelReference:
+      required:
+      - keys
+      - type
+      properties:
+         type: 
+            type: string
+            default: ModelReference
+            readOnly: true
+    ShellDescriptorSearchRequest:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Page'
+        sortBy: 
+          $ref: '#/components/schemas/Sorting'
+        query:
+          $ref: '#/components/schemas/ShellDescriptorQuery'
+    ShellDescriptorQuery:      
+      required:
+        - queryType
+        - path
+        - value
+      properties:
+        path:
+          type: string
+        value:
+          type: string
+        queryType:
+          type: string
+          enum: ['match', 'regex']
+    Page:
+       type: object
+       required:
+          - index
+          - size
+       properties:
+          index:
+             type: integer
+             minimum: 0
+          size: 
+             type: integer
+             minimum: 1
+             maximum: 10000 
+    Sorting:
+      type: object
+      required:
+        - path
+      properties:
+        direction:
+          $ref: '#/components/schemas/SortDirection'
+        path:
+           type: array
+           items:
+              $ref: '#/components/schemas/SortingPath'
+    SortingPath:
+       type: string
+       enum: 
+          - idShort
+          - identification
+          - administration.revision
+          - administration.version
+    SortDirection:
+       type: string
+       enum: [ "ASC", "DESC"]
+    ShellDescriptorSearchResponse:
+      type: object
+      required:
+        - hits
+        - total
+      properties:
+        total:
+           type: integer
+           format: int64
+           minimum: 0
+        hits:
+          type: array
+          items: 
+            $ref: '#/components/schemas/AssetAdministrationShellDescriptor'

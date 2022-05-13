@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.eclipse.basyx.aas.registry</groupId>
+		<artifactId>aas-registry</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>aas-registry-service-base-tests</artifactId>
+	<name>aas-registry-service-base-tests</name>
+	<packaging>jar</packaging>
+
+	<properties>
+		<spring-cloud.version>2020.0.4</spring-cloud.version>
+		<start-class>org.eclipse.basyx.aas.registry.service.Swagger2SpringBoot</start-class>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.basyx.aas.registry</groupId>
+			<artifactId>aas-registry-events</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.basyx.aas.registry</groupId>
+			<artifactId>aas-registry-paths</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.basyx.aas.registry</groupId>
+			<artifactId>aas-registry-client</artifactId>			
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.basyx.aas.registry</groupId>
+			<artifactId>aas-registry-service</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+</project>

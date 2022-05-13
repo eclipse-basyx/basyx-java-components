@@ -1,0 +1,5 @@
+---
+registry:
+  type: elasticsearch
+elasticsearch:
+   url: ${ELASTICSEARCH_HOST_URL}

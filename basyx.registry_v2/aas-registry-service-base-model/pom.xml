@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.eclipse.basyx.aas.registry</groupId>
+		<artifactId>aas-registry</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>aas-registry-service-base-model</artifactId>
+	<name>aas-registry-service-base-model</name>
+	<packaging>jar</packaging>
+
+	<properties>
+		<openapi.folder>${project.basedir}/${openapi.folder.name}</openapi.folder>
+		<openapi.result.file>${openapi.folder}/${openapi.name}</openapi.result.file>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${project.basedir}/${generated.folder}</directory>
+							<excludes>
+								<exclude>**/.gitkeep</exclude>
+							</excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.basyx.aas.registry</groupId>
+				<artifactId>aas-registry-plugins</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>yaml-overlay</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- <inputSpec>https://api.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/Final-Draft/swagger.yaml?resolved=true</inputSpec> -->
+					<base>${project.basedir}/../${openapi.folder.name}/${openapi.base.name}</base>
+					<overlay>${project.basedir}/../${openapi.folder.name}/${openapi.extensions.name}</overlay>
+					<out>${openapi.result.file}</out>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>io.swagger.codegen.v3</groupId>
+				<artifactId>swagger-codegen-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<generateModels>true</generateModels>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<generateApis>false</generateApis>
+							<inputSpec>${openapi.result.file}</inputSpec>
+							<language>spring</language>
+							<library>spring-boot</library>
+							<output>${project.basedir}/${generated.folder}</output>
+
+							<!-- See https://openapi-generator.tech/docs/generators/spring -->
+							<configOptions>
+								<java8>true</java8>
+								<dateLibrary>java8</dateLibrary>
+								<sourceFolder>java</sourceFolder>
+								<serializableModel>true</serializableModel>
+								<oas3>true</oas3>
+								<useSpringController>true</useSpringController>
+								<modelPackage>org.eclipse.basyx.aas.registry.model</modelPackage>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<!--SpringFox dependencies --> 
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-oas</artifactId>
+		</dependency>
+		<!-- Bean Validation API support -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+</project>

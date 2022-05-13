@@ -1,0 +1,61 @@
+[
+	{
+		"identification": "identification_2",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_2.1",
+				"description" : [{
+					"language" : "de_DE",
+					"text" : "I am a robot!"
+				}]
+			},
+			{
+				"identification": "identification_2.2"
+				
+			}
+		]
+	},
+	{
+		"identification": "identification_1"
+	},
+	{
+		"identification": "identification_3",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_3.1",
+				"description" : [{
+					"language" : "de_DE",
+					"text" : "A green Robot."
+				}]
+			},
+			{
+				"identification": "identification_3.2"
+				
+			}
+		]
+	},
+	{
+		"identification": "identification_4",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_4.1",
+				"description" : [{
+					"language" : "de_DE",
+					"text" : "A yellow drone."
+				}]
+			}
+		]
+	},
+	{
+		"identification": "identification_5",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_5.1",
+				"description" : [{
+					"language" : "de_DE",
+					"text" : "A blue roboter."
+				}]
+			}
+		]
+	}
+]
