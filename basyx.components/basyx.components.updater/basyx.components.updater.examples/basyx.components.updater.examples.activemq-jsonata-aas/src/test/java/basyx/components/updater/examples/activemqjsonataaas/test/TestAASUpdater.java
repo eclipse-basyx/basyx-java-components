@@ -90,9 +90,14 @@ public class TestAASUpdater {
 		publishNewDatapoint();
 		publishNewDatapoint2();
 		System.out.println("EVENT PUBLISHED");
+		waitForPropagation();
 		checkIfPropertyIsUpdated();
 		updater.stopComponent();
 		aasServer.stopComponent();
+	}
+
+	private void waitForPropagation() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	private void checkIfPropertyIsUpdated() throws InterruptedException {
@@ -161,7 +166,6 @@ public class TestAASUpdater {
 
 	private static void startActiveMQBroker() {
 		try {
-
 			BrokerService broker = new BrokerService();
 			broker.addConnector("tcp://localhost:61616");
 			broker.setPersistent(false);
@@ -169,9 +173,7 @@ public class TestAASUpdater {
 			systemUsage.getStoreUsage().setLimit(1024 * 1024 * 8);
 			systemUsage.getTempUsage().setLimit(1024 * 1024 * 8);
 			broker.start();
-
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

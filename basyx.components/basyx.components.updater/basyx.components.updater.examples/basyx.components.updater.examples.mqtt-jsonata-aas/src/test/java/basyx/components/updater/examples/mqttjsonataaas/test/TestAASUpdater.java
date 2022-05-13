@@ -87,9 +87,14 @@ public class TestAASUpdater {
 		System.out.println("PUBLISH EVENT");
 		publishNewDatapoint();
 		System.out.println("EVENT PUBLISHED");
+		waitForPropagation();
 		checkIfPropertyIsUpdated();
 		updater.stopComponent();
 		aasServer.stopComponent();
+	}
+
+	private void waitForPropagation() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	private void checkIfPropertyIsUpdated() throws InterruptedException {
