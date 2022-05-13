@@ -15,18 +15,18 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+import org.eclipse.milo.examples.server.ExampleServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import basyx.components.updater.camelopcua.configuration.factory.OpcuaDefaultConfigurationFactory;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
+import basyx.components.updater.camelopcua.configuration.factory.OpcuaDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.factory.DefaultRoutesConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
-import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonJacksonDefaultConfigurationFactory;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
-import org.eclipse.milo.examples.server.ExampleServer;
+import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonJacksonDefaultConfigurationFactory;
 
 public class TestAASUpdater {
 	private static AASServerComponent aasServer;
@@ -44,8 +44,7 @@ public class TestAASUpdater {
 		registry = new InMemoryRegistry();
 
 		aasContextConfig = new BaSyxContextConfiguration(4001, "");
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY,
-				"aasx/updatertest.aasx");
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/updatertest.aasx");
 		aasServer = new AASServerComponent(aasContextConfig, aasConfig);
 		aasServer.setRegistry(registry);
 	}
@@ -65,26 +64,25 @@ public class TestAASUpdater {
 		System.out.println("START UPDATER");
 		ClassLoader loader = this.getClass().getClassLoader();
 		RoutesConfiguration configuration = new RoutesConfiguration();
-		
+
 		// Extend configutation for connections
-		DefaultRoutesConfigurationFactory routesFactory = new DefaultRoutesConfigurationFactory(loader);
-		configuration.addRoutes(routesFactory.getRouteConfigurations());
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for Opcua Source
 		OpcuaDefaultConfigurationFactory opcuaConfigFactory = new OpcuaDefaultConfigurationFactory(loader);
-		configuration.addDatasources(opcuaConfigFactory.getDataSourceConfigurations());
+		configuration.addDatasources(opcuaConfigFactory.create());
 
 		// Extend configuration for AAS
 		AASProducerDefaultConfigurationFactory aasConfigFactory = new AASProducerDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(aasConfigFactory.getDataSinkConfigurations());
+		configuration.addDatasinks(aasConfigFactory.create());
 
-		JsonJacksonDefaultConfigurationFactory jsonJacksonConfigFactory = new JsonJacksonDefaultConfigurationFactory(
-				loader);
-		configuration.addTransformers(jsonJacksonConfigFactory.getDataTransformerConfigurations());
+		JsonJacksonDefaultConfigurationFactory jsonJacksonConfigFactory = new JsonJacksonDefaultConfigurationFactory(loader);
+		configuration.addTransformers(jsonJacksonConfigFactory.create());
 
 		// Extend configuration for Jsonata
 		JsonataDefaultConfigurationFactory jsonataConfigFactory = new JsonataDefaultConfigurationFactory(loader);
-		configuration.addTransformers(jsonataConfigFactory.getDataTransformerConfigurations());
+		configuration.addTransformers(jsonataConfigFactory.create());
 
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();

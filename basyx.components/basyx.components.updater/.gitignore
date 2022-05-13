@@ -112,6 +112,9 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+# generated code after execution
+basyx.components.updater.camel-hono/src/generated/
+basyx.components.updater.camel-aas/src/generated/
 
 ### Kafka ###
 basyx.components.updater.examples/kafka-multiple-zookeeper-multiple-server/zk-multiple-kafka-multiple/
