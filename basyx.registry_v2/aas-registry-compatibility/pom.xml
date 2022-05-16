@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.eclipse.basyx.aas.registry</groupId>
+		<artifactId>aas-registry</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>aas-registry-compatibility</artifactId>
+	<name>aas-registry-compatibility</name>
+	<packaging>jar</packaging>
+
+	<dependencies>
+
+		<!-- Add BaSys SDK -->
+		<dependency>
+			<groupId>org.eclipse.basyx</groupId>
+			<artifactId>basyx.sdk</artifactId>
+			<version>[1.0.0,2.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>aas-registry-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JUnit 4 for running JUnit tests -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

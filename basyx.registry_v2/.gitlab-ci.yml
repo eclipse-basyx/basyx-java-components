@@ -1,0 +1,185 @@
+image: maven:3-eclipse-temurin-11-alpine
+
+variables:
+  DOCKER_HOST: "tcp://docker:2375" 
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2  
+  MAVEN_TARGET_PLUGINS: '${CI_PROJECT_DIR}/aas-registry-plugins/target'
+  MAVEN_TARGET_CLASSES: '${CI_PROJECT_DIR}/**/target/classes'
+  MAVEN_TARGET_JARS: '${CI_PROJECT_DIR}/**/target/*.jar'
+  MAVEN_TARGET_RELEASE_JARS: '${CI_PROJECT_DIR}/aas-registry-service-release-*/target/*.jar'
+  CLIENT_OPENAPI_FOLDER: ${CI_PROJECT_DIR}/aas-registry-client/open-api
+  CLIENT_OPENAPI_FILE: ${CLIENT_OPENAPI_FOLDER}/Plattform_i40-Registry-and-Discovery.yaml
+  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+  MAVEN_CLI_OPTS: "-s ${CI_PROJECT_DIR}/.m2/settings.xml --batch-mode -Pgitlab"
+  TYPESCRIPT_FOLDER: ${CI_PROJECT_DIR}/typescript
+  NPM_REPO: ${MAVEN_REPO_URL}/npm-hosted/  # same as for maven but with npm-hosted suffix
+
+cache:
+  paths:
+    - .m2/repository/
+    
+stages:
+  - plugin
+  - validate
+  - build
+  - test
+  - install
+  - deploy
+
+mvn-build-plugin:
+  stage: plugin
+  tags:
+    - basys
+    - maven
+  script:
+    - mvn $MAVEN_CLI_OPTS install -f ./aas-registry-plugins
+  artifacts:
+    paths:
+      - $MAVEN_TARGET_PLUGINS
+    expire_in: 3 hour    
+    
+mvn-validate:
+  stage: validate
+  tags:
+    - basys
+    - maven
+  script:
+    - mvn -V $MAVEN_CLI_OPTS validate
+  dependencies:
+    - mvn-build-plugin
+    
+mvn-compile:
+  stage: build
+  tags:
+    - basys
+    - maven
+  script:
+    - mvn $MAVEN_CLI_OPTS compile -Dmaven.validate.skip=true
+  dependencies:
+    - mvn-build-plugin
+  artifacts:
+    paths:
+      - $MAVEN_TARGET_CLASSES
+      - $CLIENT_OPENAPI_FOLDER
+    expire_in: 3 hour    
+    
+npm-build:
+  stage: build
+  tags: 
+    - basys
+    - maven
+  dependencies:
+    - mvn-compile
+  script:
+    - mkdir $TYPESCRIPT_FOLDER
+    - cd $TYPESCRIPT_FOLDER
+    - mvn dependency:get -Dartifact=io.swagger.codegen.v3:swagger-codegen-cli:3.0.31:jar -Ddest=openapi-generator.jar
+    - java -jar openapi-generator.jar generate -l typescript-fetch -i ../aas-registry-client/open-api/Plattform_i40-Registry-and-Discovery.yaml -o . --additional-properties [ npmName=@basys/aas-registry-client-ts-fetch npmVersion=0.3.0 snapshot=true ]
+    - rm openapi-generator.jar
+    - rm -rf .swagger-codegen
+  artifacts:
+    paths:
+      - $TYPESCRIPT_FOLDER
+    expire_in: 3 hour
+
+mvn-test:
+  stage: test 
+  services:
+     - name: docker:20.10.12-dind
+       # explicitly disable tls to avoid docker startup interruption
+       command: ["--tls=false"]
+  tags:
+    - basys
+    - maven
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Dmaven.validate.skip=true -Dmaven.compile.skip=true
+  dependencies:
+    - mvn-compile
+
+mvn-docker-install:
+  stage: install
+  image: dfkibasys/docker-temurin11jdk:20.10.12
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+     - name: docker:20.10.12-dind
+       # explicitly disable tls to avoid docker startup interruption
+       command: ["--tls=false"]
+  tags:
+    - basys
+    - maven
+  script:
+    - chmod 775 ./mvnw
+    - ./mvnw -o $MAVEN_CLI_OPTS install -Ddocker.username=$DOCKER_REGISTRY_USER -Ddocker.password=$DOCKER_REGISTRY_PASSWORD -Dmaven.validate.skip=true -Dmaven.test.skip=true -Dmaven.compile.skip=true
+  dependencies:
+    - mvn-compile
+  artifacts:
+    paths:
+      - $MAVEN_TARGET_RELEASE_JARS
+    expire_in: 3 hour
+
+mvn-deploy:
+  stage: deploy
+  tags:
+    - basys
+    - maven
+  script:
+    - cd aas-registry-plugins; mvn $MAVEN_CLI_OPTS deploy -Dmaven.validate.skip=true  -Dmaven.test.skip=true -Dmaven.compile.skip=true -Dmaven.install.skip=true; cd ..
+    - cd aas-registry-client; mvn $MAVEN_CLI_OPTS deploy -Dmaven.validate.skip=true  -Dmaven.test.skip=true -Dmaven.compile.skip=true -Dmaven.install.skip=true; cd ..
+    - cd aas-registry-compatibility; mvn $MAVEN_CLI_OPTS deploy -Dmaven.validate.skip=true  -Dmaven.test.skip=true -Dmaven.compile.skip=true -Dmaven.install.skip=true; cd ..
+    - cd aas-registry-events; mvn $MAVEN_CLI_OPTS deploy -Dmaven.validate.skip=true  -Dmaven.test.skip=true -Dmaven.compile.skip=true -Dmaven.install.skip=true; cd ..
+    - cd aas-registry-paths; mvn $MAVEN_CLI_OPTS deploy -Dmaven.validate.skip=true  -Dmaven.test.skip=true -Dmaven.compile.skip=true -Dmaven.install.skip=true; cd ..
+  dependencies:
+    - mvn-build-plugin
+    - mvn-docker-install
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_COMMIT_BRANCH == 'develop'
+
+docker-deploy:
+  stage: deploy
+  image: dfkibasys/docker-temurin11jdk:20.10.12
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+     - name: docker:20.10.12-dind
+       # explicitly disable tls to avoid docker startup interruption
+       command: ["--tls=false"]
+  dependencies:
+    - mvn-compile
+  tags:
+    - basys
+    - docker
+  before_script:
+    - docker info
+  script:
+    - chmod 775 ./mvnw
+    - ./mvnw -o $MAVEN_CLI_OPTS deploy -Ddocker.username=$DOCKER_REGISTRY_USER -Ddocker.password=$DOCKER_REGISTRY_PASSWORD -Dmaven.validate.skip=true -Dmaven.compile.skip=true -Dmaven.test.skip=true 
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_COMMIT_BRANCH == 'develop'
+
+
+npm-deploy:
+  image: node:14-alpine
+  stage: deploy
+  tags:
+    - basys
+  dependencies:
+    - npm-build
+  script:
+    - cd $TYPESCRIPT_FOLDER
+    - npm config set strict-ssl false
+    - npm config set @basys:registry $NPM_REPO
+    - npm config set email basys-support@dfki.de
+    - TOKEN=$(echo -n ${MAVEN_REPO_USER}:${MAVEN_REPO_PASS} | base64)
+    - npm config set _auth ${TOKEN}    
+    - npm config set always-auth true
+    - npm install  # check dependencies could be installed
+    - npm prune 
+    - npm run build  # build with tests
+    - npm publish  # deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_COMMIT_BRANCH == 'develop'

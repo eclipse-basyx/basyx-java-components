@@ -1,0 +1,22 @@
+[
+	{
+		"identification":  "identification_1"
+	},
+	{
+		"identification":  "identification_2",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_2.1"
+			},
+			{
+				"identification": "identification_2.2",
+				"description": [
+					{
+						"language": "de-DE",
+						"text": "Overridden"
+					}
+				]
+			}
+		]
+	}
+]

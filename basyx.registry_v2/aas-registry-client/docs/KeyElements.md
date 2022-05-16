@@ -1,0 +1,27 @@
+# KeyElements
+
+## Enum
+
+* `ASSETADMINISTRATIONSHELL` (value: `"AssetAdministrationShell"`)
+* `ACCESSPERMISSIONRULE` (value: `"AccessPermissionRule"`)
+* `CONCEPTDESCRIPTION` (value: `"ConceptDescription"`)
+* `SUBMODEL` (value: `"Submodel"`)
+* `ANNOTATEDRELATIONSHIPELEMENT` (value: `"AnnotatedRelationshipElement"`)
+* `BASICEVENT` (value: `"BasicEvent"`)
+* `BLOB` (value: `"Blob"`)
+* `CAPABILITY` (value: `"Capability"`)
+* `DATAELEMENT` (value: `"DataElement"`)
+* `FILE` (value: `"File"`)
+* `ENTITY` (value: `"Entity"`)
+* `EVENT` (value: `"Event"`)
+* `MULTILANGUAGEPROPERTY` (value: `"MultiLanguageProperty"`)
+* `OPERATION` (value: `"Operation"`)
+* `PROPERTY` (value: `"Property"`)
+* `RANGE` (value: `"Range"`)
+* `REFERENCEELEMENT` (value: `"ReferenceElement"`)
+* `RELATIONSHIPELEMENT` (value: `"RelationshipElement"`)
+* `SUBMODELELEMENT` (value: `"SubmodelElement"`)
+* `SUBMODELELEMENTLIST` (value: `"SubmodelElementList"`)
+* `SUBMODELELEMENTSTRUCT` (value: `"SubmodelElementStruct"`)
+* `VIEW` (value: `"View"`)
+* `FRAGMENTREFERENCE` (value: `"FragmentReference"`)

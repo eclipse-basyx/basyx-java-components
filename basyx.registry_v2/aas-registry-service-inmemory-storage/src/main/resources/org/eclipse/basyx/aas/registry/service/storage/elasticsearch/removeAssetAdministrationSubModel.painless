@@ -1,0 +1,13 @@
+Map descr = ctx._source; 
+if (descr.submodelDescriptors == null) {
+	ctx.op = 'none';
+	return;	
+} 
+List submodels = descr.submodelDescriptors;
+for(int i = 0, len = submodels.size(); i < len; i++) {
+  if(submodels.get(i).identification.equals(params.id)) {
+  	submodels.remove(i);
+	return;
+  }
+}
+ctx.op = 'none';
