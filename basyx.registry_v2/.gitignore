@@ -22,5 +22,6 @@ build
 # eclipse files
 *.classpath
 *.project
+*.settings/**
 
-*/src/generated/
+**/src/generated/
