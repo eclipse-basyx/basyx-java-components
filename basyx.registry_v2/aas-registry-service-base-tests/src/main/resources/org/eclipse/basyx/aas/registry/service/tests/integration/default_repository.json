@@ -1,0 +1,109 @@
+[
+	{
+		"idShort": "identification_7",
+		"identification": "identification_7",
+		"administration": {
+			"revision": "identification_2.2" 
+		},
+		"description": [
+			{
+				"language": "de-DE",
+				"text": "identification_7"
+			}
+		]
+	},	
+	{
+		"idShort": "identification_7",
+		"identification": "identification_6",
+		"administration": {
+			"revision": "identification_2.1" 
+		},
+		"description": [
+			{
+				"language": "de-DE",
+				"text": "identification_7"
+			}
+		]
+	},
+	{
+		"idShort": "identification_1",
+		"identification": "identification_1",
+		"administration": {
+			"revision": "identification_2.2" 
+		},
+		"description": [
+			{
+				"language": "en-US",
+				"text": "identification_1"
+			}
+		]
+	},
+	{
+		"idShort": "identification_5",
+		"identification": "identification_5",
+		"administration": {
+			"revision": "identification_1.1" 
+		},
+		"description": [
+			{
+				"language": "de-DE",
+				"text": "identification_5"
+			}
+		],
+		"submodelDescriptors": [
+			{
+				"idShort": "submodel_0",
+				"identification": "submodel_0",
+				"description": [
+					{
+						"language": "de-DE",
+						"text": "G1"
+					}
+				]
+			},
+			{
+				"idShort": "submodel_1",
+				"identification": "submodel1",
+				"description": [
+					{
+						"language": "de-DE",
+						"text": "G2"
+					}
+				]
+			},
+			{
+				"idShort": "sm2",
+				"identification": "submodel2",
+				"description": [
+					{
+						"language": "de-DE",
+						"text": "G1"
+					}
+				]
+			},
+			{
+				"idShort": "sm3",
+				"identification": "submodel3",
+				"description": [
+					{
+						"language": "de-DE",
+						"text": "G2"
+					}
+				]
+			}
+		]
+	},
+	{
+		"idShort": "identification_2",
+		"identification": "identification_2",
+		"administration": {
+			"revision": "2.22221" 
+		},
+		"description": [
+			{
+				"language": "de-DE",
+				"text": "identification_2"
+			}
+		]
+	}
+]

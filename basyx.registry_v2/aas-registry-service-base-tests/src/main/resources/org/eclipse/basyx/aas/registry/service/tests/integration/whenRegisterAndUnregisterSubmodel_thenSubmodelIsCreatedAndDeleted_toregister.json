@@ -1,0 +1,8 @@
+{
+	"idShort": "submodel_1",
+	"identification": "submodel1",
+	"description": [{
+		"language": "de-DE",
+		"text": "Second Sub model descriptor."
+	}]
+}

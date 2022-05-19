@@ -1,0 +1,1623 @@
+[
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F0043_1113_5012_9303/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/0043_1113_5012_9303"
+		},
+		"idShort": "mir100_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/8152_1113_5012_0429"
+			},
+			"idShort": "mir100_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F0043_1113_5012_9303/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1435_3180_6012_0689"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F0043_1113_5012_9303/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/6291_5170_6012_9120"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5323_1113_5012_2226/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/5323_1113_5012_2226"
+		},
+		"idShort": "drone_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/3332_1113_5012_4899"
+			},
+			"idShort": "drone_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5323_1113_5012_2226/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/4263_9080_6012_8626"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5323_1113_5012_2226/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/5314_1110_6012_3213"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/baxter_2_aas/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "baxter_2_aas"
+		},
+		"idShort": "baxter_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/8125_0191_1112_1824"
+			},
+			"idShort": "baxter_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/baxter_2_aas/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/6520_7132_1112_3075"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5453_1113_5012_9841/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/5453_1113_5012_9841"
+		},
+		"idShort": "ur10_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/3572_1113_5012_2487"
+			},
+			"idShort": "ur10_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5453_1113_5012_9841/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/5175_4182_7012_5135"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5453_1113_5012_9841/aas/submodels/ControlComponentInstance/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/9485_2152_8012_0976"
+				},
+				"idShort": "ControlComponentInstance"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5453_1113_5012_9841/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7154_5170_6012_5128"
+				},
+				"idShort": "Identification"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5453_1113_5012_9841/aas/submodels/Signals/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7151_3182_7012_7596"
+				},
+				"idShort": "Signals"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F7503_1113_5012_5138/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/7503_1113_5012_5138"
+		},
+		"idShort": "aio_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/0222_1113_5012_4427"
+			},
+			"idShort": "aio_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F7503_1113_5012_5138/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/9364_0110_6012_2117"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/baxter_1_aas/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "baxter_1_aas"
+		},
+		"idShort": "baxter_1_aas",
+		"asset": {
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/3422_1113_5012_0005"
+			},
+			"idShort": "baxter_1",
+			"kind": "Instance",
+			"dataSpecification": [
+			],
+			"modelType": {
+				"name": "Asset"
+			},
+			"embeddedDataSpecifications": [
+			],
+			"assetIdentificationModel": {
+				"keys": [
+					{
+						"idType": "Custom",
+						"type": "Submodel",
+						"value": "https://test.de/ids/sm/6292_2113_5012_4413",
+						"local": true
+					}
+				]
+			}
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/baxter_1_aas/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/9014_1110_6012_1842"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F9333_1113_5012_7535/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/9333_1113_5012_7535"
+		},
+		"idShort": "mir100_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/8052_1113_5012_1023"
+			},
+			"idShort": "mir100_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F9333_1113_5012_7535/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1435_3180_6012_0689"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F9333_1113_5012_7535/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7024_1110_6012_7746"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F1133_1113_5012_3439/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/1133_1113_5012_3439"
+		},
+		"idShort": "panda_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/0242_1113_5012_3428"
+			},
+			"idShort": "panda_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F1133_1113_5012_3439/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7401_5170_6012_2623"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F9163_1113_5012_6846/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/9163_1113_5012_6846"
+		},
+		"idShort": "ur10e_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/8482_1113_5012_4409"
+			},
+			"idShort": "ur10e_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F9163_1113_5012_6846/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/2184_5170_6012_8745"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5553_1113_5012_4929/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/5553_1113_5012_4929"
+		},
+		"idShort": "ur10_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/2082_1113_5012_4886"
+			},
+			"idShort": "ur10_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5553_1113_5012_4929/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1274_5170_6012_2788"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6253_1113_5012_7178/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/6253_1113_5012_7178"
+		},
+		"idShort": "ur5_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/5472_1113_5012_2754"
+			},
+			"idShort": "ur5_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6253_1113_5012_7178/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1144_5170_6012_4316"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8351_4191_1112_7911/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/8351_4191_1112_7911"
+		},
+		"idShort": "mir100_4_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/9221_4191_1112_4976"
+			},
+			"idShort": "mir100_4",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8351_4191_1112_7911/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1435_3180_6012_0689"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8351_4191_1112_7911/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/8165_6132_1112_4319"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F7023_1113_5012_2822/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/7023_1113_5012_2822"
+		},
+		"idShort": "bmb_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/9132_1113_5012_0244"
+			},
+			"idShort": "bmb_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F7023_1113_5012_2822/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/4233_8020_6012_0953"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8543_1113_5012_7761/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/8543_1113_5012_7761"
+		},
+		"idShort": "sawyer_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/9072_1113_5012_4001"
+			},
+			"idShort": "sawyer_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8543_1113_5012_7761/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/2102_5170_6012_2032"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F1203_7132_1112_1385/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/1203_7132_1112_1385"
+		},
+		"idShort": "hololens2_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/3142_7132_1112_9303"
+			},
+			"idShort": "hololens2_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F1203_7132_1112_1385/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/5013_7132_1112_1389"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F3064_3152_8012_5186/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/3064_3152_8012_5186"
+		},
+		"idShort": "mrk40_lab_aas",
+		"asset": {
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/4564_3152_8012_5305"
+			},
+			"idShort": "mrk40_lab",
+			"kind": "Instance",
+			"dataSpecification": [
+			],
+			"modelType": {
+				"name": "Asset"
+			},
+			"category": "CONSTANT",
+			"embeddedDataSpecifications": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F3064_3152_8012_5186/aas/submodels/Layout_I40/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/8391_8081_1112_0109"
+				},
+				"idShort": "Layout_I40"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F3064_3152_8012_5186/aas/submodels/Topology_I40/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/6301_0120_8012_5974"
+				},
+				"idShort": "Topology_I40"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8523_1113_5012_2455/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/8523_1113_5012_2455"
+		},
+		"idShort": "panda_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/0142_1113_5012_2784"
+			},
+			"idShort": "panda_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F8523_1113_5012_2455/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/5414_1110_6012_8530"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6363_1113_5012_8405/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/6363_1113_5012_8405"
+		},
+		"idShort": "yumi_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/9582_1113_5012_8716"
+			},
+			"idShort": "yumi_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6363_1113_5012_8405/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1324_1110_6012_7891"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F0153_1113_5012_9422/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/0153_1113_5012_9422"
+		},
+		"idShort": "ur3_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/3372_1113_5012_9690"
+			},
+			"idShort": "ur3_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F0153_1113_5012_9422/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7124_1110_6012_4383"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5513_1113_5012_3140/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/5513_1113_5012_3140"
+		},
+		"idShort": "bmb_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/9032_1113_5012_5735"
+			},
+			"idShort": "bmb_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F5513_1113_5012_3140/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/4213_8020_6012_7967"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F1563_1113_5012_2206/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/1563_1113_5012_2206"
+		},
+		"idShort": "yumi_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/7092_1113_5012_4194"
+			},
+			"idShort": "yumi_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F1563_1113_5012_2206/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7005_5170_6012_5369"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F4233_1113_5012_4654/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/4233_1113_5012_4654"
+		},
+		"idShort": "lap_1_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/6542_1113_5012_9769"
+			},
+			"idShort": "lap_1",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F4233_1113_5012_4654/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/4514_1110_6012_0882"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6423_1113_5012_4537/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/6423_1113_5012_4537"
+		},
+		"idShort": "drone_2_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/3432_1113_5012_7640"
+			},
+			"idShort": "drone_2",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6423_1113_5012_4537/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/4263_9080_6012_8626"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6423_1113_5012_4537/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/4024_8020_6012_8167"
+				},
+				"idShort": "Identification"
+			}
+		]
+	},
+	{
+		"endpoints": [
+			{
+				"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6443_1113_5012_8886/aas",
+				"type": "http"
+			}
+		],
+		"modelType": {
+			"name": "AssetAdministrationShellDescriptor"
+		},
+		"identification": {
+			"idType": "Custom",
+			"id": "https://test.de/ids/aas/6443_1113_5012_8886"
+		},
+		"idShort": "mir100_3_aas",
+		"asset": {
+			"modelType": {
+				"name": "Asset"
+			},
+			"identification": {
+				"idType": "Custom",
+				"id": "https://test.de/ids/asset/0352_1113_5012_8795"
+			},
+			"idShort": "mir100_3",
+			"embeddedDataSpecifications": [
+			],
+			"kind": "Instance",
+			"dataSpecification": [
+			]
+		},
+		"submodels": [
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6443_1113_5012_8886/aas/submodels/Capabilities/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/1435_3180_6012_0689"
+				},
+				"idShort": "Capabilities"
+			},
+			{
+				"endpoints": [
+					{
+						"address": "http://localhost:4001/aasServer/shells/https%3A%2F%2Ftest.de%2Fids%2Faas%2F6443_1113_5012_8886/aas/submodels/Identification/submodel",
+						"type": "http"
+					}
+				],
+				"semanticId": {
+					"keys": [
+						{
+							"idType": "Custom",
+							"type": "Submodel",
+							"value": "https://www.hsu-hh.de/aut/aas/identification",
+							"local": false
+						}
+					]
+				},
+				"modelType": {
+					"name": "SubmodelDescriptor"
+				},
+				"identification": {
+					"idType": "Custom",
+					"id": "https://test.de/ids/sm/7491_5170_6012_5831"
+				},
+				"idShort": "Identification"
+			}
+		]
+	}
+]

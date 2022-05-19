@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.eclipse.basyx.aas.registry</groupId>
+		<artifactId>aas-registry</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>aas-registry-client</artifactId>
+	<name>aas-registry-client</name>
+	<packaging>jar</packaging>
+	<properties>
+		<openapi.result.folder>${project.basedir}/${openapi.folder.name}</openapi.result.folder>
+		<openapi.result.file>${openapi.result.folder}/${openapi.name}</openapi.result.file>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${project.basedir}/${generated.folder}</directory>
+							<excludes>
+								<exclude>**/.gitkeep</exclude>
+							</excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>${openapi.result.folder}</directory>
+							<excludes>
+								<exclude>**/.gitkeep</exclude>
+							</excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.basyx.aas.registry</groupId>
+				<artifactId>aas-registry-plugins</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>yaml-overlay</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- <inputSpec>https://api.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/Final-Draft/swagger.yaml?resolved=true</inputSpec> -->
+					<base>${project.basedir}/../${openapi.folder.name}/${openapi.base.name}</base>
+					<overlay>${project.basedir}/../${openapi.folder.name}/${openapi.extensions.name}</overlay>
+					<out>${openapi.result.file}</out>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>io.swagger.codegen.v3</groupId>
+				<artifactId>swagger-codegen-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<language>java</language>
+							<library>resttemplate</library>
+							<inputSpec>${openapi.result.file}</inputSpec>
+							<output>${project.basedir}/${generated.folder}</output>
+							<apiPackage>org.eclipse.basyx.aas.registry.client.api</apiPackage>
+							<invokerPackage>org.eclipse.basyx.aas.registry.client</invokerPackage>
+							<modelPackage>org.eclipse.basyx.aas.registry.model</modelPackage>
+							<generateModels>true</generateModels>
+							<generateApis>true</generateApis>
+							<generateApiTests>false</generateApiTests>
+							<generateModelDocumentation>false</generateModelDocumentation>
+							<generateApiDocumentation>false</generateApiDocumentation>
+							<generateSupportingFiles>true</generateSupportingFiles>
+							<templateDirectory>${project.basedir}/templates</templateDirectory>
+							<supportingFilesToGenerate>ApiClient.java,RFC3339DateFormat.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,OAuth.java,OauthFlow.java</supportingFilesToGenerate>
+							<!-- See https://openapi-generator.tech/docs/generators/java/ -->
+							<configOptions>
+								<java8>true</java8>
+								<dateLibrary>java8</dateLibrary>
+								<sourceFolder>java</sourceFolder>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>io.swagger.codegen.v3</groupId>
+						<artifactId>swagger-codegen-maven-plugin</artifactId>
+						<version>${swagger.codegen.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-oas</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

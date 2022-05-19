@@ -1,0 +1,26 @@
+[
+	{
+		"identification": "identification_5",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_5.1",
+				"description" : [{
+					"language" : "de_DE",
+					"text" : "A blue roboter."
+				}]
+			}
+		]
+	},
+	{
+		"identification": "identification_3",
+		"submodelDescriptors": [
+			{
+				"identification": "identification_3.1",
+				"description" : [{
+					"language" : "de_DE",
+					"text" : "A green Robot."
+				}]
+			}
+		]
+	}
+]
