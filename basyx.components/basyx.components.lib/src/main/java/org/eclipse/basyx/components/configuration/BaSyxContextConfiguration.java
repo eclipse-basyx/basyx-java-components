@@ -160,6 +160,13 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		if (atLeastOneJwtPropertyIsSet()) {
 			configureJwtAuthentication(baSyxContext);
 		}
+		
+		enableCORSIfConfigured(baSyxContext);
+
+		return baSyxContext;
+	}
+
+	private void enableCORSIfConfigured(final BaSyxContext baSyxContext) {
 		try {
 			if(getAccessControlAllowOrigin() != null && !getAccessControlAllowOrigin().isEmpty()) {
 				System.out.println("#$#$ Not Empty : " + getAccessControlAllowOrigin());
@@ -168,8 +175,6 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		} catch(Exception e) {
 			System.out.println("Exception occurred");
 		}
-
-		return baSyxContext;
 	}
 
 	private Boolean isSecureConnection() {
