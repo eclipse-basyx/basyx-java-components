@@ -43,7 +43,7 @@ public class TestBaSyxContextConfigurationPropertyFileParsing {
 	public void withCORSConfiguration() {
 		BaSyxContext context = createBasyxContext("context_with_cors_config.properties");
 		
-		String allowOrigin = "http://www.example.com ";
+		String allowOrigin = "http://www.example.com";
 
 		assertEquals(allowOrigin, context.getAccessControlAllowOrigin());
 	}
