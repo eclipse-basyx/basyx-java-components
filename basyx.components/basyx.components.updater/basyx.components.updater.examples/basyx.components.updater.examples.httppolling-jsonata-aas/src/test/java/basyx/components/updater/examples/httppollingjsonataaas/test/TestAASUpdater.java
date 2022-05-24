@@ -50,7 +50,7 @@ public class TestAASUpdater {
 		// Create and start MockServer
 		ClientAndServer clientServer = ClientAndServer.startClientAndServer(2018);
 		System.out.println("MockServer running: " + clientServer.isRunning()); // running status: true
-		clientServer.when(new HttpRequest().withMethod("GET")).respond(new HttpResponse().withStatusCode(HttpStatusCode.OK_200.code())
+		clientServer.when(HttpRequest.request().withMethod("GET")).respond(HttpResponse.response().withStatusCode(HttpStatusCode.OK_200.code())
 				.withBody("{\"objects\": \n" + "      [\n" + "        {\"name\":\"object1\", \"value\":858383},\n" + "        {\"name\":\"object2\", \"value\":42}\n" + "      ]\n" + "    }"));
 	}
 
@@ -87,9 +87,14 @@ public class TestAASUpdater {
 		updater = new UpdaterComponent(configuration);
 		updater.startComponent();
 		System.out.println("UPDATER STARTED");
+		waitForPropagation();
 		checkIfPropertyIsUpdated();
 		updater.stopComponent();
 		aasServer.stopComponent();
+	}
+
+	private void waitForPropagation() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	private void checkIfPropertyIsUpdated() throws InterruptedException {
