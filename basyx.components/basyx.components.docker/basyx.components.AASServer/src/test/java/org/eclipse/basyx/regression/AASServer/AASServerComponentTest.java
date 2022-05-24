@@ -52,7 +52,6 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistryHandler;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.testsuite.regression.vab.protocol.http.TestHttpCors;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
@@ -66,7 +65,7 @@ import org.junit.Test;
  * @author conradi, danish
  *
  */
-public class AASServerComponentTest extends TestHttpCors {
+public class AASServerComponentTest {
 	private static AASServerComponent component;
 	private static IAASRegistry registry;
 

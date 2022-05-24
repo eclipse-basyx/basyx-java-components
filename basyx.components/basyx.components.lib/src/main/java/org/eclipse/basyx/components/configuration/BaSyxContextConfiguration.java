@@ -167,14 +167,15 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	private void enableCORSIfConfigured(final BaSyxContext baSyxContext) {
-		try {
-			if(getAccessControlAllowOrigin() != null && !getAccessControlAllowOrigin().isEmpty()) {
-				System.out.println("#$#$ Not Empty : " + getAccessControlAllowOrigin());
-				baSyxContext.setAccessControlAllowOrigin(getAccessControlAllowOrigin());
-	        }
-		} catch(Exception e) {
-			System.out.println("Exception occurred");
+		if(!isCorsConfigured()) {
+			return;
 		}
+
+		baSyxContext.setAccessControlAllowOrigin(getAccessControlAllowOrigin());
+	}
+
+	private boolean isCorsConfigured() {
+		return getAccessControlAllowOrigin() != null && !getAccessControlAllowOrigin().isEmpty();
 	}
 
 	private Boolean isSecureConnection() {
