@@ -78,6 +78,12 @@
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.sdk</artifactId>
 			<version>1.1.0</version>
+		    <exclusions>
+		        <exclusion>
+		            <groupId>org.eclipse.milo</groupId>
+		            <artifactId>*</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
 
 		<!-- BaSyx SDK tests -->
@@ -87,6 +93,12 @@
 			<version>1.1.0</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
+		   	<exclusions>
+		        <exclusion>
+		            <groupId>org.eclipse.milo</groupId>
+		            <artifactId>*</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
 
 		<!-- Depends on the components library -->
