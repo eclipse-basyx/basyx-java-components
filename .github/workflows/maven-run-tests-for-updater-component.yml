@@ -61,3 +61,5 @@ jobs:
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.activemq-jsonata-aas/pom.xml
     - name: Test MQTT AAS JSONata 
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.mqtt-jsonata-aas/pom.xml
+    - name: Test OPC UA AAS
+      run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.opcua-aas/pom.xml
