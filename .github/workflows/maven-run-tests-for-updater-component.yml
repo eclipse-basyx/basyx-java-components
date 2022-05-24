@@ -64,4 +64,4 @@ jobs:
     - name: Test OPC UA AAS JSONata
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.opcua-jsonata-aas/pom.xml
     - name: Test HTTP Polling
-      run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/ basyx.components.updater.examples.httppolling-jsonata-aas/pom.xml
+      run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.httppolling-jsonata-aas/pom.xml
