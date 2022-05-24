@@ -59,6 +59,8 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI = "jwtBearerTokenAuthenticationIssuerUri";
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI = "jwtBearerTokenAuthenticationJwkSetUri";
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD = "jwtBearerTokenAuthenticationRequiredAud";
+	
+	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "accessControlAllowOrigin"; 
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "context.properties";
@@ -74,6 +76,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		defaultProps.put(PORT, Integer.toString(DEFAULT_PORT));
 		defaultProps.put(SSL_KEY_STORE_LOCATION, null);
 		defaultProps.put(SSL_KEY_PASSWORD, null);
+		defaultProps.put(ACCESS_CONTROL_ALLOW_ORIGIN, null);
 
 		return defaultProps;
 	}
@@ -129,7 +132,7 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { CONTEXTPATH, DOCBASE, HOSTNAME, PORT, JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI, JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI, JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD };
+		String[] properties = { CONTEXTPATH, DOCBASE, HOSTNAME, PORT, JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI, JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI, JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD, ACCESS_CONTROL_ALLOW_ORIGIN };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -157,8 +160,22 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		if (atLeastOneJwtPropertyIsSet()) {
 			configureJwtAuthentication(baSyxContext);
 		}
+		
+		enableCORSIfConfigured(baSyxContext);
 
 		return baSyxContext;
+	}
+
+	private void enableCORSIfConfigured(final BaSyxContext baSyxContext) {
+		if(!isCorsConfigured()) {
+			return;
+		}
+
+		baSyxContext.setAccessControlAllowOrigin(getAccessControlAllowOrigin());
+	}
+
+	private boolean isCorsConfigured() {
+		return getAccessControlAllowOrigin() != null && !getAccessControlAllowOrigin().isEmpty();
 	}
 
 	private Boolean isSecureConnection() {
@@ -245,6 +262,14 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public void setJwtBearerTokenAuthenticationRequiredAud(String jwtBearerAuthRequiredAud) {
 		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD, jwtBearerAuthRequiredAud);
 	}
+	
+	public String getAccessControlAllowOrigin() { 
+        return getProperty(ACCESS_CONTROL_ALLOW_ORIGIN); 
+    }
+
+    public void setAccessControlAllowOrigin(String accessControlAllowOrigin) { 
+        setProperty(ACCESS_CONTROL_ALLOW_ORIGIN, accessControlAllowOrigin); 
+    } 
 
 	public String getUrl() {
 		String contextPath = getContextPath();
