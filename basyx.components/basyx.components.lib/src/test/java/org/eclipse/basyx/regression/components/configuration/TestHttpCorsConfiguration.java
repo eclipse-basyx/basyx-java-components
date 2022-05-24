@@ -24,13 +24,10 @@
  ******************************************************************************/
 package org.eclipse.basyx.regression.components.configuration;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.testsuite.regression.vab.protocol.http.SimpleVABElementServlet;
 import org.eclipse.basyx.testsuite.regression.vab.protocol.http.TestHttpCors;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
-import org.junit.Test;
 
 /**
  * Tests HTTP CORS configuration
@@ -39,14 +36,6 @@ import org.junit.Test;
  *
  */
 public class TestHttpCorsConfiguration extends TestHttpCors {
-	
-	@Test
-	@Override
-	public void allowSpecificCorsOrigin() {
-		createAndStartHttpServerWithCORS(ALLOW_SPECIFIC_ORIGIN);
-
-		assertEquals(ALLOW_SPECIFIC_ORIGIN, getAccessControlAllowOriginResponseHeader());
-	}
 	
 	@Override
 	protected void createAndStartHttpServerWithCORS(String accessControlAllowOrigin) {	
