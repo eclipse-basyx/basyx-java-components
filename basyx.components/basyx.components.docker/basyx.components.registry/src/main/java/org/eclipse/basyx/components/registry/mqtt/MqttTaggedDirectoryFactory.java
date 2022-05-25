@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
- *
+ * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -19,28 +19,31 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.servlet;
 
-import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
+package org.eclipse.basyx.components.registry.mqtt;
+
+import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.restapi.TaggedDirectoryProvider;
-import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryService;
 
 /**
- * A registry servlet based on a provided MapTaggedDirectory implementation.
- *
- * @author jungjan
+ * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
+ * implementations
+ * 
+ * @author espen
+ * 
  */
-public class TaggedDirectoryServlet extends VABHTTPInterface<AASRegistryModelProvider> {
-	private static final long serialVersionUID = 1L;
+public class MqttTaggedDirectoryFactory extends MqttRegistryFactory {
+	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
+		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig);
+	}
 
-	/**
-	 * Provides registry servlet based on the provided registry implementation.
-	 */
-	public TaggedDirectoryServlet(IAASTaggedDirectory directory) {
-		super(new TaggedDirectoryProvider(directory));
+	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
+		ObservableAASTaggedDirectoryService observedAPI = new ObservableAASTaggedDirectoryService(taggedDirectory);
+		addAASRegistryServiceObserver(observedAPI, mqttConfig);
+		return observedAPI;
 	}
 }
