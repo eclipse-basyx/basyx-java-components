@@ -32,7 +32,6 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryHelper;
@@ -40,6 +39,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.testsuite.regression.extensions.shared.mqtt.MqttTestListener;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -58,7 +58,7 @@ import io.moquette.broker.config.ResourceLoaderConfig;
  * @author espen
  *
  */
-public class TestMqttRegistryBackend {
+public abstract class TestMqttRegistryBackend {
 	protected static String registryUrl;
 
 	protected static BaSyxMqttConfiguration mqttConfig;
@@ -67,6 +67,7 @@ public class TestMqttRegistryBackend {
 	protected static AASRegistryProxy aasRegistryProxy;
 
 	protected MqttTestListener listener;
+	protected RegistryComponent registryComponent;
 
 	/**
 	 * Sets up the MQTT broker and AASRegistryService for tests
@@ -87,30 +88,24 @@ public class TestMqttRegistryBackend {
 	public void setUp() {
 		listener = new MqttTestListener();
 		mqttBroker.addInterceptHandler(listener);
-	}
 
-	@Test
-	public void testEventsWithInMemoryBackend() {
-		RegistryComponent inMemoryRegistryComponent = createInMemoryRegistryComponent();
-		testMqttEventForRegistryComponent(inMemoryRegistryComponent);
-	}
-
-	@Test
-	public void testEventsWithSQLBackend() {
-		RegistryComponent sqlRegistryComponent = createSQLRegistryComponent();
-		testMqttEventForRegistryComponent(sqlRegistryComponent);
-	}
-
-	protected void testMqttEventForRegistryComponent(RegistryComponent registryComponent) {
+		registryComponent = createRegistryComponent();
 		registryComponent.enableMQTT(mqttConfig);
 		registryComponent.startComponent();
+	}
 
+	@After
+	public void tearDown() {
+		registryComponent.stopComponent();
+	}
+
+	public abstract RegistryComponent createRegistryComponent();
+
+	@Test
+	public void testEventsWithComponent() {
 		AASDescriptor aasDescriptor = createTestAASDescriptor();
 		aasRegistryProxy.register(aasDescriptor);
-
 		assertEquals(MqttAASRegistryHelper.TOPIC_REGISTERAAS, listener.lastTopic);
-
-		registryComponent.stopComponent();
 	}
 
 	private static AASRegistryProxy createRegistryProxy() {
@@ -132,23 +127,10 @@ public class TestMqttRegistryBackend {
 		mqttBroker.startServer(classPathConfig);
 	}
 
-	private RegistryComponent createSQLRegistryComponent() {
-		BaSyxSQLConfiguration sqlConfig = new BaSyxSQLConfiguration();
-		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
-		RegistryComponent registryComponent = new RegistryComponent(contextConfig, sqlConfig);
-		return registryComponent;
-	}
-
 	private static AASDescriptor createTestAASDescriptor() {
 		Identifier aasIdentifier = new Identifier(IdentifierType.CUSTOM, "testAAS");
 		String aasEndpoint = "http://localhost:8080/aasList/" + aasIdentifier.getId() + "/aas";
 		AASDescriptor aasDescriptor = new AASDescriptor(aasIdentifier, aasEndpoint);
 		return aasDescriptor;
-	}
-
-	private RegistryComponent createInMemoryRegistryComponent() {
-		RegistryComponent registryComponent = new RegistryComponent();
-		registryComponent.enableMQTT(mqttConfig);
-		return registryComponent;
 	}
 }
