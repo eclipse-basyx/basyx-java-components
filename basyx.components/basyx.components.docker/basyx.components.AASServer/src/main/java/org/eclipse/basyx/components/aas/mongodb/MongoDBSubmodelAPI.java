@@ -158,6 +158,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		if (replaced == null) {
 			mongoOps.insert(sm, collection);
 		}
+
+		sm.remove("_id");
 	}
 
 	@SuppressWarnings("unchecked")
