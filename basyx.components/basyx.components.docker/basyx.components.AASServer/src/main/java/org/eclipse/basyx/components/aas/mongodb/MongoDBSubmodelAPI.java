@@ -69,7 +69,7 @@ import com.mongodb.client.MongoClients;
  */
 public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
-	private static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	public static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected DelegatedInvocationManager invocationHelper;
 

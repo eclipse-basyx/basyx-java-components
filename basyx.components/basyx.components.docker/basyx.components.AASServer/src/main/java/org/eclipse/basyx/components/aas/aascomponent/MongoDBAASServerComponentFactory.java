@@ -32,8 +32,8 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPIFactory;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregatorFactory;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPIFactory;
+import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAggregatorFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
@@ -60,18 +60,22 @@ public class MongoDBAASServerComponentFactory extends AbstractAASServerComponent
 		this.aasServerRegistry = aasServerRegistry;
 	}
 
+	@Override
 	protected ISubmodelAPIFactory createSubmodelAPIFactory() {
 		return new MongoDBSubmodelAPIFactory(mongoDBConfig);
 	}
 
+	@Override
 	protected ISubmodelAggregatorFactory createSubmodelAggregatorFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new SubmodelAggregatorFactory(submodelAPIFactory);
+		return new MongoDBSubmodelAggregatorFactory(mongoDBConfig, submodelAPIFactory);
 	}
 
+	@Override
 	protected IAASAPIFactory createAASAPIFactory() {
 		return new MongoDBAASAPIFactory(mongoDBConfig);
 	}
 
+	@Override
 	protected IAASAggregatorFactory createAASAggregatorFactory(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		return new MongoDBAASAggregatorFactory(mongoDBConfig, aasServerRegistry, aasAPIFactory, submodelAggregatorFactory);
 	}
