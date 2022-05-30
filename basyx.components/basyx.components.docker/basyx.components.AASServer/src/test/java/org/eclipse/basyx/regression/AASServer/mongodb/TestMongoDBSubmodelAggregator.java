@@ -54,7 +54,6 @@ public class TestMongoDBSubmodelAggregator extends SubmodelAggregatorSuite {
 		BaSyxMongoDBConfiguration config = getMongoDBConfiguration();
 
 		aggregator = new MongoDBSubmodelAggregator(new MongoDBSubmodelAPIFactory(config), config);
-		populateWithDefaultSubmodels(aggregator);
 	}
 
 	@Override
