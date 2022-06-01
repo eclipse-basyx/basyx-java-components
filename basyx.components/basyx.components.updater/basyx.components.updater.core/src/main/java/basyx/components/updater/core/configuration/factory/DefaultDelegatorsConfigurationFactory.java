@@ -11,7 +11,7 @@
 
 package basyx.components.updater.core.configuration.factory;
 
-import basyx.components.updater.core.configuration.DelegatorConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DelegatorConfiguration;
 
 /**
  * A default configuration factory for Delegators from a default path

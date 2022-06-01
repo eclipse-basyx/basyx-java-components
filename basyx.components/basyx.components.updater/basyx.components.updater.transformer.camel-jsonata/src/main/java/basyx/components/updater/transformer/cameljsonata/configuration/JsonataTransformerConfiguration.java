@@ -11,9 +11,10 @@
 
 package basyx.components.updater.transformer.cameljsonata.configuration;
 
-import basyx.components.updater.core.configuration.DataTransformerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import basyx.components.updater.core.configuration.route.sources.DataTransformerConfiguration;
 
 import java.io.File;
 

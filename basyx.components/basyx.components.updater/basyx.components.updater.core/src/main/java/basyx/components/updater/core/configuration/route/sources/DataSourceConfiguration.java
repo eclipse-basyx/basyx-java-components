@@ -9,7 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration;
+package basyx.components.updater.core.configuration.route.sources;
 
 /**
  * A generic class of Data source configurations

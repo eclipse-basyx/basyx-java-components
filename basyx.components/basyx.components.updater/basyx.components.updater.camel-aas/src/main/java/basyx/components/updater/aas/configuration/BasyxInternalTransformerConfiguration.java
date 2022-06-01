@@ -11,7 +11,7 @@
 
 package basyx.components.updater.aas.configuration;
 
-import basyx.components.updater.core.configuration.DataTransformerConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DataTransformerConfiguration;
 
 /**
  * An implementation of Basyx internal transformer configuration

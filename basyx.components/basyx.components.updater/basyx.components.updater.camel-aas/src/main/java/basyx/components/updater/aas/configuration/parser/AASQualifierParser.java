@@ -21,7 +21,7 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import basyx.components.updater.aas.configuration.AASDatasinkConfiguration;
 import basyx.components.updater.aas.configuration.BasyxInternalDatasourceConfiguration;
 import basyx.components.updater.aas.configuration.BasyxInternalTransformerConfiguration;
-import basyx.components.updater.core.configuration.route.RouteConfiguration;
+import basyx.components.updater.core.configuration.route.SimpleRouteConfiguration;
 import basyx.components.updater.core.configuration.route.RoutesConfiguration;
 
 /**
@@ -145,7 +145,7 @@ public class AASQualifierParser {
 			config.getTransformers().put(uniqueId, transformerConfig);
 		}
 
-		RouteConfiguration routeConfig = createRouteConfiguration(uniqueId, transformerConfig);
+		SimpleRouteConfiguration routeConfig = createRouteConfiguration(uniqueId, transformerConfig);
 
 		config.getRoutes().add(routeConfig);
 	}
@@ -156,10 +156,10 @@ public class AASQualifierParser {
 	 * @param transformerConfig
 	 * @return
 	 */
-	private RouteConfiguration createRouteConfiguration(String uniqueId, BasyxInternalTransformerConfiguration transformerConfig) {
-		RouteConfiguration routeConfig = new RouteConfiguration();
+	private SimpleRouteConfiguration createRouteConfiguration(String uniqueId, BasyxInternalTransformerConfiguration transformerConfig) {
+		SimpleRouteConfiguration routeConfig = new SimpleRouteConfiguration();
 		routeConfig.setDatasource(uniqueId);
-		routeConfig.getDatasinks().add(uniqueId);
+		routeConfig.setDatasink(uniqueId);
 		if (transformerConfig != null) {
 			routeConfig.getTransformers().add(uniqueId);
 		}

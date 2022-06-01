@@ -13,7 +13,8 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.RouteConfiguration;
+import basyx.components.updater.core.configuration.route.IRouteConfiguration;
+import basyx.components.updater.core.configuration.route.SimpleRouteConfiguration;
 
 /**
  * A generic implementation of routes configuration factory
@@ -29,7 +30,7 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 	}
 
 	public RoutesConfigurationFactory(String filePath, ClassLoader loader) {
-		super(filePath, loader, RouteConfiguration.class);
+		super(filePath, loader, SimpleRouteConfiguration.class);
 	}
 
 	/**
@@ -38,19 +39,11 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 	 * @param loader
 	 */
 	public RoutesConfigurationFactory(ClassLoader loader) {
-		super(DEFAULT_FILE_PATH, loader, RouteConfiguration.class);
-	}
-
-	/**
-	 * @deprecated use the {@link #create()} method instead
-	 */
-	@Deprecated
-	public List<RouteConfiguration> getRouteConfigurations() {
-		return this.create();
+		super(DEFAULT_FILE_PATH, loader, SimpleRouteConfiguration.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<RouteConfiguration> create() {
-		return (List<RouteConfiguration>) getConfigurationLoader().loadListConfiguration();
+	public List<IRouteConfiguration> create() {
+		return (List<IRouteConfiguration>) getConfigurationLoader().loadListConfiguration();
 	}
 }

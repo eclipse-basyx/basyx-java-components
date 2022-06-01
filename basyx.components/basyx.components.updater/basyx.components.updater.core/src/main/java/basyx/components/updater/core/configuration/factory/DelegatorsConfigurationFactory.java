@@ -13,7 +13,7 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.DelegatorConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DelegatorConfiguration;
 
 /**
  * A generic implementation of delegators configuration factory

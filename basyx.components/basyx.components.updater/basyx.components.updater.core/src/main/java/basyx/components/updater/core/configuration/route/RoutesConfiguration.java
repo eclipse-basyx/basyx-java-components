@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (C) 2021 the Eclipse BaSyx Authors
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
 
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 
@@ -16,11 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import basyx.components.updater.core.configuration.*;
+import basyx.components.updater.core.configuration.route.sources.DataSinkConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DataSourceConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DataTransformerConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DelegatorConfiguration;
 
 /**
- * An implementation of configurations of all the routes 
- * 
+ * An implementation of configurations of all the routes
+ *
  * @author haque
  *
  */
@@ -29,29 +32,21 @@ public class RoutesConfiguration {
 	private Map<String, DataTransformerConfiguration> transformers = new HashMap<>();
 	private Map<String, DataSinkConfiguration> datasinks = new HashMap<>();
 	private Map<String, DelegatorConfiguration> delegators = new HashMap<>();
-	private List<RouteConfiguration> routes = new ArrayList<>();
+	private List<IRouteConfiguration> routes = new ArrayList<>();
 
-	public RoutesConfiguration() {}
+	public RoutesConfiguration() {
+	}
 
-	public RoutesConfiguration(
-			List<DataSourceConfiguration> datasources,
-			List<DataTransformerConfiguration> transformers,
-			List<DataSinkConfiguration> datasinks,
-			List<DelegatorConfiguration> delegators,
-			List<RouteConfiguration> routes) {
+	public RoutesConfiguration(List<DataSourceConfiguration> datasources, List<DataTransformerConfiguration> transformers, List<DataSinkConfiguration> datasinks, List<DelegatorConfiguration> delegators, List<IRouteConfiguration> routes) {
 		addDatasources(datasources);
 		addTransformers(transformers);
 		addDatasinks(datasinks);
 		addRoutes(routes);
 		addDelegators(delegators);
 	}
-	
-	public RoutesConfiguration(
-			Map<String, DataSourceConfiguration> datasources,
-			Map<String, DataTransformerConfiguration> transformers,
-			Map<String, DataSinkConfiguration> datasinks,
-			Map<String, DelegatorConfiguration> delegators,
-			List<RouteConfiguration> routes) {
+
+	public RoutesConfiguration(Map<String, DataSourceConfiguration> datasources, Map<String, DataTransformerConfiguration> transformers, Map<String, DataSinkConfiguration> datasinks, Map<String, DelegatorConfiguration> delegators,
+			List<IRouteConfiguration> routes) {
 		setDatasources(datasources);
 		setTransformers(transformers);
 		setDatasinks(datasinks);
@@ -131,19 +126,19 @@ public class RoutesConfiguration {
 		this.delegators.put(delegator.getUniqueId(), delegator);
 	}
 
-	public List<RouteConfiguration> getRoutes() {
+	public List<IRouteConfiguration> getRoutes() {
 		return routes;
 	}
 
-	public void setRoutes(List<RouteConfiguration> routes) {
+	public void setRoutes(List<IRouteConfiguration> routes) {
 		this.routes = routes;
 	}
 
-	public void addRoutes(List<RouteConfiguration> routes) {
+	public void addRoutes(List<IRouteConfiguration> routes) {
 		this.routes.addAll(routes);
 	}
 
-	public void addRoute(RouteConfiguration route) {
+	public void addRoute(IRouteConfiguration route) {
 		this.routes.add(route);
 	}
 }

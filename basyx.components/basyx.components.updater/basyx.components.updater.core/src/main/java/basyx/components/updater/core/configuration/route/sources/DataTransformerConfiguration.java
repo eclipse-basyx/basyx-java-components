@@ -9,20 +9,20 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration;
+package basyx.components.updater.core.configuration.route.sources;
 
 /**
- * A generic class of Data Sink Configuration
+ * A generic class of Data transformer configuration
  * @author haque
  *
  */
-public abstract class DataSinkConfiguration extends RouteEntity {
+public abstract class DataTransformerConfiguration extends RouteEntity {
 
-	public DataSinkConfiguration() {
+	public DataTransformerConfiguration() {
 		super();
 	}
 	
-	public DataSinkConfiguration(String uniqueId) {
+	public DataTransformerConfiguration(String uniqueId) {
 		super(uniqueId);
 	}
 }

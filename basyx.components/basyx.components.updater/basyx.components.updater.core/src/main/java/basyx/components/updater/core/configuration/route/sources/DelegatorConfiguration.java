@@ -9,7 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration;
+package basyx.components.updater.core.configuration.route.sources;
 
 import basyx.components.updater.core.delegator.servlet.DelegatorServlet;
 

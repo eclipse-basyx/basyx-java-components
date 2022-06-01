@@ -1,4 +1,4 @@
-package basyx.components.updater.core.configuration;
+package basyx.components.updater.core.configuration.route.sources;
 
 /**
  * A generic class of Timer Configuration

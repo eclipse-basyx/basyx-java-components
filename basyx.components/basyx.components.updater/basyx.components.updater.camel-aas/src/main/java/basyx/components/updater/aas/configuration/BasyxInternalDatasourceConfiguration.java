@@ -11,7 +11,7 @@
 
 package basyx.components.updater.aas.configuration;
 
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
+import basyx.components.updater.core.configuration.route.sources.DataSourceConfiguration;
 
 /**
  * An implementation of Basyx internal data source configuration
