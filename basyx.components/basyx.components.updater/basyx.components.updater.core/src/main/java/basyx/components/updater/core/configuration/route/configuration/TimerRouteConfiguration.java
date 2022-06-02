@@ -9,31 +9,36 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route;
+package basyx.components.updater.core.configuration.route.configuration;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import basyx.components.updater.core.configuration.route.sources.TimerConfiguration;
+
 /**
- * A connection of a single route (source, transformer(s), sink)
+ * A connection of a single route (source, transformer, sink)
  *
- * @author haque, fischer
+ * @author fischer
  *
  */
-public class SimpleRouteConfiguration implements IRouteConfiguration {
-	private static final String ROUTE_TYPE = "SIMPLE";
+public class TimerRouteConfiguration implements IRouteConfiguration {
+	private static final String ROUTE_TYPE = "TIMER";
 	private String routeId;
 	private String datasource;
-	private String datasink;
 	private List<String> transformers = new ArrayList<>();
+	private List<String> datasinks = new ArrayList<>();
+	private TimerConfiguration timerConfig;
+	private String delegator;
 
-	public SimpleRouteConfiguration() {
+	public TimerRouteConfiguration() {
 	}
 
-	public SimpleRouteConfiguration(String datasource, List<String> transformers, String datasink) {
+	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, TimerConfiguration timerConfig) {
 		this.datasource = datasource;
 		this.transformers = transformers;
-		this.datasink = datasink;
+		this.datasinks = datasinks;
+		this.setTimerConfig(timerConfig);
 	}
 
 	@Override
@@ -61,6 +66,11 @@ public class SimpleRouteConfiguration implements IRouteConfiguration {
 		this.transformers = transformers;
 	}
 
+	@Override
+	public String getDelegator() {
+		return delegator;
+	}
+
 	public String getDatasource() {
 		return datasource;
 	}
@@ -69,11 +79,19 @@ public class SimpleRouteConfiguration implements IRouteConfiguration {
 		this.datasource = datasource;
 	}
 
-	public String getDatasink() {
-		return datasink;
+	public List<String> getDatasinks() {
+		return datasinks;
 	}
 
-	public void setDatasink(String datasink) {
-		this.datasink = datasink;
+	public void setDatasinks(List<String> datasinks) {
+		this.datasinks = datasinks;
+	}
+
+	public TimerConfiguration getTimerConfig() {
+		return timerConfig;
+	}
+
+	public void setTimerConfig(TimerConfiguration timerConfig) {
+		this.timerConfig = timerConfig;
 	}
 }

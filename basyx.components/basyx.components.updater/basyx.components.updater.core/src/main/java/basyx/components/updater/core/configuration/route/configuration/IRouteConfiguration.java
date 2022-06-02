@@ -1,4 +1,4 @@
-package basyx.components.updater.core.configuration.route;
+package basyx.components.updater.core.configuration.route.configuration;
 
 import java.util.List;
 
@@ -12,4 +12,6 @@ public interface IRouteConfiguration {
 	public List<String> getTransformers();
 
 	public void setTransformers(List<String> transformers);
+
+	public String getDelegator();
 }

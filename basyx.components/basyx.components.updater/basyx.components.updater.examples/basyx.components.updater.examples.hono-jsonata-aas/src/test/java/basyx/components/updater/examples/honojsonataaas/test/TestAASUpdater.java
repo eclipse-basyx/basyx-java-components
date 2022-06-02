@@ -16,7 +16,7 @@ import org.junit.Test;
 import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
 import basyx.components.updater.hono.configuration.factory.HonoDefaultConfigurationFactory;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 

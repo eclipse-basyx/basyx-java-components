@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (C) 2021 the Eclipse BaSyx Authors
-* 
+*
 * This program and the accompanying materials are made
 * available under the terms of the Eclipse Public License 2.0
 * which is available at https://www.eclipse.org/legal/epl-2.0/
 
-* 
+*
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
@@ -21,13 +21,13 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import basyx.components.updater.aas.configuration.AASDatasinkConfiguration;
 import basyx.components.updater.aas.configuration.BasyxInternalDatasourceConfiguration;
 import basyx.components.updater.aas.configuration.BasyxInternalTransformerConfiguration;
-import basyx.components.updater.core.configuration.route.SimpleRouteConfiguration;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.SimpleRouteConfiguration;
 
 /**
- * An implementation of AAS Qualifer parser to grab
- * the connection values from the qualifier of an element
- * 
+ * An implementation of AAS Qualifer parser to grab the connection values from
+ * the qualifier of an element
+ *
  *
  */
 public class AASQualifierParser {
@@ -38,6 +38,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Retrieves an instance of {@link AASQualifierParser}
+	 *
 	 * @param aas
 	 * @param aasEndpoint
 	 */
@@ -48,6 +49,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Retrieves new configuration from the AAS
+	 *
 	 * @return
 	 */
 	public RoutesConfiguration newConfiguration() {
@@ -58,6 +60,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Extends the {@link RoutesConfiguration} from the AAS
+	 *
 	 * @param config
 	 */
 	public void extendConfiguration(RoutesConfiguration config) {
@@ -67,6 +70,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Parses the AAS
+	 *
 	 * @param aas
 	 */
 	private void parseAAS(IAssetAdministrationShell aas) {
@@ -75,6 +79,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Parses the submodels
+	 *
 	 * @param sm
 	 */
 	private void parseSubmodel(ISubmodel sm) {
@@ -85,6 +90,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Parses the submodel elements recursively
+	 *
 	 * @param element
 	 * @param parentPath
 	 */
@@ -98,6 +104,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Parses the collection
+	 *
 	 * @param collection
 	 * @param parentPath
 	 */
@@ -106,13 +113,14 @@ public class AASQualifierParser {
 		String currentPath = VABPathTools.concatenatePaths(parentPath, idShort);
 		collection.getSubmodelElements().values().forEach(value -> {
 			if (value instanceof ISubmodelElement) {
-				parseSMElement((ISubmodelElement) value, currentPath);
+				parseSMElement(value, currentPath);
 			}
 		});
 	}
 
 	/**
 	 * Parses the property
+	 *
 	 * @param property
 	 * @param parentPath
 	 */
@@ -120,7 +128,7 @@ public class AASQualifierParser {
 		if (!isPropertyConnected(property)) {
 			return;
 		}
-		
+
 		String propPath = VABPathTools.concatenatePaths(parentPath, property.getIdShort());
 		String uniqueId = parentPath + "." + property.getIdShort();
 
@@ -133,6 +141,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Extends the configuration from retrieved configuration
+	 *
 	 * @param uniqueId
 	 * @param datasourceConfig
 	 * @param datasinkConfig
@@ -152,6 +161,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Creates a new route configuration
+	 *
 	 * @param uniqueId
 	 * @param transformerConfig
 	 * @return
@@ -168,6 +178,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Checks whether the property is connected or not
+	 *
 	 * @param property
 	 * @return
 	 */
@@ -176,12 +187,13 @@ public class AASQualifierParser {
 	}
 
 	private BasyxInternalTransformerConfiguration createTransformerConfigFromProperty(IProperty property) {
-		//TODO: How to create the transformer configs
+		// TODO: How to create the transformer configs
 		return null;
 	}
 
 	/**
 	 * Creates data sink configuration from property
+	 *
 	 * @param parentPath
 	 * @return
 	 */
@@ -191,6 +203,7 @@ public class AASQualifierParser {
 
 	/**
 	 * Creates data source configuration from property
+	 *
 	 * @param property
 	 * @return
 	 */

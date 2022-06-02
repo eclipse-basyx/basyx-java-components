@@ -27,7 +27,8 @@ import basyx.components.updater.camelhttppolling.configuration.factory.HttpPolli
 import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.TimerRouteConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
 public class TestAASUpdater {
@@ -64,7 +65,7 @@ public class TestAASUpdater {
 
 		// Extend configutation for connections
 		// DefaulRoutesConfigFac takes default routes.json as to config
-		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader, TimerRouteConfiguration.class);
 		configuration.addRoutes(routesFactory.create());
 
 		// Extend configuration for Http Source

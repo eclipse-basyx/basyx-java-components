@@ -18,7 +18,8 @@ import basyx.components.updater.camelhttp.configuration.factory.HttpDefaultConfi
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.DelegatorsConfigurationFactory;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.TimerRouteConfiguration;
 import basyx.components.updater.examples.httpserver.HttpDataSource;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
@@ -39,7 +40,7 @@ public class TestAASUpdater {
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
 		// Extend configutation for connections
-		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader, TimerRouteConfiguration.class);
 		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for Kafka Source

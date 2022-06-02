@@ -1,14 +1,14 @@
 package basyx.components.updater.core.routebuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.tooling.model.Strings;
 
-import basyx.components.updater.core.configuration.route.IRouteConfiguration;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.IRouteConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
 import basyx.components.updater.core.configuration.route.creator.IRouteCreator;
+import basyx.components.updater.core.configuration.route.creatorfactory.IRouteCreatorFactory;
 
 /**
  * This factory is used to create the apache camel routes for the data bridge
@@ -19,25 +19,25 @@ import basyx.components.updater.core.configuration.route.creator.IRouteCreator;
  */
 public class DataBridgeRouteFactory extends RouteBuilder {
 	private static final String ROUTE_ID_PREFIX = "route";
-	private RoutesConfiguration configuration;
-	Map<String, IRouteCreator> routeCreatorMap = new HashMap<>();
+	private RoutesConfiguration routesConfiguration;
+	private Map<String, IRouteCreatorFactory> routeCreatorFactoryMap;
 
-	public DataBridgeRouteFactory(RoutesConfiguration configuration) {
-		this.configuration = configureRouteIds(configuration);
+	public DataBridgeRouteFactory(RoutesConfiguration configuration, Map<String, IRouteCreatorFactory> routeCreatorFactoryMap) {
+		this.routesConfiguration = configureRouteIds(configuration);
+		this.routeCreatorFactoryMap = routeCreatorFactoryMap;
 	}
 
 	@Override
 	public void configure() throws Exception {
-		for (IRouteConfiguration routeConfig : configuration.getRoutes()) {
-			IRouteCreator routeCreator = routeCreatorMap.get(routeConfig.getRouteType());
+		for (IRouteConfiguration routeConfig : routesConfiguration.getRoutes()) {
+			IRouteCreator routeCreator = routeCreatorFactoryMap.get(routeConfig.getRouteType()).create(this, routesConfiguration);
+
 			routeCreator.addRouteToRouteBuilder(routeConfig);
 		}
 	}
 
-	public void addRouteCreator(IRouteCreator routeCreator) {
-		routeCreator.setBuilder(this);
-		routeCreator.setRoutesConfiguration(configuration);
-
+	public void addRouteCreatorFactory(String key, IRouteCreatorFactory routeCreatorFactory) {
+		routeCreatorFactoryMap.put(key, routeCreatorFactory);
 	}
 
 	private RoutesConfiguration configureRouteIds(RoutesConfiguration routesConfiguration) {

@@ -31,7 +31,7 @@ import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConf
 import basyx.components.updater.camelkafka.configuration.factory.KafkaDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
 public class TestAASUpdater {

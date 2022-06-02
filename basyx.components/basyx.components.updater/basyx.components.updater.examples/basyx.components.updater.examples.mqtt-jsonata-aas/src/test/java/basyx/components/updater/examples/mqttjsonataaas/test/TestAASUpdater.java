@@ -28,7 +28,7 @@ import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConf
 import basyx.components.updater.camelpaho.configuration.factory.MqttDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 import io.moquette.broker.Server;
 import io.moquette.broker.config.ClasspathResourceLoader;

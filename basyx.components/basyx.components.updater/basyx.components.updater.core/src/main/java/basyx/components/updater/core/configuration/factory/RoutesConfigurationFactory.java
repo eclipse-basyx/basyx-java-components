@@ -13,8 +13,8 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.IRouteConfiguration;
-import basyx.components.updater.core.configuration.route.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.IRouteConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.SimpleRouteConfiguration;
 
 /**
  * A generic implementation of routes configuration factory
@@ -29,12 +29,30 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 		super(filePath, loader, mapperClass);
 	}
 
+	/**
+	 * This constructor uses the {@link SimpleRouteConfiguration} as the default
+	 * configuration
+	 *
+	 * @param filePath
+	 * @param loader
+	 */
 	public RoutesConfigurationFactory(String filePath, ClassLoader loader) {
 		super(filePath, loader, SimpleRouteConfiguration.class);
 	}
 
 	/**
 	 * This constructor uses the default path {@link #DEFAULT_FILE_PATH}
+	 *
+	 * @param loader
+	 * @param mapperClass
+	 */
+	public RoutesConfigurationFactory(ClassLoader loader, Class<?> mapperClass) {
+		super(DEFAULT_FILE_PATH, loader, mapperClass);
+	}
+
+	/**
+	 * This constructor uses the default path {@link #DEFAULT_FILE_PATH} and the
+	 * {@link SimpleRouteConfiguration} as the default configuration
 	 *
 	 * @param loader
 	 */

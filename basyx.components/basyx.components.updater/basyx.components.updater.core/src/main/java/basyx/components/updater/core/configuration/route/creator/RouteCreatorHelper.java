@@ -3,7 +3,7 @@ package basyx.components.updater.core.configuration.route.creator;
 import java.util.ArrayList;
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
 
 public class RouteCreatorHelper {
 	private RouteCreatorHelper() {
@@ -22,6 +22,7 @@ public class RouteCreatorHelper {
 		for (String dataSinkId : dataSinkIdList) {
 			endpoints.add(routesConfiguration.getDatasinks().get(dataSinkId).getConnectionURI());
 		}
+
 		return endpoints.toArray(new String[0]);
 	}
 

@@ -24,7 +24,8 @@ import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConf
 import basyx.components.updater.camelopcua.configuration.factory.OpcuaDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.configuration.TimerRouteConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonJacksonDefaultConfigurationFactory;
 
@@ -66,7 +67,7 @@ public class TestAASUpdater {
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
 		// Extend configutation for connections
-		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader, TimerRouteConfiguration.class);
 		configuration.addRoutes(routesFactory.create());
 
 		// Extend configutation for Opcua Source

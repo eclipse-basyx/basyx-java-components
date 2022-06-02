@@ -2,11 +2,11 @@
 	{
 		"datasource": "doublescalar",
 		"transformers": ["dataValueToJson", "jsonataExtractValue"],
-		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"]
+		"datasink": "ConnectedSubmodel/ConnectedPropertyA"
 	},
 	{
 		"datasource": "integerscalar",
 		"transformers": ["dataValueToJson", "jsonataExtractValue"],
-		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"]
+		"datasink": "ConnectedSubmodel/ConnectedPropertyB"
 	}
 ]

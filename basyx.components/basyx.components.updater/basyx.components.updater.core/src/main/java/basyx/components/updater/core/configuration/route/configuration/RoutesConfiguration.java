@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route;
+package basyx.components.updater.core.configuration.route.configuration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
