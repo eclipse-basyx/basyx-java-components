@@ -55,8 +55,6 @@ jobs:
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.kafka-jsonatamultiple-aas/pom.xml
     - name: Test HONO AAS JSONata
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.hono-jsonata-aas/pom.xml
-    # - name: Test HTTP JSONata Delegator
-    #   run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.http-jsonata-delegator/pom.xml
     - name: Test ActiveMQ AAS JSONata 
       run: mvn test -f basyx.components/basyx.components.updater/basyx.components.updater.examples/basyx.components.updater.examples.activemq-jsonata-aas/pom.xml
     - name: Test MQTT AAS JSONata 
