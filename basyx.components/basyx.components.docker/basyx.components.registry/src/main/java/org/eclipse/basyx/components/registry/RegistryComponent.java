@@ -34,6 +34,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
+import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
@@ -213,6 +214,10 @@ public class RegistryComponent implements IComponent {
 		if (this.mqttConfig != null) {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 			decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
+		}
+		if (registryConfig.isAuthorizationEnabled()) {
+			logger.info("Authorization enabled for TaggedDirectory.");
+			decoratedTaggedDirectory = new AuthorizedTaggedDirectoryFactory().create(decoratedTaggedDirectory);
 		}
 		return decoratedTaggedDirectory;
 	}
