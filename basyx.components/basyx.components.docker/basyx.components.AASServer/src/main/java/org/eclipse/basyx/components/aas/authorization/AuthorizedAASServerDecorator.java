@@ -28,9 +28,14 @@ import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.AuthorizedDecoratingAASAggregatorFactory;
+import org.eclipse.basyx.extensions.aas.aggregator.authorization.IAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.AuthorizedDecoratingAASAPIFactory;
+import org.eclipse.basyx.extensions.aas.api.authorization.IAASAPIAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.eclipse.basyx.extensions.submodel.aggregator.authorization.AuthorizedDecoratingSubmodelAggregatorFactory;
+import org.eclipse.basyx.extensions.submodel.aggregator.authorization.ISubmodelAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.submodel.authorization.AuthorizedDecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.extensions.submodel.authorization.ISubmodelAPIAuthorizer;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
@@ -41,26 +46,63 @@ import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
  * @author fischer, fried
  *
  */
-public class AuthorizedAASServerDecorator implements IAASServerDecorator {
+public class AuthorizedAASServerDecorator<SubjectInformationType> implements IAASServerDecorator {
+	protected final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer;
+	protected final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer;
+	protected final IAASAPIAuthorizer<SubjectInformationType> aasAPIAuthorizer;
+	protected final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer;
+	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
+
+	public AuthorizedAASServerDecorator(
+			final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer,
+			final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer,
+			final IAASAPIAuthorizer<SubjectInformationType> aasAPIAuthorizer,
+			final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer,
+			final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider
+	) {
+		this.submodelAPIAuthorizer = submodelAPIAuthorizer;
+		this.submodelAggregatorAuthorizer = submodelAggregatorAuthorizer;
+		this.aasAPIAuthorizer = aasAPIAuthorizer;
+		this.aasAggregatorAuthorizer = aasAggregatorAuthorizer;
+		this.subjectInformationProvider = subjectInformationProvider;
+	}
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new AuthorizedDecoratingSubmodelAPIFactory(submodelAPIFactory);
+		return new AuthorizedDecoratingSubmodelAPIFactory<>(
+				null,
+				submodelAPIFactory,
+				submodelAPIAuthorizer,
+				subjectInformationProvider
+		);
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new AuthorizedDecoratingSubmodelAggregatorFactory(submodelAggregatorFactory);
+		return new AuthorizedDecoratingSubmodelAggregatorFactory(
+				null,
+				submodelAggregatorFactory,
+				submodelAggregatorAuthorizer,
+				subjectInformationProvider
+		);
 	}
 
 	@Override
 	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
-		return new AuthorizedDecoratingAASAPIFactory(aasAPIFactory);
+		return new AuthorizedDecoratingAASAPIFactory(
+				aasAPIFactory,
+				aasAPIAuthorizer,
+				subjectInformationProvider
+		);
 	}
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new AuthorizedDecoratingAASAggregatorFactory(aasAggregatorFactory);
+		return new AuthorizedDecoratingAASAggregatorFactory(
+				aasAggregatorFactory,
+				aasAggregatorAuthorizer,
+				subjectInformationProvider
+		);
 	}
 
 }

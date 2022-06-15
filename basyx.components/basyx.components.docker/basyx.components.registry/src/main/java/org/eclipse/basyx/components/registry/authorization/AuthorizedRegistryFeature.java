@@ -22,7 +22,7 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.registry.authorization;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -34,13 +34,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.extensions.aas.aggregator.authorization.GrantedAuthorityAASAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.aas.aggregator.authorization.SimpleAbacAASAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.aas.api.authorization.GrantedAuthorityAASAPIAuthorizer;
-import org.eclipse.basyx.extensions.aas.api.authorization.SimpleAbacAASAPIAuthorizer;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.components.registry.registrycomponent.IRegistryDecorator;
+import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFeature;
+import org.eclipse.basyx.extensions.aas.registration.authorization.GrantedAuthorityAASRegistryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.SimpleAbacAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.AbacRule;
 import org.eclipse.basyx.extensions.shared.authorization.AbacRuleSet;
 import org.eclipse.basyx.extensions.shared.authorization.AuthenticationContextProvider;
@@ -52,10 +50,6 @@ import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProv
 import org.eclipse.basyx.extensions.shared.authorization.JWTAuthenticationContextProvider;
 import org.eclipse.basyx.extensions.shared.authorization.KeycloakRoleAuthenticator;
 import org.eclipse.basyx.extensions.shared.authorization.PredefinedSetAbacRuleChecker;
-import org.eclipse.basyx.extensions.submodel.aggregator.authorization.GrantedAuthoritySubmodelAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.submodel.aggregator.authorization.SimpleAbacSubmodelAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.submodel.authorization.GrantedAuthoritySubmodelAPIAuthorizer;
-import org.eclipse.basyx.extensions.submodel.authorization.SimpleAbacSubmodelAPIAuthorizer;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,16 +58,16 @@ import org.slf4j.LoggerFactory;
  * 
  * Feature for Authorization of Submodel and Shell access
  * 
- * @author fischer, fried
+ * @author wege
  *
  */
-public class AuthorizedAASServerFeature implements IAASServerFeature {
-	private static Logger logger = LoggerFactory.getLogger(AuthorizedAASServerFeature.class);
+public class AuthorizedRegistryFeature implements IRegistryFeature {
+	private static Logger logger = LoggerFactory.getLogger(AuthorizedRegistryFeature.class);
 
-	protected final BaSyxAASServerConfiguration aasConfig;
+	protected final BaSyxRegistryConfiguration registryConfig;
 
-	public AuthorizedAASServerFeature(final BaSyxAASServerConfiguration aasConfig) {
-		this.aasConfig = aasConfig;
+	public AuthorizedRegistryFeature(final BaSyxRegistryConfiguration registryConfig) {
+		this.registryConfig = registryConfig;
 	}
 
 	@Override
@@ -85,8 +79,8 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 	}
 
 	@Override
-	public IAASServerDecorator getDecorator() {
-		final String strategy = aasConfig.getAuthorizationStrategy();
+	public IRegistryDecorator getDecorator() {
+		final String strategy = registryConfig.getAuthorizationStrategy();
 		switch (strategy) {
 			case "SimpleAbac:": {
 				return getSimpleAbacDecorator();
@@ -96,37 +90,34 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 			default:
 				if (strategy == null) {
-					throw new IllegalArgumentException(String.format("no strategy set, please set %s in aas.properties", BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY));
+					throw new IllegalArgumentException(String.format("no strategy set, please set %s in registry.properties", BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY));
 				}
 				throw new IllegalArgumentException(
-						String.format("unknown strategy %s set in aas.properties, available options: %s", strategy, Arrays.toString(BaSyxAASServerConfiguration.AuthorizationStrategy.values())));
+						String.format("unknown strategy %s set in registry.properties, available options: %s", strategy, Arrays.toString(BaSyxRegistryConfiguration.AuthorizationStrategy.values())));
 		}
 	}
 
-	private <SubjectInformationType> IAASServerDecorator getSimpleAbacDecorator() {
+	private <SubjectInformationType> IRegistryDecorator getSimpleAbacDecorator() {
 		logger.info("use SimpleAbac authorization strategy");
 		final AbacRuleSet abacRuleSet = readAbacRulesFile();
 		final IAbacRuleChecker abacRuleChecker = new PredefinedSetAbacRuleChecker(abacRuleSet);
 		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleAbacRoleAuthenticator();
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleAbacSubjectInformationProvider();
 
-		return new AuthorizedAASServerDecorator<>(
-				new SimpleAbacSubmodelAPIAuthorizer<>(abacRuleChecker, roleAuthenticator),
-				new SimpleAbacSubmodelAggregatorAuthorizer<>(abacRuleChecker, roleAuthenticator),
-				new SimpleAbacAASAPIAuthorizer<>(abacRuleChecker, roleAuthenticator),
-				new SimpleAbacAASAggregatorAuthorizer<>(abacRuleChecker, roleAuthenticator),
+		return new AuthorizedRegistryDecorator<>(
+				new SimpleAbacAASRegistryAuthorizer<>(abacRuleChecker, roleAuthenticator),
 				subjectInformationProvider
 		);
 	}
 
 	private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getSimpleAbacRoleAuthenticator() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategySimpleAbacRoleAuthenticator();
+			final String className = registryConfig.getAuthorizationStrategySimpleAbacRoleAuthenticator();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IRoleAuthenticator.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_ROLE_AUTHENTICATOR + " does not implement the interface " + IRoleAuthenticator.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_ROLE_AUTHENTICATOR + " does not implement the interface " + IRoleAuthenticator.class.getName());
 			}
 
 			return (IRoleAuthenticator<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
@@ -138,12 +129,12 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 
 	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSimpleAbacSubjectInformationProvider() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategySimpleAbacSubjectInformationProvider();
+			final String className = registryConfig.getAuthorizationStrategySimpleAbacSubjectInformationProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
 			}
 
 			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
@@ -174,28 +165,25 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		return new AbacRuleSet();
 	}
 
-	private <SubjectInformationType> IAASServerDecorator getGrantedAuthorityDecorator() {
+	private <SubjectInformationType> IRegistryDecorator getGrantedAuthorityDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
 
-		return new AuthorizedAASServerDecorator<>(
-				new GrantedAuthoritySubmodelAPIAuthorizer<>(grantedAuthorityAuthenticator),
-				new GrantedAuthoritySubmodelAggregatorAuthorizer<>(grantedAuthorityAuthenticator),
-				new GrantedAuthorityAASAPIAuthorizer<>(grantedAuthorityAuthenticator),
-				new GrantedAuthorityAASAggregatorAuthorizer<>(grantedAuthorityAuthenticator),
+		return new AuthorizedRegistryDecorator<>(
+				new GrantedAuthorityAASRegistryAuthorizer<>(grantedAuthorityAuthenticator),
 				subjectInformationProvider
 		);
 	}
 
 	private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator();
+			final String className = registryConfig.getAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IGrantedAuthorityAuthenticator.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR + " does not implement the interface " + IGrantedAuthorityAuthenticator.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR + " does not implement the interface " + IGrantedAuthorityAuthenticator.class.getName());
 			}
 
 			return (IGrantedAuthorityAuthenticator<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
@@ -207,12 +195,12 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 
 	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getGrantedAuthoritySubjectInformationProvider() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategyGrantedAuthoritySubjectInformationProvider();
+			final String className = registryConfig.getAuthorizationStrategyGrantedAuthoritySubjectInformationProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
 			}
 
 			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
@@ -232,18 +220,18 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 	}
 
 	@Override
-	public void addToContext(BaSyxContext context, BaSyxAASServerConfiguration aasConfig) {
+	public void addToContext(BaSyxContext context, BaSyxRegistryConfiguration registryConfig) {
 		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
 		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
 			context.setJwtBearerTokenAuthenticationConfiguration(
-					jwtBearerTokenAuthenticationConfigurationProvider.get(aasConfig)
+					jwtBearerTokenAuthenticationConfigurationProvider.get(registryConfig)
 			);
 		}
 	}
 
 	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider();
+			final String className = registryConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider();
 
 			if (className == null) {
 				return null;
@@ -253,7 +241,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IJwtBearerTokenAuthenticationConfigurationProvider.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + IJwtBearerTokenAuthenticationConfigurationProvider.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + IJwtBearerTokenAuthenticationConfigurationProvider.class.getName());
 			}
 
 			return (IJwtBearerTokenAuthenticationConfigurationProvider) clazz.getDeclaredConstructor().newInstance();

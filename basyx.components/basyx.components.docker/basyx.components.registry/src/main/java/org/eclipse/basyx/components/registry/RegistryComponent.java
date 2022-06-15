@@ -24,8 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServlet;
-
 import org.apache.commons.collections4.map.HashedMap;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
@@ -34,10 +35,12 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
+import org.eclipse.basyx.components.registry.authorization.AuthorizedRegistryFeature;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
+import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFeature;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
@@ -71,6 +74,8 @@ public class RegistryComponent implements IComponent {
 	private BaSyxMongoDBConfiguration mongoDBConfig;
 	private BaSyxSQLConfiguration sqlConfig;
 	private BaSyxMqttConfiguration mqttConfig;
+
+	private List<IRegistryFeature> registryFeatureList = new ArrayList<>();
 
 	/**
 	 * Default constructor that loads default configurations
@@ -141,8 +146,13 @@ public class RegistryComponent implements IComponent {
 	 */
 	@Override
 	public void startComponent() {
+		loadRegistryFeaturesFromConfig();
+		initializeRegistryFeatures();
+
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createRegistryServlet());
+		addRegistryFeaturesToContext(context);
+
 		server = new BaSyxHTTPServer(context);
 		server.start();
 		logger.info("Registry server started");
@@ -186,6 +196,28 @@ public class RegistryComponent implements IComponent {
 			config = this.mongoDBConfig;
 		}
 		return config;
+	}
+
+	public void addRegistryFeature(IRegistryFeature registryFeature) {
+		registryFeatureList.add(registryFeature);
+	}
+
+	private void initializeRegistryFeatures() {
+		for (IRegistryFeature registryFeature : registryFeatureList) {
+			registryFeature.initialize();
+		}
+	}
+
+	private void cleanUpRegistryFeatures() {
+		for (IRegistryFeature registryFeature : registryFeatureList) {
+			registryFeature.cleanUp();
+		}
+	}
+
+	private void addRegistryFeaturesToContext(BaSyxContext context) {
+		for (IRegistryFeature registryFeature : registryFeatureList) {
+			registryFeature.addToContext(context, registryConfig);
+		}
 	}
 
 	private HttpServlet createRegistryServlet() {
@@ -262,8 +294,16 @@ public class RegistryComponent implements IComponent {
 		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB) || registryConfig.isAuthorizationEnabled() || mqttConfig != null);
 	}
 
+	private void loadRegistryFeaturesFromConfig() {
+		if (registryConfig.isAuthorizationEnabled()) {
+			addRegistryFeature(new AuthorizedRegistryFeature(registryConfig));
+		}
+	}
+
 	@Override
 	public void stopComponent() {
+		cleanUpRegistryFeatures();
+
 		server.shutdown();
 		logger.info("Registry server stopped");
 	}

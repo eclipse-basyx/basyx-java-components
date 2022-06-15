@@ -22,24 +22,39 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.registry.authorization;
 
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.components.registry.registrycomponent.IRegistryDecorator;
+import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFactory;
+import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 
 /**
  * 
- * Interface for AASServerFeatures
+ * Decorator for Authorization of Submodel and Shell access
  * 
- * @author fischer, fried, wege
+ * @author wege
  *
  */
-public interface IAASServerFeature {
-	void initialize();
+public class AuthorizedRegistryDecorator<SubjectInformationType> implements IRegistryDecorator {
+	protected final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer;
+	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
-	void cleanUp();
+	public AuthorizedRegistryDecorator(
+			final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer,
+			final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider
+	) {
+		this.registryAuthorizer = registryAuthorizer;
+		this.subjectInformationProvider = subjectInformationProvider;
+	}
 
-	IAASServerDecorator getDecorator();
+	@Override
+	public IRegistryFactory decorateRegistryFactory(IRegistryFactory registryFactory) {
+		return new AuthorizedDecoratingAASRegistryFactory<>(
+				registryFactory,
+				registryAuthorizer,
+				subjectInformationProvider
+		);
+	}
 
-	void addToContext(BaSyxContext context, BaSyxAASServerConfiguration aasConfig);
 }

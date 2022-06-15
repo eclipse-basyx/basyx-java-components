@@ -22,24 +22,24 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.registry.registrycomponent;
 
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 /**
  * 
- * Interface for AASServerFeatures
+ * Interface for RegistryFeatures
  * 
- * @author fischer, fried, wege
+ * @author wege
  *
  */
-public interface IAASServerFeature {
+public interface IRegistryFeature {
 	void initialize();
 
 	void cleanUp();
 
-	IAASServerDecorator getDecorator();
+	IRegistryDecorator getDecorator();
 
-	void addToContext(BaSyxContext context, BaSyxAASServerConfiguration aasConfig);
+	void addToContext(BaSyxContext context, BaSyxRegistryConfiguration aasConfig);
 }

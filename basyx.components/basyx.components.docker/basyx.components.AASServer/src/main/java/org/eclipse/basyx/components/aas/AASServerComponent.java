@@ -34,9 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -212,6 +210,7 @@ public class AASServerComponent implements IComponent {
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createAggregatorServlet());
+		addAASServerFeaturesToContext(context);
 
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
@@ -295,7 +294,7 @@ public class AASServerComponent implements IComponent {
 		}
 
 		if (aasConfig.isAuthorizationEnabled()) {
-			addAASServerFeature(new AuthorizedAASServerFeature());
+			addAASServerFeature(new AuthorizedAASServerFeature(aasConfig));
 		}
 
 		if (aasConfig.isAASXUploadEnabled()) {
@@ -419,6 +418,12 @@ public class AASServerComponent implements IComponent {
 
 		// Retrieve the aas from the package
 		return packageManager.retrieveAASBundles();
+	}
+
+	private void addAASServerFeaturesToContext(BaSyxContext context) {
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerFeature.addToContext(context, aasConfig);
+		}
 	}
 
 	private VABHTTPInterface<?> createAggregatorServlet() {

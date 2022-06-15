@@ -28,7 +28,9 @@ import java.security.ProviderException;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
+import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -80,6 +82,10 @@ public class MqttAASServerFeature implements IAASServerFeature {
 	@Override
 	public IAASServerDecorator getDecorator() {
 		return new MqttAASServerDecorator(client);
+	}
+
+	@Override
+	public void addToContext(BaSyxContext context, BaSyxAASServerConfiguration aasConfig) {
 	}
 
 }
