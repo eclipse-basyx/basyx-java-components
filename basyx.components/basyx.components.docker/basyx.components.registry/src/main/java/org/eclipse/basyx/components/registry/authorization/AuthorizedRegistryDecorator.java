@@ -24,8 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.authorization;
 
-import org.eclipse.basyx.components.registry.registrycomponent.IRegistryDecorator;
-import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFactory;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFactory;
 import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 
@@ -36,7 +36,7 @@ import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProv
  * @author wege
  *
  */
-public class AuthorizedRegistryDecorator<SubjectInformationType> implements IRegistryDecorator {
+public class AuthorizedRegistryDecorator<SubjectInformationType> implements IAASRegistryDecorator {
 	protected final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer;
 	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
@@ -49,7 +49,7 @@ public class AuthorizedRegistryDecorator<SubjectInformationType> implements IReg
 	}
 
 	@Override
-	public IRegistryFactory decorateRegistryFactory(IRegistryFactory registryFactory) {
+	public IAASRegistryFactory decorateRegistryFactory(IAASRegistryFactory registryFactory) {
 		return new AuthorizedDecoratingAASRegistryFactory<>(
 				registryFactory,
 				registryAuthorizer,

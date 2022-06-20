@@ -40,12 +40,13 @@ import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfigur
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
-import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFeature;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFactory;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFeature;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * component can also start a registry without a backend and without
  * persistency.
  * 
- * @author espen
+ * @author espen, wege
  *
  */
 public class RegistryComponent implements IComponent {
@@ -75,7 +76,7 @@ public class RegistryComponent implements IComponent {
 	private BaSyxSQLConfiguration sqlConfig;
 	private BaSyxMqttConfiguration mqttConfig;
 
-	private List<IRegistryFeature> registryFeatureList = new ArrayList<>();
+	private List<IAASRegistryFeature> registryFeatureList = new ArrayList<>();
 
 	/**
 	 * Default constructor that loads default configurations
@@ -198,24 +199,24 @@ public class RegistryComponent implements IComponent {
 		return config;
 	}
 
-	public void addRegistryFeature(IRegistryFeature registryFeature) {
+	public void addRegistryFeature(IAASRegistryFeature registryFeature) {
 		registryFeatureList.add(registryFeature);
 	}
 
 	private void initializeRegistryFeatures() {
-		for (IRegistryFeature registryFeature : registryFeatureList) {
+		for (IAASRegistryFeature registryFeature : registryFeatureList) {
 			registryFeature.initialize();
 		}
 	}
 
 	private void cleanUpRegistryFeatures() {
-		for (IRegistryFeature registryFeature : registryFeatureList) {
+		for (IAASRegistryFeature registryFeature : registryFeatureList) {
 			registryFeature.cleanUp();
 		}
 	}
 
 	private void addRegistryFeaturesToContext(BaSyxContext context) {
-		for (IRegistryFeature registryFeature : registryFeatureList) {
+		for (IAASRegistryFeature registryFeature : registryFeatureList) {
 			registryFeature.addToContext(context, registryConfig);
 		}
 	}
@@ -241,7 +242,8 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private IAASRegistry createRegistry() {
-		final IAASRegistry registryBackend = createRegistryBackend();
+		IAASRegistry registryBackend = createRegistryBackend();
+
 		final IAASRegistry decoratedRegistry = decorate(registryBackend);
 		return decoratedRegistry;
 	}
@@ -249,14 +251,14 @@ public class RegistryComponent implements IComponent {
 	private IAASRegistry createRegistryBackend() {
 		final RegistryBackend backendType = registryConfig.getRegistryBackend();
 		switch (backendType) {
-		case MONGODB:
-			return createMongoDBRegistryBackend();
-		case SQL:
-			return createSQLRegistryBackend();
-		case INMEMORY:
-			return createInMemoryRegistryBackend();
-		default:
-			throw new RuntimeException("Unknown backend type " + backendType);
+			case MONGODB:
+				return createMongoDBRegistryBackend();
+			case SQL:
+				return createSQLRegistryBackend();
+			case INMEMORY:
+				return createInMemoryRegistryBackend();
+			default:
+				throw new RuntimeException("Unknown backend type " + backendType);
 		}
 	}
 
@@ -277,17 +279,35 @@ public class RegistryComponent implements IComponent {
 		return new MongoDBRegistry(mongoDBConfiguration);
 	}
 
+	private List<IAASRegistryDecorator> createRegistryDecoratorList() {
+		List<IAASRegistryDecorator> registryDecoratorList = new ArrayList<>();
+
+		for (IAASRegistryFeature registryFeature : registryFeatureList) {
+			registryDecoratorList.add(registryFeature.getDecorator());
+		}
+
+		return registryDecoratorList;
+	}
+
 	private IAASRegistry decorate(IAASRegistry aasRegistry) {
 		IAASRegistry decoratedRegistry = aasRegistry;
+
 		if (this.mqttConfig != null) {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 			decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
 		}
-		if (this.registryConfig.isAuthorizationEnabled()) {
-			logger.info("Enable Authorization for Registry");
-			decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
+
+		final IAASRegistry innerRegistry = decoratedRegistry;
+
+		IAASRegistryFactory decoratedRegistryFactory = () -> innerRegistry;
+
+		final List<IAASRegistryDecorator> decorators = createRegistryDecoratorList();
+
+		for (IAASRegistryDecorator decorator : decorators) {
+			decoratedRegistryFactory = decorator.decorateRegistryFactory(decoratedRegistryFactory);
 		}
-		return decoratedRegistry;
+
+		return decoratedRegistryFactory.create();
 	}
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {

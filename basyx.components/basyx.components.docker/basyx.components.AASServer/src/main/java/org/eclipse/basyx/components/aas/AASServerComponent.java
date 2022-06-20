@@ -93,7 +93,7 @@ import org.xml.sax.SAXException;
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
  * ${URL}/shells
  *
- * @author schnicke, espen, fried, fischer, danish
+ * @author schnicke, espen, fried, fischer, danish, wege
  *
  */
 @SuppressWarnings("deprecation")
@@ -464,7 +464,7 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private List<IAASServerDecorator> createAASServerDecoratorList() {
-		List<IAASServerDecorator> aasServerDecoratorList = new ArrayList<IAASServerDecorator>();
+		List<IAASServerDecorator> aasServerDecoratorList = new ArrayList<>();
 
 		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
 			aasServerDecoratorList.add(aasServerFeature.getDecorator());

@@ -33,7 +33,7 @@ import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
  * Represents a BaSyx registry configuration for a BaSyx Registry with any
  * backend, that can be loaded from a properties file.
  * 
- * @author espen
+ * @author espen, wege
  *
  */
 public class BaSyxRegistryConfiguration extends BaSyxConfiguration {

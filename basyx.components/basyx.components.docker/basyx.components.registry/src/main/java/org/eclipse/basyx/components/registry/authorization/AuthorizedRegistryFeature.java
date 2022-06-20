@@ -35,8 +35,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.components.registry.registrycomponent.IRegistryDecorator;
-import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFeature;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration.AuthorizationStrategy;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFeature;
 import org.eclipse.basyx.extensions.aas.registration.authorization.GrantedAuthorityAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.aas.registration.authorization.SimpleAbacAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.AbacRule;
@@ -61,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * @author wege
  *
  */
-public class AuthorizedRegistryFeature implements IRegistryFeature {
+public class AuthorizedRegistryFeature implements IAASRegistryFeature {
 	private static Logger logger = LoggerFactory.getLogger(AuthorizedRegistryFeature.class);
 
 	protected final BaSyxRegistryConfiguration registryConfig;
@@ -79,25 +80,33 @@ public class AuthorizedRegistryFeature implements IRegistryFeature {
 	}
 
 	@Override
-	public IRegistryDecorator getDecorator() {
-		final String strategy = registryConfig.getAuthorizationStrategy();
+	public IAASRegistryDecorator getDecorator() {
+		final String strategyString = registryConfig.getAuthorizationStrategy();
+
+		if (strategyString == null) {
+			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in aas.properties", BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY));
+		}
+
+		final AuthorizationStrategy strategy;
+		try {
+			strategy = AuthorizationStrategy.valueOf(strategyString);
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in aas.properties, available options: %s", strategyString, Arrays.toString(BaSyxRegistryConfiguration.AuthorizationStrategy.values())));
+		}
+
 		switch (strategy) {
-			case "SimpleAbac:": {
+			case SimpleAbac: {
 				return getSimpleAbacDecorator();
 			}
-			case "GrantedAuthority": {
+			case GrantedAuthority: {
 				return getGrantedAuthorityDecorator();
 			}
 			default:
-				if (strategy == null) {
-					throw new IllegalArgumentException(String.format("no strategy set, please set %s in registry.properties", BaSyxRegistryConfiguration.AUTHORIZATION_STRATEGY));
-				}
-				throw new IllegalArgumentException(
-						String.format("unknown strategy %s set in registry.properties, available options: %s", strategy, Arrays.toString(BaSyxRegistryConfiguration.AuthorizationStrategy.values())));
+				throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
 		}
 	}
 
-	private <SubjectInformationType> IRegistryDecorator getSimpleAbacDecorator() {
+	private <SubjectInformationType> IAASRegistryDecorator getSimpleAbacDecorator() {
 		logger.info("use SimpleAbac authorization strategy");
 		final AbacRuleSet abacRuleSet = readAbacRulesFile();
 		final IAbacRuleChecker abacRuleChecker = new PredefinedSetAbacRuleChecker(abacRuleSet);
@@ -165,7 +174,7 @@ public class AuthorizedRegistryFeature implements IRegistryFeature {
 		return new AbacRuleSet();
 	}
 
-	private <SubjectInformationType> IRegistryDecorator getGrantedAuthorityDecorator() {
+	private <SubjectInformationType> IAASRegistryDecorator getGrantedAuthorityDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();

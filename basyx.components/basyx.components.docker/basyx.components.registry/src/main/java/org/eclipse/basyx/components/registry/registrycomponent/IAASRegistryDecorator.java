@@ -31,6 +31,6 @@ package org.eclipse.basyx.components.registry.registrycomponent;
  * @author wege
  *
  */
-public interface IRegistryDecorator {
-	public IRegistryFactory decorateRegistryFactory(IRegistryFactory registryFactory);
+public interface IAASRegistryDecorator {
+	IAASRegistryFactory decorateRegistryFactory(IAASRegistryFactory registryFactory);
 }

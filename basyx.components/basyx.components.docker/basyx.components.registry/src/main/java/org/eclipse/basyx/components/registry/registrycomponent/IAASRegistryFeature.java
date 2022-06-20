@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2022 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,22 +22,24 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-
 package org.eclipse.basyx.components.registry.registrycomponent;
 
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 /**
- * Interface for providing a Registry
+ * 
+ * Interface for RegistryFeatures
  * 
  * @author wege
  *
  */
-public interface IRegistryFactory {
-	/**
-	 * Return a constructed Registry
-	 * 
-	 * @return
-	 */
-	public IAASRegistry create();
+public interface IAASRegistryFeature {
+	void initialize();
+
+	void cleanUp();
+
+	IAASRegistryDecorator getDecorator();
+
+	void addToContext(BaSyxContext context, BaSyxRegistryConfiguration aasConfig);
 }

@@ -37,6 +37,7 @@ import java.util.Map;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration.AuthorizationStrategy;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.GrantedAuthorityAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.SimpleAbacAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.GrantedAuthorityAASAPIAuthorizer;
@@ -64,7 +65,7 @@ import org.slf4j.LoggerFactory;
  * 
  * Feature for Authorization of Submodel and Shell access
  * 
- * @author fischer, fried
+ * @author fischer, fried, wege
  *
  */
 public class AuthorizedAASServerFeature implements IAASServerFeature {
@@ -86,20 +87,28 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		final String strategy = aasConfig.getAuthorizationStrategy();
+		final String strategyString = aasConfig.getAuthorizationStrategy();
+
+		if (strategyString == null) {
+			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in aas.properties", BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY));
+		}
+
+		final AuthorizationStrategy strategy;
+		try {
+			strategy = AuthorizationStrategy.valueOf(strategyString);
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in aas.properties, available options: %s", strategyString, Arrays.toString(BaSyxAASServerConfiguration.AuthorizationStrategy.values())));
+		}
+
 		switch (strategy) {
-			case "SimpleAbac:": {
+			case SimpleAbac: {
 				return getSimpleAbacDecorator();
 			}
-			case "GrantedAuthority": {
+			case GrantedAuthority: {
 				return getGrantedAuthorityDecorator();
 			}
 			default:
-				if (strategy == null) {
-					throw new IllegalArgumentException(String.format("no strategy set, please set %s in aas.properties", BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY));
-				}
-				throw new IllegalArgumentException(
-						String.format("unknown strategy %s set in aas.properties, available options: %s", strategy, Arrays.toString(BaSyxAASServerConfiguration.AuthorizationStrategy.values())));
+				throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
 		}
 	}
 
@@ -174,7 +183,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		return new AbacRuleSet();
 	}
 
-	private <SubjectInformationType> IAASServerDecorator getGrantedAuthorityDecorator() {
+	public  <SubjectInformationType> IAASServerDecorator getGrantedAuthorityDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();

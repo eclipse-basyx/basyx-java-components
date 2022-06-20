@@ -12,5 +12,12 @@
     "aasId": "*",
     "smId": "*",
     "smElIdShortPath": "*"
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:aas-registry:read",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
   }
 ]

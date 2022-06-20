@@ -54,5 +54,47 @@
     "aasId": "*",
     "smId": "*",
     "smElIdShortPath": "*"
+  },
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:scope:sm-api:execute",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:aas-aggregator:read",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:aas-api:read",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:sm-aggregator:read",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:sm-api:read",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:sm-api:execute",
+    "aasId": "*",
+    "smId": "*",
+    "smElIdShortPath": "*"
   }
 ]

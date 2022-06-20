@@ -39,7 +39,7 @@ import com.google.gson.Gson;
  * Represents a BaSyx server configuration for an AAS Server with any backend,
  * that can be loaded from a properties file.
  * 
- * @author espen
+ * @author espen, wege
  *
  */
 public class BaSyxAASServerConfiguration extends BaSyxConfiguration {

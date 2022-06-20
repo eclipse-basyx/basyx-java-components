@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.components.registry.registrycomponent.IRegistryFactory;
+import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFactory;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.extensions.aas.registration.authorization.GrantedAuthorityAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
@@ -38,13 +38,14 @@ import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProv
  * 
  * @author espen
  */
-public class AuthorizedDecoratingAASRegistryFactory<SubjectInformationType> implements IRegistryFactory {
-	protected final IRegistryFactory registryFactory;
+public class AuthorizedDecoratingAASRegistryFactory<SubjectInformationType> implements
+    IAASRegistryFactory {
+	protected final IAASRegistryFactory registryFactory;
 	protected final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer;
 	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
 	public AuthorizedDecoratingAASRegistryFactory(
-			final IRegistryFactory registryFactory,
+			final IAASRegistryFactory registryFactory,
 			final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer,
 			final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider
 	) {
@@ -54,7 +55,7 @@ public class AuthorizedDecoratingAASRegistryFactory<SubjectInformationType> impl
 	}
 
 	public AuthorizedDecoratingAASRegistryFactory(
-			final IRegistryFactory registryFactory
+			final IAASRegistryFactory registryFactory
 	) {
 		this(
 				registryFactory,
