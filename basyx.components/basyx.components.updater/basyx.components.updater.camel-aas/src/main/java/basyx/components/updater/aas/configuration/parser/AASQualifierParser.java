@@ -21,8 +21,8 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import basyx.components.updater.aas.configuration.AASDatasinkConfiguration;
 import basyx.components.updater.aas.configuration.BasyxInternalDatasourceConfiguration;
 import basyx.components.updater.aas.configuration.BasyxInternalTransformerConfiguration;
-import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
-import basyx.components.updater.core.configuration.route.configuration.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
 
 /**
  * An implementation of AAS Qualifer parser to grab the connection values from

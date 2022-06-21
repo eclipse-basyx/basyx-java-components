@@ -18,7 +18,7 @@ import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 
 import basyx.components.updater.aas.configuration.parser.AASQualifierParser;
-import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
 
 /**
  * An implementation of Basyx RoutesConfiguration builder

@@ -9,12 +9,12 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route.configuration;
+package basyx.components.updater.core.configuration.route.timer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.sources.TimerConfiguration;
+import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
 
 /**
  * A connection of a single route (source, transformer, sink)
@@ -22,61 +22,21 @@ import basyx.components.updater.core.configuration.route.sources.TimerConfigurat
  * @author fischer
  *
  */
-public class TimerRouteConfiguration implements IRouteConfiguration {
+public class TimerRouteConfiguration extends RouteConfiguration {
 	private static final String ROUTE_TYPE = "TIMER";
-	private String routeId;
-	private String datasource;
-	private List<String> transformers = new ArrayList<>();
 	private List<String> datasinks = new ArrayList<>();
 	private TimerConfiguration timerConfig;
-	private String delegator;
 
 	public TimerRouteConfiguration() {
+		this.routeType = ROUTE_TYPE;
 	}
 
 	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, TimerConfiguration timerConfig) {
+		this();
 		this.datasource = datasource;
 		this.transformers = transformers;
 		this.datasinks = datasinks;
 		this.setTimerConfig(timerConfig);
-	}
-
-	@Override
-	public String getRouteId() {
-		return routeId;
-	}
-
-	@Override
-	public void setRouteId(String routeId) {
-		this.routeId = routeId;
-	}
-
-	@Override
-	public String getRouteType() {
-		return ROUTE_TYPE;
-	}
-
-	@Override
-	public List<String> getTransformers() {
-		return transformers;
-	}
-
-	@Override
-	public void setTransformers(List<String> transformers) {
-		this.transformers = transformers;
-	}
-
-	@Override
-	public String getDelegator() {
-		return delegator;
-	}
-
-	public String getDatasource() {
-		return datasource;
-	}
-
-	public void setDatasource(String datasource) {
-		this.datasource = datasource;
 	}
 
 	public List<String> getDatasinks() {

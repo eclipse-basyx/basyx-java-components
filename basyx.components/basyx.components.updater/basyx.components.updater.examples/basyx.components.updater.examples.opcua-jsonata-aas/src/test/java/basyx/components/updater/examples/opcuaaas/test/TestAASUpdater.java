@@ -24,7 +24,7 @@ import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConf
 import basyx.components.updater.camelopcua.configuration.factory.OpcuaDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 import basyx.components.updater.transformer.cameljsonjackson.configuration.factory.JsonJacksonDefaultConfigurationFactory;
 

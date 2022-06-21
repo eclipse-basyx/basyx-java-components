@@ -1,9 +1,7 @@
-package basyx.components.updater.core.configuration.route.creator;
+package basyx.components.updater.core.configuration.route.core;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
 
 public class RouteCreatorHelper {
 	private RouteCreatorHelper() {

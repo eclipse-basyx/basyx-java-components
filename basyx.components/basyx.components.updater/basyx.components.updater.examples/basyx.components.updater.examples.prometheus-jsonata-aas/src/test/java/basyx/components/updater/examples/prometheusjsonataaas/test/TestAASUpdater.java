@@ -21,8 +21,8 @@ import basyx.components.updater.camelprometheus.configuration.factory.Prometheus
 import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
-import basyx.components.updater.core.configuration.route.configuration.TimerRouteConfiguration;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.timer.TimerRouteConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
 public class TestAASUpdater {

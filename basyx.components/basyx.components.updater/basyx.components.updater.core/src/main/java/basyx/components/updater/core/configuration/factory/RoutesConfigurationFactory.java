@@ -13,8 +13,8 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.configuration.IRouteConfiguration;
-import basyx.components.updater.core.configuration.route.configuration.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
+import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
 
 /**
  * A generic implementation of routes configuration factory
@@ -61,7 +61,7 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<IRouteConfiguration> create() {
-		return (List<IRouteConfiguration>) getConfigurationLoader().loadListConfiguration();
+	public List<RouteConfiguration> create() {
+		return (List<RouteConfiguration>) getConfigurationLoader().loadListConfiguration();
 	}
 }

@@ -20,13 +20,13 @@ import org.eclipse.basyx.components.IComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import basyx.components.updater.core.configuration.route.configuration.RoutesConfiguration;
-import basyx.components.updater.core.configuration.route.configuration.SimpleRouteConfiguration;
-import basyx.components.updater.core.configuration.route.configuration.TimerRouteConfiguration;
-import basyx.components.updater.core.configuration.route.creatorfactory.IRouteCreatorFactory;
-import basyx.components.updater.core.configuration.route.creatorfactory.SimpleRouteCreatorFactory;
-import basyx.components.updater.core.configuration.route.creatorfactory.TimerRouteCreatorFactory;
-import basyx.components.updater.core.routebuilder.DataBridgeRouteFactory;
+import basyx.components.updater.core.configuration.route.core.IRouteCreatorFactory;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.simple.SimpleRouteCreatorFactory;
+import basyx.components.updater.core.configuration.route.timer.TimerRouteConfiguration;
+import basyx.components.updater.core.configuration.route.timer.TimerRouteCreatorFactory;
+import basyx.components.updater.core.routebuilder.DataBridgeRouteBuilder;
 
 /**
  * Core Updater component which can run the updater if routes configuration is
@@ -37,18 +37,16 @@ import basyx.components.updater.core.routebuilder.DataBridgeRouteFactory;
  */
 public class UpdaterComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(UpdaterComponent.class);
-	private RoutesConfiguration routeConfiguration;
-	private Map<String, IRouteCreatorFactory> routeCreatorFactoryMap = new HashMap<>();
-	private DataBridgeRouteFactory orchestrator;
+	private DataBridgeRouteBuilder orchestrator;
 
 	protected CamelContext camelContext;
 
 	public UpdaterComponent(RoutesConfiguration configuration) {
-		this.routeConfiguration = configuration;
-		this.routeCreatorFactoryMap = getRouteCreatorFactoryMapDefault();
+		camelContext = new DefaultCamelContext();
+		orchestrator = new DataBridgeRouteBuilder(configuration, getRouteCreatorFactoryMapDefault());
 	}
 
-	private Map<String, IRouteCreatorFactory> getRouteCreatorFactoryMapDefault() {
+	private static Map<String, IRouteCreatorFactory> getRouteCreatorFactoryMapDefault() {
 		Map<String, IRouteCreatorFactory> defaultRouteCreatorFactoryMap = new HashMap<>();
 		defaultRouteCreatorFactoryMap.put(new SimpleRouteConfiguration().getRouteType(), new SimpleRouteCreatorFactory());
 		defaultRouteCreatorFactoryMap.put(new TimerRouteConfiguration().getRouteType(), new TimerRouteCreatorFactory());
@@ -61,13 +59,11 @@ public class UpdaterComponent implements IComponent {
 	 */
 	@Override
 	public void startComponent() {
-		startRoutesWithoutDelegator();
+		startRoutes();
 	}
 
-	public void startRoutesWithoutDelegator() {
-		camelContext = new DefaultCamelContext();
+	public void startRoutes() {
 		try {
-			orchestrator = new DataBridgeRouteFactory(routeConfiguration, routeCreatorFactoryMap);
 			camelContext.addRoutes(orchestrator);
 			camelContext.start();
 			logger.info("Updater started");
@@ -75,10 +71,6 @@ public class UpdaterComponent implements IComponent {
 			e.printStackTrace();
 			camelContext = null;
 		}
-	}
-
-	public void addRouteCreatorFactory(String key, IRouteCreatorFactory routeCreatorFactory) {
-		orchestrator.addRouteCreatorFactory(key, routeCreatorFactory);
 	}
 
 	/**

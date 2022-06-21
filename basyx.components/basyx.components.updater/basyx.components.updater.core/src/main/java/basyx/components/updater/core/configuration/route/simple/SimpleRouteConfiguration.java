@@ -9,10 +9,11 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route.configuration;
+package basyx.components.updater.core.configuration.route.simple;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
 
 /**
  * A connection of a single route (source, transformer(s), sink(s))
@@ -20,59 +21,19 @@ import java.util.List;
  * @author haque, fischer
  *
  */
-public class SimpleRouteConfiguration implements IRouteConfiguration {
+public class SimpleRouteConfiguration extends RouteConfiguration {
 	private static final String ROUTE_TYPE = "SIMPLE";
-	private String routeId;
-	private String datasource;
 	private String datasink;
-	private List<String> transformers = new ArrayList<>();
-	private String delegator;
 
 	public SimpleRouteConfiguration() {
+		this.routeType = ROUTE_TYPE;
 	}
 
 	public SimpleRouteConfiguration(String datasource, List<String> transformers, String datasink) {
+		this();
 		this.datasource = datasource;
 		this.transformers = transformers;
 		this.datasink = datasink;
-	}
-
-	@Override
-	public String getRouteId() {
-		return routeId;
-	}
-
-	@Override
-	public void setRouteId(String routeId) {
-		this.routeId = routeId;
-	}
-
-	@Override
-	public String getRouteType() {
-		return ROUTE_TYPE;
-	}
-
-	@Override
-	public List<String> getTransformers() {
-		return transformers;
-	}
-
-	@Override
-	public void setTransformers(List<String> transformers) {
-		this.transformers = transformers;
-	}
-
-	@Override
-	public String getDelegator() {
-		return delegator;
-	}
-
-	public String getDatasource() {
-		return datasource;
-	}
-
-	public void setDatasource(String datasource) {
-		this.datasource = datasource;
 	}
 
 	public String getDatasink() {
@@ -82,4 +43,5 @@ public class SimpleRouteConfiguration implements IRouteConfiguration {
 	public void setDatasink(String datasink) {
 		this.datasink = datasink;
 	}
+
 }

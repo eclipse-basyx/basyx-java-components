@@ -11,7 +11,7 @@
 
 package basyx.components.updater.core.configuration.factory;
 
-import basyx.components.updater.core.configuration.route.configuration.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
 
 /**
  * A default implementation of Routes configuration factory from a default file
