@@ -11,7 +11,7 @@
 
 package basyx.components.updater.transformer.cameljsonjackson.configuration;
 
-import basyx.components.updater.core.configuration.route.sources.DataTransformerConfiguration;
+import basyx.components.updater.core.configuration.entity.DataTransformerConfiguration;
 
 /**
  * An implementation of JsonJackson transformer configuration using camel

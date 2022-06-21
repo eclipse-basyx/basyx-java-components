@@ -11,7 +11,7 @@
 
 package basyx.components.updater.cameltimer.configuration;
 
-import basyx.components.updater.core.configuration.route.sources.DataSourceConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSourceConfiguration;
 
 /**
  * An implementation of Timer consumer configuration

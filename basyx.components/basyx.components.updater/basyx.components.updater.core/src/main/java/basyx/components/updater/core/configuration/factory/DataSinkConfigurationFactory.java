@@ -13,7 +13,7 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.sources.DataSinkConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSinkConfiguration;
 
 /**
  * A generic implementation of data sink configuration factory

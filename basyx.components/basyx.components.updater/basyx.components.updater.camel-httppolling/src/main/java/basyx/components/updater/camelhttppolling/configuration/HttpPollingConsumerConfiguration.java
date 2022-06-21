@@ -11,7 +11,7 @@
 
 package basyx.components.updater.camelhttppolling.configuration;
 
-import basyx.components.updater.core.configuration.route.sources.DataSinkConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSinkConfiguration;
 
 /**
  * An implementation of httppolling consumer configuration

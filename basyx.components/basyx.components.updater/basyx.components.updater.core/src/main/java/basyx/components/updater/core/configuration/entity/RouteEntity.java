@@ -9,7 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route.sources;
+package basyx.components.updater.core.configuration.entity;
 
 /**
  * An generic class of Route Entity. parent of all configuration class

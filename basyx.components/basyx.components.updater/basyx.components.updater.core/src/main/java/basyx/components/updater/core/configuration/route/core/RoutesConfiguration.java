@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import basyx.components.updater.core.configuration.route.sources.DataSinkConfiguration;
-import basyx.components.updater.core.configuration.route.sources.DataSourceConfiguration;
-import basyx.components.updater.core.configuration.route.sources.DataTransformerConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSinkConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSourceConfiguration;
+import basyx.components.updater.core.configuration.entity.DataTransformerConfiguration;
 
 /**
  * An implementation of configurations of all the routes

@@ -1,6 +1,6 @@
 package basyx.components.updater.core.configuration.route.timer;
 
-import basyx.components.updater.core.configuration.route.sources.RouteEntity;
+import basyx.components.updater.core.configuration.entity.RouteEntity;
 
 /**
  * A generic class of Timer Configuration
