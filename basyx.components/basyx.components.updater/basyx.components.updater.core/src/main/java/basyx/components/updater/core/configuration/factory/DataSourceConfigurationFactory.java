@@ -13,7 +13,7 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSourceConfiguration;
 
 /**
  * A generic implementation of data source configuration factory

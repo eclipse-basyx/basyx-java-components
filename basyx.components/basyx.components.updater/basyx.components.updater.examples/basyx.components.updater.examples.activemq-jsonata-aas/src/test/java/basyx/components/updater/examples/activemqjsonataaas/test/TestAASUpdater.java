@@ -34,7 +34,7 @@ import basyx.components.updater.aas.configuration.factory.AASProducerDefaultConf
 import basyx.components.updater.camelactivemq.configuration.factory.ActiveMQDefaultConfigurationFactory;
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
 public class TestAASUpdater {
@@ -67,11 +67,11 @@ public class TestAASUpdater {
 		ClassLoader loader = TestAASUpdater.class.getClassLoader();
 		RoutesConfiguration configuration = new RoutesConfiguration();
 
-		// Extend configutation for connections
+		// Extend configuration for connections
 		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
 		configuration.addRoutes(routesFactory.create());
 
-		// Extend configutation for Kafka Source
+		// Extend configuration for Kafka Source
 		ActiveMQDefaultConfigurationFactory activeMQConfigFactory = new ActiveMQDefaultConfigurationFactory(loader);
 		configuration.addDatasources(activeMQConfigFactory.create());
 

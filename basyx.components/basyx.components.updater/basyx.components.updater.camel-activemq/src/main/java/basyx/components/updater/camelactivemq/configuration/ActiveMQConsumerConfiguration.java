@@ -11,7 +11,7 @@
 
 package basyx.components.updater.camelactivemq.configuration;
 
-import basyx.components.updater.core.configuration.DataSourceConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSourceConfiguration;
 
 /**
  * An implementation of ActiveMQ consumer configuration

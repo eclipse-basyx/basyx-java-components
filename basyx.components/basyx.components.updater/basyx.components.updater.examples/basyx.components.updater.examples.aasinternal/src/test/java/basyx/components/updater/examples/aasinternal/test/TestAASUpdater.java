@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import basyx.components.updater.aas.builder.BasyxRoutesConfigurationBuilder;
 import basyx.components.updater.core.component.UpdaterComponent;
-import basyx.components.updater.core.configuration.route.RoutesConfiguration;
+import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
 import io.moquette.broker.Server;
 import io.moquette.broker.config.ClasspathResourceLoader;
 import io.moquette.broker.config.IConfig;

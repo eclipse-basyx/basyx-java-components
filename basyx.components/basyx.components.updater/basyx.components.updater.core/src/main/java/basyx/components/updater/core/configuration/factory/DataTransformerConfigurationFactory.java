@@ -13,7 +13,7 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.DataTransformerConfiguration;
+import basyx.components.updater.core.configuration.entity.DataTransformerConfiguration;
 
 /**
  * A generic implementation of data transformer configuration factory

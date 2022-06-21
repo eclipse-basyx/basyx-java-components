@@ -13,7 +13,8 @@ package basyx.components.updater.core.configuration.factory;
 
 import java.util.List;
 
-import basyx.components.updater.core.configuration.route.RouteConfiguration;
+import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
+import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
 
 /**
  * A generic implementation of routes configuration factory
@@ -28,25 +29,35 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 		super(filePath, loader, mapperClass);
 	}
 
+	/**
+	 * This constructor uses the {@link SimpleRouteConfiguration} as the default
+	 * configuration
+	 *
+	 * @param filePath
+	 * @param loader
+	 */
 	public RoutesConfigurationFactory(String filePath, ClassLoader loader) {
-		super(filePath, loader, RouteConfiguration.class);
+		super(filePath, loader, SimpleRouteConfiguration.class);
 	}
 
 	/**
 	 * This constructor uses the default path {@link #DEFAULT_FILE_PATH}
 	 *
 	 * @param loader
+	 * @param mapperClass
 	 */
-	public RoutesConfigurationFactory(ClassLoader loader) {
-		super(DEFAULT_FILE_PATH, loader, RouteConfiguration.class);
+	public RoutesConfigurationFactory(ClassLoader loader, Class<?> mapperClass) {
+		super(DEFAULT_FILE_PATH, loader, mapperClass);
 	}
 
 	/**
-	 * @deprecated use the {@link #create()} method instead
+	 * This constructor uses the default path {@link #DEFAULT_FILE_PATH} and the
+	 * {@link SimpleRouteConfiguration} as the default configuration
+	 *
+	 * @param loader
 	 */
-	@Deprecated
-	public List<RouteConfiguration> getRouteConfigurations() {
-		return this.create();
+	public RoutesConfigurationFactory(ClassLoader loader) {
+		super(DEFAULT_FILE_PATH, loader, SimpleRouteConfiguration.class);
 	}
 
 	@SuppressWarnings("unchecked")

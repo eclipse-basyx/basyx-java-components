@@ -1,8 +1,0 @@
-[
-	{
-		"datasource": "property1",
-		"transformers": ["jsonataA"],
-		"datasinks": [],
-		"delegator": "DelegatorA"
-	}
-]

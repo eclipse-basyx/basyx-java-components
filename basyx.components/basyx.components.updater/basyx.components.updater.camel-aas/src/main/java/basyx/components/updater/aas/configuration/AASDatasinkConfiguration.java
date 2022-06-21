@@ -11,7 +11,7 @@
 
 package basyx.components.updater.aas.configuration;
 
-import basyx.components.updater.core.configuration.DataSinkConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSinkConfiguration;
 
 /**
  * An implementation of AAS data sink configuration
