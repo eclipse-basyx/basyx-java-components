@@ -13,7 +13,6 @@
 	</properties>
 
 	<modules>
-		<module>basyx.components.updater.examples.aasinternal</module>
 		<module>basyx.components.updater.examples.aasserver</module>
 		<module>basyx.components.updater.examples.kafkaproducer</module>
 		<module>basyx.components.updater.examples.activemqproducer</module>
