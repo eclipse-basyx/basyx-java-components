@@ -222,10 +222,31 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param registry
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		setMongoDBConfiguration(config, MongoClients.create(config.getConnectionUrl()));
+		this.config = config;
+		this.registry = registry;
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
+		init();
+	}
+
+	/**
+	 * Receives a BaSyxMongoDBConfiguration, IAASRegistry, IAASAPIFactory,
+	 * ISubmodelAggregatorFactory and a MongoClient to create a persistent MongoDB
+	 * backend.
+	 * 
+	 * @param config
+	 * @param registry
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
 	 * 
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		setMongoDBConfiguration(config);
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		setMongoDBConfiguration(config, client);
 		this.config = config;
 		this.registry = registry;
 		this.aasApiProvider = aasAPIFactory;
@@ -240,10 +261,30 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param config
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		setMongoDBConfiguration(config, MongoClients.create(config.getConnectionUrl()));
+		this.config = config;
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
+		init();
+	}
+
+	/**
+	 * Receives a BaSyxMongoDBConfiguration,
+	 * IAASAPIFactory,ISubmodelAggregatorFactory and a MongoClient to create a
+	 * persistent MongoDB backend.
+	 * 
+	 * @param config
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
 	 * 
 	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		setMongoDBConfiguration(config);
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		setMongoDBConfiguration(config, client);
 		this.config = config;
 		this.aasApiProvider = aasAPIFactory;
 		this.submodelAggregatorFactory = submodelAggregatorFactory;
@@ -258,12 +299,36 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param registry
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
-		setMongoDBConfiguration(config);
+		setMongoDBConfiguration(config, MongoClients.create(config.getConnectionUrl()));
+		this.registry = registry;
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
+		init();
+	}
+
+	/**
+	 * Receives a resourceConfigPath, IAASRegistry, IAASAPIFactory,
+	 * ISubmodelAggregatorFactory and a MongoClient to create a persistent MongoDB
+	 * backend.
+	 * 
+	 * @param resourceConfigPath
+	 * @param registry
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 *            Use the new constructor using a MongoClient
+	 * 
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		setMongoDBConfiguration(config, client);
 		this.registry = registry;
 		this.aasApiProvider = aasAPIFactory;
 		this.submodelAggregatorFactory = submodelAggregatorFactory;
@@ -277,12 +342,32 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param resourceConfigPath
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
-		setMongoDBConfiguration(config);
+		setMongoDBConfiguration(config, MongoClients.create(config.getConnectionUrl()));
+		this.aasApiProvider = aasAPIFactory;
+		this.submodelAggregatorFactory = submodelAggregatorFactory;
+		init();
+	}
+
+	/**
+	 * Receives a resourceConfigPath, IAASAPIFactory, ISubmodelAggregatorFactory and
+	 * a MongoClient to create a persistent MongoDB backend.
+	 * 
+	 * @param resourceConfigPath
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 * 
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		setMongoDBConfiguration(config, client);
 		this.aasApiProvider = aasAPIFactory;
 		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		init();
@@ -294,10 +379,23 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * 
 	 * @param aasAPIFactory
 	 * @param submodelAggregatorFactory
-	 * 
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBAASAggregator(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory);
+	}
+
+	/**
+	 * Constructor using the default configuration, with the given
+	 * IAASAPIFactory,ISubmodelAggregatorFactory and MongoClient.
+	 * 
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 */
+	public MongoDBAASAggregator(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory, client);
 	}
 
 	/**
@@ -348,9 +446,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		};
 	}
 
-	private void setMongoDBConfiguration(BaSyxMongoDBConfiguration config) {
+	private void setMongoDBConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
 		this.config = config;
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
 		this.aasCollection = config.getAASCollection();
 		this.smCollection = config.getSubmodelCollection();

@@ -29,6 +29,9 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
 /**
  * 
  * Factory for creating a MongoDBAASAPI
@@ -39,14 +42,22 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
 	private BaSyxMongoDBConfiguration config;
+	private MongoClient client;
 
+	@Deprecated
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
 		this.config = config;
+		this.client = MongoClients.create(config.getConnectionUrl());
+	}
+
+	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
+		this.config = config;
+		this.client = client;
 	}
 
 	@Override
 	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId());
+		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
 		api.setAAS(aas);
 		return api;
 	}

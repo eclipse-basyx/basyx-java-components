@@ -29,6 +29,9 @@ import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
 /**
  * 
  * Factory for creating a MongoDBSubmodelAPI
@@ -39,14 +42,22 @@ import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 public class MongoDBSubmodelAPIFactory implements ISubmodelAPIFactory {
 
 	private BaSyxMongoDBConfiguration config;
+	private MongoClient client;
 
+	@Deprecated
 	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config) {
 		this.config = config;
+		this.client = MongoClients.create(config.getConnectionUrl());
+	}
+
+	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
+		this.config = config;
+		this.client = client;
 	}
 
 	@Override
 	public ISubmodelAPI getSubmodelAPI(Submodel submodel) {
-		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId());
+		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId(), client);
 		api.setSubmodel(submodel);
 		return api;
 	}

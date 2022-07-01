@@ -65,9 +65,35 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * Receives the path of the configuration.properties file in it's constructor.
 	 * 
 	 * @param config
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId) {
-		this.setConfiguration(config);
+		this.setConfiguration(config, MongoClients.create(config.getConnectionUrl()));
+		this.setAASId(aasId);
+	}
+
+	/**
+	 * Receives the path of the configuration.properties file in it's constructor.
+	 * 
+	 * @param config
+	 */
+	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId, MongoClient client) {
+		this.setConfiguration(config, client);
+		this.setAASId(aasId);
+	}
+
+	/**
+	 * Receives the path of the .properties file in it's constructor from a
+	 * resource.
+	 * 
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBAASAPI(String resourceConfigPath, String aasId) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		this.setConfiguration(config, MongoClients.create(config.getConnectionUrl()));
 		this.setAASId(aasId);
 	}
 
@@ -75,23 +101,32 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * Receives the path of the .properties file in it's constructor from a
 	 * resource.
 	 */
-	public MongoDBAASAPI(String resourceConfigPath, String aasId) {
+	public MongoDBAASAPI(String resourceConfigPath, String aasId, MongoClient client) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
-		this.setConfiguration(config);
+		this.setConfiguration(config, client);
 		this.setAASId(aasId);
 	}
 
 	/**
 	 * Constructor using default sql connections
+	 * 
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBAASAPI(String aasId) {
 		this(DEFAULT_CONFIG_PATH, aasId);
 	}
 
-	public void setConfiguration(BaSyxMongoDBConfiguration config) {
+	/**
+	 * Constructor using default sql connections
+	 */
+	public MongoDBAASAPI(String aasId, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, aasId, client);
+	}
+
+	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
 		this.config = config;
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
 		this.collection = config.getAASCollection();
 	}

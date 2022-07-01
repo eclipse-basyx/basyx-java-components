@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.components.aas.mongodb;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -52,12 +51,21 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	private String smCollection;
 	private MongoTemplate mongoOps;
 
+	@Deprecated
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
 		super(smApiFactory);
 
 		smCollection = config.getSubmodelCollection();
 
 		MongoClient client = MongoClients.create(config.getConnectionUrl());
+		mongoOps = new MongoTemplate(client, config.getDatabase());
+	}
+
+	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
+		super(smApiFactory);
+
+		smCollection = config.getSubmodelCollection();
+
 		mongoOps = new MongoTemplate(client, config.getDatabase());
 	}
 
