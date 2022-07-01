@@ -58,7 +58,7 @@ public class MongoDBConnections {
 			aasAggregator.createAAS(new AssetAdministrationShell("id_" + i, aasIdentifier, new Asset("assetId_" + i, new Identifier(IdentifierType.CUSTOM, "assetIdentifier_" + i), AssetKind.INSTANCE)));
 			aasAggregator.deleteAAS(aasIdentifier);
 			aggregator.createSubmodel(new Submodel("id_" + i, new Identifier(IdentifierType.CUSTOM, "" + i)));
-			aggregator.deleteSubmodelByIdShort("id_i");
+			aggregator.deleteSubmodelByIdShort("id_"+i);
 		}
 
 	}
