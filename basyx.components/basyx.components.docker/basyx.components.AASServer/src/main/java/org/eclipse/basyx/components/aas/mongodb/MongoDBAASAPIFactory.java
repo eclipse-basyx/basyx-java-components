@@ -46,8 +46,7 @@ public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
 	@Deprecated
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this.config = config;
-		this.client = MongoClients.create(config.getConnectionUrl());
+		this(config, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {

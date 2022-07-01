@@ -69,8 +69,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	@Deprecated
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId) {
-		this.setConfiguration(config, MongoClients.create(config.getConnectionUrl()));
-		this.setAASId(aasId);
+		this(config, aasId, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	/**
@@ -93,7 +92,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	public MongoDBAASAPI(String resourceConfigPath, String aasId) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
-		this.setConfiguration(config, MongoClients.create(config.getConnectionUrl()));
+		this.setConfiguration(config);
 		this.setAASId(aasId);
 	}
 
@@ -123,6 +122,13 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	public MongoDBAASAPI(String aasId, MongoClient client) {
 		this(DEFAULT_CONFIG_PATH, aasId, client);
+	}
+
+	@Deprecated
+	public void setConfiguration(BaSyxMongoDBConfiguration config) {
+		this.config = config;
+		this.mongoOps = new MongoTemplate(MongoClients.create(config.getConnectionUrl()), config.getDatabase());
+		this.collection = config.getAASCollection();
 	}
 
 	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {

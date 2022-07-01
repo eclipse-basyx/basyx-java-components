@@ -101,10 +101,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 
 	@Deprecated
 	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
-		this.client = MongoClients.create(config.getConnectionUrl());
-		this.setConfiguration(config);
-		this.setSubmodelId(smId);
-		this.invocationHelper = invocationHelper;
+		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {

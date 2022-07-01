@@ -226,12 +226,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		setMongoDBConfiguration(config, MongoClients.create(config.getConnectionUrl()));
-		this.config = config;
-		this.registry = registry;
-		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregatorFactory = submodelAggregatorFactory;
-		init();
+		this(config, registry, aasAPIFactory, submodelAggregatorFactory, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	/**
@@ -265,11 +260,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		setMongoDBConfiguration(config, MongoClients.create(config.getConnectionUrl()));
-		this.config = config;
-		this.aasApiProvider = aasAPIFactory;
-		this.submodelAggregatorFactory = submodelAggregatorFactory;
-		init();
+		this(config, aasAPIFactory, submodelAggregatorFactory, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	/**

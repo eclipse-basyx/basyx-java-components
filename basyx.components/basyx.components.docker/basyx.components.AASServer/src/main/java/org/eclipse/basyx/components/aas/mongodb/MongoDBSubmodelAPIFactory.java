@@ -46,8 +46,7 @@ public class MongoDBSubmodelAPIFactory implements ISubmodelAPIFactory {
 
 	@Deprecated
 	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config) {
-		this.config = config;
-		this.client = MongoClients.create(config.getConnectionUrl());
+		this(config, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {

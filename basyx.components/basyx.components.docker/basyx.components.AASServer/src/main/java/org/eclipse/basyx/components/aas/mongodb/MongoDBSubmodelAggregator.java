@@ -53,12 +53,7 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 
 	@Deprecated
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
-		super(smApiFactory);
-
-		smCollection = config.getSubmodelCollection();
-
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
-		mongoOps = new MongoTemplate(client, config.getDatabase());
+		this(smApiFactory, config, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {

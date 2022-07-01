@@ -47,9 +47,7 @@ public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFact
 
 	@Deprecated
 	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
-		this.config = config;
-		this.submodelAPIFactory = submodelAPIFactory;
-		this.client = MongoClients.create(config.getConnectionUrl());
+		this(config, submodelAPIFactory, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory, MongoClient client) {
