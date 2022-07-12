@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -65,7 +66,7 @@ public class ServletHeaderConfiguration {
 
 		private final List<HeaderDefinition> headerDefs;
 
-		private final Map<CacheKey, Map<String, String>> resolvedHeadersByPath = new HashMap<>();
+		private final Map<CacheKey, Map<String, String>> resolvedHeadersByPath = new ConcurrentHashMap<>();
 
 		public MappingsHeaderApplier(List<HeaderDefinition> headerDefs) {
 			this.headerDefs = headerDefs;
