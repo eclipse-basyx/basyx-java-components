@@ -111,6 +111,7 @@
 										<AAS_CONFIG_KEY>BASYX_AAS</AAS_CONFIG_KEY>
 										<MONGODB_CONFIG_KEY>BASYX_MONGODB</MONGODB_CONFIG_KEY>
 										<DOCKER_CONFIG_KEY>BASYX_DOCKER</DOCKER_CONFIG_KEY>
+										<MQTT_CONFIG_KEY>BASYX_MQTT</MQTT_CONFIG_KEY>
 										<SQL_CONFIG_KEY>BASYX_SQL</SQL_CONFIG_KEY>
                                     </args>
                                 </build>
