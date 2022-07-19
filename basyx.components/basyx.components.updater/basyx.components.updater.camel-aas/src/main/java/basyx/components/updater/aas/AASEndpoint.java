@@ -11,8 +11,8 @@
 
 package basyx.components.updater.aas;
 
-import org.apache.camel.Consumer;
 import org.apache.camel.Category;
+import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.spi.Metadata;
@@ -20,6 +20,7 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
+import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class AASEndpoint extends DefaultEndpoint {
     private String name;
 
 	@UriParam(defaultValue = "")
-	private String propertyPath = "/smIdShort/smElementCollection/myPropertyIdShort";
+	private String propertyPath;
 
 	public AASEndpoint() {
     }
@@ -55,9 +56,6 @@ public class AASEndpoint extends DefaultEndpoint {
 		return null;
 	}
 
-    /**
-     * Some description of this option, and what it does
-     */
     public void setName(String name) {
         this.name = name;
     }
@@ -98,8 +96,7 @@ public class AASEndpoint extends DefaultEndpoint {
 	 * @return
 	 */
 	private String getSubmodelId() {
-		String[] splittedPath = getSplittedPropertyPath();
-		String submodelId = splittedPath[0]; 
+		String submodelId = VABPathTools.getEntry(getPropertyPath(), 0);
     	logger.info("Submodel ID: " + submodelId);
 		return submodelId;
 	}
@@ -109,13 +106,9 @@ public class AASEndpoint extends DefaultEndpoint {
 	 * @return
 	 */
 	private String getSubmodelElementId() {
-		String[] splittedPath = getSplittedPropertyPath();
-		String submodelElementId = splittedPath[1]; 
+		String submodelElementId = VABPathTools.skipEntries(getPropertyPath(), 1);
     	logger.info("Submodel Element ID: " + submodelElementId);
 		return submodelElementId;
 	}
 	
-	private String[] getSplittedPropertyPath() {
-		return this.getPropertyPath().split("/");
-	}
 }
