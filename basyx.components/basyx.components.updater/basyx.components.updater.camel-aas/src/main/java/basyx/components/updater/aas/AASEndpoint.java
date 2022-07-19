@@ -33,8 +33,9 @@ import org.slf4j.LoggerFactory;
 public class AASEndpoint extends DefaultEndpoint {
 	private static final Logger logger = LoggerFactory.getLogger(AASEndpoint.class);
 	
-    @UriPath @Metadata(required = true)
-    private String name;
+	@UriPath
+	@Metadata(required = true)
+	private String name;
 
 	@UriParam(defaultValue = "")
 	private String propertyPath;
@@ -56,13 +57,18 @@ public class AASEndpoint extends DefaultEndpoint {
 		return null;
 	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	/**
+	 * Sets the name
+	 * 
+	 * @param name
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
 	/**
 	 * The path to the property relative to the target AAS
@@ -103,7 +109,7 @@ public class AASEndpoint extends DefaultEndpoint {
 	
 	/**
 	 * Gets the submodel element id for data dump
-	 * @return
+	 * @return 
 	 */
 	private String getSubmodelElementId() {
 		String submodelElementId = VABPathTools.skipEntries(getPropertyPath(), 1);
