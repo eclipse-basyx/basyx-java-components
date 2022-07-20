@@ -80,7 +80,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private MongoClient client;
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
 	 * @deprecated Use the new constructor using a MongoClient
@@ -91,7 +91,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
 	 */
@@ -112,8 +112,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a
-	 * resource.
+	 * Receives the path of the .properties file in its constructor from a resource.
 	 * 
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
@@ -123,8 +122,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a
-	 * resource.
+	 * Receives the path of the .properties file in its constructor from a resource.
 	 */
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, MongoClient client) {
 		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
@@ -150,7 +148,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	/**
-	 * Constructor using default sql connections
+	 * Constructor using default MongoDB connections
 	 * 
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
@@ -165,7 +163,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	/**
-	 * Constructor using default sql connections
+	 * Constructor using default MongoDB connections
 	 */
 	public MongoDBSubmodelAPI(String smId, MongoClient client) {
 		this(DEFAULT_CONFIG_PATH, smId, client);

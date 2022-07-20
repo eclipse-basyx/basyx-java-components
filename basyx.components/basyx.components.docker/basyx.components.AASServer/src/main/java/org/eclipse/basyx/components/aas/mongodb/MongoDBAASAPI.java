@@ -62,7 +62,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	protected String aasId;
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
 	 * @deprecated Use the new constructor using a MongoClient
@@ -73,7 +73,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
 	 */
@@ -83,8 +83,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a
-	 * resource.
+	 * Receives the path of the .properties file in its constructor from a resource.
 	 * 
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
@@ -97,8 +96,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a
-	 * resource.
+	 * Receives the path of the .properties file in its constructor from a resource.
 	 */
 	public MongoDBAASAPI(String resourceConfigPath, String aasId, MongoClient client) {
 		config = new BaSyxMongoDBConfiguration();
@@ -108,7 +106,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Constructor using default sql connections
+	 * Constructor using default MongoDB connections
 	 * 
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
@@ -118,7 +116,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * Constructor using default sql connections
+	 * Constructor using default MongoDB connections
 	 */
 	public MongoDBAASAPI(String aasId, MongoClient client) {
 		this(DEFAULT_CONFIG_PATH, aasId, client);
@@ -126,9 +124,8 @@ public class MongoDBAASAPI implements IAASAPI {
 
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
-		this.config = config;
-		this.mongoOps = new MongoTemplate(MongoClients.create(config.getConnectionUrl()), config.getDatabase());
-		this.collection = config.getAASCollection();
+		MongoClient client = MongoClients.create(config.getConnectionUrl());
+		setConfiguration(config, client);
 	}
 
 	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {

@@ -43,7 +43,7 @@ import org.eclipse.basyx.aas.restapi.AASModelProvider;
 import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
+import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
@@ -121,7 +121,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            The MongoDB Configuration
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link InMemoryAASServerComponentFactory}.
+	 *             {@link MongoDBAASServerComponentFactory}.
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config) {
@@ -140,7 +140,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            The registry
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link InMemoryAASServerComponentFactory}.
+	 *             {@link MongoDBAASServerComponentFactory}.
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
@@ -158,7 +158,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            Path of the configuration file
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link InMemoryAASServerComponentFactory}
+	 *             {@link MongoDBAASServerComponentFactory}
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath) {
@@ -178,7 +178,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param registry
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link InMemoryAASServerComponentFactory}
+	 *             {@link MongoDBAASServerComponentFactory}
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry) {
@@ -194,7 +194,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * Constructor using default connections
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link InMemoryAASServerComponentFactory}
+	 *             {@link MongoDBAASServerComponentFactory}
 	 */
 	@Deprecated
 	public MongoDBAASAggregator() {
@@ -207,7 +207,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @param registry
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link InMemoryAASServerComponentFactory}
+	 *             {@link MongoDBAASServerComponentFactory}
 	 */
 	@Deprecated
 	public MongoDBAASAggregator(IAASRegistry registry) {
@@ -413,7 +413,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            The MongoDB Configuration
 	 * 
 	 * @deprecated This method is used with the old, deprecated Constructors. Use
-	 *             {@link InMemoryAASServerComponentFactory} instead
+	 *             {@link MongoDBAASServerComponentFactory} instead
 	 */
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
