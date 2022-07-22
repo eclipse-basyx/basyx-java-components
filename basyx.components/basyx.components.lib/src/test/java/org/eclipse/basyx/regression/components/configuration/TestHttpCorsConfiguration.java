@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2022 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,19 +22,41 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-
-package org.eclipse.basyx.regression.registry;
+package org.eclipse.basyx.regression.components.configuration;
 
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.components.registry.RegistryComponent;
+import org.eclipse.basyx.testsuite.regression.vab.protocol.http.SimpleVABElementServlet;
+import org.eclipse.basyx.testsuite.regression.vab.protocol.http.TestHttpCors;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
-public class TestMongoDBMqttRegistryBackend extends TestMqttRegistryBackend {
+/**
+ * Tests HTTP CORS configuration
+ * 
+ * @author danish
+ *
+ */
+public class TestHttpCorsConfiguration extends TestHttpCors {
+	
 	@Override
-	public RegistryComponent createRegistryComponent() {
-		BaSyxMongoDBConfiguration mongoDBConfig = new BaSyxMongoDBConfiguration();
-		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
-		RegistryComponent registryComponent = new RegistryComponent(contextConfig, mongoDBConfig);
-		return registryComponent;
+	protected void createAndStartHttpServerWithCORS(String accessControlAllowOrigin) {	
+		BaSyxContext contextConfig = createBasyxContext(accessControlAllowOrigin);
+
+		configureAndStartServer(contextConfig);
 	}
+
+	protected BaSyxContext createBasyxContext(String accessControlAllowOrigin) {
+		BaSyxContextConfiguration basyxContextConfig = createBasyxContextConfiguration(accessControlAllowOrigin);
+		
+		BaSyxContext context = basyxContextConfig.createBaSyxContext();
+		context.addServletMapping("/shells/*", new SimpleVABElementServlet());
+		
+		return context;
+	}
+
+	private BaSyxContextConfiguration createBasyxContextConfiguration(String accessControlAllowOrigin) {
+		BaSyxContextConfiguration basyxContextConfig = new BaSyxContextConfiguration(CONTEXT_PATH, DOCBASE_PATH, HOSTNAME, PORT);
+		basyxContextConfig.setAccessControlAllowOrigin(accessControlAllowOrigin);
+		return basyxContextConfig;
+	}
+	
 }

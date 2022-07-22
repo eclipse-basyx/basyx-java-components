@@ -22,43 +22,43 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.mongodb;
+package org.eclipse.basyx.regression.components.configuration;
 
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.restapi.api.IAASAPI;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.junit.Test;
 
 /**
+ * Tests parsing of context property files
  * 
- * Factory for creating a MongoDBAASAPI
- * 
- * @author fried
+ * @author danish
  *
  */
-public class MongoDBAASAPIFactory implements IAASAPIFactory {
+public class TestBaSyxContextConfigurationPropertyFileParsing {
+	
+	@Test
+	public void withCORSConfiguration() {
+		BaSyxContext context = createBasyxContext("context_with_cors_config.properties");
+		
+		String allowOrigin = "http://www.example.com";
 
-	private BaSyxMongoDBConfiguration config;
-	private MongoClient client;
-
-	@Deprecated
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
+		assertEquals(allowOrigin, context.getAccessControlAllowOrigin());
 	}
-
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.client = client;
+	
+	@Test
+	public void withoutCORSConfiguration() {
+		BaSyxContext context = createBasyxContext("context_without_cors_config.properties");
+		
+		assertNull(context.getAccessControlAllowOrigin());
 	}
+	
+	private BaSyxContext createBasyxContext(String resourceFile) {
+		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(4001, "");
+		contextConfig.loadFromResource(resourceFile);
 
-	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
-		api.setAAS(aas);
-		return api;
+		return contextConfig.createBaSyxContext();
 	}
-
 }

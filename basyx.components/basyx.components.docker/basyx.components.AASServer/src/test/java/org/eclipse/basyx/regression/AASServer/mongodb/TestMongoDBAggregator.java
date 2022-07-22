@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.regression.AASServer;
+package org.eclipse.basyx.regression.AASServer.mongodb;
 
 import static org.junit.Assert.assertEquals;
 

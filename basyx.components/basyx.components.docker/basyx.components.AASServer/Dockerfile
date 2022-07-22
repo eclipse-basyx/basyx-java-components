@@ -1,7 +1,7 @@
-# Add java runtime environment for execution
-FROM alpine
+FROM openjdk:8-jdk-slim-bullseye
 
-RUN apk update && apk add openjdk8 && apk add bash && apk add jq
+# Install dependency for wait-for-it-env.sh
+RUN apt update && apt install -y jq && apt clean
 
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
@@ -36,5 +36,9 @@ ENV ${CONTEXT_CONFIG_KEY} "/usr/share/config/context.properties"
 ARG MONGODB_CONFIG_KEY
 ENV ${MONGODB_CONFIG_KEY} "/usr/share/config/mongodb.properties"
 
+# Set the path for the mqtt configuration file
+ARG MQTT_CONFIG_KEY
+ENV ${MQTT_CONFIG_KEY} "/usr/share/config/mqtt.properties"
+
 # Start the jar
-CMD exec ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"
+CMD ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"

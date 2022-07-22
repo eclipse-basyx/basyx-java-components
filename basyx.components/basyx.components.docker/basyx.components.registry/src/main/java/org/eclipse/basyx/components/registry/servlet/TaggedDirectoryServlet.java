@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.registry.servlet;
 
 import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
-import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.restapi.TaggedDirectoryProvider;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 
@@ -40,7 +40,7 @@ public class TaggedDirectoryServlet extends VABHTTPInterface<AASRegistryModelPro
 	/**
 	 * Provides registry servlet based on the provided registry implementation.
 	 */
-	public TaggedDirectoryServlet(MapTaggedDirectory directory) {
+	public TaggedDirectoryServlet(IAASTaggedDirectory directory) {
 		super(new TaggedDirectoryProvider(directory));
 	}
 }

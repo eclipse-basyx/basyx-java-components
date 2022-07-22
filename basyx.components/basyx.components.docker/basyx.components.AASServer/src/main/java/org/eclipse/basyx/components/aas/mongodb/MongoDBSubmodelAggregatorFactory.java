@@ -22,43 +22,43 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
+
 package org.eclipse.basyx.components.aas.mongodb;
 
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.restapi.api.IAASAPI;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
+import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 /**
+ * Factory for creating a {@link MongoDBSubmodelAggregator}
  * 
- * Factory for creating a MongoDBAASAPI
- * 
- * @author fried
+ * @author schnicke
  *
  */
-public class MongoDBAASAPIFactory implements IAASAPIFactory {
+public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFactory {
 
 	private BaSyxMongoDBConfiguration config;
+	private ISubmodelAPIFactory submodelAPIFactory;
 	private MongoClient client;
 
 	@Deprecated
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
+	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
+		this(config, submodelAPIFactory, MongoClients.create(config.getConnectionUrl()));
 	}
 
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
+	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory, MongoClient client) {
 		this.config = config;
 		this.client = client;
+		this.submodelAPIFactory = submodelAPIFactory;
 	}
 
 	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
-		api.setAAS(aas);
-		return api;
+	public ISubmodelAggregator create() {
+		return new MongoDBSubmodelAggregator(submodelAPIFactory, config, client);
 	}
 
 }

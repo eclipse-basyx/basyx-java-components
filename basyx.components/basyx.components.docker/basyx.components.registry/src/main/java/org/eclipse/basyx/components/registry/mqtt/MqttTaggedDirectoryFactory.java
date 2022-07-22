@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,43 +22,28 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.mongodb;
 
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.restapi.api.IAASAPI;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+package org.eclipse.basyx.components.registry.mqtt;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryService;
 
 /**
+ * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
+ * implementations
  * 
- * Factory for creating a MongoDBAASAPI
+ * @author espen
  * 
- * @author fried
- *
  */
-public class MongoDBAASAPIFactory implements IAASAPIFactory {
-
-	private BaSyxMongoDBConfiguration config;
-	private MongoClient client;
-
-	@Deprecated
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
+public class MqttTaggedDirectoryFactory extends MqttRegistryFactory {
+	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
+		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig);
 	}
 
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.client = client;
+	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
+		ObservableAASTaggedDirectoryService observedAPI = new ObservableAASTaggedDirectoryService(taggedDirectory);
+		addAASRegistryServiceObserver(observedAPI, mqttConfig);
+		return observedAPI;
 	}
-
-	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
-		api.setAAS(aas);
-		return api;
-	}
-
 }

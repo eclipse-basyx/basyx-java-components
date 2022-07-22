@@ -93,33 +93,42 @@
 
 				<!-- Build the docker image -->
 				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>1.4.10</version>
-					<executions>
-						<execution>
-							<id>default</id>
-							<goals>
-								<goal>build</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<repository>${BASYX_IMAGE_NAME}</repository>
-						<tag>${BASYX_IMAGE_TAG}</tag>
-						<buildArgs>
-							<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-							<PORT>${BASYX_CONTAINER_PORT}</PORT>
-							<!-- The system property/env keys for basyx configuration files -->
-							<CONTEXT_CONFIG_KEY>BASYX_CONTEXT</CONTEXT_CONFIG_KEY>
-							<REGISTRY_CONFIG_KEY>BASYX_REGISTRY</REGISTRY_CONFIG_KEY>
-							<AAS_CONFIG_KEY>BASYX_AAS</AAS_CONFIG_KEY>
-							<MONGODB_CONFIG_KEY>BASYX_MONGODB</MONGODB_CONFIG_KEY>
-							<DOCKER_CONFIG_KEY>BASYX_DOCKER</DOCKER_CONFIG_KEY>
-							<SQL_CONFIG_KEY>BASYX_SQL</SQL_CONFIG_KEY>
-						</buildArgs>
-					</configuration>
-				</plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.39.1</version>
+                    <configuration>
+                        <images>
+                            <image>
+                                <name>${BASYX_IMAGE_NAME}:${BASYX_IMAGE_TAG}</name>
+                                <build>
+                                    <contextDir>${project.basedir}</contextDir>
+                                    <args>
+                                        <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+										<PORT>${BASYX_CONTAINER_PORT}</PORT>
+										<!-- The system property/env keys for basyx configuration files -->
+										<CONTEXT_CONFIG_KEY>BASYX_CONTEXT</CONTEXT_CONFIG_KEY>
+										<REGISTRY_CONFIG_KEY>BASYX_REGISTRY</REGISTRY_CONFIG_KEY>
+										<AAS_CONFIG_KEY>BASYX_AAS</AAS_CONFIG_KEY>
+										<MONGODB_CONFIG_KEY>BASYX_MONGODB</MONGODB_CONFIG_KEY>
+										<DOCKER_CONFIG_KEY>BASYX_DOCKER</DOCKER_CONFIG_KEY>
+										<MQTT_CONFIG_KEY>BASYX_MQTT</MQTT_CONFIG_KEY>
+										<SQL_CONFIG_KEY>BASYX_SQL</SQL_CONFIG_KEY>
+                                    </args>
+                                </build>
+                            </image>
+                        </images>
+                        <verbose>true</verbose>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>docker:build</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
 				<!-- Create integration test environment -->
 				<plugin>
@@ -214,7 +223,7 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

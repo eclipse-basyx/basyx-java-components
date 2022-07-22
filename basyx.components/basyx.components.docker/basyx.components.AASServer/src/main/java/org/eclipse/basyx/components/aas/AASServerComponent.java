@@ -197,6 +197,26 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
+	 * Explicitly sets AAS bundles that should be loaded during startup
+	 * 
+	 * @param aasBundles
+	 *            The bundles that will be loaded during startup
+	 */
+	public void setAASBundles(Collection<AASBundle> aasBundles) {
+		this.aasBundles = aasBundles;
+	}
+
+	/**
+	 * Explicitly sets an AAS bundle that should be loaded during startup
+	 * 
+	 * @param aasBundle
+	 *            The bundle that will be loaded during startup
+	 */
+	public void setAASBundle(AASBundle aasBundle) {
+		this.aasBundles = Collections.singleton(aasBundle);
+	}
+
+	/**
 	 * Starts the AASX component at http://${hostName}:${port}/${path}
 	 */
 	@Override
@@ -428,7 +448,7 @@ public class AASServerComponent implements IComponent {
 
 	private VABHTTPInterface<?> createAggregatorServlet() {
 		aggregator = createAASAggregator();
-		aasBundles = loadAASFromSource(aasConfig.getAASSourceAsList());
+		loadAASBundles();
 		
 		if (aasBundles != null) {
 			AASBundleHelper.integrate(aggregator, aasBundles);
@@ -471,6 +491,15 @@ public class AASServerComponent implements IComponent {
 		}
 
 		return aasServerDecoratorList;
+	}
+
+	private void loadAASBundles() {
+		if (aasBundles != null) {
+			return;
+		}
+
+		List<String> aasSources = aasConfig.getAASSourceAsList();
+		aasBundles = loadAASFromSource(aasSources);
 	}
 
 	private Set<AASBundle> loadAASFromSource(List<String> aasSources) {

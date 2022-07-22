@@ -54,6 +54,11 @@ public class MqttRegistryFactory {
 
 	private static IAASRegistry wrapRegistryInMqttObserver(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig) {
 		ObservableAASRegistryService observedAPI = new ObservableAASRegistryService(registry);
+		addAASRegistryServiceObserver(observedAPI, mqttConfig);
+		return observedAPI;
+	}
+
+	protected static void addAASRegistryServiceObserver(ObservableAASRegistryService observedAPI, BaSyxMqttConfiguration mqttConfig) {
 		String brokerEndpoint = mqttConfig.getServer();
 		MqttClientPersistence mqttPersistence = getMqttPersistenceFromConfig(mqttConfig);
 		try {
@@ -62,8 +67,6 @@ public class MqttRegistryFactory {
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);
 		}
-
-		return observedAPI;
 	}
 
 	private static MqttClientPersistence getMqttPersistenceFromConfig(BaSyxMqttConfiguration config) {
