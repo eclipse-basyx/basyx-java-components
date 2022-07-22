@@ -30,7 +30,7 @@ public class AASProducer extends DefaultProducer {
     public AASProducer(AASEndpoint endpoint) {
         super(endpoint);
         this.endpoint = endpoint;
-		LOG.info("Creating ASS Producer for endpoint " + endpoint.getEndpointUri());
+		LOG.info("Creating AAS Producer for endpoint " + endpoint.getEndpointUri());
 		connectToElement();
     }
 
