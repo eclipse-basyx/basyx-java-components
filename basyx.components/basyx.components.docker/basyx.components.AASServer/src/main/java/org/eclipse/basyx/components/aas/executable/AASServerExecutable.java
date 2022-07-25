@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.storage.StorageAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

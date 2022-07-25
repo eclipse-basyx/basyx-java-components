@@ -70,6 +70,7 @@ import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguratio
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
+import org.eclipse.basyx.components.aas.storage.StorageAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
@@ -156,7 +157,7 @@ public class AASServerComponent implements IComponent {
 	 * backend.
 	 *
 	 * @param configuration
-	 * 
+	 *
 	 * @deprecated Add MQTT via {@link MqttAASServerFeature} instead.
 	 */
 	@Deprecated
@@ -167,7 +168,7 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Disables mqtt configuration. Has to be called before the component is
 	 * started.
-	 * 
+	 *
 	 * @deprecated remove MQTT from the feature list instead.
 	 */
 	@Deprecated
@@ -320,6 +321,10 @@ public class AASServerComponent implements IComponent {
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
+		}
+
+		if (!aasConfig.getSubmodelElementStorageOption().isEmpty() && !aasConfig.getSubmodelElementStorageBackend().isEmpty()) {
+			addAASServerFeature(new StorageAASServerFeature(aasConfig.getSubmodelElementStorageOption(), aasConfig.getSubmodelElementStorageBackend()));
 		}
 	}
 
