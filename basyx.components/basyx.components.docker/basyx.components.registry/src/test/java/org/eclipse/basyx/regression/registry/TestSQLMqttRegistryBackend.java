@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2021 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,43 +22,19 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.mongodb;
 
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.restapi.api.IAASAPI;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+package org.eclipse.basyx.regression.registry;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
+import org.eclipse.basyx.components.registry.RegistryComponent;
 
-/**
- * 
- * Factory for creating a MongoDBAASAPI
- * 
- * @author fried
- *
- */
-public class MongoDBAASAPIFactory implements IAASAPIFactory {
-
-	private BaSyxMongoDBConfiguration config;
-	private MongoClient client;
-
-	@Deprecated
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
-	}
-
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.client = client;
-	}
-
+public class TestSQLMqttRegistryBackend extends TestMqttRegistryBackend {
 	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
-		api.setAAS(aas);
-		return api;
+	public RegistryComponent createRegistryComponent() {
+		BaSyxSQLConfiguration sqlConfig = new BaSyxSQLConfiguration();
+		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
+		RegistryComponent registryComponent = new RegistryComponent(contextConfig, sqlConfig);
+		return registryComponent;
 	}
-
 }
