@@ -73,6 +73,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
+import org.eclipse.basyx.extensions.shared.authorization.CodeAuthentication;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -431,6 +432,8 @@ public class AASServerComponent implements IComponent {
 		aasBundles = loadAASFromSource(aasConfig.getAASSourceAsList());
 		
 		if (aasBundles != null) {
+			CodeAuthentication.setCodeAuthentication();
+
 			AASBundleHelper.integrate(aggregator, aasBundles);
 		}
 
