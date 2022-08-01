@@ -38,6 +38,7 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration.AuthorizationStrategy;
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.GrantedAuthorityAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.SimpleAbacAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.GrantedAuthorityAASAPIAuthorizer;
@@ -106,6 +107,9 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 			case GrantedAuthority: {
 				return getGrantedAuthorityDecorator();
+			}
+			case Custom: {
+				return getCustomDecorator();
 			}
 			default:
 				throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
@@ -221,7 +225,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
 			}
 
 			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
@@ -266,6 +270,56 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 
 			return (IJwtBearerTokenAuthenticationConfigurationProvider) clazz.getDeclaredConstructor().newInstance();
+		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+			logger.error(e.getMessage(), e);
+			throw new IllegalArgumentException(e);
+		}
+	}
+
+	private <SubjectInformationType> IAASServerDecorator getCustomDecorator() {
+		logger.info("use Custom authorization strategy");
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getCustomSubjectInformationProvider();
+		final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getCustomAuthorizersProvider();
+
+		final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(aasConfig);
+
+		return new AuthorizedAASServerDecorator<>(
+				authorizers.getSubmodelAPIAuthorizer(),
+				authorizers.getSubmodelAggregatorAuthorizer(),
+				authorizers.getAasApiAuthorizer(),
+				authorizers.getAasAggregatorAuthorizer(),
+				subjectInformationProvider
+		);
+	}
+
+	private <SubjectInformationType> IAuthorizersProvider<SubjectInformationType> getCustomAuthorizersProvider() {
+		try {
+			final String className = aasConfig.getAuthorizationStrategyCustomAuthorizersProvider();
+			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+			final Class<?> clazz = Class.forName(effectiveClassName);
+
+			if (!IAuthorizersProvider.class.isAssignableFrom(clazz)) {
+				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + IAuthorizersProvider.class.getName());
+			}
+
+			return (IAuthorizersProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
+		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+			logger.error(e.getMessage(), e);
+			throw new IllegalArgumentException(e);
+		}
+	}
+
+	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getCustomSubjectInformationProvider() {
+		try {
+			final String className = aasConfig.getAuthorizationStrategyCustomSubjectInformationProvider();
+			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+			final Class<?> clazz = Class.forName(effectiveClassName);
+
+			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
+				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
+			}
+
+			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
 		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);

@@ -78,10 +78,13 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.simpleAbac.subjectInformationProvider";
 	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR = "aas.authorization.strategy.grantedAuthority.grantedAuthorityAuthenticator";
 	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.grantedAuthority.subjectInformationProvider";
+	public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "aas.authorization.strategy.custom.authorizersProvider";
+	public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.custom.subjectInformationProvider";
 
 	public enum AuthorizationStrategy {
 		SimpleAbac,
-		GrantedAuthority
+		GrantedAuthority,
+		Custom
 	}
 
 	// The default path for the context properties file
@@ -362,5 +365,21 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	public void setAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator(String authorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator) {
 		setProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, authorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator);
+	}
+
+	public String getAuthorizationStrategyCustomAuthorizersProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER);
+	}
+
+	public void setAuthorizationStrategyCustomAuthorizersProvider(String authorizationStrategyCustomAuthorizers) {
+		setProperty(AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, authorizationStrategyCustomAuthorizers);
+	}
+
+	public String getAuthorizationStrategyCustomSubjectInformationProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER);
+	}
+
+	public void setAuthorizationStrategyCustomSubjectInformationProvider(String authorizationStrategyCustomSubjectInformationProvider) {
+		setProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, authorizationStrategyCustomSubjectInformationProvider);
 	}
 }
