@@ -29,5 +29,9 @@ ENV ${SQL_CONFIG_KEY} "/usr/share/config/sql.properties"
 ARG MONGODB_CONFIG_KEY
 ENV ${MONGODB_CONFIG_KEY} "/usr/share/config/mongodb.properties"
 
+# Set the path for the mqtt configuration file
+ARG MQTT_CONFIG_KEY
+ENV ${MQTT_CONFIG_KEY} "/usr/share/config/mqtt.properties"
+
 # Start the jar
 CMD java -jar "/usr/share/basyxExecutable.jar"

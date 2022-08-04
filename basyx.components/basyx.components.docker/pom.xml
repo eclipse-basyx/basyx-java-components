@@ -111,6 +111,7 @@
 										<AAS_CONFIG_KEY>BASYX_AAS</AAS_CONFIG_KEY>
 										<MONGODB_CONFIG_KEY>BASYX_MONGODB</MONGODB_CONFIG_KEY>
 										<DOCKER_CONFIG_KEY>BASYX_DOCKER</DOCKER_CONFIG_KEY>
+										<MQTT_CONFIG_KEY>BASYX_MQTT</MQTT_CONFIG_KEY>
 										<SQL_CONFIG_KEY>BASYX_SQL</SQL_CONFIG_KEY>
                                     </args>
                                 </build>
@@ -222,7 +223,7 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

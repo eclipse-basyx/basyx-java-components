@@ -69,7 +69,7 @@ import com.mongodb.client.MongoClients;
  */
 public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
-	private static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	public static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected DelegatedInvocationManager invocationHelper;
 
@@ -77,47 +77,100 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	protected MongoOperations mongoOps;
 	protected String collection;
 	protected String smId;
+	private MongoClient client;
 
 	/**
-	 * Receives the path of the configuration.properties file in it's constructor.
+	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId) {
 		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
+	/**
+	 * Receives the path of the configuration.properties file in its constructor.
+	 * 
+	 * @param config
+	 */
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, MongoClient client) {
+		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
+	}
+
+	@Deprecated
 	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
+		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
+	}
+
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+		this.client = client;
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
 		this.invocationHelper = invocationHelper;
 	}
 
 	/**
-	 * Receives the path of the .properties file in it's constructor from a
-	 * resource.
+	 * Receives the path of the .properties file in its constructor from a resource.
+	 * 
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId) {
 		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
+	/**
+	 * Receives the path of the .properties file in its constructor from a resource.
+	 */
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, MongoClient client) {
+		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
+	}
+
+	@Deprecated
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
+		this.client = MongoClients.create(config.getConnectionUrl());
+		this.setConfiguration(config);
+		this.setSubmodelId(smId);
+		this.invocationHelper = invocationHelper;
+	}
+
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+		config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		this.client = client;
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
 		this.invocationHelper = invocationHelper;
 	}
 
 	/**
-	 * Constructor using default sql connections
+	 * Constructor using default MongoDB connections
+	 * 
+	 * @deprecated Use the new constructor using a MongoClient
 	 */
+	@Deprecated
 	public MongoDBSubmodelAPI(String smId) {
 		this(DEFAULT_CONFIG_PATH, smId);
 	}
 
+	@Deprecated
 	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper) {
 		this(DEFAULT_CONFIG_PATH, smId, invocationHelper);
+	}
+
+	/**
+	 * Constructor using default MongoDB connections
+	 */
+	public MongoDBSubmodelAPI(String smId, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, smId, client);
+	}
+
+	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, smId, invocationHelper, client);
 	}
 
 	/**
@@ -127,7 +180,6 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	 */
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
 		this.config = config;
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
 		this.collection = config.getSubmodelCollection();
 	}
@@ -158,6 +210,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		if (replaced == null) {
 			mongoOps.insert(sm, collection);
 		}
+
+		sm.remove("_id");
 	}
 
 	@SuppressWarnings("unchecked")
