@@ -37,6 +37,9 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
 /**
  * 
  * Factory building the AASAggregator for the AASComponent with given decorators
@@ -48,35 +51,38 @@ import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 public class MongoDBAASServerComponentFactory extends AbstractAASServerComponentFactory {
 
 	private BaSyxMongoDBConfiguration mongoDBConfig;
+	private MongoClient client;
 
 	public MongoDBAASServerComponentFactory(BaSyxMongoDBConfiguration config, List<IAASServerDecorator> decorators, IAASRegistry aasServerRegistry) {
 		this.mongoDBConfig = config;
 		this.aasServerRegistry = aasServerRegistry;
 		this.aasServerDecorators = decorators;
+		this.client = MongoClients.create(config.getConnectionUrl());
 	}
 
 	public MongoDBAASServerComponentFactory(BaSyxMongoDBConfiguration config, IAASRegistry aasServerRegistry) {
 		this.mongoDBConfig = config;
 		this.aasServerRegistry = aasServerRegistry;
+		this.client = MongoClients.create(config.getConnectionUrl());
 	}
 
 	@Override
 	protected ISubmodelAPIFactory createSubmodelAPIFactory() {
-		return new MongoDBSubmodelAPIFactory(mongoDBConfig);
+		return new MongoDBSubmodelAPIFactory(mongoDBConfig, client);
 	}
 
 	@Override
 	protected ISubmodelAggregatorFactory createSubmodelAggregatorFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new MongoDBSubmodelAggregatorFactory(mongoDBConfig, submodelAPIFactory);
+		return new MongoDBSubmodelAggregatorFactory(mongoDBConfig, submodelAPIFactory, client);
 	}
 
 	@Override
 	protected IAASAPIFactory createAASAPIFactory() {
-		return new MongoDBAASAPIFactory(mongoDBConfig);
+		return new MongoDBAASAPIFactory(mongoDBConfig, client);
 	}
 
 	@Override
 	protected IAASAggregatorFactory createAASAggregatorFactory(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new MongoDBAASAggregatorFactory(mongoDBConfig, aasServerRegistry, aasAPIFactory, submodelAggregatorFactory);
+		return new MongoDBAASAggregatorFactory(mongoDBConfig, aasServerRegistry, aasAPIFactory, submodelAggregatorFactory, client);
 	}
 }
