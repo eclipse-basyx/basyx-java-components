@@ -22,7 +22,6 @@ import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultCon
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
-import basyx.components.updater.core.configuration.route.timer.TimerRouteConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
 public class TestAASUpdater {
@@ -53,7 +52,7 @@ public class TestAASUpdater {
 
 		// Extend configuration for connections
 		// DefaultRoutesConfigFac takes default routes.json as to config
-		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader, TimerRouteConfiguration.class);
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
 		configuration.addRoutes(routesFactory.create());
 
 		// Extend configuration for prometheus Source
