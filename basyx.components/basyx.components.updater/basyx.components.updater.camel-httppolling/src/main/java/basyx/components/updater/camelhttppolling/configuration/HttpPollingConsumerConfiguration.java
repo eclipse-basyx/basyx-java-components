@@ -11,41 +11,21 @@
 
 package basyx.components.updater.camelhttppolling.configuration;
 
-import basyx.components.updater.core.configuration.entity.DataSinkConfiguration;
+import basyx.components.updater.core.configuration.entity.DataSourceConfiguration;
 
 /**
  * An implementation of httppolling consumer configuration
  * @author n14s - Niklas Mertens
  *
  */
-public class HttpPollingConsumerConfiguration extends DataSinkConfiguration {
-    private String serverUrl;
-    private int serverPort;
+public class HttpPollingConsumerConfiguration extends DataSourceConfiguration {
     private String query;
 
 	public HttpPollingConsumerConfiguration() {}
 	
 	public HttpPollingConsumerConfiguration(String uniqueId, String serverUrl, int serverPort, String query) {
-		super(uniqueId);
-		this.serverUrl = serverUrl;
-		this.serverPort = serverPort;
+		super(uniqueId, serverUrl, serverPort);
 		this.query= query;
-	}
-
-	public String getServerUrl() {
-		return serverUrl;
-	}
-
-	public void setServerUrl(String serverUrl) {
-		this.serverUrl = serverUrl;
-	}
-
-	public int getServerPort() {
-		return serverPort;
-	}
-
-	public void setServerPort(int serverPort) {
-		this.serverPort = serverPort;
 	}
 
 	public String getQuery() {
@@ -56,6 +36,7 @@ public class HttpPollingConsumerConfiguration extends DataSinkConfiguration {
 		this.query = query;
 	}
 
+	@Override
 	public String getConnectionURI() {
 		return getServerUrl();
 	}

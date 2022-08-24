@@ -1,14 +1,14 @@
 package basyx.components.updater.camelhttppolling.configuration.factory;
 
 import basyx.components.updater.camelhttppolling.configuration.HttpPollingConsumerConfiguration;
-import basyx.components.updater.core.configuration.factory.DataSinkConfigurationFactory;
+import basyx.components.updater.core.configuration.factory.DataSourceConfigurationFactory;
 
 /**
  * A default configuration factory for Http polling from a default file location
  * @author Niklas Mertens
  *
  */
-public class HttpPollingDefaultConfigurationFactory extends DataSinkConfigurationFactory {
+public class HttpPollingDefaultConfigurationFactory extends DataSourceConfigurationFactory {
 	private static final String FILE_PATH = "httpconsumer.json";
 	
 	public HttpPollingDefaultConfigurationFactory(ClassLoader loader) {

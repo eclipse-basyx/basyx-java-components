@@ -1,7 +1,9 @@
 package basyx.components.updater.core.configuration.route.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RouteConfiguration {
 	private String trigger;
@@ -9,6 +11,8 @@ public class RouteConfiguration {
 	private String datasource;
 	private List<String> transformers = new ArrayList<>();
 	private List<String> datasinks = new ArrayList<>();
+
+	private Map<String, Object> triggerData = new HashMap<>();
 
 	public RouteConfiguration() {
 	}
@@ -28,8 +32,13 @@ public class RouteConfiguration {
 	}
 
 	public RouteConfiguration(RouteConfiguration configuration) {
-		this(configuration.trigger, configuration.getDatasource(), configuration.getTransformers(), configuration.getDatasinks());
+		this(configuration.getRouteTrigger(), configuration.getDatasource(), configuration.getTransformers(), configuration.getDatasinks());
 		setRouteId(configuration.getRouteId());
+		this.triggerData = configuration.triggerData;
+	}
+
+	protected Map<String, Object> getTriggerData() {
+		return triggerData;
 	}
 
 	public List<String> getDatasinks() {

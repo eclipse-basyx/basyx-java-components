@@ -69,7 +69,7 @@ public class TestAASUpdater {
 
 		// Extend configuration for Http Source
 		HttpPollingDefaultConfigurationFactory httpPollingConfigFactory = new HttpPollingDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(httpPollingConfigFactory.create());
+		configuration.addDatasources(httpPollingConfigFactory.create());
 
 		// Extend configuration for AAS
 		// DefaulRoutesConfigFactory takes default aasserver.json as to config

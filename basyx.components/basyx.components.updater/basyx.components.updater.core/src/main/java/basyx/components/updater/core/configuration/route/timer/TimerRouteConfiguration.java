@@ -23,6 +23,9 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  */
 public class TimerRouteConfiguration extends RouteConfiguration {
 	public static final String ROUTE_TRIGGER = "timer";
+	private static final String TIMER_NAME = "timerName";
+
+	private String timerName;
 
 	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
 		super(ROUTE_TRIGGER, datasource, transformers, datasinks);
@@ -30,6 +33,15 @@ public class TimerRouteConfiguration extends RouteConfiguration {
 
 	public TimerRouteConfiguration(RouteConfiguration configuration) {
 		super(configuration);
+		timerName = (String) getTriggerData().get(TIMER_NAME);
+	}
+
+	public String getTimerName() {
+		return timerName;
+	}
+
+	public void setTimerName(String timerName) {
+		this.timerName = timerName;
 	}
 
 	@Override
