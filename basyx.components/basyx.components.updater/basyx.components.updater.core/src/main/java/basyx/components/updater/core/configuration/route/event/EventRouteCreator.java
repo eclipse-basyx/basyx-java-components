@@ -3,36 +3,24 @@ package basyx.components.updater.core.configuration.route.event;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 
-import basyx.components.updater.core.configuration.route.core.IRouteCreator;
-import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
-import basyx.components.updater.core.configuration.route.core.RouteCreatorHelper;
+import basyx.components.updater.core.configuration.route.core.AbstractRouteCreator;
 import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
 
-public class EventRouteCreator implements IRouteCreator {
-	private RouteBuilder routeBuilder;
-	private RoutesConfiguration routesConfiguration;
+public class EventRouteCreator extends AbstractRouteCreator {
 
 	public EventRouteCreator(RouteBuilder routeBuilder, RoutesConfiguration routesConfiguration) {
-		this.routeBuilder = routeBuilder;
-		this.routesConfiguration = routesConfiguration;
+		super(routeBuilder, routesConfiguration);
 	}
 
 	@Override
-	public void addRouteToRouteBuilder(RouteConfiguration routeConfig) {
-		EventRouteConfiguration simpleRouteConfig = (EventRouteConfiguration) routeConfig;
-
-		String dataSourceEndpoint = RouteCreatorHelper.getDataSourceEndpoint(routesConfiguration, simpleRouteConfig.getDatasource());
-		String dataSinkEndpoints = RouteCreatorHelper.getDataSinkEndpoint(routesConfiguration, simpleRouteConfig.getDatasink());
-		String[] dataTransformerEndpoints = RouteCreatorHelper.getDataTransformerEndpoints(routesConfiguration, simpleRouteConfig.getTransformers());
-		String routeId = simpleRouteConfig.getRouteId();
-
-		RouteDefinition routeDefinition = routeBuilder.from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId);
+	protected void configureRoute(String dataSourceEndpoint, String[] dataSinkEndpoints, String[] dataTransformerEndpoints, String routeId) {
+		RouteDefinition routeDefinition = getRouteBuilder().from(dataSourceEndpoint).routeId(routeId).to("log:" + routeId);
 
 		if (!(dataTransformerEndpoints == null || dataTransformerEndpoints.length == 0)) {
 			routeDefinition.to(dataTransformerEndpoints).to("log:" + routeId);
 		}
 
-		routeDefinition.to(dataSinkEndpoints).to("log:" + routeId);
+		routeDefinition.to(dataSinkEndpoints[0]).to("log:" + routeId);
 	}
 
 }
