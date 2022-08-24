@@ -11,7 +11,7 @@
 
 package basyx.components.updater.core.configuration.factory;
 
-import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.event.EventRouteConfiguration;
 
 /**
  * A default implementation of Routes configuration factory from a default file
@@ -34,7 +34,7 @@ public class DefaultRoutesConfigurationFactory extends RoutesConfigurationFactor
 	 */
 	@Deprecated
 	public DefaultRoutesConfigurationFactory(ClassLoader loader) {
-		super(FILE_PATH, loader, SimpleRouteConfiguration.class);
+		super(FILE_PATH, loader, EventRouteConfiguration.class);
 	}
 
 	/**
@@ -47,6 +47,6 @@ public class DefaultRoutesConfigurationFactory extends RoutesConfigurationFactor
 	 */
 	@Deprecated
 	public DefaultRoutesConfigurationFactory(String filePath, ClassLoader loader) {
-		super(filePath, loader, SimpleRouteConfiguration.class);
+		super(filePath, loader, EventRouteConfiguration.class);
 	}
 }

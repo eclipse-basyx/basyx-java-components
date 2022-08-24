@@ -14,7 +14,7 @@ package basyx.components.updater.core.configuration.factory;
 import java.util.List;
 
 import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
-import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
+import basyx.components.updater.core.configuration.route.event.EventRouteConfiguration;
 
 /**
  * A generic implementation of routes configuration factory
@@ -30,14 +30,14 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 	}
 
 	/**
-	 * This constructor uses the {@link SimpleRouteConfiguration} as the default
+	 * This constructor uses the {@link EventRouteConfiguration} as the default
 	 * configuration
 	 *
 	 * @param filePath
 	 * @param loader
 	 */
 	public RoutesConfigurationFactory(String filePath, ClassLoader loader) {
-		super(filePath, loader, SimpleRouteConfiguration.class);
+		super(filePath, loader, EventRouteConfiguration.class);
 	}
 
 	/**
@@ -52,12 +52,12 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 
 	/**
 	 * This constructor uses the default path {@link #DEFAULT_FILE_PATH} and the
-	 * {@link SimpleRouteConfiguration} as the default configuration
+	 * {@link EventRouteConfiguration} as the default configuration
 	 *
 	 * @param loader
 	 */
 	public RoutesConfigurationFactory(ClassLoader loader) {
-		super(DEFAULT_FILE_PATH, loader, SimpleRouteConfiguration.class);
+		super(DEFAULT_FILE_PATH, loader, EventRouteConfiguration.class);
 	}
 
 	@SuppressWarnings("unchecked")

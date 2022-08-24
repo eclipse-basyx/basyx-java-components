@@ -9,7 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route.simple;
+package basyx.components.updater.core.configuration.route.event;
 
 import java.util.List;
 
@@ -21,15 +21,15 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  * @author haque, fischer
  *
  */
-public class SimpleRouteConfiguration extends RouteConfiguration {
-	private static final String ROUTE_TYPE = "SIMPLE";
+public class EventRouteConfiguration extends RouteConfiguration {
+	private static final String ROUTE_TYPE = "event";
 	private String datasink;
 
-	public SimpleRouteConfiguration() {
+	public EventRouteConfiguration() {
 		this.routeType = ROUTE_TYPE;
 	}
 
-	public SimpleRouteConfiguration(String datasource, List<String> transformers, String datasink) {
+	public EventRouteConfiguration(String datasource, List<String> transformers, String datasink) {
 		this();
 		this.datasource = datasource;
 		this.transformers = transformers;

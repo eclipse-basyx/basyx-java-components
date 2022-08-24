@@ -1,4 +1,4 @@
-package basyx.components.updater.core.configuration.route.simple;
+package basyx.components.updater.core.configuration.route.event;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
@@ -8,18 +8,18 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
 import basyx.components.updater.core.configuration.route.core.RouteCreatorHelper;
 import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
 
-public class SimpleRouteCreator implements IRouteCreator {
+public class EventRouteCreator implements IRouteCreator {
 	private RouteBuilder routeBuilder;
 	private RoutesConfiguration routesConfiguration;
 
-	public SimpleRouteCreator(RouteBuilder routeBuilder, RoutesConfiguration routesConfiguration) {
+	public EventRouteCreator(RouteBuilder routeBuilder, RoutesConfiguration routesConfiguration) {
 		this.routeBuilder = routeBuilder;
 		this.routesConfiguration = routesConfiguration;
 	}
 
 	@Override
 	public void addRouteToRouteBuilder(RouteConfiguration routeConfig) {
-		SimpleRouteConfiguration simpleRouteConfig = (SimpleRouteConfiguration) routeConfig;
+		EventRouteConfiguration simpleRouteConfig = (EventRouteConfiguration) routeConfig;
 
 		String dataSourceEndpoint = RouteCreatorHelper.getDataSourceEndpoint(routesConfiguration, simpleRouteConfig.getDatasource());
 		String dataSinkEndpoints = RouteCreatorHelper.getDataSinkEndpoint(routesConfiguration, simpleRouteConfig.getDatasink());
