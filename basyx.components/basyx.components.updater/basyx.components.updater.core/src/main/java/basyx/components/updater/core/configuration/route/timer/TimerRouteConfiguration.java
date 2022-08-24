@@ -23,18 +23,9 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  */
 public class TimerRouteConfiguration extends RouteConfiguration {
 	public static final String ROUTE_TYPE = "timer";
-	private TimerConfiguration timerConfig;
 
 	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
 		super(ROUTE_TYPE, datasource, transformers, datasinks);
-	}
-
-	public TimerConfiguration getTimerConfig() {
-		return timerConfig;
-	}
-
-	public void setTimerConfig(TimerConfiguration timerConfig) {
-		this.timerConfig = timerConfig;
 	}
 
 	@Override
