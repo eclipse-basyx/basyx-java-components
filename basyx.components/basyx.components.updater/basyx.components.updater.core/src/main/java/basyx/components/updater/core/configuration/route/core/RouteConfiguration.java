@@ -4,10 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class RouteConfiguration {
-	protected String routeType;
-	protected String routeId;
-	protected String datasource;
-	protected List<String> transformers = new ArrayList<>();
+	private String routeType;
+	private String routeId;
+	private String datasource;
+	private List<String> transformers = new ArrayList<>();
+	private List<String> datasinks = new ArrayList<>();
+
+	/**
+	 * @param routeType
+	 * @param routeId
+	 * @param datasource
+	 * @param transformers
+	 * @param datasinks
+	 */
+	public RouteConfiguration(String routeType, String datasource, List<String> transformers, List<String> datasinks) {
+		this.routeType = routeType;
+		this.datasource = datasource;
+		this.transformers = transformers;
+		this.datasinks = datasinks;
+	}
+
+	public List<String> getDatasinks() {
+		return datasinks;
+	}
 
 	public String getRouteId() {
 		return routeId;

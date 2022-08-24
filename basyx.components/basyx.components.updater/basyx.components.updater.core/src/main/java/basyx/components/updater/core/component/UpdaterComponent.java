@@ -48,8 +48,8 @@ public class UpdaterComponent implements IComponent {
 
 	private static Map<String, IRouteCreatorFactory> getRouteCreatorFactoryMapDefault() {
 		Map<String, IRouteCreatorFactory> defaultRouteCreatorFactoryMap = new HashMap<>();
-		defaultRouteCreatorFactoryMap.put(new EventRouteConfiguration().getRouteType(), new EventRouteCreatorFactory());
-		defaultRouteCreatorFactoryMap.put(new TimerRouteConfiguration().getRouteType(), new TimerRouteCreatorFactory());
+		defaultRouteCreatorFactoryMap.put(EventRouteConfiguration.ROUTE_TYPE, new EventRouteCreatorFactory());
+		defaultRouteCreatorFactoryMap.put(TimerRouteConfiguration.ROUTE_TYPE, new TimerRouteCreatorFactory());
 
 		return defaultRouteCreatorFactoryMap;
 	}

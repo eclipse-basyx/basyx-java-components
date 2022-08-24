@@ -22,26 +22,14 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  *
  */
 public class EventRouteConfiguration extends RouteConfiguration {
-	private static final String ROUTE_TYPE = "event";
-	private String datasink;
+	public static final String ROUTE_TYPE = "event";
 
-	public EventRouteConfiguration() {
-		this.routeType = ROUTE_TYPE;
+	public EventRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
+		super(ROUTE_TYPE, datasource, transformers, datasinks);
 	}
 
-	public EventRouteConfiguration(String datasource, List<String> transformers, String datasink) {
-		this();
-		this.datasource = datasource;
-		this.transformers = transformers;
-		this.datasink = datasink;
+	@Override
+	public String getRouteType() {
+		return ROUTE_TYPE;
 	}
-
-	public String getDatasink() {
-		return datasink;
-	}
-
-	public void setDatasink(String datasink) {
-		this.datasink = datasink;
-	}
-
 }

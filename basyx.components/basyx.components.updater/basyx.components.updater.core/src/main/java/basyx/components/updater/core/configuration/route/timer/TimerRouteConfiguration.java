@@ -11,7 +11,6 @@
 
 package basyx.components.updater.core.configuration.route.timer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
@@ -23,28 +22,11 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  *
  */
 public class TimerRouteConfiguration extends RouteConfiguration {
-	private static final String ROUTE_TYPE = "timer";
-	private List<String> datasinks = new ArrayList<>();
+	public static final String ROUTE_TYPE = "timer";
 	private TimerConfiguration timerConfig;
 
-	public TimerRouteConfiguration() {
-		this.routeType = ROUTE_TYPE;
-	}
-
-	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, TimerConfiguration timerConfig) {
-		this();
-		this.datasource = datasource;
-		this.transformers = transformers;
-		this.datasinks = datasinks;
-		this.setTimerConfig(timerConfig);
-	}
-
-	public List<String> getDatasinks() {
-		return datasinks;
-	}
-
-	public void setDatasinks(List<String> datasinks) {
-		this.datasinks = datasinks;
+	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
+		super(ROUTE_TYPE, datasource, transformers, datasinks);
 	}
 
 	public TimerConfiguration getTimerConfig() {
@@ -53,5 +35,10 @@ public class TimerRouteConfiguration extends RouteConfiguration {
 
 	public void setTimerConfig(TimerConfiguration timerConfig) {
 		this.timerConfig = timerConfig;
+	}
+
+	@Override
+	public String getRouteType() {
+		return ROUTE_TYPE;
 	}
 }
