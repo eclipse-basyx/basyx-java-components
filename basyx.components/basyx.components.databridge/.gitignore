@@ -117,8 +117,8 @@ basyx.components.updater.camel-hono/src/generated/
 basyx.components.updater.camel-aas/src/generated/
 
 ### Kafka ###
-basyx.components.updater.examples/kafka-multiple-zookeeper-multiple-server/zk-multiple-kafka-multiple/
-basyx.components.updater.examples/kafka-multiple-zookeeper-single-server/zk-single-kafka-multiple/
-basyx.components.updater.examples/kafka-single-broker-server/zk-single-kafka-single
+basyx.components.databridge.examples/kafka-multiple-zookeeper-multiple-server/zk-multiple-kafka-multiple/
+basyx.components.databridge.examples/kafka-multiple-zookeeper-single-server/zk-single-kafka-multiple/
+basyx.components.databridge.examples/kafka-single-broker-server/zk-single-kafka-single
 
 # End of https://www.toptal.com/developers/gitignore/api/maven,java,eclipse
