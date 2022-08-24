@@ -27,14 +27,6 @@ public class DataTransformerConfigurationFactory extends ConfigurationFactory {
 		super(filePath, loader, mapperClass);
 	}
 
-	/**
-	 * @deprecated use the {@link #create()} method instead
-	 */
-	@Deprecated
-	public List<DataTransformerConfiguration> getDataTransformerConfigurations() {
-		return this.create();
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<DataTransformerConfiguration> create() {
 		return (List<DataTransformerConfiguration>) getConfigurationLoader().loadListConfiguration();
