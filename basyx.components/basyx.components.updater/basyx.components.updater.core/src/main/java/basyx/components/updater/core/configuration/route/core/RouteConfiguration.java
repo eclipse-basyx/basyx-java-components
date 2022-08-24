@@ -3,25 +3,33 @@ package basyx.components.updater.core.configuration.route.core;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RouteConfiguration {
-	private String routeType;
+public class RouteConfiguration {
+	private String trigger;
 	private String routeId;
 	private String datasource;
 	private List<String> transformers = new ArrayList<>();
 	private List<String> datasinks = new ArrayList<>();
 
+	public RouteConfiguration() {
+	}
+
 	/**
-	 * @param routeType
+	 * @param trigger
 	 * @param routeId
 	 * @param datasource
 	 * @param transformers
 	 * @param datasinks
 	 */
-	public RouteConfiguration(String routeType, String datasource, List<String> transformers, List<String> datasinks) {
-		this.routeType = routeType;
+	public RouteConfiguration(String trigger, String datasource, List<String> transformers, List<String> datasinks) {
+		this.trigger = trigger;
 		this.datasource = datasource;
 		this.transformers = transformers;
 		this.datasinks = datasinks;
+	}
+
+	public RouteConfiguration(RouteConfiguration configuration) {
+		this(configuration.trigger, configuration.getDatasource(), configuration.getTransformers(), configuration.getDatasinks());
+		setRouteId(configuration.getRouteId());
 	}
 
 	public List<String> getDatasinks() {
@@ -36,8 +44,8 @@ public abstract class RouteConfiguration {
 		this.routeId = routeId;
 	}
 
-	public String getRouteType() {
-		return routeType;
+	public String getRouteTrigger() {
+		return trigger;
 	}
 
 	public List<String> getTransformers() {

@@ -16,20 +16,24 @@ import java.util.List;
 import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
 
 /**
- * A connection of a single route (source, transformer, sink)
+ * A connection of a single route (source, transformer(s), sink(s))
  *
  * @author fischer
  *
  */
 public class TimerRouteConfiguration extends RouteConfiguration {
-	public static final String ROUTE_TYPE = "timer";
+	public static final String ROUTE_TRIGGER = "timer";
 
 	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
-		super(ROUTE_TYPE, datasource, transformers, datasinks);
+		super(ROUTE_TRIGGER, datasource, transformers, datasinks);
+	}
+
+	public TimerRouteConfiguration(RouteConfiguration configuration) {
+		super(configuration);
 	}
 
 	@Override
-	public String getRouteType() {
-		return ROUTE_TYPE;
+	public String getRouteTrigger() {
+		return ROUTE_TRIGGER;
 	}
 }

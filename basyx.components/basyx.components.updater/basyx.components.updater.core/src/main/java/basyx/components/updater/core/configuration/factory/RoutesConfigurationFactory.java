@@ -11,10 +11,12 @@
 
 package basyx.components.updater.core.configuration.factory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
 import basyx.components.updater.core.configuration.route.event.EventRouteConfiguration;
+import basyx.components.updater.core.configuration.route.timer.TimerRouteConfiguration;
 
 /**
  * A generic implementation of routes configuration factory
@@ -25,10 +27,6 @@ import basyx.components.updater.core.configuration.route.event.EventRouteConfigu
 public class RoutesConfigurationFactory extends ConfigurationFactory {
 	private static final String DEFAULT_FILE_PATH = "routes.json";
 
-	public RoutesConfigurationFactory(String filePath, ClassLoader loader, Class<?> mapperClass) {
-		super(filePath, loader, mapperClass);
-	}
-
 	/**
 	 * This constructor uses the {@link EventRouteConfiguration} as the default
 	 * configuration
@@ -37,17 +35,7 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 	 * @param loader
 	 */
 	public RoutesConfigurationFactory(String filePath, ClassLoader loader) {
-		super(filePath, loader, EventRouteConfiguration.class);
-	}
-
-	/**
-	 * This constructor uses the default path {@link #DEFAULT_FILE_PATH}
-	 *
-	 * @param loader
-	 * @param mapperClass
-	 */
-	public RoutesConfigurationFactory(ClassLoader loader, Class<?> mapperClass) {
-		super(DEFAULT_FILE_PATH, loader, mapperClass);
+		super(filePath, loader, RouteConfiguration.class);
 	}
 
 	/**
@@ -57,11 +45,35 @@ public class RoutesConfigurationFactory extends ConfigurationFactory {
 	 * @param loader
 	 */
 	public RoutesConfigurationFactory(ClassLoader loader) {
-		super(DEFAULT_FILE_PATH, loader, EventRouteConfiguration.class);
+		super(DEFAULT_FILE_PATH, loader, RouteConfiguration.class);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<RouteConfiguration> create() {
-		return (List<RouteConfiguration>) getConfigurationLoader().loadListConfiguration();
+		List<RouteConfiguration> configurations = (List<RouteConfiguration>) getConfigurationLoader().loadListConfiguration();
+
+		return mapToSpecificRouteConfigurations(configurations);
+	}
+
+	private List<RouteConfiguration> mapToSpecificRouteConfigurations(List<RouteConfiguration> configurations) {
+		List<RouteConfiguration> mapped = new ArrayList<>();
+
+		for (RouteConfiguration configuration : configurations) {
+			if (isEventConfiguration(configuration)) {
+				mapped.add(new EventRouteConfiguration(configuration));
+			} else if (isTimerConfiguration(configuration)) {
+				mapped.add(new TimerRouteConfiguration(configuration));
+			}
+		}
+
+		return mapped;
+	}
+
+	private boolean isTimerConfiguration(RouteConfiguration configuration) {
+		return configuration.getRouteTrigger().equals(TimerRouteConfiguration.ROUTE_TRIGGER);
+	}
+
+	private boolean isEventConfiguration(RouteConfiguration configuration) {
+		return configuration.getRouteTrigger().equals(EventRouteConfiguration.ROUTE_TRIGGER);
 	}
 }

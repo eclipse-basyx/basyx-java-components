@@ -16,7 +16,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -27,7 +26,6 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 public class JsonParser {
-	private GsonBuilder gsonBuilder;
 	private Gson gson;
 	Class<?> mapperClass;
 	
@@ -37,8 +35,7 @@ public class JsonParser {
 	 * @param mapperClass
 	 */
 	public JsonParser(Class<?> mapperClass) {
-		gsonBuilder = new GsonBuilder();
-		gson = gsonBuilder.create();
+		gson = new Gson();
 		this.mapperClass = mapperClass;
 	}
 	

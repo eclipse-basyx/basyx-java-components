@@ -2,11 +2,13 @@
 	{
 		"datasource": "property1",
 		"transformers": ["jsonataA"],
-		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"]
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyA"],
+		"trigger": "event"
 	},
 	{
 		"datasource": "property2",
 		"transformers": ["jsonataB"],
-		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"]
+		"datasinks": ["ConnectedSubmodel/ConnectedPropertyB"],
+		"trigger": "event"
 	}
 ]

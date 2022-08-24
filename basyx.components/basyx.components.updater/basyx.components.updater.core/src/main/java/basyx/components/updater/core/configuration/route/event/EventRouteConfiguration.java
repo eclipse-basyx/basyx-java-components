@@ -22,14 +22,18 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  *
  */
 public class EventRouteConfiguration extends RouteConfiguration {
-	public static final String ROUTE_TYPE = "event";
+	public static final String ROUTE_TRIGGER = "event";
 
 	public EventRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
-		super(ROUTE_TYPE, datasource, transformers, datasinks);
+		super(ROUTE_TRIGGER, datasource, transformers, datasinks);
+	}
+
+	public EventRouteConfiguration(RouteConfiguration configuration) {
+		super(configuration);
 	}
 
 	@Override
-	public String getRouteType() {
-		return ROUTE_TYPE;
+	public String getRouteTrigger() {
+		return ROUTE_TRIGGER;
 	}
 }
