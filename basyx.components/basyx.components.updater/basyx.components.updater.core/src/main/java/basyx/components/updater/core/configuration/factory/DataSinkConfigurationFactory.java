@@ -27,14 +27,6 @@ public class DataSinkConfigurationFactory extends ConfigurationFactory {
 		super(filePath, loader, mapperClass);
 	}
 
-	/**
-	 * @deprecated use the {@link #create()} method instead
-	 */
-	@Deprecated
-	public List<DataSinkConfiguration> getDataSinkConfigurations() {
-		return this.create();
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<DataSinkConfiguration> create() {
 		return (List<DataSinkConfiguration>) getConfigurationLoader().loadListConfiguration();

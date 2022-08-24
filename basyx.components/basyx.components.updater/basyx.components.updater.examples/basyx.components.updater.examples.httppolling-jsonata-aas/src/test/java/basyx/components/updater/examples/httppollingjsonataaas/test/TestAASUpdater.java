@@ -28,7 +28,6 @@ import basyx.components.updater.cameltimer.configuration.factory.TimerDefaultCon
 import basyx.components.updater.core.component.UpdaterComponent;
 import basyx.components.updater.core.configuration.factory.RoutesConfigurationFactory;
 import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
-import basyx.components.updater.core.configuration.route.timer.TimerRouteConfiguration;
 import basyx.components.updater.transformer.cameljsonata.configuration.factory.JsonataDefaultConfigurationFactory;
 
 public class TestAASUpdater {
@@ -65,12 +64,12 @@ public class TestAASUpdater {
 
 		// Extend configutation for connections
 		// DefaulRoutesConfigFac takes default routes.json as to config
-		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader, TimerRouteConfiguration.class);
+		RoutesConfigurationFactory routesFactory = new RoutesConfigurationFactory(loader);
 		configuration.addRoutes(routesFactory.create());
 
 		// Extend configuration for Http Source
 		HttpPollingDefaultConfigurationFactory httpPollingConfigFactory = new HttpPollingDefaultConfigurationFactory(loader);
-		configuration.addDatasinks(httpPollingConfigFactory.create());
+		configuration.addDatasources(httpPollingConfigFactory.create());
 
 		// Extend configuration for AAS
 		// DefaulRoutesConfigFactory takes default aasserver.json as to config
@@ -95,7 +94,7 @@ public class TestAASUpdater {
 	}
 
 	private void waitForPropagation() throws InterruptedException {
-		Thread.sleep(1000);
+		Thread.sleep(3000);
 	}
 
 	private void checkIfPropertyIsUpdated() throws InterruptedException {

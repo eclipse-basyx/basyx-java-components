@@ -9,7 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 ******************************************************************************/
 
-package basyx.components.updater.core.configuration.route.simple;
+package basyx.components.updater.core.configuration.route.event;
 
 import java.util.List;
 
@@ -21,27 +21,19 @@ import basyx.components.updater.core.configuration.route.core.RouteConfiguration
  * @author haque, fischer
  *
  */
-public class SimpleRouteConfiguration extends RouteConfiguration {
-	private static final String ROUTE_TYPE = "SIMPLE";
-	private String datasink;
+public class EventRouteConfiguration extends RouteConfiguration {
+	public static final String ROUTE_TRIGGER = "event";
 
-	public SimpleRouteConfiguration() {
-		this.routeType = ROUTE_TYPE;
+	public EventRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
+		super(ROUTE_TRIGGER, datasource, transformers, datasinks);
 	}
 
-	public SimpleRouteConfiguration(String datasource, List<String> transformers, String datasink) {
-		this();
-		this.datasource = datasource;
-		this.transformers = transformers;
-		this.datasink = datasink;
+	public EventRouteConfiguration(RouteConfiguration configuration) {
+		super(configuration);
 	}
 
-	public String getDatasink() {
-		return datasink;
+	@Override
+	public String getRouteTrigger() {
+		return ROUTE_TRIGGER;
 	}
-
-	public void setDatasink(String datasink) {
-		this.datasink = datasink;
-	}
-
 }

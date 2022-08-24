@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import basyx.components.updater.core.configuration.route.core.IRouteCreatorFactory;
 import basyx.components.updater.core.configuration.route.core.RoutesConfiguration;
-import basyx.components.updater.core.configuration.route.simple.SimpleRouteConfiguration;
-import basyx.components.updater.core.configuration.route.simple.SimpleRouteCreatorFactory;
+import basyx.components.updater.core.configuration.route.event.EventRouteConfiguration;
+import basyx.components.updater.core.configuration.route.event.EventRouteCreatorFactory;
 import basyx.components.updater.core.configuration.route.timer.TimerRouteConfiguration;
 import basyx.components.updater.core.configuration.route.timer.TimerRouteCreatorFactory;
 import basyx.components.updater.core.routebuilder.DataBridgeRouteBuilder;
@@ -48,8 +48,8 @@ public class UpdaterComponent implements IComponent {
 
 	private static Map<String, IRouteCreatorFactory> getRouteCreatorFactoryMapDefault() {
 		Map<String, IRouteCreatorFactory> defaultRouteCreatorFactoryMap = new HashMap<>();
-		defaultRouteCreatorFactoryMap.put(new SimpleRouteConfiguration().getRouteType(), new SimpleRouteCreatorFactory());
-		defaultRouteCreatorFactoryMap.put(new TimerRouteConfiguration().getRouteType(), new TimerRouteCreatorFactory());
+		defaultRouteCreatorFactoryMap.put(EventRouteConfiguration.ROUTE_TRIGGER, new EventRouteCreatorFactory());
+		defaultRouteCreatorFactoryMap.put(TimerRouteConfiguration.ROUTE_TRIGGER, new TimerRouteCreatorFactory());
 
 		return defaultRouteCreatorFactoryMap;
 	}

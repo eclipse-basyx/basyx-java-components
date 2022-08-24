@@ -4,9 +4,7 @@
 		"serverUrl": "127.0.0.1",
 		"serverPort": 12686,
 		"pathToService": "milo",
-		"nodeInformation": "ns=2;s=HelloWorld/ScalarTypes/Double",
-		"username": "user",
-		"password": "password1"
+		"nodeInformation": "ns=2;s=HelloWorld/ScalarTypes/Double"
 	},
 	{
 		"uniqueId": "integerscalar",

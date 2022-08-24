@@ -11,47 +11,41 @@
 
 package basyx.components.updater.core.configuration.route.timer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import basyx.components.updater.core.configuration.route.core.RouteConfiguration;
 
 /**
- * A connection of a single route (source, transformer, sink)
+ * A connection of a single route (source, transformer(s), sink(s))
  *
  * @author fischer
  *
  */
 public class TimerRouteConfiguration extends RouteConfiguration {
-	private static final String ROUTE_TYPE = "TIMER";
-	private List<String> datasinks = new ArrayList<>();
-	private TimerConfiguration timerConfig;
+	public static final String ROUTE_TRIGGER = "timer";
+	private static final String TIMER_NAME = "timerName";
 
-	public TimerRouteConfiguration() {
-		this.routeType = ROUTE_TYPE;
+	private String timerName;
+
+	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks) {
+		super(ROUTE_TRIGGER, datasource, transformers, datasinks);
 	}
 
-	public TimerRouteConfiguration(String datasource, List<String> transformers, List<String> datasinks, TimerConfiguration timerConfig) {
-		this();
-		this.datasource = datasource;
-		this.transformers = transformers;
-		this.datasinks = datasinks;
-		this.setTimerConfig(timerConfig);
+	public TimerRouteConfiguration(RouteConfiguration configuration) {
+		super(configuration);
+		timerName = (String) getTriggerData().get(TIMER_NAME);
 	}
 
-	public List<String> getDatasinks() {
-		return datasinks;
+	public String getTimerName() {
+		return timerName;
 	}
 
-	public void setDatasinks(List<String> datasinks) {
-		this.datasinks = datasinks;
+	public void setTimerName(String timerName) {
+		this.timerName = timerName;
 	}
 
-	public TimerConfiguration getTimerConfig() {
-		return timerConfig;
-	}
-
-	public void setTimerConfig(TimerConfiguration timerConfig) {
-		this.timerConfig = timerConfig;
+	@Override
+	public String getRouteTrigger() {
+		return ROUTE_TRIGGER;
 	}
 }
