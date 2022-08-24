@@ -1,4 +1,4 @@
-# Updater Component 
+# DataBridge Component 
 
 This project is the implementation of master's thesis **Design, Implementation and Evaluation of Asynchroneous Data Source Integration Patterns for Digital Twins enabling Scalable Industrie 4.0.** This framework acts as a middleware which can integrate and make asynchronous communication capability between various data sources which, in the long run helps maintain strict separation and reduce dependency between different the sources. This concepts of service-oriented-architecture and digital twins are also applied here. Different possible architectural solutions are explored here to create a scalable Digital Twin infrastructure as well as a scalable integration of third-party data.
 
@@ -13,11 +13,11 @@ Different data sources are added here using Docker containers. To run the contai
 
 The updater is segregated into multiple projects. containing an updater-core and different components for each camel wrapped Source, Sinks and Transformers.
 
-### basyx.components.updater.core
+### basyx.components.databridge.core
 This is the module containing core logics and interfaces of the updater. This module must be included to use the updater. To run the module and include it in your project-
 
 ```bash
-cd basyx.components.updater.core
+cd basyx.components.databridge.core
 mvn clean install
 ```
 
@@ -26,7 +26,7 @@ Then include in your pom.xml-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.core</artifactId>
+	<artifactId>basyx.components.databridge.core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -88,11 +88,11 @@ Delegators can be configured by json files like below-
 If a route contains a delegator, then the route will not be started right away. The delegator will expose an API endpoint based on the delegator configurations and upon receiving a request, it will start the route, receive one message, stop the route again and return the retrieved message as a response.
 
 
-#### basyx.components.updater.camel-aas
+#### basyx.components.databridge.camel-aas
 This is the module containing the custom camel component of the Basyx Asset administration shell. To run and include the module. first core component must be added to project. Then-
 
 ```bash
-cd basyx.components.updater.camel-aas
+cd basyx.components.databridge.camel-aas
 mvn clean install
 ```
 
@@ -101,7 +101,7 @@ Then include in your pom.xml-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-aas</artifactId>
+	<artifactId>basyx.components.databridge.camel-aas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -133,11 +133,11 @@ In the json file, the following properties has to be provided-
 ```
 Multiple AAS data sinks can be provided in this way. Where each must have different uniqueId to finally map in each route.
 
-#### basyx.components.updater.camel-kafka
+#### basyx.components.databridge.camel-kafka
 This is the module containing the camel component of the Apache Kafka. To run and include the module. first core component must be added to project. Then-
 
 ```bash
-cd basyx.components.updater.camel-kafka
+cd basyx.components.databridge.camel-kafka
 mvn clean install
 ```
 
@@ -146,7 +146,7 @@ Then include in your pom.xml-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-kafka</artifactId>
+	<artifactId>basyx.components.databridge.camel-kafka</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -186,11 +186,11 @@ In the json file, the following properties has to be provided-
 ```
 Multiple Kafka data sources can be provided in this way. Where each must have different uniqueId to finally map in each route.
 
-#### basyx.components.updater.camel-activemq
+#### basyx.components.databridge.camel-activemq
 This is the module containing the camel component of the ActiveMQ. To run and include the module. first core component must be added to project. Then-
 
 ```bash
-cd basyx.components.updater.camel-activemq
+cd basyx.components.databridge.camel-activemq
 mvn clean install
 ```
 
@@ -199,7 +199,7 @@ Then include in your pom.xml-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-activemq</artifactId>
+	<artifactId>basyx.components.databridge.camel-activemq</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -232,11 +232,11 @@ In the json file, the following properties has to be provided-
 Multiple ActiveMQ data sources can be provided in this way. Where each must have different uniqueID to finally map in each route.
 
 
-#### basyx.components.updater.camel-paho
+#### basyx.components.databridge.camel-paho
 This is the module containing the camel component of the MQTT. To run and include the module. first core component must be added to project. Then-
 
 ```bash
-cd basyx.components.updater.camel-paho
+cd basyx.components.databridge.camel-paho
 mvn clean install
 ```
 
@@ -245,7 +245,7 @@ Then include in your pom.xml-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-paho</artifactId>
+	<artifactId>basyx.components.databridge.camel-paho</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -278,11 +278,11 @@ In the json file, the following properties has to be provided-
 Multiple MQTT data sources can be provided in this way. Where each must have different uniqueID to finally map in each route.
 
 
-#### basyx.components.updater.transformer.camel-jsonata
+#### basyx.components.databridge.transformer.camel-jsonata
 This is the module containing the camel component of the Jsonata. To run and include the module. first core component must be added to project. Then-
 
 ```bash
-cd basyx.components.updater.tranformer.camel-jsonata
+cd basyx.components.databridge.tranformer.camel-jsonata
 mvn clean install
 ```
 
@@ -291,7 +291,7 @@ Then include in your pom.xml-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.transformer.camel-jsonata</artifactId>
+	<artifactId>basyx.components.databridge.transformer.camel-jsonata</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -309,13 +309,13 @@ In the json file, the following properties has to be provided-
 [
 	{
 		"uniqueId": "jsonataA",
-		"queryPath": "classpath://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.updater.examples/basyx.components.updater.examples.mqtt-jsonata-aas/src/main/resources/jsonataA.json",
+		"queryPath": "classpath://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.databridge.examples/basyx.components.databridge.examples.mqtt-jsonata-aas/src/main/resources/jsonataA.json",
 		"inputType": "JsonString",
 		"outputType": "JsonString"
 	},
 	{
 		"uniqueId": "jsonataB",
-		"queryPath": "file://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.updater.examples/basyx.components.updater.examples.mqtt-jsonata-aas/src/main/resources/jsonataB.json",
+		"queryPath": "file://C:/Users/ashha/Desktop/Development/Thesis/updater-component/basyx.components.databridge.examples/basyx.components.databridge.examples.mqtt-jsonata-aas/src/main/resources/jsonataB.json",
 		"inputType": "JsonString",
 		"outputType": "JsonString"
 	}
@@ -332,25 +332,25 @@ Include the core, jsonata, kafka and aas component to the project-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.core</artifactId>
+	<artifactId>basyx.components.databridge.core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 		
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-kafka</artifactId>
+	<artifactId>basyx.components.databridge.camel-kafka</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-aas</artifactId>
+	<artifactId>basyx.components.databridge.camel-aas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.transformer.camel-jsonata</artifactId>
+	<artifactId>basyx.components.databridge.transformer.camel-jsonata</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -390,25 +390,25 @@ Include the core, jsonata, activeMQ and aas component to the project-
 ```
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.core</artifactId>
+	<artifactId>basyx.components.databridge.core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 		
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-activemq</artifactId>
+	<artifactId>basyx.components.databridge.camel-activemq</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.camel-aas</artifactId>
+	<artifactId>basyx.components.databridge.camel-aas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 
 <dependency>
 	<groupId>org.eclipse.basyx</groupId>
-	<artifactId>basyx.components.updater.transformer.camel-jsonata</artifactId>
+	<artifactId>basyx.components.databridge.transformer.camel-jsonata</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
@@ -462,14 +462,14 @@ After providing all necessary json configuration files for activemq, jsonata, de
 ```
 
 
-In the **basyx.components.updater.examples** there are many integration examples between kafka, activemq, paho, aas internal, jsonata, delegator routes etc. Take a look at them.
+In the **basyx.components.databridge.examples** there are many integration examples between kafka, activemq, paho, aas internal, jsonata, delegator routes etc. Take a look at them.
 
 
 #### Example
 ##### Running Single Zookeeper Single Broker Kafka server
 To run the single zookeeper single broker kafka server, docker needs to be installed in the machine. docker-compose must be accessible from the CLI. Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\kafka-single-broker-server
+cd basyx.components.databridge.examples\kafka-single-broker-server
 docker-compose up
 ```
 This will run the zookeeper server at port 2181 and kafka server at 9092
@@ -477,7 +477,7 @@ This will run the zookeeper server at port 2181 and kafka server at 9092
 ##### Running Single Zookeeper Multiple Broker Kafka server
 To run the single zookeeper multiple broker kafka server, docker needs to be installed in the machine. docker-compose must be accessible from the CLI. Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\kafka-multiple-zookeeper-single-server
+cd basyx.components.databridge.examples\kafka-multiple-zookeeper-single-server
 docker-compose up
 ```
 This will run the zookeeper server at port 2181 and multiple broker kafka server at 9092,9093 and 9094. This will be helpful to create topic with replication factor more than 1. This will increase reliability of the system.
@@ -485,7 +485,7 @@ This will run the zookeeper server at port 2181 and multiple broker kafka server
 ##### Running Multiple Zookeeper Multiple Broker Kafka server
 To run the multiple zookeeper multiple broker kafka server, docker needs to be installed in the machine. docker-compose must be accessible from the CLI. Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\kafka-multiple-zookeeper-multiple-server
+cd basyx.components.databridge.examples\kafka-multiple-zookeeper-multiple-server
 docker-compose up
 ```
 This will run the zookeeper server at port 2181,2182 and 2183 and kafka server at 9092,9093 and 9094. This will increase reliability as well as availability of the system if a zookeeper is down
@@ -493,7 +493,7 @@ This will run the zookeeper server at port 2181,2182 and 2183 and kafka server a
 ##### Running ActiveMQ Server
 To run the activemq server, docker needs to be installed in the machine. docker-compose must be accessible from the CLI. Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\active-mq-server
+cd basyx.components.databridge.examples\active-mq-server
 docker-compose up
 ```
 This will run the activemq server at port 61616 
@@ -501,7 +501,7 @@ This will run the activemq server at port 61616
 ##### Running Dummy Kafka Producer
 To run a dummy Kafka producer, Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\basyx.components.updater.examples.kafkaproducer
+cd basyx.components.databridge.examples\basyx.components.databridge.examples.kafkaproducer
 mvn clean install
 mvn exec:java
 ```
@@ -510,7 +510,7 @@ This will run a dummy kafka producer which will generate 100 JSON message in 100
 ##### Running Dummy ActiveMQ Producer
 To run a dummy ActiveMQ producer, Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\basyx.components.updater.examples.activemqproducer
+cd basyx.components.databridge.examples\basyx.components.databridge.examples.activemqproducer
 mvn clean install
 mvn exec:java
 ```
@@ -519,17 +519,17 @@ This will run a dummy activemq producer which will generate 100 JSON message in 
 ##### Running AAS Server
 To run a dummy AAS server, Open up a bash in the clone directory and run the below command-
 ```bash
-cd basyx.components.updater.examples\basyx.components.updater.examples.aasserver
+cd basyx.components.databridge.examples\basyx.components.databridge.examples.aasserver
 mvn exec:java
 ```
 This will run an AAS Server at http://localhost:4001/aasServer/shells
-Current setting of the Updater will update the submodel element value at-
+Current setting of the DataBridge will update the submodel element value at-
 http://localhost:4001/aasServer/shells/eclipse.basyx.aas.oven/aas/submodels/documentationSm/submodel/submodelElements/maxTemp/value
 
-If Kafka server, AAS Server, Updater and Kafka Producer are run in this order, the output will be reflected in the value property of the submodel element.
+If Kafka server, AAS Server, DataBridge and Kafka Producer are run in this order, the output will be reflected in the value property of the submodel element.
 
 #### Load Testing using Jmeter
-Jmeter can be used to perform load test/ performance tests of the Updater component. To use Jmeter go to https://jmeter.apache.org/ and download Jmeter, build and run the Jar file.
+Jmeter can be used to perform load test/ performance tests of the DataBridge component. To use Jmeter go to https://jmeter.apache.org/ and download Jmeter, build and run the Jar file.
 
 ##### Kafka Load Testing
 To Load test using kafka, go to https://github.com/GSLabDev/pepper-box/archive/v1.0.tar.gz. This will download the compressed project. Decompress the project and build the project using java compiler. This will create a jar file. Add the jar to-
@@ -538,6 +538,6 @@ To Load test using kafka, go to https://github.com/GSLabDev/pepper-box/archive/v
 ```
 And restart Jmeter. Then you can use Jmeter to open the .jmx file situated in the-
 ```bash
-basyx.components.updater.examples\Kafka Jmeter Load Test
+basyx.components.databridge.examples\Kafka Jmeter Load Test
 ```
 If the kafka server is running, this .jmx file can be used to load test kafka producer
