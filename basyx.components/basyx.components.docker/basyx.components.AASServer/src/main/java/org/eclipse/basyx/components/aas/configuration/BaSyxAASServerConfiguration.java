@@ -59,6 +59,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_EVENTS = AASEventBackend.NONE.toString();
 	public static final String DEFAULT_AASX_UPLOAD = FEATURE_ENABLED;
 	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
+	public static final String DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "/rbac_rules.json";
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -73,16 +74,16 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER = "aas.authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider";
 	public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL = "aas.authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.serverUrl";
 	public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM = "aas.authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.realm";
-	public static final String AUTHORIZATION_STRATEGY_SIMPLEABAC_RULES_FILE_PATH = "aas.authorization.strategy.simpleAbac.rulesFilePath";
-	public static final String AUTHORIZATION_STRATEGY_SIMPLEABAC_ROLE_AUTHENTICATOR = "aas.authorization.strategy.simpleAbac.roleAuthenticator";
-	public static final String AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.simpleAbac.subjectInformationProvider";
+	public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "aas.authorization.strategy.simpleRbac.rulesFilePath";
+	public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR = "aas.authorization.strategy.simpleRbac.roleAuthenticator";
+	public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.simpleRbac.subjectInformationProvider";
 	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR = "aas.authorization.strategy.grantedAuthority.grantedAuthorityAuthenticator";
 	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.grantedAuthority.subjectInformationProvider";
 	public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "aas.authorization.strategy.custom.authorizersProvider";
 	public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.custom.subjectInformationProvider";
 
 	public enum AuthorizationStrategy {
-		SimpleAbac,
+		SimpleRbac,
 		GrantedAuthority,
 		Custom
 	}
@@ -105,6 +106,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
 		defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
+		defaultProps.put(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
 		return defaultProps;
 	}
 
@@ -327,28 +329,28 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM, authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm);
 	}
 
-	public String getAuthorizationStrategySimpleAbacRulesFilePath() {
-		return getProperty(AUTHORIZATION_STRATEGY_SIMPLEABAC_RULES_FILE_PATH);
+	public String getAuthorizationStrategySimpleRbacRulesFilePath() {
+		return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
 	}
 
-	public void setAuthorizationStrategySimpleAbacRulesFilePath(String authorizationStrategySimpleAbacRulesFilePath) {
-		setProperty(AUTHORIZATION_STRATEGY_SIMPLEABAC_RULES_FILE_PATH, authorizationStrategySimpleAbacRulesFilePath);
+	public void setAuthorizationStrategySimpleRbacRulesFilePath(String authorizationStrategySimpleRbacRulesFilePath) {
+		setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, authorizationStrategySimpleRbacRulesFilePath);
 	}
 
-	public String getAuthorizationStrategySimpleAbacSubjectInformationProvider() {
-		return getProperty(AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER);
+	public String getAuthorizationStrategySimpleRbacSubjectInformationProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER);
 	}
 
-	public void setAuthorizationStrategySimpleAbacSubjectInformationProvider(String authorizationStrategySimpleAbacSubjectInformationProvider) {
-		setProperty(AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER, authorizationStrategySimpleAbacSubjectInformationProvider);
+	public void setAuthorizationStrategySimpleRbacSubjectInformationProvider(String authorizationStrategySimpleRbacSubjectInformationProvider) {
+		setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, authorizationStrategySimpleRbacSubjectInformationProvider);
 	}
 
-	public String getAuthorizationStrategySimpleAbacRoleAuthenticator() {
-		return getProperty(AUTHORIZATION_STRATEGY_SIMPLEABAC_ROLE_AUTHENTICATOR);
+	public String getAuthorizationStrategySimpleRbacRoleAuthenticator() {
+		return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR);
 	}
 
-	public void setAuthorizationStrategySimpleabacRoleAuthenticator(String authorizationStrategySimpleAbacRoleAuthenticator) {
-		setProperty(AUTHORIZATION_STRATEGY_SIMPLEABAC_ROLE_AUTHENTICATOR, authorizationStrategySimpleAbacRoleAuthenticator);
+	public void setAuthorizationStrategySimpleRbacRoleAuthenticator(String authorizationStrategySimpleRbacRoleAuthenticator) {
+		setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, authorizationStrategySimpleRbacRoleAuthenticator);
 	}
 
 	public String getAuthorizationStrategyGrantedAuthoritySubjectInformationProvider() {

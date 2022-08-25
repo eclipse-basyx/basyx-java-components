@@ -24,12 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,26 +32,24 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration.AuthorizationStrategy;
-import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.GrantedAuthorityAASAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.aas.aggregator.authorization.SimpleAbacAASAggregatorAuthorizer;
+import org.eclipse.basyx.extensions.aas.aggregator.authorization.SimpleRbacAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.GrantedAuthorityAASAPIAuthorizer;
-import org.eclipse.basyx.extensions.aas.api.authorization.SimpleAbacAASAPIAuthorizer;
-import org.eclipse.basyx.extensions.shared.authorization.AbacRule;
-import org.eclipse.basyx.extensions.shared.authorization.AbacRuleSet;
+import org.eclipse.basyx.extensions.aas.api.authorization.SimpleRbacAASAPIAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.RbacRuleSet;
 import org.eclipse.basyx.extensions.shared.authorization.AuthenticationContextProvider;
 import org.eclipse.basyx.extensions.shared.authorization.AuthenticationGrantedAuthorityAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.IAbacRuleChecker;
+import org.eclipse.basyx.extensions.shared.authorization.IRbacRuleChecker;
 import org.eclipse.basyx.extensions.shared.authorization.IGrantedAuthorityAuthenticator;
 import org.eclipse.basyx.extensions.shared.authorization.IRoleAuthenticator;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.eclipse.basyx.extensions.shared.authorization.JWTAuthenticationContextProvider;
 import org.eclipse.basyx.extensions.shared.authorization.KeycloakRoleAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.PredefinedSetAbacRuleChecker;
+import org.eclipse.basyx.extensions.shared.authorization.PredefinedSetRbacRuleChecker;
 import org.eclipse.basyx.extensions.submodel.aggregator.authorization.GrantedAuthoritySubmodelAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.submodel.aggregator.authorization.SimpleAbacSubmodelAggregatorAuthorizer;
+import org.eclipse.basyx.extensions.submodel.aggregator.authorization.SimpleRbacSubmodelAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.submodel.authorization.GrantedAuthoritySubmodelAPIAuthorizer;
-import org.eclipse.basyx.extensions.submodel.authorization.SimpleAbacSubmodelAPIAuthorizer;
+import org.eclipse.basyx.extensions.submodel.authorization.SimpleRbacSubmodelAPIAuthorizer;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,8 +94,8 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		}
 
 		switch (strategy) {
-			case SimpleAbac: {
-				return getSimpleAbacDecorator();
+			case SimpleRbac: {
+				return getSimpleRbacDecorator();
 			}
 			case GrantedAuthority: {
 				return getGrantedAuthorityDecorator();
@@ -116,75 +108,54 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		}
 	}
 
-	private <SubjectInformationType> IAASServerDecorator getSimpleAbacDecorator() {
-		logger.info("use SimpleAbac authorization strategy");
-		final AbacRuleSet abacRuleSet = readAbacRulesFile();
-		final IAbacRuleChecker abacRuleChecker = new PredefinedSetAbacRuleChecker(abacRuleSet);
-		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleAbacRoleAuthenticator();
-		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleAbacSubjectInformationProvider();
+	private <SubjectInformationType> IAASServerDecorator getSimpleRbacDecorator() {
+		logger.info("use SimpleRbac authorization strategy");
+		final RbacRuleSet rbacRuleSet = RbacRuleSet.fromFile(aasConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
+		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
 
 		return new AuthorizedAASServerDecorator<>(
-				new SimpleAbacSubmodelAPIAuthorizer<>(abacRuleChecker, roleAuthenticator),
-				new SimpleAbacSubmodelAggregatorAuthorizer<>(abacRuleChecker, roleAuthenticator),
-				new SimpleAbacAASAPIAuthorizer<>(abacRuleChecker, roleAuthenticator),
-				new SimpleAbacAASAggregatorAuthorizer<>(abacRuleChecker, roleAuthenticator),
+				new SimpleRbacSubmodelAPIAuthorizer<>(rbacRuleChecker, roleAuthenticator),
+				new SimpleRbacSubmodelAggregatorAuthorizer<>(rbacRuleChecker, roleAuthenticator),
+				new SimpleRbacAASAPIAuthorizer<>(rbacRuleChecker, roleAuthenticator),
+				new SimpleRbacAASAggregatorAuthorizer<>(rbacRuleChecker, roleAuthenticator),
 				subjectInformationProvider
 		);
 	}
 
-	private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getSimpleAbacRoleAuthenticator() {
+	private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getSimpleRbacRoleAuthenticator() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategySimpleAbacRoleAuthenticator();
+			final String className = aasConfig.getAuthorizationStrategySimpleRbacRoleAuthenticator();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IRoleAuthenticator.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_ROLE_AUTHENTICATOR + " does not implement the interface " + IRoleAuthenticator.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR + " does not implement the interface " + IRoleAuthenticator.class.getName());
 			}
 
 			return (IRoleAuthenticator<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
 	}
 
-	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSimpleAbacSubjectInformationProvider() {
+	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSimpleRbacSubjectInformationProvider() {
 		try {
-			final String className = aasConfig.getAuthorizationStrategySimpleAbacSubjectInformationProvider();
+			final String className = aasConfig.getAuthorizationStrategySimpleRbacSubjectInformationProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
-				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLEABAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
+				throw new IllegalArgumentException("given " + BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER + " -> " + effectiveClassName + " does not implement the interface " + ISubjectInformationProvider.class.getName());
 			}
 
 			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
-	}
-
-	private final String ABAC_RULES_PATH = "/abac_rules.json";
-
-	private AbacRuleSet readAbacRulesFile() {
-		logger.info("loading abac rules...");
-		try (final InputStream inputStream = getClass().getResourceAsStream(ABAC_RULES_PATH)) {
-			if (inputStream == null) {
-				throw new FileNotFoundException("could not find " + ABAC_RULES_PATH);
-			}
-			final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-			final JsonReader jsonReader = new JsonReader(inputStreamReader);
-			final AbacRule[] abacRules = new Gson().fromJson(jsonReader, AbacRule[].class);
-			logger.info("Read abac rules: " + Arrays.toString(abacRules));
-			final AbacRuleSet abacRuleSet = new AbacRuleSet();
-			Arrays.stream(abacRules).forEach(abacRuleSet::addRule);
-			return abacRuleSet;
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-		return new AbacRuleSet();
 	}
 
 	public  <SubjectInformationType> IAASServerDecorator getGrantedAuthorityDecorator() {
@@ -212,7 +183,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 
 			return (IGrantedAuthorityAuthenticator<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
@@ -229,7 +200,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 
 			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
@@ -270,7 +241,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 
 			return (IJwtBearerTokenAuthenticationConfigurationProvider) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
@@ -303,7 +274,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 
 			return (IAuthorizersProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
@@ -320,7 +291,7 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			}
 
 			return (ISubjectInformationProvider<SubjectInformationType>) clazz.getDeclaredConstructor().newInstance();
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
