@@ -109,6 +109,8 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	@Override
 	public void insert(AASDescriptor descriptor) {
 		mongoOps.insert(descriptor, collection);
+		// mongoOps added "_id" to descriptor after insert
+		removeMongDBSpecificId(descriptor);
 	}
 
 	@Override
@@ -126,11 +128,16 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 		Criteria hasId = new Criteria();
 		hasId.orOperator(where(AASID).is(id), where(ASSETID).is(id));
 		AASDescriptor result = mongoOps.findOne(query(hasId), AASDescriptor.class, collection);
+		removeMongDBSpecificId(result);
+		
+		return result;
+	}
+
+	private void removeMongDBSpecificId(AASDescriptor result) {
 		if (result != null) {
 			// Remove mongoDB-specific map attribute from AASDescriptor
 			result.remove("_id");
 		}
-		return result;
 	}
 
 	@Override
