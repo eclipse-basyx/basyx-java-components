@@ -282,7 +282,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {
-		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.isAuthorizationEnabled());
+		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL));
 	}
 
 	@Override
