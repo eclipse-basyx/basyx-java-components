@@ -55,6 +55,7 @@ import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -204,8 +205,6 @@ public class AASServerComponentTest {
 
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(4, aasDescriptors.size());
-
-		stopAASServerComponent();
 	}
 
 	@Test
@@ -216,8 +215,6 @@ public class AASServerComponentTest {
 
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		assertEquals(1, aasDescriptors.size());
-
-		stopAASServerComponent();
 	}
 
 	@Test
@@ -229,8 +226,6 @@ public class AASServerComponentTest {
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
 		System.out.println(aasDescriptors.size());
 		assertEquals(0, aasDescriptors.size());
-
-		stopAASServerComponent();
 	}
 
 	/**
@@ -277,8 +272,6 @@ public class AASServerComponentTest {
 		
 		AASDescriptor aasDescriptor = registry.lookupAAS(aasIdentifier);
 		assertEquals(aasIdentifier.getId(), aasDescriptor.getIdentifier().getId());
-		
-		stopAASServerComponent();
 	}
 	
 	@Test
@@ -293,14 +286,17 @@ public class AASServerComponentTest {
 		
 		Collection<SubmodelDescriptor> smDescriptor = aasDescriptor.getSubmodelDescriptors(); 
 		assertEquals(2, smDescriptor.size());
-		
-		stopAASServerComponent();
 	}
 
-	public void stopAASServerComponent() {
+	public static void stopAASServerComponent() {
 		component.stopComponent();
 	}
 	
+	@After
+	public void stopServer() {
+		stopAASServerComponent();
+	}
+
 	@AfterClass
 	public static void tearDownClass() {
 		resetMongoDBTestData();
