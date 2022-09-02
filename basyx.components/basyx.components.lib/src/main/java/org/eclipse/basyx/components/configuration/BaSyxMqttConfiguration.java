@@ -43,7 +43,7 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	// Default BaSyx MQTT configuration
 	public static final String DEFAULT_USER = "";
 	public static final String DEFAULT_PASS = "";
-	public static final String DEFAULT_SERVER = "http://localhost:1883/";
+	public static final String DEFAULT_SERVER = "tcp://localhost:1883";
 	public static final String DEFAULT_QOS = "1";
 	public static final String DEFAULT_PERSISTENCE_TYPE = MqttPersistence.FILE.toString();
 	public static final String DEFAULT_PERSISTENCE_PATH = "";
