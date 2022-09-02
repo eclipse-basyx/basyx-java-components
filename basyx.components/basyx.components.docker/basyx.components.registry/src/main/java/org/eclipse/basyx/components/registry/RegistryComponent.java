@@ -232,8 +232,7 @@ public class RegistryComponent implements IComponent {
 
 	private void throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory() {
 		if (!isConfigurationSuitableForTaggedDirectory()) {
-			throw new RuntimeException("The current version does not support this configuration.\n" + "\t* Persistent backends (SQL, MongoDB)\n" + "\t* Authorization\n" + "\t* or MQTT eventing\n"
-					+ "are currently not supported in combination with tagged directory functionality.");
+			throw new RuntimeException("The current version does not support this configuration.\n" + "\t* Persistent backend SQL\n" + "is currently not supported in combination with tagged directory functionality.");
 		}
 	}
 

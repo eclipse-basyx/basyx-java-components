@@ -32,57 +32,48 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestTaggedDirectoryRaw {
-	private static BaSyxContextConfiguration contextConfig;
-	private static BaSyxRegistryConfiguration registryConfig;
+	private BaSyxContextConfiguration contextConfig;
+	private BaSyxRegistryConfiguration registryConfig;
 
 	protected static AASRegistryProxy aasRegistryProxy;
 
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUpClass() {
 		contextConfig = new BaSyxContextConfiguration();
 		registryConfig = new BaSyxRegistryConfiguration();
 		registryConfig.enableTaggedDirectory();
 	}
 
 	@Test
-	public void directedDirectoryWithMqtt() {
-		try {
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
-			taggedDirectoryComponent.enableMQTT(new BaSyxMqttConfiguration());
-			taggedDirectoryComponent.startComponent();
-			fail();
-		} catch (RuntimeException expected) {
-		}
+	public void startsWithMQTT() {
+		RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
+		taggedDirectoryComponent.enableMQTT(new BaSyxMqttConfiguration());
+		taggedDirectoryComponent.startComponent();
+		taggedDirectoryComponent.stopComponent();
 	}
 
 	@Test
-	public void directedDirectoryWithAuthorization() {
-		try {
-			registryConfig.enableAuthorization();
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
-			taggedDirectoryComponent.startComponent();
-			fail();
-		} catch (RuntimeException expected) {
-		}
+	public void startsWithAuthorization() {
+		registryConfig.enableAuthorization();
+		RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
+		taggedDirectoryComponent.startComponent();
+		taggedDirectoryComponent.stopComponent();
 	}
 
 	@Test
-	public void directedDirectoryWithMongoDb() {
-		try {
-			registryConfig.setRegistryBackend(RegistryBackend.MONGODB);
-			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
-			taggedDirectoryComponent.startComponent();
-			fail();
-		} catch (RuntimeException expected) {
-		}
+	public void startsWithMongoDb() {
+		registryConfig.setRegistryBackend(RegistryBackend.MONGODB);
+		RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
+		taggedDirectoryComponent.startComponent();
+		taggedDirectoryComponent.stopComponent();
 	}
 
 	@Test
-	public void directedDirectoryWithSQL() {
+	public void doesNotStartWithSQL() {
 		try {
 			registryConfig.setRegistryBackend(RegistryBackend.SQL);
 			RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
