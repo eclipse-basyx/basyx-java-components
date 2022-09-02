@@ -24,6 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry;
 
+import java.util.HashMap;
+
 import javax.servlet.http.HttpServlet;
 
 import org.apache.commons.collections4.map.HashedMap;
@@ -38,6 +40,7 @@ import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirec
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
+import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
@@ -204,7 +207,12 @@ public class RegistryComponent implements IComponent {
 	private HttpServlet createTaggedRegistryServlet() {
 		throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory();
 		logger.info("Enable tagged directory functionality");
-		IAASTaggedDirectory taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+		IAASTaggedDirectory taggedDirectory;
+		if (registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB)) {
+			taggedDirectory = new MongoDBTaggedDirectory(loadMongoDBConfiguration(), new HashMap<>());
+		} else {
+			taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+		}
 		IAASTaggedDirectory decoratedDirectory = decorateTaggedDirectory(taggedDirectory);
 		return new TaggedDirectoryServlet(decoratedDirectory);
 	}
@@ -274,7 +282,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {
-		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB) || registryConfig.isAuthorizationEnabled());
+		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.isAuthorizationEnabled());
 	}
 
 	@Override
