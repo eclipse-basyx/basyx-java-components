@@ -432,9 +432,13 @@ public class AASServerComponent implements IComponent {
 		aasBundles = loadAASFromSource(aasConfig.getAASSourceAsList());
 		
 		if (aasBundles != null) {
-			CodeAuthentication.setCodeAuthentication();
+			try {
+				CodeAuthentication.setCodeAuthentication();
 
-			AASBundleHelper.integrate(aggregator, aasBundles);
+				AASBundleHelper.integrate(aggregator, aasBundles);
+			} finally {
+				CodeAuthentication.unsetCodeAuthentication();
+			}
 		}
 
 		if (isAASXUploadEnabled) {
