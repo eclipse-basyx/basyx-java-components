@@ -18,6 +18,7 @@
 			of the public void main(String[]). It is needed when building the jar in 
 			the maven-jar-plugin (see basyx.components.docker/pom.xml) -->
 		<basyx.components.executable>org.eclipse.basyx.components.aas.executable.AASServerExecutable</basyx.components.executable>
+		<jackson.version>2.13.4</jackson.version>
 	</properties>
 
 	<packaging>jar</packaging>
@@ -110,6 +111,10 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -119,6 +124,27 @@
 			<version>1.2.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mdanish98.keycloakmock</groupId>
+            <artifactId>mock</artifactId>
+            <version>0.14.0</version>
+        </dependency>        
 	</dependencies>
 
 	<profiles>
