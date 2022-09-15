@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-slim-bullseye
+FROM openjdk:11-slim-bullseye
 
 # Install dependency for wait-for-it-env.sh
 RUN apt update && apt install -y jq && apt clean
