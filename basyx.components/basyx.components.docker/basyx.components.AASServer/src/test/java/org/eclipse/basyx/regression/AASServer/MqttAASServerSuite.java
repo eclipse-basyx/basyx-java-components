@@ -15,11 +15,14 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelper;
+import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelperV2;
 import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIHelper;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregatorHelper;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.testsuite.regression.extensions.shared.mqtt.MqttTestListener;
+import org.eclipse.basyx.vab.coder.json.serialization.DefaultTypeFactory;
+import org.eclipse.basyx.vab.coder.json.serialization.GSONTools;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -77,11 +80,12 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 
 		manager.createAAS(shell, getURL());
 
-		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);
+		assertEquals(MqttAASAggregatorHelperV2.createCreateAASTopic("aas-repository"), listener.lastTopic);
+		
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
 		manager.deleteAAS(shellIdentifier);
-		assertEquals(MqttAASAggregatorHelper.TOPIC_DELETEAAS, listener.lastTopic);
+		assertEquals(MqttAASAggregatorHelperV2.createDeleteAASTopic("aas-repository"), listener.lastTopic);
 		try {
 			manager.retrieveAAS(shellIdentifier);
 			fail();
@@ -135,5 +139,11 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 		IResourceLoader classpathLoader = new ClasspathResourceLoader();
 		final IConfig classPathConfig = new ResourceLoaderConfig(classpathLoader);
 		mqttBroker.startServer(classPathConfig);
+	}
+	
+	private String serialize(Object payload) {
+		GSONTools tools = new GSONTools(new DefaultTypeFactory(), false, false);
+		
+		return tools.serialize(payload);
 	}
 }

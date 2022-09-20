@@ -27,10 +27,10 @@ package org.eclipse.basyx.components.aas.mqtt;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttDecoratingAASAggregatorFactory;
+import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttDecoratingAASAggregatorFactoryV2;
 import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactory;
-import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactoryV2;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactoryV2;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -52,12 +52,12 @@ public class MqttAASServerDecorator implements IAASServerDecorator {
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new MqttDecoratingSubmodelAPIFactory(submodelAPIFactory, client);
+		return new MqttDecoratingSubmodelAPIFactoryV2(submodelAPIFactory, client);
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new MqttDecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client);
+		return new MqttDecoratingSubmodelAggregatorFactoryV2(submodelAggregatorFactory, client);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MqttAASServerDecorator implements IAASServerDecorator {
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new MqttDecoratingAASAggregatorFactory(aasAggregatorFactory, client);
+		return new MqttDecoratingAASAggregatorFactoryV2(aasAggregatorFactory, client);
 	}
 
 }
