@@ -66,6 +66,6 @@ public class RegistryExecutable {
 	}
 
 	private static boolean isMqttBackendSelected(BaSyxRegistryConfiguration registryConfig) {
-		return registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT);
+		return registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT) || registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2);
 	}
 }

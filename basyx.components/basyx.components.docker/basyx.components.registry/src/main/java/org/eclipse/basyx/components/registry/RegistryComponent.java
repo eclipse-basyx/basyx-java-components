@@ -39,10 +39,13 @@ import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
+import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
+import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactoryV2;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
+import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactoryV2;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
@@ -221,7 +224,13 @@ public class RegistryComponent implements IComponent {
 		IAASTaggedDirectory decoratedTaggedDirectory = taggedDirectory;
 		if (this.mqttConfig != null) {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
+			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
+				decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
+				logger.info("MQTT event backend for " + taggedDirectory.getRegistryId());
+			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
+				decoratedTaggedDirectory = new MqttTaggedDirectoryFactoryV2().create(decoratedTaggedDirectory, mqttConfig);
+				logger.info("MQTTV2 event backend for " + taggedDirectory.getRegistryId());
+			}
 		}
 		if (registryConfig.isAuthorizationEnabled()) {
 			logger.info("Authorization enabled for TaggedDirectory.");
@@ -271,7 +280,13 @@ public class RegistryComponent implements IComponent {
 		IAASRegistry decoratedRegistry = aasRegistry;
 		if (this.mqttConfig != null) {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
+			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
+				decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
+				logger.info("MQTT event backend for " + aasRegistry.getRegistryId());
+			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
+				decoratedRegistry = new MqttRegistryFactoryV2().create(decoratedRegistry, this.mqttConfig);
+				logger.info("MQTTV2 event backend for " + aasRegistry.getRegistryId());
+			}
 		}
 		if (this.registryConfig.isAuthorizationEnabled()) {
 			logger.info("Enable Authorization for Registry");

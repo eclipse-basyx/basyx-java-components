@@ -22,51 +22,29 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.configuration;
 
-import org.eclipse.basyx.submodel.metamodel.enumhelper.StandardizedLiteralEnumHelper;
+package org.eclipse.basyx.components.registry.mqtt;
 
-import com.google.common.base.Strings;
+import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryService;
+import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryServiceV2;
 
 /**
- * Possible types for Registry event backends.
+ * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
+ * implementations
  * 
  * @author espen
- *
+ * 
  */
-public enum RegistryEventBackend {
-	NONE("NONE"), MQTT("MQTT"), MQTTV2("MQTTV2");
-
-	private String literal;
-
-	private RegistryEventBackend(String literal) {
-		this.literal = literal;
+public class MqttTaggedDirectoryFactoryV2 extends MqttRegistryFactoryV2 {
+	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
+		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig);
 	}
 
-	@Override
-	public String toString() {
-		return literal;
-	}
-
-	/**
-	 * Method to transform string literal to Registry event enum.
-	 * 
-	 * @see StandardizedLiteralEnumHelper StandardizedLiteralEnumHelper
-	 * 
-	 * @param literal
-	 * @return
-	 */
-	public static RegistryEventBackend fromString(String literal) {
-		if (Strings.isNullOrEmpty(literal)) {
-			return null;
-		}
-
-		RegistryEventBackend[] enumConstants = RegistryEventBackend.class.getEnumConstants();
-		for (RegistryEventBackend constant : enumConstants) {
-			if (constant.toString().equals(literal)) {
-				return constant;
-			}
-		}
-		throw new IllegalArgumentException("The literal '" + literal + "' is not a valid EventBackend");
+	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
+		ObservableAASTaggedDirectoryServiceV2 observedAPI = new ObservableAASTaggedDirectoryServiceV2(taggedDirectory);
+		addAASRegistryServiceObserver(observedAPI, mqttConfig);
+		return observedAPI;
 	}
 }
