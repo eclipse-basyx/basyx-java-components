@@ -80,12 +80,12 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 
 		manager.createAAS(shell, getURL());
 
-		assertEquals(MqttAASAggregatorHelperV2.createCreateAASTopic("aas-repository"), listener.lastTopic);
+		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);
 		
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
 		manager.deleteAAS(shellIdentifier);
-		assertEquals(MqttAASAggregatorHelperV2.createDeleteAASTopic("aas-repository"), listener.lastTopic);
+		assertEquals(MqttAASAggregatorHelper.TOPIC_DELETEAAS, listener.lastTopic);
 		try {
 			manager.retrieveAAS(shellIdentifier);
 			fail();
@@ -139,11 +139,5 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 		IResourceLoader classpathLoader = new ClasspathResourceLoader();
 		final IConfig classPathConfig = new ResourceLoaderConfig(classpathLoader);
 		mqttBroker.startServer(classPathConfig);
-	}
-	
-	private String serialize(Object payload) {
-		GSONTools tools = new GSONTools(new DefaultTypeFactory(), false, false);
-		
-		return tools.serialize(payload);
 	}
 }
