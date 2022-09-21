@@ -28,7 +28,6 @@ package org.eclipse.basyx.components.registry.mqtt;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryService;
-import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryServiceV2;
 
 /**
  * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
@@ -43,7 +42,7 @@ public class MqttTaggedDirectoryFactory extends MqttRegistryFactory {
 	}
 
 	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
-		ObservableAASTaggedDirectoryServiceV2 observedAPI = new ObservableAASTaggedDirectoryServiceV2(taggedDirectory);
+		ObservableAASTaggedDirectoryService observedAPI = new ObservableAASTaggedDirectoryService(taggedDirectory);
 		addAASRegistryServiceObserver(observedAPI, mqttConfig);
 		return observedAPI;
 	}
