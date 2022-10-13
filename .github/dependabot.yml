@@ -35,8 +35,3 @@ updates:
     directory: "/basyx.components/basyx.components.docker/basyx.components.registry/"
     schedule:
       interval: "daily"
-
-
-
-
-
