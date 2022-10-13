@@ -141,10 +141,11 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.mdanish98.keycloakmock</groupId>
-            <artifactId>mock</artifactId>
-            <version>0.14.0</version>
-        </dependency>        
+		    <groupId>com.tngtech.keycloakmock</groupId>
+		    <artifactId>mock</artifactId>
+		    <scope>test</scope>
+		    <version>0.11.0</version>
+		</dependency>  
 	</dependencies>
 
 	<profiles>
