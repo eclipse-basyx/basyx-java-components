@@ -332,7 +332,7 @@ public class AASServerComponent implements IComponent {
 	 * @return
 	 */
 	public String getURL() {
-		return contextConfig.getUrl();
+		return getComponentBasePath();
 	}
 
 	@Override
