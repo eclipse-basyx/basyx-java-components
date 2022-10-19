@@ -332,7 +332,11 @@ public class AASServerComponent implements IComponent {
 	 * @return
 	 */
 	public String getURL() {
-		return contextConfig.getUrl();
+		String basePath = aasConfig.getHostpath();
+		if (basePath.isEmpty()) {
+			return contextConfig.getUrl();
+		}
+		return basePath;
 	}
 
 	@Override
@@ -569,7 +573,7 @@ public class AASServerComponent implements IComponent {
 			return;
 		}
 
-		String baseUrl = getComponentBasePath();
+		String baseUrl = getURL();
 		String aggregatorPath = VABPathTools.concatenatePaths(baseUrl, AASAggregatorProvider.PREFIX);
 		AASBundleHelper.register(registry, aasBundles, aggregatorPath);
 	}
@@ -606,7 +610,7 @@ public class AASServerComponent implements IComponent {
 	private String getSMEndpoint(IIdentifier smId) {
 		String aasId = getAASIdFromSMId(smId);
 		String encodedAASId = VABPathTools.encodePathElement(aasId);
-		String aasBasePath = VABPathTools.concatenatePaths(getComponentBasePath(), encodedAASId, "aas");
+		String aasBasePath = VABPathTools.concatenatePaths(getURL(), encodedAASId, "aas");
 		String smIdShort = getSMIdShortFromSMId(smId);
 		return VABPathTools.concatenatePaths(aasBasePath, "submodels", smIdShort, "submodel");
 	}
@@ -631,14 +635,6 @@ public class AASServerComponent implements IComponent {
 			}
 		}
 		throw new ResourceNotFoundException("Submodel in registry whitelist does not belong to any AAS in AASBundle");
-	}
-
-	private String getComponentBasePath() {
-		String basePath = aasConfig.getHostpath();
-		if (basePath.isEmpty()) {
-			return contextConfig.getUrl();
-		}
-		return basePath;
 	}
 
 	/**
