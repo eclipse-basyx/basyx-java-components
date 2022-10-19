@@ -50,7 +50,6 @@ import org.eclipse.basyx.aas.factory.aasx.FileLoaderHelper;
 import org.eclipse.basyx.aas.factory.aasx.SubmodelFileEndpointLoader;
 import org.eclipse.basyx.aas.factory.json.JSONAASBundleFactory;
 import org.eclipse.basyx.aas.factory.xml.XMLAASBundleFactory;
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
@@ -83,8 +82,6 @@ import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
-import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
@@ -123,8 +120,6 @@ public class AASServerComponent implements IComponent {
 	private boolean isAASXUploadEnabled = false;
 	
 	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
-	
-	private ConnectedAssetAdministrationShellManager manager;
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -224,10 +219,6 @@ public class AASServerComponent implements IComponent {
 	public void startComponent() {
 		logger.info("Create the server...");
 		registry = createRegistryFromConfig(aasConfig);
-		
-		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
-		
-		manager = new ConnectedAssetAdministrationShellManager(registry, connectorFactory);
 
 		loadAASServerFeaturesFromConfig();
 		initializeAASServerFeatures();
