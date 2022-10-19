@@ -40,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
@@ -78,6 +79,7 @@ import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXU
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
+import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
@@ -272,23 +274,33 @@ public class AASServerComponent implements IComponent {
 
 	private void registerAAS(IAssetAdministrationShell aas) {
 		try {
-			manager.createAAS((AssetAdministrationShell) aas, getURL());
+			String combinedEndpoint = getAASAccessPath(aas);
+			registry.register(new AASDescriptor(aas, combinedEndpoint));
 			logger.info("The AAS " + aas.getIdShort() + " is Successfully Registered from DB");
 		} catch(Exception e) {
 			logger.info("The AAS " + aas.getIdShort() + " could not be Registered from DB" + e);
 		}
 	}
 
+	private String getAASAccessPath(IAssetAdministrationShell aas) {
+		return VABPathTools.concatenatePaths(getURL(), AASAggregatorAPIHelper.getAASAccessPath(aas.getIdentification()));
+	}
+
 	private void registerSubmodels(IAssetAdministrationShell aas) {
 		List<ISubmodel> submodels = getSubmodelFromAggregator(aggregator, aas.getIdentification());
 		try {
-			submodels.stream().forEach(submodel -> manager.createSubmodel(aas.getIdentification(), (Submodel) submodel));
+			submodels.stream().forEach(submodel -> registerSubmodel(aas, submodel));
 			logger.info("The submodels from AAS " + aas.getIdShort() + " are Successfully Registered from DB");
 		} catch(Exception e) {
 			logger.info("The submodel from AAS " + aas.getIdShort() + " could not be Registered from DB " + e);
 		}
 	}
 	
+	private void registerSubmodel(IAssetAdministrationShell aas, ISubmodel submodel) {
+		String smEndpoint = VABPathTools.concatenatePaths(getAASAccessPath(aas), AssetAdministrationShell.SUBMODELS, submodel.getIdShort(), SubmodelProvider.SUBMODEL);
+		registry.register(aas.getIdentification(), new SubmodelDescriptor(submodel, smEndpoint));
+	}
+
 	private List<ISubmodel> getSubmodelFromAggregator(IAASAggregator aggregator, IIdentifier iIdentifier) {
 		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(iIdentifier);
 
