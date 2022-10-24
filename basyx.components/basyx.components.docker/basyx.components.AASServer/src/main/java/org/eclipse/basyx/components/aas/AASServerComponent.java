@@ -63,7 +63,6 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
-import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -75,6 +74,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
+import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -317,10 +317,6 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
 		}
 
-		if (aasConfig.isAuthorizationEnabled()) {
-			addAASServerFeature(new AuthorizedAASServerFeature());
-		}
-
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
@@ -544,6 +540,11 @@ public class AASServerComponent implements IComponent {
 		if (registryUrl == null || registryUrl.isEmpty()) {
 			return null;
 		}
+		
+		if(aasConfig.isAuthorizationEnabled()) {
+			return new AuthorizedAASRegistryProxy(registryUrl, aasConfig.configureAndGetAuthorizationSupplier());
+		}
+		
 		// Load registry url from config
 		logger.info("Registry loaded at \"" + registryUrl + "\"");
 		return new AASRegistryProxy(registryUrl);
