@@ -25,7 +25,8 @@
 package org.eclipse.basyx.components.configuration.exception;
 
 /**
- * Used to indicate that the Authorization is disabled
+ * Used to indicate that the required authorization credentials configuration is
+ * missing
  * 
  * @author danish
  *
@@ -33,10 +34,9 @@ package org.eclipse.basyx.components.configuration.exception;
 public class AuthorizationConfigurationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public AuthorizationConfigurationException(String message) {
 		super(message);
 	}
-	
 
 }
