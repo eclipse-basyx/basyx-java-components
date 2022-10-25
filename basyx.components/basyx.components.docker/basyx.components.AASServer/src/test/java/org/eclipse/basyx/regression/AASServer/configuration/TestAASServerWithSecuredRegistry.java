@@ -37,7 +37,7 @@ import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.configuration.exception.AuthorizationDisabledException;
+import org.eclipse.basyx.components.configuration.exception.AuthorizationConfigurationException;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
@@ -51,6 +51,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.tngtech.keycloakmock.api.KeycloakMock;
 
 /**
@@ -100,14 +101,14 @@ public class TestAASServerWithSecuredRegistry {
 		manager.retrieveAAS(assetAdministrationShell.getIdentification()).getIdShort();
 	}
 	
-	@Test(expected = AuthorizationDisabledException.class)
-	public void exceptionShouldBeThrownWhenAuthorizationIsDisabled() {
+	@Test(expected = AuthorizationConfigurationException.class)
+	public void exceptionShouldBeThrownWhenAuthorizationCredentialsForSecuredRegistryIsNotConfigured() {
 		startRegistryServer();
 		
 		configureAndStartKeyCloakMockServer(clientScopes);
 		
 		BaSyxAASServerConfiguration aasContextConfig = configureAndStartAASServerComponent();
-		aasContextConfig.disableAuthorization();
+		aasContextConfig.setTokenEndpoint("");
 		
 		createAuthorizedAASRegistryProxy(aasContextConfig);
 	}
@@ -189,8 +190,7 @@ public class TestAASServerWithSecuredRegistry {
 		/* The below instantiation of keyCloakMock is commented because the changes in Keycloak mock is pending, 
 		 * once the changes is merged uncomment this and delete the null declaration of keyCloakMock*/
 		
-		// keyCloakMock = new KeycloakMock(aServerConfig().withPort(9006).withDefaultRealm("basyx-demo").withClientScopes(scopes).build());
-		
+//		keyCloakMock = new KeycloakMock(aServerConfig().withPort(9006).withDefaultRealm("basyx-demo").withClientScopes(scopes).build());
 		keyCloakMock = null;
 		
 	    keyCloakMock.start();
@@ -218,11 +218,11 @@ public class TestAASServerWithSecuredRegistry {
 		return new AuthorizedAASRegistryProxy(REGISTRYPATH, aasContextConfig.configureAndGetAuthorizationSupplier());
 	}
 
-	private static void stopServices() {
-		keyCloakMock.stop();
-		
+	private static void stopServices() {	
 		aasServerComponent.stopComponent();
 		
 		registryComponent.stopComponent();
+		
+		keyCloakMock.stop();
 	}
 }

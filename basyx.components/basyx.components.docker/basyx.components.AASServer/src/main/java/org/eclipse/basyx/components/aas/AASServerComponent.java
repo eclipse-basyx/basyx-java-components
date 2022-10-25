@@ -63,6 +63,7 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -317,6 +318,10 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
 		}
 
+		if (aasConfig.isAuthorizationEnabled()) {
+			addAASServerFeature(new AuthorizedAASServerFeature());
+		}
+
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
@@ -541,7 +546,7 @@ public class AASServerComponent implements IComponent {
 			return null;
 		}
 		
-		if(aasConfig.isAuthorizationEnabled()) {
+		if(aasConfig.isAuthorizationCredentialsForSecuredRegistryConfigured()) {
 			return new AuthorizedAASRegistryProxy(registryUrl, aasConfig.configureAndGetAuthorizationSupplier());
 		}
 		

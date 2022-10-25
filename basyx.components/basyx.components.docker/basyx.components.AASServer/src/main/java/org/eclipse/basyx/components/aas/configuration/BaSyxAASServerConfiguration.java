@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
-import org.eclipse.basyx.components.configuration.exception.AuthorizationDisabledException;
+import org.eclipse.basyx.components.configuration.exception.AuthorizationConfigurationException;
 import org.eclipse.basyx.vab.protocol.http.connector.IAuthorizationSupplier;
 import org.eclipse.basyx.vab.protocol.http.connector.OAuth2ClientCredentialsBasedAuthorizationSupplier;
 
@@ -181,8 +181,8 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 	
 	public IAuthorizationSupplier configureAndGetAuthorizationSupplier() {
-		if(!isAuthorizationEnabled()) {
-			throw new AuthorizationDisabledException("Authorization is disabled");
+		if(!isAuthorizationCredentialsForSecuredRegistryConfigured()) {
+			throw new AuthorizationConfigurationException("Authorization credentials for the secured registry is not configured");
 		}
 		
 		return new OAuth2ClientCredentialsBasedAuthorizationSupplier(getTokenEndpoint(), getClientId(), getClientSecret(), getClientScopes());
@@ -344,5 +344,25 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	
 	public void setClientScopes(String clientScopes) {
 		setProperty(CLIENT_SCOPES, clientScopes);
+	}
+	
+	public boolean isAuthorizationCredentialsForSecuredRegistryConfigured() {
+		return isTokenEndpointConfigured() && isClientIdConfigured() && isClientSecretConfigured() && isScopeConfigured();
+	}
+
+	private boolean isTokenEndpointConfigured() {
+		return getProperty(TOKEN_ENDPOINT) != null && !getProperty(TOKEN_ENDPOINT).isEmpty();
+	}
+	
+	private boolean isClientIdConfigured() {
+		return getProperty(CLIENT_ID) != null && !getProperty(CLIENT_ID).isEmpty();
+	}
+
+	private boolean isClientSecretConfigured() {
+		return getProperty(CLIENT_SECRET) != null && !getProperty(CLIENT_SECRET).isEmpty();
+	}
+	
+	private boolean isScopeConfigured() {
+		return getProperty(CLIENT_SCOPES) != null && !getProperty(CLIENT_SCOPES).isEmpty();
 	}
 }

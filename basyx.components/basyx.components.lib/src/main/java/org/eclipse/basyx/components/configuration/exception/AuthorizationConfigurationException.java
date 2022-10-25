@@ -30,11 +30,11 @@ package org.eclipse.basyx.components.configuration.exception;
  * @author danish
  *
  */
-public class AuthorizationDisabledException extends RuntimeException {
+public class AuthorizationConfigurationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	
-	public AuthorizationDisabledException(String message) {
+	public AuthorizationConfigurationException(String message) {
 		super(message);
 	}
 	
