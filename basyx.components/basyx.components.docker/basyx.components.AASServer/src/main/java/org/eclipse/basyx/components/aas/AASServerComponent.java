@@ -546,14 +546,18 @@ public class AASServerComponent implements IComponent {
 			return null;
 		}
 		
-		if(aasConfig.isAuthorizationCredentialsForSecuredRegistryConfigured()) {
-			return new AuthorizedAASRegistryProxy(registryUrl, aasConfig.configureAndGetAuthorizationSupplier());
-		}
-		
 		// Load registry url from config
 		logger.info("Registry loaded at \"" + registryUrl + "\"");
-		return new AASRegistryProxy(registryUrl);
+		
+		if(shouldUseSecuredRegistryConnection(aasConfig)) {
+			return new AuthorizedAASRegistryProxy(registryUrl, aasConfig.configureAndGetAuthorizationSupplier());
+		} else {
+			return new AASRegistryProxy(registryUrl);
+		}
+	}
 
+	private boolean shouldUseSecuredRegistryConnection(BaSyxAASServerConfiguration aasConfig) {
+		return aasConfig.isAuthorizationCredentialsForSecuredRegistryConfigured();
 	}
 
 	private void registerEnvironment() {

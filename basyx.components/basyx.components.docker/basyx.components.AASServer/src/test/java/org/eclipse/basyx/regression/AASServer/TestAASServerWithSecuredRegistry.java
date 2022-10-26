@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.regression.AASServer.configuration;
+package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -43,6 +43,7 @@ import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfigur
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.extensions.aas.manager.authorized.AuthorizedConnectedAASManager;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
@@ -67,6 +68,8 @@ public class TestAASServerWithSecuredRegistry {
 	
 	private static KeycloakMock keyCloakMock;
 	
+	private static IIdentifier aasId = new Identifier(IdentifierType.CUSTOM, "CustomTestAAS");
+	private static IAASRegistry registry;
 	private static AASServerComponent aasServerComponent;
 	private static IComponent registryComponent;
 	private static AuthorizedConnectedAASManager manager;
@@ -85,13 +88,11 @@ public class TestAASServerWithSecuredRegistry {
 		
 		assetAdministrationShell = createAASAndSubmodel(manager);
 		
-		String aasIdshort = manager.retrieveAAS(assetAdministrationShell.getIdentification()).getIdShort();
-		
-		assertEquals(AAS_IDSHORT, aasIdshort);
+		assertEquals(aasId, registry.lookupAAS(aasId).getIdentifier());
 	}
 	
 	@Test(expected = ProviderException.class)
-	public void exceptionShouldBeThrownWhenNotProvidingRequiredClientScope() {
+	public void exceptionThrownWhenNotProvidingRequiredClientScope() {
 		removeAClientScope();
 		
 		configureAndStartServices();
@@ -102,7 +103,7 @@ public class TestAASServerWithSecuredRegistry {
 	}
 	
 	@Test(expected = AuthorizationConfigurationException.class)
-	public void exceptionShouldBeThrownWhenAuthorizationCredentialsForSecuredRegistryIsNotConfigured() {
+	public void exceptionThrownWhenAuthorizationCredentialsForSecuredRegistryIsNotConfigured() {
 		startRegistryServer();
 		
 		configureAndStartKeyCloakMockServer(clientScopes);
@@ -152,7 +153,7 @@ public class TestAASServerWithSecuredRegistry {
 	}
 
 	private static AssetAdministrationShell createAASAndSubmodel(AuthorizedConnectedAASManager manager) {
-		AssetAdministrationShell assetAdministrationShell = new AssetAdministrationShell(AAS_IDSHORT, new Identifier(IdentifierType.CUSTOM, "CustomTestAAS"), new Asset());
+		AssetAdministrationShell assetAdministrationShell = new AssetAdministrationShell(AAS_IDSHORT, aasId, new Asset());
 		
 		Submodel submodel = new Submodel("TestSubmodel", new Identifier(IdentifierType.CUSTOM, "CustomTestSubmodel"));
 		
@@ -171,8 +172,8 @@ public class TestAASServerWithSecuredRegistry {
 		
 		BaSyxAASServerConfiguration aasContextConfig = configureAndStartAASServerComponent();
 		
-		IAASRegistry registry = createAuthorizedAASRegistryProxy(aasContextConfig);
-		manager = createAuthorizedConnectedAASManager(aasContextConfig, registry);
+		registry = createAuthorizedAASRegistryProxy(aasContextConfig);
+		manager = createAuthorizedConnectedAASManager(aasContextConfig);
 	}
 	
 	private static void startRegistryServer() {
@@ -210,7 +211,7 @@ public class TestAASServerWithSecuredRegistry {
 	}
 	
 	private static AuthorizedConnectedAASManager createAuthorizedConnectedAASManager(
-			BaSyxAASServerConfiguration aasContextConfig, IAASRegistry registry) {
+			BaSyxAASServerConfiguration aasContextConfig) {
 		return new AuthorizedConnectedAASManager(registry, aasContextConfig.configureAndGetAuthorizationSupplier());
 	}
 
