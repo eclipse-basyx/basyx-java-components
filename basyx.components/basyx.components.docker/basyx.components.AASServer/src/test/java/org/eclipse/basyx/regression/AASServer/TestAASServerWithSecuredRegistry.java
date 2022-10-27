@@ -155,7 +155,7 @@ public class TestAASServerWithSecuredRegistry {
 
 	private static void startAASServerComponent(BaSyxContextConfiguration contextConfig,
 			BaSyxAASServerConfiguration aasContextConfig) {
-		aasServerComponent = new AASServerComponent(contextConfig ,aasContextConfig);
+		aasServerComponent = new AASServerComponent(contextConfig, aasContextConfig);
 		aasServerComponent.startComponent();
 	}
 
