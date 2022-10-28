@@ -119,6 +119,12 @@
 			<version>1.3.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>com.tngtech.keycloakmock</groupId>
+		    <artifactId>mock</artifactId>
+		    <scope>test</scope>
+		    <version>0.11.0</version>
+		</dependency>  
 	</dependencies>
 
 	<profiles>

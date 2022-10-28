@@ -75,6 +75,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
+import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -544,10 +545,19 @@ public class AASServerComponent implements IComponent {
 		if (registryUrl == null || registryUrl.isEmpty()) {
 			return null;
 		}
+		
 		// Load registry url from config
 		logger.info("Registry loaded at \"" + registryUrl + "\"");
-		return new AASRegistryProxy(registryUrl);
+		
+		if(shouldUseSecuredRegistryConnection(aasConfig)) {
+			return new AuthorizedAASRegistryProxy(registryUrl, aasConfig.configureAndGetAuthorizationSupplier());
+		} else {
+			return new AASRegistryProxy(registryUrl);
+		}
+	}
 
+	private boolean shouldUseSecuredRegistryConnection(BaSyxAASServerConfiguration aasConfig) {
+		return aasConfig.isAuthorizationCredentialsForSecuredRegistryConfigured();
 	}
 
 	private void registerEnvironment() {
