@@ -71,7 +71,7 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-sync</artifactId>
-			<version>4.2.3</version>
+			<version>4.7.2</version>
 		</dependency>
 
 		<!-- Use Spring Data MongoDB for db data management -->
