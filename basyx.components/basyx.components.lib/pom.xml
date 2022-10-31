@@ -72,13 +72,13 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.23</version>
+			<version>42.5.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.camunda.bpm</groupId>
 			<artifactId>camunda-engine</artifactId>
-			<version>7.15.0</version>
+			<version>7.18.0</version>
 		</dependency>
 
 		<dependency>

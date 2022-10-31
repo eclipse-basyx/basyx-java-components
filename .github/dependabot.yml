@@ -11,27 +11,32 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    target-branch: "development"
 
   # Maintain dependencies for Maven
   - package-ecosystem: "maven"
     directory: "/basyx.components/"
     schedule:
       interval: "daily"
+    target-branch: "development"
 
   # Maintain dependencies for Maven
   - package-ecosystem: "maven"
     directory: "/basyx.components/basyx.components.docker/"
     schedule:
       interval: "daily"
+    target-branch: "development"
 
   # Maintain dependencies for Maven
   - package-ecosystem: "maven"
     directory: "/basyx.components/basyx.components.docker/basyx.components.AASServer/"
     schedule:
       interval: "daily"
+    target-branch: "development"
 
   # Maintain dependencies for Maven
   - package-ecosystem: "maven"
     directory: "/basyx.components/basyx.components.docker/basyx.components.registry/"
     schedule:
       interval: "daily"
+    target-branch: "development"
