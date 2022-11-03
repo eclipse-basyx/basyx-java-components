@@ -1,4 +1,4 @@
-# Eclipse BaSyx Java Components
+# Eclipse BaSyx Java Components ![Docker Pulls](https://img.shields.io/docker/pulls/eclipsebasyx/aas-server?style=plastic)
 [![BaSyx Logo](https://www.eclipse.org/basyx/img/basyxlogo.png)](https://www.eclipse.org/basyx/)
 
 [![AAS Server javadoc](https://javadoc.io/badge2/org.eclipse.basyx/basyx.components.AASServer/javadoc.svg)](https://javadoc.io/doc/org.eclipse.basyx/basyx.components.AASServer) AAS Server 
