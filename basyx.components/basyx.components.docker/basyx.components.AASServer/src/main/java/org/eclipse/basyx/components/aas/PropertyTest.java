@@ -26,6 +26,7 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.AASLambdaPropertyHelper;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPI;
 import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
@@ -42,7 +43,7 @@ public class PropertyTest {
 		assetAdministrationShell.setIdShort("aasIdShort");
 		Property prop = new Property("test", 123);
 		Collection<IConstraint> qualifierCollection = new ArrayList<>();
-		qualifierCollection.add(new Qualifier("delegatedTo", "http://127.0.0.1:8083/delegator", "String", null));
+		qualifierCollection.add(new Qualifier("delegatedTo", "http://127.0.0.1:8083/delegator", "anyType", null));
 		
 		prop.setQualifiers(qualifierCollection);
         AASLambdaPropertyHelper.setLambdaValue(prop, PropertyTest::getPropertyValue, null);
@@ -126,6 +127,8 @@ public class PropertyTest {
 				logger.info("instance of Qualifier");
 				if(((Qualifier) iConstraint).getType().equals("delegatedTo") ) {
 					logger.info("Qualifier contains delgated to");
+					logger.info("Qualifier Value : " + ((Qualifier) iConstraint).getType());
+					logger.info("Qualifier Value : " + ((Qualifier) iConstraint).getValue());
 				}
 			}
 		}
