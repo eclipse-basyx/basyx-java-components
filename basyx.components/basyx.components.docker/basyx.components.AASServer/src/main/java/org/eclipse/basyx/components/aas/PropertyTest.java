@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.asn1.esf.SigPolicyQualifiers;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
@@ -21,6 +22,7 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IPro
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.ConnectedSubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.qualifiable.Qualifier;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.AASLambdaPropertyHelper;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
@@ -47,7 +49,7 @@ public class PropertyTest {
         
         Submodel testSm = new Submodel("testSm", new CustomId("Test"));
         SubmodelElementCollection smc = new SubmodelElementCollection("smc");
-        SubmodelElementCollection subSmc = new SubmodelElementCollection("subsmc");
+        SubmodelElementCollection subSmc = new SubmodelElementCollection("subsmc"); 
         subSmc.addSubmodelElement(prop);
         smc.addSubmodelElement(subSmc);
         testSm.addSubmodelElement(smc);
@@ -60,12 +62,7 @@ public class PropertyTest {
         ISubmodelElement smElement = api.getSubmodel().getSubmodelElement("smc");
         logger.info("Get SM : {}", api.getSubmodel());
         Map<String, ISubmodelElement> smElem = api.getSubmodel().getSubmodelElements();
-        for (var entry : smElem.entrySet()) {
-            logger.info(entry.getKey() + "/" + entry.getValue());
-            if(entry.getValue() instanceof SubmodelElementCollection) {
-            	logger.info("instance of SM ELEM COLL");
-            }
-        }
+        recursiveMet(smElem);
         
 //        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
         
@@ -96,11 +93,46 @@ public class PropertyTest {
 //        System.out.println(api.getSubmodel().getSubmodelElement("test"));
 	}
 
+	private static void recursiveMet(Map<String, ISubmodelElement> smElem) {
+		for (var entry : smElem.entrySet()) {
+            logger.info(entry.getKey() + "/" + entry.getValue());
+            if(entry.getValue() instanceof SubmodelElementCollection) {
+            	logger.info("instance of SM ELEM COLL");
+            	SubmodelElementCollection smElementCollection = (SubmodelElementCollection) entry.getValue();
+            	smElementCollection.getSubmodelElements();
+            	recursiveMet(smElementCollection.getSubmodelElements());
+            } else if(entry.getValue() instanceof SubmodelElement) {
+            	logger.info("instance of SM ELEM");
+            	handleSubmodelElementProperty(entry.getValue());
+            }
+        }
+	}
+
 //	private static void fetchSm(AssetAdministrationShell assetAdministrationShell) {
 //		IAASAPI aIaasapi = new VABAASAPI(new VABLambdaProvider(assetAdministrationShell));
 //		System.out.println("From AAS : " + aIaasapi.getAAS().getSubmodels());
 //		
 //	}
+
+	private static void handleSubmodelElementProperty(ISubmodelElement value) {
+		// TODO Auto-generated method stub
+		if(!(value instanceof Property)) {
+			return;
+		}
+		
+		Collection<IConstraint> qualifiers = value.getQualifiers();
+		for (IConstraint iConstraint : qualifiers) {
+			if(iConstraint instanceof Qualifier) {
+				logger.info("instance of Qualifier");
+				if(((Qualifier) iConstraint).getType().equals("delegatedTo") ) {
+					logger.info("Qualifier contains delgated to");
+				}
+			}
+		}
+//		if(qualifiers.contains("delegatedTo")) {
+//			logger.info("Qualifier contains delgated to");
+//		}
+	}
 
 	private static String getPropertyValue() {
 		URL url = null;
