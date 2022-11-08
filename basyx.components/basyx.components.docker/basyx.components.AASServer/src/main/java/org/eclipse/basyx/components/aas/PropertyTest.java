@@ -68,12 +68,12 @@ public class PropertyTest {
 //        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
         
         
-//        System.out.println("Going to sleep");
-//        Thread.sleep(30000);
+        System.out.println("Going to sleep");
+        Thread.sleep(30000);
         
-//        System.out.println("Woke up from sleep");
+        System.out.println("Woke up from sleep");
         
-//        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
+        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
         
 //        Collection<ISubmodelElement> submodelElements = api.getSubmodelElements();
 ////        Collection<ISubmodelElementCollection> smCollections = api.getSubmodelElements().stream().filter(e -> e instanceof ISubmodelElementCollection smec).map(e -> (SubmodelElementCollection) e).collect(Collectors.toList());
@@ -149,9 +149,9 @@ public class PropertyTest {
 		System.out.println("Authority : " + url.getRef());
 		System.out.println("Address : " + url.getHost());
 		System.out.println("Path : " + url.getPath());
-		HTTPConnector connector = new HTTPConnector("https://reqres.in");
+		HTTPConnector connector = new HTTPConnector("https://o8mwz.mocklab.io");
 //		System.out.println("Value : " + connector.getValue("/api/users/2"));
-		return connector.getValue("/api/users/2");
+		return connector.getValue("/v1/contacts/1234");
 	}
 
 }
