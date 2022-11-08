@@ -34,7 +34,7 @@ import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAAS
  * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
  * implementations
  * 
- * @author espen
+ * @author espen, siebert
  * 
  */
 public class MqttV2TaggedDirectoryFactory extends MqttV2RegistryFactory {

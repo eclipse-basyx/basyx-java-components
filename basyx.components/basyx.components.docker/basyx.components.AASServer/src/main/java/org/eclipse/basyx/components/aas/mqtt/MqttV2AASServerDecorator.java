@@ -39,7 +39,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
  * 
  * Decorator for Mqtt eventing of Submodel and Shell interactions
  * 
- * @author fischer, fried
+ * @author fischer, fried, siebert
  *
  */
 public class MqttV2AASServerDecorator implements IAASServerDecorator {

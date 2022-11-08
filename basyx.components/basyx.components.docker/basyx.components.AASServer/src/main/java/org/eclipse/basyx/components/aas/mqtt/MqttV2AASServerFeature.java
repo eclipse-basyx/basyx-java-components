@@ -39,7 +39,7 @@ import com.google.common.base.Strings;
  * 
  * Feature for Mqtt eventing of the AASServer
  * 
- * @author fischer, fried
+ * @author fischer, fried, siebert
  *
  */
 public class MqttV2AASServerFeature implements IAASServerFeature {

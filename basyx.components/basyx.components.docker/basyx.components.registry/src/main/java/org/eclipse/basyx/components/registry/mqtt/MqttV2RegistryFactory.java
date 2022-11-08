@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Factory for building a Mqtt-Registry model provider
  * 
- * @author espen
+ * @author espen, siebert
  * 
  */
 public class MqttV2RegistryFactory {
