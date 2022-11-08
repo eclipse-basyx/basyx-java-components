@@ -31,7 +31,7 @@ import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryService
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryServiceObserver;
-import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryServiceObserverV2;
+import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryServiceObserver;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -45,9 +45,9 @@ import org.slf4j.LoggerFactory;
  * @author espen
  * 
  */
-public class MqttRegistryFactoryV2 {
+public class MqttV2RegistryFactory {
 
-	private static Logger logger = LoggerFactory.getLogger(MqttRegistryFactoryV2.class);
+	private static Logger logger = LoggerFactory.getLogger(MqttV2RegistryFactory.class);
 	private static final String REGISTRY_CLIENT_ID = "aasRegistryClient";
 
 	public IAASRegistry create(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig) {
@@ -64,7 +64,7 @@ public class MqttRegistryFactoryV2 {
 		String brokerEndpoint = mqttConfig.getServer();
 		MqttClientPersistence mqttPersistence = getMqttPersistenceFromConfig(mqttConfig);
 		try {
-			MqttAASRegistryServiceObserverV2 mqttObserver = new MqttAASRegistryServiceObserverV2(brokerEndpoint, REGISTRY_CLIENT_ID, mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
+			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, REGISTRY_CLIENT_ID, mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
 			observedAPI.addObserver(mqttObserver);
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);

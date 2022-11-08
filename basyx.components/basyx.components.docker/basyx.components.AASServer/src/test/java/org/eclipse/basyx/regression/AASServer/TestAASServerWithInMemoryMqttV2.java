@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.junit.BeforeClass;
 
-public class TestAASServerWithInMemoryMqttV2 extends MqttAASServerSuiteV2 {
+public class TestAASServerWithInMemoryMqttV2 extends MqttV2AASServerSuite {
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		BaSyxAASServerConfiguration serverConfig = new BaSyxAASServerConfiguration();

@@ -43,9 +43,9 @@ import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
-import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactoryV2;
+import org.eclipse.basyx.components.registry.mqtt.MqttV2RegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
-import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactoryV2;
+import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
@@ -228,7 +228,7 @@ public class RegistryComponent implements IComponent {
 				decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
 				logger.info("MQTT event backend for " + taggedDirectory.getRegistryId());
 			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
-				decoratedTaggedDirectory = new MqttTaggedDirectoryFactoryV2().create(decoratedTaggedDirectory, mqttConfig);
+				decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, mqttConfig);
 				logger.info("MQTTV2 event backend for " + taggedDirectory.getRegistryId());
 			}
 		}
@@ -284,7 +284,7 @@ public class RegistryComponent implements IComponent {
 				decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
 				logger.info("MQTT event backend for " + aasRegistry.getRegistryId());
 			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
-				decoratedRegistry = new MqttRegistryFactoryV2().create(decoratedRegistry, this.mqttConfig);
+				decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig);
 				logger.info("MQTTV2 event backend for " + aasRegistry.getRegistryId());
 			}
 		}

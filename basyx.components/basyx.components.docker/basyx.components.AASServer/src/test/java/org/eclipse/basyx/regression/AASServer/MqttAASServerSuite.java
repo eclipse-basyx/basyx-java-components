@@ -3,9 +3,7 @@ package org.eclipse.basyx.regression.AASServer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
@@ -15,20 +13,16 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelper;
-import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelperV2;
 import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIHelper;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregatorHelper;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.testsuite.regression.extensions.shared.mqtt.MqttTestListener;
-import org.eclipse.basyx.vab.coder.json.serialization.DefaultTypeFactory;
-import org.eclipse.basyx.vab.coder.json.serialization.GSONTools;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-
 import io.moquette.broker.Server;
 import io.moquette.broker.config.ClasspathResourceLoader;
 import io.moquette.broker.config.IConfig;

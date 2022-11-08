@@ -37,7 +37,7 @@ import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAAS
  * @author espen
  * 
  */
-public class MqttTaggedDirectoryFactoryV2 extends MqttRegistryFactoryV2 {
+public class MqttV2TaggedDirectoryFactory extends MqttV2RegistryFactory {
 	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig) {
 		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig);
 	}

@@ -27,10 +27,10 @@ package org.eclipse.basyx.components.aas.mqtt;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttDecoratingAASAggregatorFactoryV2;
+import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2DecoratingAASAggregatorFactory;
 import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttDecoratingSubmodelAggregatorFactoryV2;
-import org.eclipse.basyx.extensions.submodel.mqtt.MqttDecoratingSubmodelAPIFactoryV2;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2DecoratingSubmodelAggregatorFactory;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttV2DecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -42,22 +42,22 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
  * @author fischer, fried
  *
  */
-public class MqttAASServerDecoratorV2 implements IAASServerDecorator {
+public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	private MqttClient client;
 
-	public MqttAASServerDecoratorV2(MqttClient client) {
+	public MqttV2AASServerDecorator(MqttClient client) {
 		this.client = client;
 	}
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new MqttDecoratingSubmodelAPIFactoryV2(submodelAPIFactory, client);
+		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client);
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new MqttDecoratingSubmodelAggregatorFactoryV2(submodelAggregatorFactory, client);
+		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MqttAASServerDecoratorV2 implements IAASServerDecorator {
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new MqttDecoratingAASAggregatorFactoryV2(aasAggregatorFactory, client);
+		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client);
 	}
 
 }

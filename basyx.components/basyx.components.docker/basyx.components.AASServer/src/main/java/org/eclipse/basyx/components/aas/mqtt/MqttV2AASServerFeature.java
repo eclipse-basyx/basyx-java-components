@@ -42,12 +42,12 @@ import com.google.common.base.Strings;
  * @author fischer, fried
  *
  */
-public class MqttAASServerFeatureV2 implements IAASServerFeature {
+public class MqttV2AASServerFeature implements IAASServerFeature {
 	private BaSyxMqttConfiguration mqttConfig;
 	private MqttClient client;
 	private String clientId;
 
-	public MqttAASServerFeatureV2(BaSyxMqttConfiguration mqttConfig, String clientId) {
+	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId) {
 		this.mqttConfig = mqttConfig;
 		this.clientId = clientId;
 	}
@@ -79,7 +79,7 @@ public class MqttAASServerFeatureV2 implements IAASServerFeature {
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		return new MqttAASServerDecoratorV2(client);
+		return new MqttV2AASServerDecorator(client);
 	}
 
 }
