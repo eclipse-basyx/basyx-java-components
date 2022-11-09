@@ -198,11 +198,12 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private HttpServlet createRegistryServlet() {
-		if (this.registryConfig.isTaggedDirectoryEnabled()) {
+		if (!this.registryConfig.isTaggedDirectoryEnabled()) {
 			return createTaggedRegistryServlet();
 		}
 
 		IAASRegistry registryBackend = createRegistryBackend();
+		registryBackend.setRegistryId(this.registryConfig.getRegistryId());
 		IAASRegistry decoratedRegistry = decorate(registryBackend);
 		return new RegistryServlet(decoratedRegistry);
 	}
@@ -216,6 +217,7 @@ public class RegistryComponent implements IComponent {
 		} else {
 			taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
 		}
+		taggedDirectory.setRegistryId(this.registryConfig.getRegistryId());
 		IAASTaggedDirectory decoratedDirectory = decorateTaggedDirectory(taggedDirectory);
 		return new TaggedDirectoryServlet(decoratedDirectory);
 	}
