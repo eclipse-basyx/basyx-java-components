@@ -13,6 +13,8 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.extensions.submodel.delegation.DelegatedSubmodelAPI;
 import org.eclipse.basyx.extensions.submodel.delegation.DelegationDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.qualifiable.IConstraint;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.qualifiable.Qualifier;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
@@ -40,44 +42,25 @@ public class TestAASServerWithDelegation {
 	@BeforeClass
 	public static void init() {
 		Submodel submodel = new Submodel();
-		Property prop = new Property("test", 123);
+		Property prop = new Property("test", "abc");
 		Collection<IConstraint> qualifierCollection = new ArrayList<>();
-		qualifierCollection.add(new Qualifier("delegatedTo", "https://o8mwz.mocklab.io/v1/contacts/1234", "anyType", null));
+		qualifierCollection.add(new Qualifier("delegatedTo", "https://gorest.co.in/public/v2/posts/2441", "anyType", null));
 		prop.setQualifiers(qualifierCollection);
 		SubmodelElementCollection smc = new SubmodelElementCollection("smc");
 		smc.addSubmodelElement(prop);
-		submodel.addSubmodelElement(smc);
-//		submodelAPI.addSubmodelElement(smc);
+		submodel.addSubmodelElement(prop);
 		
-		DelegationAASServerFeature delegationAASServerFeature = new DelegationAASServerFeature();
-		DelegationAASServerDecorator decorator = (DelegationAASServerDecorator) delegationAASServerFeature.getDecorator();
-		DelegationDecoratingSubmodelAPIFactory delegationDecoratingSubmodelAPIFactory = (DelegationDecoratingSubmodelAPIFactory) decorator.decorateSubmodelAPIFactory(new VABSubmodelAPIFactory());
+		DelegationDecoratingSubmodelAPIFactory delegationDecoratingSubmodelAPIFactory = new DelegationDecoratingSubmodelAPIFactory(new VABSubmodelAPIFactory());
 		
 		submodelAPI = delegationDecoratingSubmodelAPIFactory.getSubmodelAPI(submodel);
-		
-//		delegatedSubmodelAPI = new DelegatedSubmodelAPI(submodelAPI);
 	}
 	
 	@Test
 	public void currentValueFromDelegatedEndpoint() {
-		logger.info("Current Value : {} ", ((SubmodelElementCollection) submodelAPI.getSubmodel().getSubmodelElement("smc")).getSubmodelElement("test").getValue());
-	}
-	
-	private static void startAASServerComponent(BaSyxContextConfiguration contextConfig,
-			BaSyxAASServerConfiguration aasContextConfig) {
-		aasServerComponent = new AASServerComponent(contextConfig, aasContextConfig);
-		aasServerComponent.startComponent();
-	}
-	
-	private static BaSyxAASServerConfiguration configureAASServer() {
-		BaSyxAASServerConfiguration aasContextConfig = new BaSyxAASServerConfiguration();
-		aasContextConfig.loadFromResource("aasServerPropertyDelegationConfig.properties");
-		return aasContextConfig;
-	}
-	
-	private static BaSyxContextConfiguration configureBasyxContext(String path) {
-		BaSyxContextConfiguration contextConfig= new BaSyxContextConfiguration();
-		contextConfig.loadFromResource(path);
-		return contextConfig;
+		ISubmodelElement smc = (ISubmodelElement) submodelAPI.getSubmodel().getSubmodelElement("test");
+//		int i = Integer.parseInt(smc.getValue().toString());
+		logger.info("Current Value : {} ", smc.getValue());
+//		logger.info("Current Value : {} ", smc.getSubmodelElement("test").getValue());
+//		logger.info("Full view : {} ", submodelAPI.getSubmodel().getSubmodelElement("smc").toString());
 	}
 }
