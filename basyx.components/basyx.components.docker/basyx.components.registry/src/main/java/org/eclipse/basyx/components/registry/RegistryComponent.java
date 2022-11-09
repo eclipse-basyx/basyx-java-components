@@ -203,7 +203,6 @@ public class RegistryComponent implements IComponent {
 		}
 
 		IAASRegistry registryBackend = createRegistryBackend();
-		registryBackend.setRegistryId(this.registryConfig.getRegistryId());
 		IAASRegistry decoratedRegistry = decorate(registryBackend);
 		return new RegistryServlet(decoratedRegistry);
 	}
@@ -217,7 +216,6 @@ public class RegistryComponent implements IComponent {
 		} else {
 			taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
 		}
-		taggedDirectory.setRegistryId(this.registryConfig.getRegistryId());
 		IAASTaggedDirectory decoratedDirectory = decorateTaggedDirectory(taggedDirectory);
 		return new TaggedDirectoryServlet(decoratedDirectory);
 	}
@@ -228,10 +226,10 @@ public class RegistryComponent implements IComponent {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
 				decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
-				logger.info("MQTT event backend for " + taggedDirectory.getRegistryId());
+				logger.info("MQTT event backend for " + this.registryConfig.getRegistryId());
 			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
-				decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, mqttConfig);
-				logger.info("MQTTV2 event backend for " + taggedDirectory.getRegistryId());
+				decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, mqttConfig, this.registryConfig);
+				logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
 			}
 		}
 		if (registryConfig.isAuthorizationEnabled()) {
@@ -284,10 +282,10 @@ public class RegistryComponent implements IComponent {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
 				decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
-				logger.info("MQTT event backend for " + aasRegistry.getRegistryId());
+				logger.info("MQTT event backend for " + this.registryConfig.getRegistryId());
 			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
-				decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig);
-				logger.info("MQTTV2 event backend for " + aasRegistry.getRegistryId());
+				decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig, this.registryConfig);
+				logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
 			}
 		}
 		if (this.registryConfig.isAuthorizationEnabled()) {

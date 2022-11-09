@@ -30,6 +30,7 @@ import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryService
 import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryServiceV2;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryServiceObserver;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryServiceObserver;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
@@ -50,12 +51,12 @@ public class MqttV2RegistryFactory {
 	private static Logger logger = LoggerFactory.getLogger(MqttV2RegistryFactory.class);
 	private static final String REGISTRY_CLIENT_ID = "aasRegistryClient";
 
-	public IAASRegistry create(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig) {
-		return wrapRegistryInMqttObserver(registry, mqttConfig);
+	public IAASRegistry create(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
+		return wrapRegistryInMqttObserver(registry, mqttConfig, registryConfig);
 	}
 
-	private static IAASRegistry wrapRegistryInMqttObserver(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig) {
-		ObservableAASRegistryServiceV2 observedAPI = new ObservableAASRegistryServiceV2(registry);
+	private static IAASRegistry wrapRegistryInMqttObserver(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
+		ObservableAASRegistryServiceV2 observedAPI = new ObservableAASRegistryServiceV2(registry, registryConfig.getRegistryId());
 		addAASRegistryServiceObserver(observedAPI, mqttConfig);
 		return observedAPI;
 	}
