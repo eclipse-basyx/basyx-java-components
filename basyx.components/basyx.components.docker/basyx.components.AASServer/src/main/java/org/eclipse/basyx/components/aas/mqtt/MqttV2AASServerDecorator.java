@@ -45,19 +45,21 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	private MqttClient client;
+	private String aasServerId;
 
-	public MqttV2AASServerDecorator(MqttClient client) {
+	public MqttV2AASServerDecorator(MqttClient client, String aasServerId) {
 		this.client = client;
+		this.aasServerId = aasServerId;
 	}
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client);
+		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client, this.aasServerId);
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client);
+		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client, this.aasServerId);
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client);
+		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client, this.aasServerId);
 	}
 
 }

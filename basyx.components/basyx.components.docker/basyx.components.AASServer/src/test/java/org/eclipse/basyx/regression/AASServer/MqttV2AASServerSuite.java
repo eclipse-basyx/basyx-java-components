@@ -96,7 +96,7 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 
 		component = new AASServerComponent(contextConfig, serverConfig);
-		component.addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "MqttAASServerSuiteClientId"));
+		component.addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "MqttAASServerSuiteClientId", "aas-server"));
 		component.startComponent();
 	}
 

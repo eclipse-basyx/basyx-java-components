@@ -46,10 +46,12 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 	private BaSyxMqttConfiguration mqttConfig;
 	private MqttClient client;
 	private String clientId;
+	private String aasServerId;
 
-	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId) {
+	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasServerId) {
 		this.mqttConfig = mqttConfig;
 		this.clientId = clientId;
+		this.aasServerId = aasServerId;
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		return new MqttV2AASServerDecorator(client);
+		return new MqttV2AASServerDecorator(client, this.aasServerId);
 	}
 
 }

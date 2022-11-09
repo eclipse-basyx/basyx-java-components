@@ -74,6 +74,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String REGISTRY = "registry.path";
 	public static final String HOSTPATH = "registry.host";
 	public static final String SUBMODELS = "registry.submodels";
+	public static final String ID = "aas.id";
 	public static final String BACKEND = "aas.backend";
 	public static final String SOURCE = "aas.source";
 	public static final String EVENTS = "aas.events";
@@ -186,6 +187,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		}
 		
 		return new OAuth2ClientCredentialsBasedAuthorizationSupplier(getTokenEndpoint(), getClientId(), getClientSecret(), getClientScopes());
+	}
+	
+	public String getAASId() {
+	  return getProperty(ID);
 	}
 
 	public AASServerBackend getAASBackend() {
