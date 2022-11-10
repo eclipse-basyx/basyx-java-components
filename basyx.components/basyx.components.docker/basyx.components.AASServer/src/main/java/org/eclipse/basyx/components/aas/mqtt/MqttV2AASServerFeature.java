@@ -56,23 +56,15 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 
 	@Override
 	public void initialize() {
+	  MqttAASServerFeature mqttAASServerFeature = new MqttAASServerFeature(mqttConfig, clientId);
 		try {
 			String serverEndpoint = mqttConfig.getServer();
-			MqttConnectOptions options = createMqttConnectOptions();
+			MqttConnectOptions options = mqttAASServerFeature.createMqttConnectOptions();
 			client = new MqttClient(serverEndpoint, clientId);
 			client.connect(options);
 		} catch (MqttException e) {
 			throw new ProviderException("moquette.conf Error ", e);
 		}
-	}
-
-	protected MqttConnectOptions createMqttConnectOptions() {
-		MqttConnectOptions options = new MqttConnectOptions();
-		if (!Strings.isNullOrEmpty(mqttConfig.getUser())) {
-			options.setUserName(mqttConfig.getUser());
-			options.setPassword(mqttConfig.getPass().toCharArray());
-		}
-		return options;
 	}
 
 	@Override
