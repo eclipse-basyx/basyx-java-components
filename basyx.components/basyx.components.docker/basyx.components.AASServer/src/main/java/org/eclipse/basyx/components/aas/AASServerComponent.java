@@ -316,13 +316,13 @@ public class AASServerComponent implements IComponent {
 		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
 			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 			mqttConfig.loadFromDefaultSource();
-			addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
+			addAASServerFeature(new MqttAASServerFeature(mqttConfig, mqttConfig.getClientId()));
 		}
 		
 		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTTV2)) {
 			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 			mqttConfig.loadFromDefaultSource();
-			addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "aasServerClientId", aasConfig.getAASId()));
+			addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, mqttConfig.getClientId(), aasConfig.getAASId()));
 		}
 		
 		if (aasConfig.isAuthorizationEnabled()) {
