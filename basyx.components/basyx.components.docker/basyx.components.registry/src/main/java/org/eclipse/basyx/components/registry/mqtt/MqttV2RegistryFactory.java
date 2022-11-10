@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 public class MqttV2RegistryFactory {
 
 	private static Logger logger = LoggerFactory.getLogger(MqttV2RegistryFactory.class);
-	private static final String REGISTRY_CLIENT_ID = "aasRegistryClient";
 
 	public IAASRegistry create(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
 		return wrapRegistryInMqttObserver(registry, mqttConfig, registryConfig);
@@ -65,7 +64,7 @@ public class MqttV2RegistryFactory {
 		String brokerEndpoint = mqttConfig.getServer();
 		MqttClientPersistence mqttPersistence = getMqttPersistenceFromConfig(mqttConfig);
 		try {
-			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, REGISTRY_CLIENT_ID, mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
+			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, mqttConfig.getClientId(), mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
 			observedAPI.addObserver(mqttObserver);
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);

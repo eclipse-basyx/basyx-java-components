@@ -56,6 +56,7 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	public static final String PERSISTENCE_PATH = "persistencepath";
 	public static final String WHITELIST_PREFIX = "whitelist.";
 	public static final String WHITELIST_ELEMENT_PREFIX = "whitelist.element.";
+	public static final String CLIENT_ID = "clientId";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "mqtt.properties";
@@ -203,5 +204,9 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 			String propName = smPrefix + "." + elemId;
 			setProperty(propName, "true");
 		}
+	}
+	
+	public String getClientId() {
+	  return getProperty(CLIENT_ID);
 	}
 }
