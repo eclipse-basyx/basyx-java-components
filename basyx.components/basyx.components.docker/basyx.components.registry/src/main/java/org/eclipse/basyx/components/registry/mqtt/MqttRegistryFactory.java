@@ -69,7 +69,7 @@ public class MqttRegistryFactory {
 		}
 	}
 
-	private static MqttClientPersistence getMqttPersistenceFromConfig(BaSyxMqttConfiguration config) {
+	protected static MqttClientPersistence getMqttPersistenceFromConfig(BaSyxMqttConfiguration config) {
 		String persistenceFilePath = config.getPersistencePath();
 		MqttPersistence persistenceType = config.getPersistenceType();
 		if (isFilePersistenceType(persistenceType)) {

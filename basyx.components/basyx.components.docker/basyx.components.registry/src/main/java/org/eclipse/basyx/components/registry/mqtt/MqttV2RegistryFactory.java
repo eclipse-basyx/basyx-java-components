@@ -62,7 +62,7 @@ public class MqttV2RegistryFactory {
 
 	protected static void addAASRegistryServiceObserver(ObservableAASRegistryServiceV2 observedAPI, BaSyxMqttConfiguration mqttConfig) {
 		String brokerEndpoint = mqttConfig.getServer();
-		MqttClientPersistence mqttPersistence = getMqttPersistenceFromConfig(mqttConfig);
+		MqttClientPersistence mqttPersistence = MqttRegistryFactory.getMqttPersistenceFromConfig(mqttConfig);
 		try {
 			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, mqttConfig.getClientId(), mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
 			observedAPI.addObserver(mqttObserver);
@@ -70,31 +70,4 @@ public class MqttV2RegistryFactory {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);
 		}
 	}
-
-	private static MqttClientPersistence getMqttPersistenceFromConfig(BaSyxMqttConfiguration config) {
-		String persistenceFilePath = config.getPersistencePath();
-		MqttPersistence persistenceType = config.getPersistenceType();
-		if (isFilePersistenceType(persistenceType)) {
-			return createMqttFilePersistence(persistenceFilePath);
-		} else {
-			return new MemoryPersistence();
-		}
-	}
-
-	private static MqttClientPersistence createMqttFilePersistence(String persistenceFilePath) {
-		if (!isFilePathSet(persistenceFilePath)) {
-			return new MqttDefaultFilePersistence();
-		} else {
-			return new MqttDefaultFilePersistence(persistenceFilePath);
-		}
-	}
-
-	private static boolean isFilePathSet(String persistenceFilePath) {
-		return persistenceFilePath != null && !persistenceFilePath.isEmpty();
-	}
-
-	private static boolean isFilePersistenceType(MqttPersistence persistenceType) {
-		return persistenceType == MqttPersistence.FILE;
-	}
-
 }
