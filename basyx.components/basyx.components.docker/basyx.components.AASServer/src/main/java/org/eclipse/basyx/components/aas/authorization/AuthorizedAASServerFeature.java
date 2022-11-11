@@ -128,6 +128,11 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		try {
 			final String className = aasConfig.getAuthorizationStrategySimpleRbacRoleAuthenticator();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("simple rbac role authenticator class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IRoleAuthenticator.class.isAssignableFrom(clazz)) {
@@ -145,6 +150,11 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		try {
 			final String className = aasConfig.getAuthorizationStrategySimpleRbacSubjectInformationProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("simple rbac subject information provider class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
@@ -176,6 +186,11 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		try {
 			final String className = aasConfig.getAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("granted authority granted authority authenticator class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IGrantedAuthorityAuthenticator.class.isAssignableFrom(clazz)) {
@@ -193,6 +208,11 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		try {
 			final String className = aasConfig.getAuthorizationStrategyGrantedAuthoritySubjectInformationProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("granted authority subject information provider class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
@@ -267,6 +287,11 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		try {
 			final String className = aasConfig.getAuthorizationStrategyCustomAuthorizersProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("custom authorizers provider class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IAuthorizersProvider.class.isAssignableFrom(clazz)) {
@@ -284,6 +309,11 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		try {
 			final String className = aasConfig.getAuthorizationStrategyCustomSubjectInformationProvider();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("custom subject information provider class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!ISubjectInformationProvider.class.isAssignableFrom(clazz)) {
@@ -295,5 +325,70 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 			logger.error(e.getMessage(), e);
 			throw new IllegalArgumentException(e);
 		}
+	}
+
+	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+		final String strategyString = aasConfig.getAuthorizationStrategy();
+
+		if (strategyString == null) {
+			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in aas.properties", BaSyxAASServerConfiguration.AUTHORIZATION_STRATEGY));
+		}
+
+		final AuthorizationStrategy strategy;
+		try {
+			strategy = AuthorizationStrategy.valueOf(strategyString);
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in aas.properties, available options: %s", strategyString, Arrays.toString(BaSyxAASServerConfiguration.AuthorizationStrategy.values())));
+		}
+
+		switch (strategy) {
+			case SimpleRbac: {
+				return getSimpleRbacFilesAuthorizerParams();
+			}
+			case GrantedAuthority: {
+				return getGrantedAuthorityFilesAuthorizerParams();
+			}
+			case Custom: {
+				return getCustomFilesAuthorizerParams();
+			}
+			default:
+				throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
+		}
+	}
+
+	private <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getSimpleRbacFilesAuthorizerParams() {
+		logger.info("use SimpleRbac authorization strategy");
+		final RbacRuleSet rbacRuleSet = RbacRuleSet.fromFile(aasConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
+		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
+
+		return new AuthorizedDefaultServletParams<>(
+				new SimpleRbacFilesAuthorizer<>(rbacRuleChecker, roleAuthenticator),
+				subjectInformationProvider
+		);
+	}
+
+	private <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getGrantedAuthorityFilesAuthorizerParams() {
+		logger.info("use GrantedAuthority authorization strategy for files authorizer");
+		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
+
+		return new AuthorizedDefaultServletParams<>(
+				new GrantedAuthorityFilesAuthorizer<>(grantedAuthorityAuthenticator),
+				subjectInformationProvider
+		);
+	}
+
+	private <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getCustomFilesAuthorizerParams() {
+		logger.info("use Custom authorization strategy for files authorizer");
+		final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getCustomAuthorizersProvider();
+		final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(aasConfig);
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getCustomSubjectInformationProvider();
+
+		return new AuthorizedDefaultServletParams<>(
+				authorizers.getFilesAuthorizer(),
+				subjectInformationProvider
+		);
 	}
 }

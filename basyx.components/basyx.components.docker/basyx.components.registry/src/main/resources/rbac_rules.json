@@ -2,22 +2,28 @@
   {
     "role": "admin",
     "action": "urn:org.eclipse.basyx:scope:aas-registry:read",
-    "aasId": "*",
-    "smId": "*",
-    "smElIdShortPath": "*"
+    "targetInformation": {
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
   },
   {
     "role": "admin",
     "action": "urn:org.eclipse.basyx:scope:aas-registry:write",
-    "aasId": "*",
-    "smId": "*",
-    "smElIdShortPath": "*"
+    "targetInformation": {
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
   },
   {
     "role": "user",
     "action": "urn:org.eclipse.basyx:scope:aas-registry:read",
-    "aasId": "*",
-    "smId": "*",
-    "smElIdShortPath": "*"
+    "targetInformation": {
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
   }
 ]

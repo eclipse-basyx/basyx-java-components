@@ -164,6 +164,11 @@ public class AuthorizedRegistryFeature implements IAASRegistryFeature {
 		try {
 			final String className = registryConfig.getAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator();
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("granted authority granted authority authenticator class is null");
+			}
+
 			final Class<?> clazz = Class.forName(effectiveClassName);
 
 			if (!IGrantedAuthorityAuthenticator.class.isAssignableFrom(clazz)) {

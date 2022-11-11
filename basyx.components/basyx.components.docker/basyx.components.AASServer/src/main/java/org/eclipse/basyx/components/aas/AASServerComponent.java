@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
@@ -62,6 +61,9 @@ import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentF
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedDefaultServlet;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedDefaultServletParams;
+import org.eclipse.basyx.components.aas.authorization.IFilesAuthorizer;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -74,6 +76,7 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.shared.authorization.CodeAuthentication;
+import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -216,7 +219,7 @@ public class AASServerComponent implements IComponent {
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
 			// 1. Also provide the files
-			context.addServletMapping("/files/*", new DefaultServlet());
+			context.addServletMapping("/files/*", new AuthorizedDefaultServlet<>(getAuthorizedDefaultServletParams(aasConfig)));
 
 			// 2. Fix the file paths according to the servlet configuration
 			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
@@ -230,6 +233,12 @@ public class AASServerComponent implements IComponent {
 		server.start();
 		
 		registerPreexistingAASAndSMIfPossible();
+	}
+
+	private AuthorizedDefaultServletParams<?> getAuthorizedDefaultServletParams(final BaSyxAASServerConfiguration aasConfig) {
+		final AuthorizedAASServerFeature authorizedAASServerFeature = new AuthorizedAASServerFeature(aasConfig);
+
+		return authorizedAASServerFeature.getFilesAuthorizerParams();
 	}
 	
 	private void registerPreexistingAASAndSMIfPossible() {

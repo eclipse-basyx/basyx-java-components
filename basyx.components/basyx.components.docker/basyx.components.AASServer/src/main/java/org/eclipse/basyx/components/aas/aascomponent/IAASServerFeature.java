@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.aascomponent;
 
+import org.eclipse.basyx.components.aas.authorization.IFilesAuthorizer;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 

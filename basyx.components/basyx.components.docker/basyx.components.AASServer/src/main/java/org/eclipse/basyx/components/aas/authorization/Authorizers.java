@@ -30,15 +30,23 @@ public class Authorizers<SubjectInformationType> {
     return submodelAPIAuthorizer;
   }
 
+  private final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
+
+  public IFilesAuthorizer<SubjectInformationType> getFilesAuthorizer() {
+    return filesAuthorizer;
+  }
+
   public Authorizers(
       final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer,
       final IAASAPIAuthorizer<SubjectInformationType> aasApiAuthorizer,
       final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer,
-      final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer
+      final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer,
+      final IFilesAuthorizer<SubjectInformationType> filesAuthorizer
   ) {
     this.aasAggregatorAuthorizer = aasAggregatorAuthorizer;
     this.aasApiAuthorizer = aasApiAuthorizer;
     this.submodelAggregatorAuthorizer = submodelAggregatorAuthorizer;
     this.submodelAPIAuthorizer = submodelAPIAuthorizer;
+    this.filesAuthorizer = filesAuthorizer;
   }
 }
