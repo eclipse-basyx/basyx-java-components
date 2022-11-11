@@ -26,6 +26,7 @@
 
 package org.eclipse.basyx.regression.AASServer.mongodb;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -80,7 +81,7 @@ public class TestMongoDBSubmodelAggregator extends SubmodelAggregatorSuite {
 		List<Submodel> submodels = mongoOps.findAll(Submodel.class, config.getSubmodelCollection());
 
 		Optional<Submodel> possibleSm = submodels.stream().filter(sm -> sm.getIdentification().equals(toDelete.getIdentification())).findFirst();
-		assertTrue(possibleSm.isEmpty());
+		assertFalse(possibleSm.isPresent());
 	}
 
 	private static MongoTemplate getMongoTemplate(BaSyxMongoDBConfiguration config) {
