@@ -35,17 +35,20 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
+import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.authorization.AuthorizedRegistryFeature;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
+import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
 import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFactory;
 import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFeature;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
@@ -223,15 +226,33 @@ public class RegistryComponent implements IComponent {
 
 	private HttpServlet createRegistryServlet() {
 		if (this.registryConfig.isTaggedDirectoryEnabled()) {
-			logger.info("enable tagged directory functionality");
-			return new TaggedDirectoryServlet(createTaggedDirectory());
+			return createTaggedRegistryServlet();
 		}
-		return new RegistryServlet(createRegistry());
+
+		IAASRegistry registryBackend = createRegistryBackend();
+		IAASRegistry decoratedRegistry = decorate(registryBackend);
+		return new RegistryServlet(decoratedRegistry);
 	}
 
-	private MapTaggedDirectory createTaggedDirectory() {
+	private HttpServlet createTaggedRegistryServlet() {
 		throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory();
-		return new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+		logger.info("Enable tagged directory functionality");
+		IAASTaggedDirectory taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+		IAASTaggedDirectory decoratedDirectory = decorateTaggedDirectory(taggedDirectory);
+		return new TaggedDirectoryServlet(decoratedDirectory);
+	}
+
+	private IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory) {
+		IAASTaggedDirectory decoratedTaggedDirectory = taggedDirectory;
+		if (this.mqttConfig != null) {
+			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+			decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
+		}
+		if (registryConfig.isAuthorizationEnabled()) {
+			logger.info("Authorization enabled for TaggedDirectory.");
+			decoratedTaggedDirectory = new AuthorizedTaggedDirectoryFactory().create(decoratedTaggedDirectory);
+		}
+		return decoratedTaggedDirectory;
 	}
 
 	private void throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory() {
@@ -311,7 +332,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {
-		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB) || registryConfig.isAuthorizationEnabled() || mqttConfig != null);
+		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB) || registryConfig.isAuthorizationEnabled());
 	}
 
 	private void loadRegistryFeaturesFromConfig() {
@@ -322,8 +343,6 @@ public class RegistryComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
-		cleanUpRegistryFeatures();
-
 		server.shutdown();
 		logger.info("Registry server stopped");
 	}

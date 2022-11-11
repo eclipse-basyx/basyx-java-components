@@ -22,7 +22,7 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.regression.AASServer;
+package org.eclipse.basyx.regression.AASServer.mongodb;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,6 +32,7 @@ import java.util.Map;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.regression.AASServer.SimpleNoOpAASSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
 import org.eclipse.basyx.submodel.restapi.MultiSubmodelElementProvider;
 import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
@@ -150,6 +151,10 @@ public class TestMongoDBSubmodelProvider extends SubmodelProviderTest {
 	@Override
 	@Test
 	public void testReadSingleOperation() {
+	}
+
+	@Override
+	public void testInvokeOperationWithExplicitSync() {
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2022 the Eclipse BaSyx Authors
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -19,28 +19,46 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.servlet;
+package org.eclipse.basyx.regression.components.configuration;
 
-import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
-import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.restapi.TaggedDirectoryProvider;
-import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.junit.Test;
 
 /**
- * A registry servlet based on a provided MapTaggedDirectory implementation.
+ * Tests parsing of context property files
+ * 
+ * @author danish
  *
- * @author jungjan
  */
-public class TaggedDirectoryServlet extends VABHTTPInterface<AASRegistryModelProvider> {
-	private static final long serialVersionUID = 1L;
+public class TestBaSyxContextConfigurationPropertyFileParsing {
+	
+	@Test
+	public void withCORSConfiguration() {
+		BaSyxContext context = createBasyxContext("context_with_cors_config.properties");
+		
+		String allowOrigin = "http://www.example.com";
 
-	/**
-	 * Provides registry servlet based on the provided registry implementation.
-	 */
-	public TaggedDirectoryServlet(IAASTaggedDirectory directory) {
-		super(new TaggedDirectoryProvider(directory));
+		assertEquals(allowOrigin, context.getAccessControlAllowOrigin());
+	}
+	
+	@Test
+	public void withoutCORSConfiguration() {
+		BaSyxContext context = createBasyxContext("context_without_cors_config.properties");
+		
+		assertNull(context.getAccessControlAllowOrigin());
+	}
+	
+	private BaSyxContext createBasyxContext(String resourceFile) {
+		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration(4001, "");
+		contextConfig.loadFromResource(resourceFile);
+
+		return contextConfig.createBaSyxContext();
 	}
 }

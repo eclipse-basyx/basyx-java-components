@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2022 the Eclipse BaSyx Authors
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -19,28 +19,37 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.servlet;
 
-import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
-import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.restapi.TaggedDirectoryProvider;
-import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
+
+package org.eclipse.basyx.components.aas.mongodb;
+
+import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
+import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
 /**
- * A registry servlet based on a provided MapTaggedDirectory implementation.
+ * Factory for creating a {@link MongoDBSubmodelAggregator}
+ * 
+ * @author schnicke
  *
- * @author jungjan
  */
-public class TaggedDirectoryServlet extends VABHTTPInterface<AASRegistryModelProvider> {
-	private static final long serialVersionUID = 1L;
+public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFactory {
 
-	/**
-	 * Provides registry servlet based on the provided registry implementation.
-	 */
-	public TaggedDirectoryServlet(IAASTaggedDirectory directory) {
-		super(new TaggedDirectoryProvider(directory));
+	private BaSyxMongoDBConfiguration config;
+	private ISubmodelAPIFactory submodelAPIFactory;
+
+	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
+		this.config = config;
+		this.submodelAPIFactory = submodelAPIFactory;
 	}
+
+	@Override
+	public ISubmodelAggregator create() {
+		return new MongoDBSubmodelAggregator(submodelAPIFactory, config);
+	}
+
 }
