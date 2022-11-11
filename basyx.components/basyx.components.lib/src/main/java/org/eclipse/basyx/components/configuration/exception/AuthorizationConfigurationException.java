@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2022 the Eclipse BaSyx Authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -19,46 +19,24 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
+ *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.mongodb;
-
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.restapi.api.IAASAPI;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+package org.eclipse.basyx.components.configuration.exception;
 
 /**
+ * Used to indicate that the required authorization credentials configuration is
+ * missing
  * 
- * Factory for creating a MongoDBAASAPI
- * 
- * @author fried
+ * @author danish
  *
  */
-public class MongoDBAASAPIFactory implements IAASAPIFactory {
+public class AuthorizationConfigurationException extends RuntimeException {
 
-	private BaSyxMongoDBConfiguration config;
-	private MongoClient client;
+	private static final long serialVersionUID = 1L;
 
-	@Deprecated
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
-	}
-
-	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.client = client;
-	}
-
-	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
-		api.setAAS(aas);
-		return api;
+	public AuthorizationConfigurationException(String message) {
+		super(message);
 	}
 
 }

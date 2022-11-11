@@ -26,6 +26,8 @@ package org.eclipse.basyx.components.registry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+
 import javax.servlet.http.HttpServlet;
 import org.apache.commons.collections4.map.HashedMap;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
@@ -40,6 +42,7 @@ import org.eclipse.basyx.components.registry.authorization.AuthorizedRegistryFea
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
+import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
@@ -237,7 +240,12 @@ public class RegistryComponent implements IComponent {
 	private HttpServlet createTaggedRegistryServlet() {
 		throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory();
 		logger.info("Enable tagged directory functionality");
-		IAASTaggedDirectory taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+		IAASTaggedDirectory taggedDirectory;
+		if (registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB)) {
+			taggedDirectory = new MongoDBTaggedDirectory(loadMongoDBConfiguration(), new HashMap<>());
+		} else {
+			taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
+		}
 		IAASTaggedDirectory decoratedDirectory = decorateTaggedDirectory(taggedDirectory);
 		return new TaggedDirectoryServlet(decoratedDirectory);
 	}
@@ -257,16 +265,8 @@ public class RegistryComponent implements IComponent {
 
 	private void throwRuntimeExceptionIfConfigurationIsNotSuitableForTaggedDirectory() {
 		if (!isConfigurationSuitableForTaggedDirectory()) {
-			throw new RuntimeException("The current version does not support this configuration.\n" + "\t* Persistent backends (SQL, MongoDB)\n" + "\t* Authorization\n" + "\t* or MQTT eventing\n"
-					+ "are currently not supported in combination with tagged directory functionality.");
+			throw new RuntimeException("The current version does not support this configuration.\n" + "\t* Persistent backend SQL\n" + "is currently not supported in combination with tagged directory functionality.");
 		}
-	}
-
-	private IAASRegistry createRegistry() {
-		IAASRegistry registryBackend = createRegistryBackend();
-
-		final IAASRegistry decoratedRegistry = decorate(registryBackend);
-		return decoratedRegistry;
 	}
 
 	private IAASRegistry createRegistryBackend() {
@@ -332,7 +332,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {
-		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL) || registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB) || registryConfig.isAuthorizationEnabled());
+		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL));
 	}
 
 	private void loadRegistryFeaturesFromConfig() {
@@ -343,6 +343,8 @@ public class RegistryComponent implements IComponent {
 
 	@Override
 	public void stopComponent() {
+		cleanUpRegistryFeatures();
+
 		server.shutdown();
 		logger.info("Registry server stopped");
 	}

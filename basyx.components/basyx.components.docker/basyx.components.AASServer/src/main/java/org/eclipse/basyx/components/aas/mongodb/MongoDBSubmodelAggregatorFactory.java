@@ -23,13 +23,15 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.components.aas.mongodb;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 /**
  * Factory for creating a {@link MongoDBSubmodelAggregator}
@@ -41,15 +43,22 @@ public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFact
 
 	private BaSyxMongoDBConfiguration config;
 	private ISubmodelAPIFactory submodelAPIFactory;
+	private MongoClient client;
 
+	@Deprecated
 	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
+		this(config, submodelAPIFactory, MongoClients.create(config.getConnectionUrl()));
+	}
+
+	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory, MongoClient client) {
 		this.config = config;
+		this.client = client;
 		this.submodelAPIFactory = submodelAPIFactory;
 	}
 
 	@Override
 	public ISubmodelAggregator create() {
-		return new MongoDBSubmodelAggregator(submodelAPIFactory, config);
+		return new MongoDBSubmodelAggregator(submodelAPIFactory, config, client);
 	}
 
 }

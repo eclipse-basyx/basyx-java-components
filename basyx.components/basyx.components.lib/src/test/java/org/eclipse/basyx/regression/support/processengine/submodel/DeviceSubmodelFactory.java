@@ -62,7 +62,7 @@ public class DeviceSubmodelFactory {
 			return true;
 		});
 		op2.setInputVariables(Collections.singletonList(new OperationVariable(new Property("position", 0))));
-		op2.setOutputVariables(Collections.singletonList(new OperationVariable(new Property("result", 0))));
+		op2.setOutputVariables(Collections.singletonList(new OperationVariable(new Property("result", false))));
 		op2.setIdShort("moveTo");
 
 		// create a list for defined operations

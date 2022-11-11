@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-slim-bullseye
+FROM openjdk:11-slim-bullseye
 
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
@@ -28,6 +28,10 @@ ENV ${SQL_CONFIG_KEY} "/usr/share/config/sql.properties"
 # Set the path for the mongodb configuration file
 ARG MONGODB_CONFIG_KEY
 ENV ${MONGODB_CONFIG_KEY} "/usr/share/config/mongodb.properties"
+
+# Set the path for the mqtt configuration file
+ARG MQTT_CONFIG_KEY
+ENV ${MQTT_CONFIG_KEY} "/usr/share/config/mqtt.properties"
 
 # Start the jar
 CMD java -jar "/usr/share/basyxExecutable.jar"

@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-slim-bullseye
+FROM openjdk:11-slim-bullseye
 
 # Install dependency for wait-for-it-env.sh
 RUN apt update && apt install -y jq && apt clean
@@ -35,6 +35,10 @@ ENV ${CONTEXT_CONFIG_KEY} "/usr/share/config/context.properties"
 # Set the path for the mongodb configuration file
 ARG MONGODB_CONFIG_KEY
 ENV ${MONGODB_CONFIG_KEY} "/usr/share/config/mongodb.properties"
+
+# Set the path for the mqtt configuration file
+ARG MQTT_CONFIG_KEY
+ENV ${MQTT_CONFIG_KEY} "/usr/share/config/mqtt.properties"
 
 # Start the jar
 CMD ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components.docker</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.3.0-SNAPSHOT</version>
 	</parent>
  
 	<artifactId>basyx.components.AASServer</artifactId>
@@ -75,14 +75,14 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-sync</artifactId>
-			<version>4.2.3</version>
+			<version>4.7.2</version>
 		</dependency>
 
 		<!-- Use Spring Data MongoDB for db data management -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.2.6</version>
+			<version>3.4.5</version>
 		</dependency>
 
 		<!-- Adds additional classes of the BaSys SDK for tests -->
@@ -116,9 +116,15 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.registry</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
+			<version>1.3.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>com.tngtech.keycloakmock</groupId>
+		    <artifactId>mock</artifactId>
+		    <scope>test</scope>
+		    <version>0.12.0</version>
+		</dependency>  
 	</dependencies>
 
 	<profiles>

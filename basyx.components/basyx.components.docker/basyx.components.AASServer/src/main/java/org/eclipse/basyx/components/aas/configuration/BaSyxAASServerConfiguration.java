@@ -24,14 +24,19 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.configuration;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
+import org.eclipse.basyx.components.configuration.exception.AuthorizationConfigurationException;
+import org.eclipse.basyx.vab.protocol.http.connector.IAuthorizationSupplier;
+import org.eclipse.basyx.vab.protocol.http.connector.OAuth2ClientCredentialsBasedAuthorizationSupplier;
 
 import com.google.gson.Gson;
 
@@ -39,7 +44,7 @@ import com.google.gson.Gson;
  * Represents a BaSyx server configuration for an AAS Server with any backend,
  * that can be loaded from a properties file.
  * 
- * @author espen, wege
+ * @author espen, danish, wege
  *
  */
 public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
@@ -60,6 +65,11 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_AASX_UPLOAD = FEATURE_ENABLED;
 	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
 	public static final String DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "/rbac_rules.json";
+	public static final String DEFAULT_TOKEN_ENDPOINT = "";
+	public static final String DEFAULT_CLIENT_ID = "";
+	public static final String DEFAULT_CLIENT_SECRET = "";
+	public static final String DEFAULT_CLIENT_SCOPES = "[]";
+
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -87,6 +97,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		GrantedAuthority,
 		Custom
 	}
+	public static final String TOKEN_ENDPOINT = "tokenEndpoint";
+	public static final String CLIENT_ID = "clientId";
+	public static final String CLIENT_SECRET = "clientSecret";
+	public static final String CLIENT_SCOPES = "clientScopes";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -107,6 +121,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
 		defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
 		defaultProps.put(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
+		defaultProps.put(TOKEN_ENDPOINT, DEFAULT_TOKEN_ENDPOINT);
+		defaultProps.put(CLIENT_ID, DEFAULT_CLIENT_ID);
+		defaultProps.put(CLIENT_SECRET, DEFAULT_CLIENT_SECRET);
+		defaultProps.put(CLIENT_SCOPES, DEFAULT_CLIENT_SCOPES);
 		return defaultProps;
 	}
 
@@ -198,6 +216,14 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public void loadFromDefaultSource() {
 		loadFileOrDefaultResource(DEFAULT_FILE_KEY, DEFAULT_CONFIG_PATH);
 		loadFromEnvironmentVariables();
+	}
+
+	public IAuthorizationSupplier configureAndGetAuthorizationSupplier() {
+		if (!isAuthorizationCredentialsForSecuredRegistryConfigured()) {
+			throw new AuthorizationConfigurationException("Authorization credentials for the secured registry is not configured");
+		}
+
+		return new OAuth2ClientCredentialsBasedAuthorizationSupplier(getTokenEndpoint(), getClientId(), getClientSecret(), getClientScopes());
 	}
 
 	public AASServerBackend getAASBackend() {
@@ -295,6 +321,15 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		List<String> fromJson = new Gson().fromJson(property, List.class);
 		if (fromJson == null) {
 			return new ArrayList<>();
+		} else {
+			return fromJson;
+		}
+	}
+
+	private <T> T parseFromJson(String property, Class<T> classTypeT) {
+		T fromJson = new Gson().fromJson(property, (Type) classTypeT);
+		if (fromJson == null) {
+			return null;
 		} else {
 			return fromJson;
 		}
@@ -402,5 +437,58 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	public void setAuthorizationStrategyCustomSubjectInformationProvider(String authorizationStrategyCustomSubjectInformationProvider) {
 		setProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, authorizationStrategyCustomSubjectInformationProvider);
+	}
+
+	public String getTokenEndpoint() {
+		return getProperty(TOKEN_ENDPOINT);
+	}
+
+	public void setTokenEndpoint(String tokenEndpoint) {
+		setProperty(TOKEN_ENDPOINT, tokenEndpoint);
+	}
+
+	public String getClientId() {
+		return getProperty(CLIENT_ID);
+	}
+
+	public void setClientId(String clientId) {
+		setProperty(CLIENT_ID, clientId);
+	}
+
+	public String getClientSecret() {
+		return getProperty(CLIENT_SECRET);
+	}
+
+	public void setClientSecret(String clientSecret) {
+		setProperty(CLIENT_SECRET, clientSecret);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<String> getClientScopes() {
+		return parseFromJson(getProperty(CLIENT_SCOPES), Set.class);
+	}
+
+	public void setClientScopes(String clientScopes) {
+		setProperty(CLIENT_SCOPES, clientScopes);
+	}
+
+	public boolean isAuthorizationCredentialsForSecuredRegistryConfigured() {
+		return isTokenEndpointConfigured() && isClientIdConfigured() && isClientSecretConfigured() && isScopeConfigured();
+	}
+
+	private boolean isTokenEndpointConfigured() {
+		return getProperty(TOKEN_ENDPOINT) != null && !getProperty(TOKEN_ENDPOINT).isEmpty();
+	}
+
+	private boolean isClientIdConfigured() {
+		return getProperty(CLIENT_ID) != null && !getProperty(CLIENT_ID).isEmpty();
+	}
+
+	private boolean isClientSecretConfigured() {
+		return getProperty(CLIENT_SECRET) != null && !getProperty(CLIENT_SECRET).isEmpty();
+	}
+
+	private boolean isScopeConfigured() {
+		return getProperty(CLIENT_SCOPES) != null && !getProperty(CLIENT_SCOPES).isEmpty();
 	}
 }
