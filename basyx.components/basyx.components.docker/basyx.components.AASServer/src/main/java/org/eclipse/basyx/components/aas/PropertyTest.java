@@ -39,41 +39,45 @@ public class PropertyTest {
 	private static Logger logger = LoggerFactory.getLogger(PropertyTest.class);
 	
 	public static void main(String[] args) throws InterruptedException {
-		AssetAdministrationShell assetAdministrationShell = new AssetAdministrationShell();
-		assetAdministrationShell.setIdShort("aasIdShort");
-		Property prop = new Property("test", 123);
-		Collection<IConstraint> qualifierCollection = new ArrayList<>();
-		qualifierCollection.add(new Qualifier("delegatedTo", "http://127.0.0.1:8083/delegator", "anyType", null));
+//		Property prop = new Property("test", 123);
+//		Collection<IConstraint> qualifierCollection = new ArrayList<>();
+//		qualifierCollection.add(new Qualifier("delegatedTo", "http://127.0.0.1:8083/delegator", "anyType", null));
 		
-		prop.setQualifiers(qualifierCollection);
-        AASLambdaPropertyHelper.setLambdaValue(prop, PropertyTest::getPropertyValue, null);
+//		prop.setQualifiers(qualifierCollection);
+//        AASLambdaPropertyHelper.setLambdaValue(prop, PropertyTest::getPropertyValue, null);
         
         Submodel testSm = new Submodel("testSm", new CustomId("Test"));
-        SubmodelElementCollection smc = new SubmodelElementCollection("smc");
-        SubmodelElementCollection subSmc = new SubmodelElementCollection("subsmc"); 
-        subSmc.addSubmodelElement(prop);
-        smc.addSubmodelElement(subSmc);
-        testSm.addSubmodelElement(smc);
+//        SubmodelElementCollection smc = new SubmodelElementCollection("smc");
+//        SubmodelElementCollection subSmc = new SubmodelElementCollection("subsmc"); 
+//        subSmc.addSubmodelElement(prop);
+//        smc.addSubmodelElement(subSmc);
+//        testSm.addSubmodelElement(smc);
         
-        assetAdministrationShell.addSubmodel(testSm);
+        Property prop2 = new Property("prop2", "abcd");
+        testSm.addSubmodelElement(prop2);
+        
         
         ISubmodelAPI api = new VABSubmodelAPI(new VABLambdaProvider(testSm));
+        api.updateSubmodelElement("prop2", "ijkl");
+        System.out.println("aafaFAF" + api.getSubmodel().getSubmodelElement("prop2").toString());
+        logger.info("New Prop2 value = {}", api.getSubmodel().getSubmodelElement("prop2").toString());
 //        System.out.println(api.getSubmodel().getSubmodelElement("smc"));
         
-        ISubmodelElement smElement = api.getSubmodel().getSubmodelElement("smc");
-        logger.info("Get SM : {}", api.getSubmodel());
-        Map<String, ISubmodelElement> smElem = api.getSubmodel().getSubmodelElements();
-        recursiveMet(smElem);
+        
+//        ISubmodelElement smElement = api.getSubmodel().getSubmodelElement("smc");
+////        logger.info("Get SM : {}", api.getSubmodel());
+//        Map<String, ISubmodelElement> smElem = api.getSubmodel().getSubmodelElements();
+//        recursiveMet(smElem);
         
 //        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
         
         
-        System.out.println("Going to sleep");
-        Thread.sleep(30000);
-        
-        System.out.println("Woke up from sleep");
-        
-        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
+//        System.out.println("Going to sleep");
+//        Thread.sleep(30000);
+//        
+//        System.out.println("Woke up from sleep");
+//        
+//        System.out.println(api.getSubmodel().getSubmodelElement("smc").getValue());
         
 //        Collection<ISubmodelElement> submodelElements = api.getSubmodelElements();
 ////        Collection<ISubmodelElementCollection> smCollections = api.getSubmodelElements().stream().filter(e -> e instanceof ISubmodelElementCollection smec).map(e -> (SubmodelElementCollection) e).collect(Collectors.toList());

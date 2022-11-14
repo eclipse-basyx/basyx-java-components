@@ -1,5 +1,7 @@
 package org.eclipse.basyx.regression.AASServer;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,7 +12,7 @@ import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguratio
 import org.eclipse.basyx.components.aas.delegation.DelegationAASServerDecorator;
 import org.eclipse.basyx.components.aas.delegation.DelegationAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.extensions.submodel.delegation.DelegatedSubmodelAPI;
+import org.eclipse.basyx.extensions.submodel.delegation.DelegationSubmodelAPI;
 import org.eclipse.basyx.extensions.submodel.delegation.DelegationDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.qualifiable.IConstraint;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -33,21 +35,15 @@ public class TestAASServerWithDelegation {
 	private Logger logger = LoggerFactory.getLogger(TestAASServerWithDelegation.class);
 	
 	private static ISubmodelAPI submodelAPI;
-	private static DelegatedSubmodelAPI delegatedSubmodelAPI;
-	
 	ISubmodelAPIFactory submodelAPIFactory;
-	
-	private static AASServerComponent aasServerComponent;
 	
 	@BeforeClass
 	public static void init() {
 		Submodel submodel = new Submodel();
 		Property prop = new Property("test", "abc");
 		Collection<IConstraint> qualifierCollection = new ArrayList<>();
-		qualifierCollection.add(new Qualifier("delegatedTo", "https://gorest.co.in/public/v2/posts/2441", "anyType", null));
+		qualifierCollection.add(new Qualifier("delegatedTo", "https://www.boredapi.com/api/activity?participants=1", "anyType", null));
 		prop.setQualifiers(qualifierCollection);
-		SubmodelElementCollection smc = new SubmodelElementCollection("smc");
-		smc.addSubmodelElement(prop);
 		submodel.addSubmodelElement(prop);
 		
 		DelegationDecoratingSubmodelAPIFactory delegationDecoratingSubmodelAPIFactory = new DelegationDecoratingSubmodelAPIFactory(new VABSubmodelAPIFactory());
@@ -58,9 +54,9 @@ public class TestAASServerWithDelegation {
 	@Test
 	public void currentValueFromDelegatedEndpoint() {
 		ISubmodelElement smc = (ISubmodelElement) submodelAPI.getSubmodel().getSubmodelElement("test");
-//		int i = Integer.parseInt(smc.getValue().toString());
+		logger.info("Current Value SMC : {} ", smc);
 		logger.info("Current Value : {} ", smc.getValue());
-//		logger.info("Current Value : {} ", smc.getSubmodelElement("test").getValue());
-//		logger.info("Full view : {} ", submodelAPI.getSubmodel().getSubmodelElement("smc").toString());
+		
+		assertEquals("abc", smc.getValue());
 	}
 }
