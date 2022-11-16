@@ -72,6 +72,7 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 		defaultProps.put(QOS, DEFAULT_QOS);
 		defaultProps.put(PERSISTENCE_TYPE, DEFAULT_PERSISTENCE_TYPE);
 		defaultProps.put(PERSISTENCE_PATH, DEFAULT_PERSISTENCE_PATH);
+		defaultProps.put(CLIENT_ID, CLIENT_ID);
 		return defaultProps;
 	}
 

@@ -230,6 +230,8 @@ public class RegistryComponent implements IComponent {
 			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
 				decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, mqttConfig, this.registryConfig);
 				logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
+			} else {
+			  decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
 			}
 		}
 		if (registryConfig.isAuthorizationEnabled()) {
@@ -286,6 +288,8 @@ public class RegistryComponent implements IComponent {
 			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
 				decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig, this.registryConfig);
 				logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
+			} else {			  
+			  decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
 			}
 		}
 		if (this.registryConfig.isAuthorizationEnabled()) {
