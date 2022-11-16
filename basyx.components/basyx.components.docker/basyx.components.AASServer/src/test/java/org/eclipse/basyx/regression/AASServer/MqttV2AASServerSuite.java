@@ -65,6 +65,7 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 	protected static AASServerComponent component;
 	protected static Server mqttBroker;
 	protected MqttTestListener listener;
+	private static final String AAS_SERVER_ID = "aas-server";
 
 	@Override
 	protected String getURL() {
@@ -96,7 +97,7 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 
 		component = new AASServerComponent(contextConfig, serverConfig);
-		component.addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "MqttAASServerSuiteClientId", "aas-server"));
+		component.addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "MqttAASServerSuiteClientId", AAS_SERVER_ID));
 		component.startComponent();
 	}
 
@@ -106,12 +107,12 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 
 		manager.createAAS(shell, getURL());
 
-		assertEquals(MqttV2AASAggregatorHelper.createCreateAASTopic("aas-repository"), listener.lastTopic);
+		assertEquals(MqttV2AASAggregatorHelper.createCreateAASTopic(AAS_SERVER_ID), listener.lastTopic);
 		
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
 		manager.deleteAAS(shellIdentifier);
-		assertEquals(MqttV2AASAggregatorHelper.createDeleteAASTopic("aas-repository"), listener.lastTopic);
+		assertEquals(MqttV2AASAggregatorHelper.createDeleteAASTopic(AAS_SERVER_ID), listener.lastTopic);
 		try {
 			manager.retrieveAAS(shellIdentifier);
 			fail();
@@ -130,14 +131,14 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
 
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttV2SubmodelAggregatorHelper.createCreateSubmodelTopic(shell.getIdentification().getId(), "submodel-repository"))));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttV2SubmodelAggregatorHelper.createCreateSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 
 		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttV2SubmodelAggregatorHelper.createDeleteSubmodelTopic(shell.getIdentification().getId(), "submodel-repository"))));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttV2SubmodelAggregatorHelper.createDeleteSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 		try {
 			manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 			fail();
