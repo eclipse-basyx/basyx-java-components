@@ -3,7 +3,7 @@ package org.eclipse.basyx.components.aas.delegation;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.extensions.submodel.delegation.DelegationDecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.extensions.submodel.delegation.DelegatingDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
@@ -11,7 +11,7 @@ public class DelegationAASServerDecorator implements IAASServerDecorator{
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new DelegationDecoratingSubmodelAPIFactory(submodelAPIFactory);
+		return new DelegatingDecoratingSubmodelAPIFactory(submodelAPIFactory);
 	}
 
 	@Override

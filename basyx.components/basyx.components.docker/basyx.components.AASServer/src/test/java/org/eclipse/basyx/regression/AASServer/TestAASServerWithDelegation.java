@@ -13,7 +13,7 @@ import org.eclipse.basyx.components.aas.delegation.DelegationAASServerDecorator;
 import org.eclipse.basyx.components.aas.delegation.DelegationAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.extensions.submodel.delegation.DelegationSubmodelAPI;
-import org.eclipse.basyx.extensions.submodel.delegation.DelegationDecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.extensions.submodel.delegation.DelegatingDecoratingSubmodelAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.qualifiable.IConstraint;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
@@ -46,7 +46,7 @@ public class TestAASServerWithDelegation {
 		prop.setQualifiers(qualifierCollection);
 		submodel.addSubmodelElement(prop);
 		
-		DelegationDecoratingSubmodelAPIFactory delegationDecoratingSubmodelAPIFactory = new DelegationDecoratingSubmodelAPIFactory(new VABSubmodelAPIFactory());
+		DelegatingDecoratingSubmodelAPIFactory delegationDecoratingSubmodelAPIFactory = new DelegatingDecoratingSubmodelAPIFactory(new VABSubmodelAPIFactory());
 		
 		submodelAPI = delegationDecoratingSubmodelAPIFactory.getSubmodelAPI(submodel);
 	}
