@@ -198,7 +198,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private HttpServlet createRegistryServlet() {
-		if (!this.registryConfig.isTaggedDirectoryEnabled()) {
+		if (this.registryConfig.isTaggedDirectoryEnabled()) {
 			return createTaggedRegistryServlet();
 		}
 
