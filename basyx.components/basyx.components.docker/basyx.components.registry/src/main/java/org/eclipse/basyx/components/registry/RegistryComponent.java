@@ -43,8 +43,8 @@ import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
-import org.eclipse.basyx.components.registry.mqtt.MqttV2RegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
+import org.eclipse.basyx.components.registry.mqtt.MqttV2RegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
@@ -280,7 +280,7 @@ public class RegistryComponent implements IComponent {
 
 	private IAASRegistry decorate(IAASRegistry aasRegistry) {
 		IAASRegistry decoratedRegistry = aasRegistry;
-		if (this.mqttConfig != null) {
+		if (this.mqttConfig != null && !registryConfig.getRegistryEvents().equals(RegistryEventBackend.NONE)) {
 			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
 				decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
