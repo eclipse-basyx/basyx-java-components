@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.codehaus.janino.util.DeepCopier;
 import org.eclipse.basyx.aas.aggregator.AASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
+import org.eclipse.basyx.aas.aggregator.proxy.AASAggregatorProxy;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
@@ -126,6 +127,8 @@ public class TestAASServerWithPropertyDelegation {
 		
 //		aggregator.createAAS(aas);
 //		pushSubmodel(submodel, aas.getIdentification());
+		
+//		System.out.println("Value From Del Prop : " + getPropertyValue("http://127.0.0.1:4001/aasServer/shells/testAAS/aas/submodels/testSubmodel/submodel/submodelElements/", new HTTPConnectorFactory()));
 	}
 	
 	private static Object getPropertyValue(String delegatedTo, HTTPConnectorFactory connectorProvider) {
@@ -144,24 +147,13 @@ public class TestAASServerWithPropertyDelegation {
 				+ (url.getPort() != -1 ? Integer.toString(url.getPort()) : "");
 	}
 	
-	private static void createExpectationForGet(){
-        new MockServerClient("127.0.0.1", 1080)
-            .when(
-                request()
-                   .withMethod("GET")
-                   .withPath("/valueEndpoint")
-                )
-            .respond(
-                    response()
-                        .withStatusCode(200)
-                        .withHeaders(
-                            new Header("Content-Type", "application/json; charset=utf-8"),
-                            new Header("Cache-Control", "public, max-age=86400")
-                    )
-                        .withBody("10")
-                        .withDelay(TimeUnit.SECONDS,1)
-                );
-    }
+	private static void createExpectationForGet() {
+		new MockServerClient("127.0.0.1", 1080).when(request().withMethod("GET").withPath("/valueEndpoint"))
+				.respond(response().withStatusCode(200)
+						.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
+								new Header("Cache-Control", "public, max-age=86400"))
+						.withBody("10").withDelay(TimeUnit.SECONDS, 1));
+	}
 	
 	private static void pushSubmodel(Submodel sm, IIdentifier aasIdentifier) {
 		provider.setValue("/" + AASAggregatorProvider.PREFIX + "/" + aasIdentifier.getId() + "/aas/submodels/" + sm.getIdShort(), sm);
@@ -169,10 +161,9 @@ public class TestAASServerWithPropertyDelegation {
 	
 	@Test
 	public void currentValueFromDelegatedEndpoint() {
-//		ISubmodel submodel = getSubmodelFromAggregator(aggregator);
-//		System.out.println("Submodel : " + submodel.toString());
-//		
-//		System.out.println("Prop Val : " + getPropertyValueFromSubmodel(submodel));
+		IAASAggregator proxy = new AASAggregatorProxy(aasServerComponent.getURL());
+		
+		System.out.println("Value : " + proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement("delegated").getValue());
 	}
 	
 	private String getPropertyValueFromSubmodel(ISubmodel submodel2) {
