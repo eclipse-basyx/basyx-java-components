@@ -68,6 +68,7 @@ import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
+import org.eclipse.basyx.components.aas.mqtt.MqttV2AASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorServlet;
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
@@ -315,9 +316,15 @@ public class AASServerComponent implements IComponent {
 		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
 			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 			mqttConfig.loadFromDefaultSource();
-			addAASServerFeature(new MqttAASServerFeature(mqttConfig, "aasServerClientId"));
+			addAASServerFeature(new MqttAASServerFeature(mqttConfig, mqttConfig.getClientId()));
 		}
-
+		
+		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTTV2)) {
+			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
+			mqttConfig.loadFromDefaultSource();
+			addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, mqttConfig.getClientId(), aasConfig.getAASId()));
+		}
+		
 		if (aasConfig.isAuthorizationEnabled()) {
 			addAASServerFeature(new AuthorizedAASServerFeature());
 		}
