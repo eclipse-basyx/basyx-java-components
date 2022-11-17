@@ -1,12 +1,19 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+import static org.mockserver.matchers.Times.exactly;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.codehaus.janino.util.DeepCopier;
 import org.eclipse.basyx.aas.aggregator.AASAggregator;
@@ -49,10 +56,16 @@ import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPIFactory;
+import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +80,8 @@ public class TestAASServerWithPropertyDelegation {
 	private static IComponent registryComponent;
 	
 	private static final int EXPECTED_VALUE = 10;
-	private static final String SERVER_URL = "https://reqres.in";
-	private static final String ENDPOINT = "/api/users/2";
+	private static final String SERVER_URL = "http://127.0.0.1:1080";
+	private static final String ENDPOINT = "/valueEndpoint";
 	
 	private static IAASAggregator aggregator;
 	
@@ -78,8 +91,11 @@ public class TestAASServerWithPropertyDelegation {
 	private static Submodel submodel;
 	private static AASAggregatorProvider provider;
 	
+	private static ClientAndServer mockServer;
+	
 	@BeforeClass
 	public static void init() {
+		mockServer = startClientAndServer(1080);
 		aggregator = new AASAggregator();
 		
 		submodel = new Submodel("testSubmodel", smIdentifier);
@@ -96,6 +112,8 @@ public class TestAASServerWithPropertyDelegation {
 		startRegistryServer();
 		
 		BaSyxAASServerConfiguration aasContextConfig = configureAASServer();
+		createExpectationForGet();
+		System.out.println("FROM URL : " + getPropertyValue("http://127.0.0.1:1080/valueEndpoint", new HTTPConnectorFactory()));
 		
 		startAASServerComponent(configureBasyxContext("aasContext.properties"), aasContextConfig);
 		
@@ -104,11 +122,46 @@ public class TestAASServerWithPropertyDelegation {
 //		submodelAPI = delegationDecoratingSubmodelAPIFactory.getSubmodelAPI(submodel);
 		
 //		registry = createAASRegistryProxy(aasContextConfig);
-		provider = new AASAggregatorProvider(aggregator);
+//		provider = new AASAggregatorProvider(aggregator);
 		
-		aggregator.createAAS(aas);
-		pushSubmodel(submodel, aas.getIdentification());
+//		aggregator.createAAS(aas);
+//		pushSubmodel(submodel, aas.getIdentification());
 	}
+	
+	private static Object getPropertyValue(String delegatedTo, HTTPConnectorFactory connectorProvider) {
+		try {
+			URL url = new URL(delegatedTo);
+			String address = createAddressFromURL(url);
+			IModelProvider connector = connectorProvider.create(address);
+			return connector.getValue(url.getPath());
+		} catch (MalformedURLException e) {
+			throw new ProviderException(e);
+		}
+	}
+
+	private static String createAddressFromURL(URL url) {
+		return url.getProtocol() + "://" + url.getHost() + ":"
+				+ (url.getPort() != -1 ? Integer.toString(url.getPort()) : "");
+	}
+	
+	private static void createExpectationForGet(){
+        new MockServerClient("127.0.0.1", 1080)
+            .when(
+                request()
+                   .withMethod("GET")
+                   .withPath("/valueEndpoint")
+                )
+            .respond(
+                    response()
+                        .withStatusCode(200)
+                        .withHeaders(
+                            new Header("Content-Type", "application/json; charset=utf-8"),
+                            new Header("Cache-Control", "public, max-age=86400")
+                    )
+                        .withBody("10")
+                        .withDelay(TimeUnit.SECONDS,1)
+                );
+    }
 	
 	private static void pushSubmodel(Submodel sm, IIdentifier aasIdentifier) {
 		provider.setValue("/" + AASAggregatorProvider.PREFIX + "/" + aasIdentifier.getId() + "/aas/submodels/" + sm.getIdShort(), sm);
@@ -116,30 +169,15 @@ public class TestAASServerWithPropertyDelegation {
 	
 	@Test
 	public void currentValueFromDelegatedEndpoint() {
-		ISubmodel submodel = getSubmodelFromAggregator(aggregator);
-		System.out.println("Submodel : " + submodel.toString());
-//		logger.info("Submodel : " + submodel.toString());
-//		ISubmodelElement smc = (ISubmodelElement) submodelAPI.getSubmodel().getSubmodelElement("test");
-//		logger.info("Current Value SMC : {} ", smc);
-//		logger.info("Current Value : {} ", smc.getValue());
+//		ISubmodel submodel = getSubmodelFromAggregator(aggregator);
+//		System.out.println("Submodel : " + submodel.toString());
 //		
-//		assertEquals("abc", smc.getValue());
-		
-//		ISubmodel assetAdministrationShell = aggregator.getAAS(aasIdentifier).getSubmodel(smIdentifier);
-//		ConnectedAssetAdministrationShell connectedAAS = (ConnectedAssetAdministrationShell) aggregator.getAAS(aasIdentifier);
-//		logger.info("Submodel : {}", connectedAAS.getSubmodel(smIdentifier));
-//		aasServerComponent.
-//		List<AASDescriptor> aasDescriptors = registry.lookupAll();
-////		
-//		aasDescriptors.stream().forEach(aas -> System.out.println("aas : " + aas.toString()));
-		System.out.println("Prop Val : " + getPropertyValueFromSubmodel(submodel));
+//		System.out.println("Prop Val : " + getPropertyValueFromSubmodel(submodel));
 	}
 	
 	private String getPropertyValueFromSubmodel(ISubmodel submodel2) {
 		IModelProvider aasProvider = aggregator.getAASProvider(aasIdentifier);
-//		Object smObject = aasProvider.getValue("/aas/submodels/testSubmodel/submodel/submodelElements/delegated");
-		Object propValue = aasProvider.getValue("/aas/submodels/testSubmodel/submodel/submodelElements/delegated");
-//		ISubmodel persistentSM = Submodel.createAsFacade((Map<String, Object>) smObject);
+		Object propValue = aasProvider.getValue("/aas/submodels/testSubmodel/submodel/submodelElements/delegated/value");
 		return propValue.toString();
 	}
 
@@ -155,7 +193,7 @@ public class TestAASServerWithPropertyDelegation {
 			BaSyxAASServerConfiguration aasContextConfig) {
 		aasServerComponent = new AASServerComponent(contextConfig, aasContextConfig);
 		
-//		aasServerComponent.setAASBundle(new AASBundle(aas, Collections.singleton(submodel)));
+		aasServerComponent.setAASBundle(new AASBundle(aas, Collections.singleton(submodel)));
 		
 		aasServerComponent.startComponent();
 	}
@@ -192,4 +230,9 @@ public class TestAASServerWithPropertyDelegation {
 	private static IQualifier createQualifier(String serverUrl, String endpoint) {
 		return PropertyDelegationManager.createDelegationQualifier(serverUrl + endpoint);
 	}
+	
+	@AfterClass
+    public static void stopServer() {
+        mockServer.stop();
+    }
 }
