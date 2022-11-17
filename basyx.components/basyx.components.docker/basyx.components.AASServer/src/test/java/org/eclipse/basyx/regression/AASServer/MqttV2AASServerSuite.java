@@ -34,21 +34,17 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.mqtt.MqttV2AASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
-import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttAASAggregatorHelper;
-import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2AASAggregatorHelper;
+import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2AASAggregatorTopicFactory;
 import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIHelper;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttSubmodelAggregatorHelper;
-import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2SubmodelAggregatorHelper;
+import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2SubmodelAggregatorTopicFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.testsuite.regression.extensions.shared.mqtt.MqttTestListener;
-import org.eclipse.basyx.vab.coder.json.serialization.DefaultTypeFactory;
-import org.eclipse.basyx.vab.coder.json.serialization.GSONTools;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -97,22 +93,24 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		BaSyxMqttConfiguration mqttConfig = createMqttConfig();
 
 		component = new AASServerComponent(contextConfig, serverConfig);
-		component.addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "MqttAASServerSuiteClientId", AAS_SERVER_ID));
+		component.addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, "MqttAASServerSuiteClientId", AAS_SERVER_ID, new Base64URLEncoder()));
 		component.startComponent();
 	}
 
 	@Test
 	public void shellLifeCycle() {
+		MqttV2AASAggregatorTopicFactory aasAggregatorFactory = new MqttV2AASAggregatorTopicFactory(new Base64URLEncoder());
+
 		AssetAdministrationShell shell = createShell(shellIdentifier.getId(), shellIdentifier);
 
 		manager.createAAS(shell, getURL());
 
-		assertEquals(MqttV2AASAggregatorHelper.createCreateAASTopic(AAS_SERVER_ID), listener.lastTopic);
+		assertEquals(aasAggregatorFactory.createCreateAASTopic(AAS_SERVER_ID), listener.lastTopic);
 		
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
 		manager.deleteAAS(shellIdentifier);
-		assertEquals(MqttV2AASAggregatorHelper.createDeleteAASTopic(AAS_SERVER_ID), listener.lastTopic);
+		assertEquals(aasAggregatorFactory.createDeleteAASTopic(AAS_SERVER_ID), listener.lastTopic);
 		try {
 			manager.retrieveAAS(shellIdentifier);
 			fail();
@@ -123,6 +121,7 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 
 	@Test
 	public void submodelLifeCycle() {
+		MqttV2SubmodelAggregatorTopicFactory submodelAggregatorFactory = new MqttV2SubmodelAggregatorTopicFactory(new Base64URLEncoder());
 		IIdentifier shellIdentifierForSubmodel = new CustomId("shellSubmodelId");
 		AssetAdministrationShell shell = createShell(shellIdentifierForSubmodel.getId(), shellIdentifierForSubmodel);
 		manager.createAAS(shell, getURL());
@@ -131,14 +130,14 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
 
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttV2SubmodelAggregatorHelper.createCreateSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(submodelAggregatorFactory.createCreateSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 
 		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttV2SubmodelAggregatorHelper.createDeleteSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
+		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(submodelAggregatorFactory.createDeleteSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 		try {
 			manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 			fail();

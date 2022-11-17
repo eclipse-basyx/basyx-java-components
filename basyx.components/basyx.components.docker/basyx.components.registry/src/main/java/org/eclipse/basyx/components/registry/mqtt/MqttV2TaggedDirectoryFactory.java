@@ -28,7 +28,6 @@ package org.eclipse.basyx.components.registry.mqtt;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryService;
 import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryServiceV2;
 
 /**

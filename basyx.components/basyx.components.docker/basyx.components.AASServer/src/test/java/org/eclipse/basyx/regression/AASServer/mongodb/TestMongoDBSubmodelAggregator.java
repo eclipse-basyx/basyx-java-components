@@ -52,8 +52,8 @@ public class TestMongoDBSubmodelAggregator extends SubmodelAggregatorSuite {
 	@BeforeClass
 	public static void initialize() {
 		BaSyxMongoDBConfiguration config = getMongoDBConfiguration();
-
-		aggregator = new MongoDBSubmodelAggregator(new MongoDBSubmodelAPIFactory(config), config);
+		MongoClient client = MongoClients.create(config.getConnectionUrl());
+		aggregator = new MongoDBSubmodelAggregator(new MongoDBSubmodelAPIFactory(config, client), config, client);
 	}
 
 	@Override

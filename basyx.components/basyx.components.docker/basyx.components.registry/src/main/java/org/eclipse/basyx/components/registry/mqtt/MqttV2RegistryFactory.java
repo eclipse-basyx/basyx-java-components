@@ -26,17 +26,14 @@
 package org.eclipse.basyx.components.registry.mqtt;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryService;
 import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryServiceV2;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
-import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryServiceObserver;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryServiceObserver;
+import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryTopicFactory;
+import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +61,8 @@ public class MqttV2RegistryFactory {
 		String brokerEndpoint = mqttConfig.getServer();
 		MqttClientPersistence mqttPersistence = MqttRegistryFactory.getMqttPersistenceFromConfig(mqttConfig);
 		try {
-			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, mqttConfig.getClientId(), mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
+			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, mqttConfig.getClientId(), mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence,
+					new MqttV2AASRegistryTopicFactory(new Base64URLEncoder()));
 			observedAPI.addObserver(mqttObserver);
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);
