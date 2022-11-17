@@ -7,14 +7,10 @@ public class DelegationAASServerFeature implements IAASServerFeature {
 
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void cleanUp() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

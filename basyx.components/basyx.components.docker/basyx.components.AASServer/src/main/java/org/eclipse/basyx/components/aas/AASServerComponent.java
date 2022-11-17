@@ -313,6 +313,11 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private void loadAASServerFeaturesFromConfig() {
+		if(aasConfig.isPropertyDelegationEnabled()) {
+			logger.info("Property Delegation Enabled");
+			addAASServerFeature(new DelegationAASServerFeature());
+		}
+		
 		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
 			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 			mqttConfig.loadFromDefaultSource();
@@ -325,11 +330,6 @@ public class AASServerComponent implements IComponent {
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
-		}
-		
-		if(aasConfig.isPropertyDelegationEnabled()) {
-			logger.info("Property Delegation Enabled");
-			addAASServerFeature(new DelegationAASServerFeature());
 		}
 	}
 

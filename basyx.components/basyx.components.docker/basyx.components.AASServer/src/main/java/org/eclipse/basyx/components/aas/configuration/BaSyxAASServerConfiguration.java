@@ -68,7 +68,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_CLIENT_ID = "";
 	public static final String DEFAULT_CLIENT_SECRET = "";
 	public static final String DEFAULT_CLIENT_SCOPES = "[]";
-	public static final String DEFAULT_PROPERTY_DELEGATION = FEATURE_DISABLED;
+	public static final String DEFAULT_PROPERTY_DELEGATION = FEATURE_ENABLED;
 
 
 	// Configuration keys
