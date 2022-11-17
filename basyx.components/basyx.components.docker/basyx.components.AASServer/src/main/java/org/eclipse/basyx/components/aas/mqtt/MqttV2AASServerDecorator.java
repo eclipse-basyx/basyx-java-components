@@ -29,7 +29,6 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2AASAggregatorTopicFactory;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2DecoratingAASAggregatorFactory;
-import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2DecoratingSubmodelAggregatorFactory;
@@ -71,7 +70,7 @@ public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	@Override
 	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
-		return new MqttDecoratingAASAPIFactory(aasAPIFactory, client);
+		return aasAPIFactory;
 	}
 
 	@Override
