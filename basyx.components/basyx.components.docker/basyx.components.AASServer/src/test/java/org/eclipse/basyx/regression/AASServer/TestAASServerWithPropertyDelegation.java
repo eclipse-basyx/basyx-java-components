@@ -12,13 +12,9 @@ import org.eclipse.basyx.aas.aggregator.proxy.AASAggregatorProxy;
 import org.eclipse.basyx.aas.bundle.AASBundle;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
-import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.registry.RegistryComponent;
-import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.extensions.shared.delegation.PropertyDelegationManager;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.qualifiable.IQualifier;
@@ -34,11 +30,12 @@ import org.mockserver.model.Header;
 
 public class TestAASServerWithPropertyDelegation {
 	private static AASServerComponent aasServerComponent;
-	private static IComponent registryComponent;
 	
 	private static final int EXPECTED_VALUE = 10;
 	private static final int SERVER_PORT = 1080;
-	private static final String SERVER_URL = "http://localhost:" + SERVER_PORT;
+	
+	private static final String SERVER_IP = "127.0.0.1";
+	private static final String SERVER_URL = "http://" + SERVER_IP + ":" + SERVER_PORT;
 	private static final String ENDPOINT = "/valueEndpoint";
 	
 	private static IIdentifier aasIdentifier = new CustomId("testAAS");
@@ -53,6 +50,17 @@ public class TestAASServerWithPropertyDelegation {
 		
 		createExpectationForGet();
 		startAASServerComponentWithAASBundle(configureAndGetBasyxContext(), configureAndGetAASServer(), aasBundle);
+	}
+	
+	@Test
+	public void currentValueFromDelegatedEndpoint() {
+		createExpectationForGet();
+		
+		IAASAggregator proxy = new AASAggregatorProxy(aasServerComponent.getURL());
+		
+		Object actualValue = proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement("delegated").getValue();
+		
+		assertEquals(EXPECTED_VALUE, Integer.parseInt(actualValue.toString()));
 	}
 
 	private static AASBundle createAASBundle() {
@@ -84,23 +92,11 @@ public class TestAASServerWithPropertyDelegation {
 	}
 	
 	private static void createExpectationForGet() {
-		new MockServerClient("127.0.0.1", SERVER_PORT).when(request().withMethod("GET").withPath("/valueEndpoint"))
+		new MockServerClient(SERVER_IP, SERVER_PORT).when(request().withMethod("GET").withPath(ENDPOINT))
 				.respond(response().withStatusCode(200)
 						.withHeaders(new Header("Content-Type", "text/plain; charset=utf-8"),
 								new Header("Cache-Control", "public, max-age=86400"))
-						.withBody("10").withDelay(TimeUnit.SECONDS, 1));
-	}
-	
-	@Test
-	public void currentValueFromDelegatedEndpoint() {
-		createExpectationForGet();
-		
-		IAASAggregator proxy = new AASAggregatorProxy(aasServerComponent.getURL());
-		
-		System.out.println("Value : " + proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement("delegated").getValue());
-		Object actualValue = proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement("delegated").getValue();
-		
-		assertEquals(EXPECTED_VALUE, Integer.parseInt(actualValue.toString()));
+						.withBody(Integer.toString(EXPECTED_VALUE)).withDelay(TimeUnit.SECONDS, 1));
 	}
 	
 	private static void startAASServerComponentWithAASBundle(BaSyxContextConfiguration contextConfig,
@@ -138,6 +134,8 @@ public class TestAASServerWithPropertyDelegation {
 	
 	@AfterClass
     public static void stopServer() {
+		aasServerComponent.stopComponent();
+		
         mockServer.stop();
     }
 }
