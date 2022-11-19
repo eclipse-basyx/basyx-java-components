@@ -75,14 +75,14 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-sync</artifactId>
-			<version>4.2.3</version>
+			<version>4.8.0</version>
 		</dependency>
 
 		<!-- Use Spring Data MongoDB for db data management -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.2.6</version>
+			<version>3.4.5</version>
 		</dependency>
 
 		<!-- Adds additional classes of the BaSys SDK for tests -->
@@ -123,18 +123,21 @@
 			<groupId>com.tngtech.keycloakmock</groupId>
 			<artifactId>mock</artifactId>
 			<scope>test</scope>
-			<version>0.11.0</version>
+			<version>0.12.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-netty</artifactId>
 			<version>3.10.8</version>
+			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-client-java</artifactId>
 			<version>3.10.8</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

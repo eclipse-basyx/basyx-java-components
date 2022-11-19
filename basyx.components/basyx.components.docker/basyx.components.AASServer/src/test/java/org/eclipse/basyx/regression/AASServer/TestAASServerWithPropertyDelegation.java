@@ -37,6 +37,7 @@ public class TestAASServerWithPropertyDelegation {
 	private static final String SERVER_IP = "127.0.0.1";
 	private static final String SERVER_URL = "http://" + SERVER_IP + ":" + SERVER_PORT;
 	private static final String ENDPOINT = "/valueEndpoint";
+	private static final String SM_ELEM_IDSHORT = "delegated";
 	
 	private static IIdentifier aasIdentifier = new CustomId("testAAS");
 	private static IIdentifier smIdentifier = new CustomId("testSM");
@@ -48,17 +49,16 @@ public class TestAASServerWithPropertyDelegation {
 		
 		AASBundle aasBundle = createAASBundle();
 		
-		createExpectationForGet();
-		startAASServerComponentWithAASBundle(configureAndGetBasyxContext(), configureAndGetAASServer(), aasBundle);
+		createExpectationForMockedGet();
+		
+		startAASServerComponentWithAASBundle(configureAndGetBasyxContext(), new BaSyxAASServerConfiguration(), aasBundle);
 	}
 	
 	@Test
-	public void currentValueFromDelegatedEndpoint() {
-		createExpectationForGet();
-		
+	public void valueFromDelegatedProperty() {
 		IAASAggregator proxy = new AASAggregatorProxy(aasServerComponent.getURL());
 		
-		Object actualValue = proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement("delegated").getValue();
+		Object actualValue = proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement(SM_ELEM_IDSHORT).getValue();
 		
 		assertEquals(EXPECTED_VALUE, Integer.parseInt(actualValue.toString()));
 	}
@@ -91,7 +91,7 @@ public class TestAASServerWithPropertyDelegation {
 		mockServer = startClientAndServer(SERVER_PORT);
 	}
 	
-	private static void createExpectationForGet() {
+	private static void createExpectationForMockedGet() {
 		new MockServerClient(SERVER_IP, SERVER_PORT).when(request().withMethod("GET").withPath(ENDPOINT))
 				.respond(response().withStatusCode(200)
 						.withHeaders(new Header("Content-Type", "text/plain; charset=utf-8"),
@@ -109,21 +109,16 @@ public class TestAASServerWithPropertyDelegation {
 	}
 	
 	private static BaSyxContextConfiguration configureAndGetBasyxContext() {
-		String path = "aasContext.properties";
-		
 		BaSyxContextConfiguration contextConfig= new BaSyxContextConfiguration();
-		contextConfig.loadFromResource(path);
+		contextConfig.setHostname("localhost");
+		contextConfig.setContextPath("/aasServer");
+		contextConfig.setPort(4001);
+		
 		return contextConfig;
-	}
-
-	private static BaSyxAASServerConfiguration configureAndGetAASServer() {
-		BaSyxAASServerConfiguration aasContextConfig = new BaSyxAASServerConfiguration();
-		aasContextConfig.loadFromResource("aasServerConfig.properties");
-		return aasContextConfig;
 	}
 	
 	private static Property createDelegatedProperty() {
-		Property delegated = new Property("delegated", ValueType.String);
+		Property delegated = new Property(SM_ELEM_IDSHORT, ValueType.String);
 		delegated.setQualifiers(Collections.singleton(createQualifier(SERVER_URL, ENDPOINT)));
 		return delegated;
 	}

@@ -51,6 +51,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_TAGGED_DIRECTORY = FEATURE_DISABLED;
 
 	// Configuration keys
+	public static final String ID = "registry.id";
 	public static final String BACKEND = "registry.backend";
 	public static final String EVENTS = "registry.events";
 	public static final String AUTHORIZATION = "registry.authorization";
@@ -91,6 +92,10 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	public void loadFromDefaultSource() {
 		loadFileOrDefaultResource(DEFAULT_FILE_KEY, DEFAULT_CONFIG_PATH);
 		loadFromEnvironmentVariables();
+	}
+
+	public String getRegistryId() {
+		return getProperty(ID);
 	}
 
 	public RegistryBackend getRegistryBackend() {
