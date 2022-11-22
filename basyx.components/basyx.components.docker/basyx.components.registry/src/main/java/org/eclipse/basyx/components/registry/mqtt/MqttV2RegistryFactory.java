@@ -32,8 +32,11 @@ import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfigur
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryServiceObserver;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryTopicFactory;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +61,27 @@ public class MqttV2RegistryFactory {
 	}
 
 	protected static void addAASRegistryServiceObserver(ObservableAASRegistryServiceV2 observedAPI, BaSyxMqttConfiguration mqttConfig) {
-		String brokerEndpoint = mqttConfig.getServer();
-		MqttClientPersistence mqttPersistence = MqttRegistryFactory.getMqttPersistenceFromConfig(mqttConfig);
 		try {
-			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, mqttConfig.getClientId(), mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence,
+			MqttClient mqttClient = createAndConnectMqttClient(mqttConfig);
+
+			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(mqttClient,
 					new MqttV2AASRegistryTopicFactory(new Base64URLEncoder()));
 			observedAPI.addObserver(mqttObserver);
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);
 		}
+	}
+
+	private static MqttClient createAndConnectMqttClient(BaSyxMqttConfiguration mqttConfig) throws MqttException, MqttSecurityException {
+		MqttClientPersistence mqttPersistence = MqttRegistryFactory.getMqttPersistenceFromConfig(mqttConfig);
+
+		MqttClient mqttClient = new MqttClient(mqttConfig.getServer(), mqttConfig.getClientId(), mqttPersistence);
+		
+		MqttConnectOptions options = new MqttConnectOptions();
+		options.setUserName(mqttConfig.getUser());
+		options.setPassword(mqttConfig.getPass().toCharArray());
+		
+		mqttClient.connect(options);
+		return mqttClient;
 	}
 }

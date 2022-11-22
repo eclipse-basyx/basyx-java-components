@@ -45,13 +45,22 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 	private BaSyxMqttConfiguration mqttConfig;
 	private MqttClient client;
 	private String clientId;
-	private String aasServerId;
+	private String aasRepoId;
 	private IEncoder idEncoder;
 
-	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasServerId, IEncoder idEncoder) {
+	/**
+	 * Creates the aas server feature for integrating the MqttV2 feature in the AAS
+	 * Server
+	 * 
+	 * @param mqttConfig
+	 * @param clientId
+	 * @param aasRepoId
+	 * @param idEncoder
+	 */
+	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasRepoId, IEncoder idEncoder) {
 		this.mqttConfig = mqttConfig;
 		this.clientId = clientId;
-		this.aasServerId = aasServerId;
+		this.aasRepoId = aasRepoId;
 		this.idEncoder = idEncoder;
 	}
 
@@ -74,7 +83,7 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		return new MqttV2AASServerDecorator(client, this.aasServerId, idEncoder);
+		return new MqttV2AASServerDecorator(client, this.aasRepoId, idEncoder);
 	}
 
 }

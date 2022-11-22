@@ -315,10 +315,12 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private void loadAASServerFeaturesFromConfig() {
-		configureMqttFeature();
+		if (isEventingEnabled()) {
+			configureMqttFeature();
+		}
 		
 		if (aasConfig.isAuthorizationEnabled()) {
-			addAASServerFeature(new AuthorizedAASServerFeature());
+			configureAuthorization();
 		}
 
 		if (aasConfig.isAASXUploadEnabled()) {
@@ -326,10 +328,15 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
-	private void configureMqttFeature() {
-		if (aasConfig.getAASEvents().equals(AASEventBackend.NONE))
-			return;
+	private void configureAuthorization() {
+		addAASServerFeature(new AuthorizedAASServerFeature());
+	}
 
+	private boolean isEventingEnabled() {
+		return !aasConfig.getAASEvents().equals(AASEventBackend.NONE);
+	}
+
+	private void configureMqttFeature() {
 		BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
 		mqttConfig.loadFromDefaultSource();
 		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {

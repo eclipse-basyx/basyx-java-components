@@ -49,23 +49,31 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	private MqttClient client;
-	private String aasServerId;
+	private String aasRepoId;
 	private IEncoder idEncoder;
 
-	public MqttV2AASServerDecorator(MqttClient client, String aasServerId, IEncoder idEncoder) {
+	/**
+	 * Creates the aas server decorator for integrating the MqttV2 decorations in
+	 * the AAS Server
+	 * 
+	 * @param client
+	 * @param aasRepoId
+	 * @param idEncoder
+	 */
+	public MqttV2AASServerDecorator(MqttClient client, String aasRepoId, IEncoder idEncoder) {
 		this.client = client;
-		this.aasServerId = aasServerId;
+		this.aasRepoId = aasRepoId;
 		this.idEncoder = idEncoder;
 	}
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client, this.aasServerId, new MqttV2SubmodelAPITopicFactory(idEncoder));
+		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client, this.aasRepoId, new MqttV2SubmodelAPITopicFactory(idEncoder));
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client, this.aasServerId, new MqttV2SubmodelAggregatorTopicFactory(idEncoder));
+		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client, this.aasRepoId, new MqttV2SubmodelAggregatorTopicFactory(idEncoder));
 	}
 
 	@Override
@@ -75,7 +83,7 @@ public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client, this.aasServerId, new MqttV2AASAggregatorTopicFactory(new Base64URLEncoder()));
+		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client, this.aasRepoId, new MqttV2AASAggregatorTopicFactory(new Base64URLEncoder()));
 	}
 
 }
