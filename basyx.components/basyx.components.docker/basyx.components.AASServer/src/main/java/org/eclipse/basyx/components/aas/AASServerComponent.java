@@ -315,7 +315,6 @@ public class AASServerComponent implements IComponent {
 
 	private void loadAASServerFeaturesFromConfig() {
 		if(aasConfig.isPropertyDelegationEnabled()) {
-			logger.info("Property Delegation Enabled");
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 		

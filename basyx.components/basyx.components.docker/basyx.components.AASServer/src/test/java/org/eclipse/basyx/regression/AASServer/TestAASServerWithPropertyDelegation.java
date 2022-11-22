@@ -26,8 +26,6 @@ package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 import java.util.Collections;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.proxy.AASAggregatorProxy;
@@ -37,18 +35,15 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.extensions.submodel.delegation.PropertyDelegationManager;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.metamodel.api.qualifier.qualifiable.IQualifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
+import org.eclipse.basyx.testsuite.regression.extensions.submodel.delegation.DelegationTestHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
-import org.mockserver.model.Header;
 
 /**
  * Integration tests for Submodel with delegated Property
@@ -59,12 +54,6 @@ import org.mockserver.model.Header;
 public class TestAASServerWithPropertyDelegation {
 	private static AASServerComponent aasServerComponent;
 	
-	private static final int EXPECTED_VALUE = 10;
-	private static final int SERVER_PORT = 1080;
-	
-	private static final String SERVER_IP = "127.0.0.1";
-	private static final String SERVER_URL = "http://" + SERVER_IP + ":" + SERVER_PORT;
-	private static final String ENDPOINT = "/valueEndpoint";
 	private static final String SM_ELEM_IDSHORT = "delegated";
 	
 	private static IIdentifier aasIdentifier = new CustomId("testAAS");
@@ -78,7 +67,7 @@ public class TestAASServerWithPropertyDelegation {
 		
 		AASBundle aasBundle = createAASBundle();
 		
-		createExpectationForMockedGet();
+		mockServerClient = DelegationTestHelper.createExpectationForMockedGet();
 		
 		startAASServerComponentWithAASBundle(configureAndGetBasyxContext(), new BaSyxAASServerConfiguration(), aasBundle);
 	}
@@ -89,13 +78,13 @@ public class TestAASServerWithPropertyDelegation {
 		
 		Object actualValue = proxy.getAAS(aasIdentifier).getSubmodel(smIdentifier).getSubmodelElement(SM_ELEM_IDSHORT).getValue();
 		
-		assertEquals(EXPECTED_VALUE, Integer.parseInt(actualValue.toString()));
+		assertEquals(DelegationTestHelper.EXPECTED_VALUE, Integer.parseInt(actualValue.toString()));
 	}
 
 	private static AASBundle createAASBundle() {
 		String submodelIdShort = "testSubmodel";
 		
-		Property delegatedProperty = createDelegatedProperty();
+		Property delegatedProperty = DelegationTestHelper.createDelegatedProperty();
 		
 		Submodel submodel = new Submodel(submodelIdShort, smIdentifier);
 		submodel.addSubmodelElement(delegatedProperty);
@@ -117,17 +106,7 @@ public class TestAASServerWithPropertyDelegation {
 	}
 
 	private static void configureAndStartMockHttpServer() {
-		mockServer = startClientAndServer(SERVER_PORT);
-	}
-	
-	private static void createExpectationForMockedGet() {
-		mockServerClient = new MockServerClient(SERVER_IP, SERVER_PORT);
-		
-		mockServerClient.when(request().withMethod("GET").withPath(ENDPOINT))
-				.respond(response().withStatusCode(200)
-						.withHeaders(new Header("Content-Type", "text/plain; charset=utf-8"),
-								new Header("Cache-Control", "public, max-age=86400"))
-						.withBody(Integer.toString(EXPECTED_VALUE)));
+		mockServer = startClientAndServer(DelegationTestHelper.SERVER_PORT);
 	}
 	
 	private static void startAASServerComponentWithAASBundle(BaSyxContextConfiguration contextConfig,
@@ -149,16 +128,6 @@ public class TestAASServerWithPropertyDelegation {
 		contextConfig.setPort(4001);
 		
 		return contextConfig;
-	}
-	
-	private static Property createDelegatedProperty() {
-		Property delegated = new Property(SM_ELEM_IDSHORT, ValueType.String);
-		delegated.setQualifiers(Collections.singleton(createQualifier(SERVER_URL, ENDPOINT)));
-		return delegated;
-	}
-	
-	private static IQualifier createQualifier(String serverUrl, String endpoint) {
-		return PropertyDelegationManager.createDelegationQualifier(serverUrl + endpoint);
 	}
 	
 	@AfterClass
