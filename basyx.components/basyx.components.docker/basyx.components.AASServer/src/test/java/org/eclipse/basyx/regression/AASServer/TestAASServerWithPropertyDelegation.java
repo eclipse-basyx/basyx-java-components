@@ -29,8 +29,6 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.proxy.AASAggregatorProxy;
 import org.eclipse.basyx.aas.bundle.AASBundle;
@@ -39,7 +37,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.extensions.shared.delegation.PropertyDelegationManager;
+import org.eclipse.basyx.extensions.submodel.delegation.PropertyDelegationManager;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.qualifiable.IQualifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -48,7 +46,7 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.prop
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
@@ -72,6 +70,7 @@ public class TestAASServerWithPropertyDelegation {
 	private static IIdentifier aasIdentifier = new CustomId("testAAS");
 	private static IIdentifier smIdentifier = new CustomId("testSM");
 	private static ClientAndServer mockServer;
+	private static MockServerClient mockServerClient;
 	
 	@BeforeClass
 	public static void init() {
@@ -122,11 +121,13 @@ public class TestAASServerWithPropertyDelegation {
 	}
 	
 	private static void createExpectationForMockedGet() {
-		new MockServerClient(SERVER_IP, SERVER_PORT).when(request().withMethod("GET").withPath(ENDPOINT))
+		mockServerClient = new MockServerClient(SERVER_IP, SERVER_PORT);
+		
+		mockServerClient.when(request().withMethod("GET").withPath(ENDPOINT))
 				.respond(response().withStatusCode(200)
 						.withHeaders(new Header("Content-Type", "text/plain; charset=utf-8"),
 								new Header("Cache-Control", "public, max-age=86400"))
-						.withBody(Integer.toString(EXPECTED_VALUE)).withDelay(TimeUnit.SECONDS, 1));
+						.withBody(Integer.toString(EXPECTED_VALUE)));
 	}
 	
 	private static void startAASServerComponentWithAASBundle(BaSyxContextConfiguration contextConfig,
@@ -165,5 +166,7 @@ public class TestAASServerWithPropertyDelegation {
 		aasServerComponent.stopComponent();
 		
         mockServer.stop();
+        
+        mockServerClient.close();
     }
 }
