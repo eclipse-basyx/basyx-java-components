@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.4.5</version>
+			<version>3.4.6</version>
 		</dependency>
 
 		<!-- Adds additional classes of the BaSys SDK for tests -->
