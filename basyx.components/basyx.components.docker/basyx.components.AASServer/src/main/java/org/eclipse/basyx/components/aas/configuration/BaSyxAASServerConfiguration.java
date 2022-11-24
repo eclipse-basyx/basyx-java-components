@@ -68,6 +68,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_CLIENT_ID = "";
 	public static final String DEFAULT_CLIENT_SECRET = "";
 	public static final String DEFAULT_CLIENT_SCOPES = "[]";
+	public static final String DEFAULT_PROPERTY_DELEGATION = FEATURE_ENABLED;
 
 
 	// Configuration keys
@@ -84,6 +85,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String CLIENT_ID = "clientId";
 	public static final String CLIENT_SECRET = "clientSecret";
 	public static final String CLIENT_SCOPES = "clientScopes";
+	public static final String PROPERTY_DELEGATION = "aas.delegation";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -107,6 +109,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(CLIENT_ID, DEFAULT_CLIENT_ID);
 		defaultProps.put(CLIENT_SECRET, DEFAULT_CLIENT_SECRET);
 		defaultProps.put(CLIENT_SCOPES, DEFAULT_CLIENT_SCOPES);
+		defaultProps.put(PROPERTY_DELEGATION, DEFAULT_PROPERTY_DELEGATION);
 		return defaultProps;
 	}
 
@@ -172,7 +175,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES };
+		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -349,6 +352,18 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	
 	public void setClientScopes(String clientScopes) {
 		setProperty(CLIENT_SCOPES, clientScopes);
+	}
+	
+	public void enablePropertyDelegation() {
+		setProperty(PROPERTY_DELEGATION, FEATURE_ENABLED);
+	}
+
+	public void disablePropertyDelegation() {
+		setProperty(PROPERTY_DELEGATION, FEATURE_DISABLED);
+	}
+	
+	public boolean isPropertyDelegationEnabled() {
+		return getProperty(PROPERTY_DELEGATION).equals(FEATURE_ENABLED);
 	}
 	
 	public boolean isAuthorizationCredentialsForSecuredRegistryConfigured() {
