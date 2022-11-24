@@ -28,13 +28,17 @@ package org.eclipse.basyx.regression.registry;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
+import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 
 public class TestSQLMqttRegistryBackend extends TestMqttRegistryBackend {
 	@Override
 	public RegistryComponent createRegistryComponent() {
-		BaSyxSQLConfiguration sqlConfig = new BaSyxSQLConfiguration();
-		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
-		RegistryComponent registryComponent = new RegistryComponent(contextConfig, sqlConfig);
-		return registryComponent;
+		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
+		registryConfig.setRegistryBackend(RegistryBackend.SQL);
+		registryConfig.setRegistryEvents(RegistryEventBackend.MQTT);
+
+		return new RegistryComponent(new BaSyxContextConfiguration(), registryConfig, new BaSyxSQLConfiguration());
 	}
 }

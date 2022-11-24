@@ -120,6 +120,22 @@ public class RegistryComponent implements IComponent {
 
 	/**
 	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with a MongoDB backend.
+	 * 
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param registryConfig
+	 * @param mongoDBConfig
+	 *            The mongoDB configuration
+	 */
+	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
+		this.contextConfig = contextConfig;
+		this.registryConfig = registryConfig;
+		this.mongoDBConfig = mongoDBConfig;
+	}
+
+	/**
+	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create a registry with an SQL backend.
 	 * 
 	 * @param contextConfig
@@ -130,6 +146,22 @@ public class RegistryComponent implements IComponent {
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
 		this.registryConfig = new BaSyxRegistryConfiguration(RegistryBackend.SQL);
+		this.sqlConfig = sqlConfig;
+	}
+
+	/**
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with an SQL backend.
+	 * 
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param registryConfig
+	 * @param sqlConfig
+	 *            The sql configuration
+	 */
+	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxSQLConfiguration sqlConfig) {
+		this.contextConfig = contextConfig;
+		this.registryConfig = registryConfig;
 		this.sqlConfig = sqlConfig;
 	}
 

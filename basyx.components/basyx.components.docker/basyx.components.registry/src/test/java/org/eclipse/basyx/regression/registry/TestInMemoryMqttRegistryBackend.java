@@ -25,11 +25,19 @@
 
 package org.eclipse.basyx.regression.registry;
 
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
+import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 
 public class TestInMemoryMqttRegistryBackend extends TestMqttRegistryBackend {
 	@Override
 	public RegistryComponent createRegistryComponent() {
-		return new RegistryComponent();
+		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
+		registryConfig.setRegistryBackend(RegistryBackend.INMEMORY);
+		registryConfig.setRegistryEvents(RegistryEventBackend.MQTT);
+
+		return new RegistryComponent(new BaSyxContextConfiguration(), registryConfig);
 	}
 }
