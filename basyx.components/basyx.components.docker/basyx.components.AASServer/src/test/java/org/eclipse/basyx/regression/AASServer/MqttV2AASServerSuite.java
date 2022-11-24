@@ -39,7 +39,6 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2AASAggregatorTopicFactory;
-import org.eclipse.basyx.extensions.aas.api.mqtt.MqttAASAPIHelper;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2SubmodelAggregatorTopicFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -129,21 +128,20 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		Submodel submodel = createSubmodel(submodelIdentifier.getId(), submodelIdentifier);
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
 
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(submodelAggregatorFactory.createCreateSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 
 		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(submodelAggregatorFactory.createDeleteSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
+
 		try {
 			manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 			fail();
-		} catch (ResourceNotFoundException e) {
-			// ResourceNotFoundException expected
+		} catch (ResourceNotFoundException expected) {
 		}
+
 		manager.deleteAAS(shellIdentifierForSubmodel);
 	}
 
