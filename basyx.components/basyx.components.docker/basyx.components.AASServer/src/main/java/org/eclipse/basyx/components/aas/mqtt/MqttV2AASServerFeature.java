@@ -29,11 +29,10 @@ import java.security.ProviderException;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-
-import com.google.common.base.Strings;
 
 /**
  * 
@@ -46,12 +45,23 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 	private BaSyxMqttConfiguration mqttConfig;
 	private MqttClient client;
 	private String clientId;
-	private String aasServerId;
+	private String aasRepoId;
+	private IEncoder idEncoder;
 
-	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasServerId) {
+	/**
+	 * Creates the aas server feature for integrating the MqttV2 feature in the AAS
+	 * Server
+	 * 
+	 * @param mqttConfig
+	 * @param clientId
+	 * @param aasRepoId
+	 * @param idEncoder
+	 */
+	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasRepoId, IEncoder idEncoder) {
 		this.mqttConfig = mqttConfig;
 		this.clientId = clientId;
-		this.aasServerId = aasServerId;
+		this.aasRepoId = aasRepoId;
+		this.idEncoder = idEncoder;
 	}
 
 	@Override
@@ -73,7 +83,7 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		return new MqttV2AASServerDecorator(client, this.aasServerId);
+		return new MqttV2AASServerDecorator(client, this.aasRepoId, idEncoder);
 	}
 
 }

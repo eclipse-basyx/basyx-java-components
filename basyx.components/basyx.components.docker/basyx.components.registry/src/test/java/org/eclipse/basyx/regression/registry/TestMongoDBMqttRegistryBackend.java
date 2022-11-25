@@ -28,13 +28,17 @@ package org.eclipse.basyx.regression.registry;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
+import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 
 public class TestMongoDBMqttRegistryBackend extends TestMqttRegistryBackend {
 	@Override
 	public RegistryComponent createRegistryComponent() {
-		BaSyxMongoDBConfiguration mongoDBConfig = new BaSyxMongoDBConfiguration();
-		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
-		RegistryComponent registryComponent = new RegistryComponent(contextConfig, mongoDBConfig);
-		return registryComponent;
+		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
+		registryConfig.setRegistryBackend(RegistryBackend.MONGODB);
+		registryConfig.setRegistryEvents(RegistryEventBackend.MQTT);
+
+		return new RegistryComponent(new BaSyxContextConfiguration(), registryConfig, new BaSyxMongoDBConfiguration());
 	}
 }

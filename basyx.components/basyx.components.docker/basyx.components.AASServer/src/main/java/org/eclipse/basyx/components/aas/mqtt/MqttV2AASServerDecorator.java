@@ -27,10 +27,14 @@ package org.eclipse.basyx.components.aas.mqtt;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2AASAggregatorTopicFactory;
 import org.eclipse.basyx.extensions.aas.aggregator.mqtt.MqttV2DecoratingAASAggregatorFactory;
-import org.eclipse.basyx.extensions.aas.api.mqtt.MqttDecoratingAASAPIFactory;
+import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
+import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
 import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2DecoratingSubmodelAggregatorFactory;
+import org.eclipse.basyx.extensions.submodel.aggregator.mqtt.MqttV2SubmodelAggregatorTopicFactory;
 import org.eclipse.basyx.extensions.submodel.mqtt.MqttV2DecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.extensions.submodel.mqtt.MqttV2SubmodelAPITopicFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -45,31 +49,41 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 public class MqttV2AASServerDecorator implements IAASServerDecorator {
 
 	private MqttClient client;
-	private String aasServerId;
+	private String aasRepoId;
+	private IEncoder idEncoder;
 
-	public MqttV2AASServerDecorator(MqttClient client, String aasServerId) {
+	/**
+	 * Creates the aas server decorator for integrating the MqttV2 decorations in
+	 * the AAS Server
+	 * 
+	 * @param client
+	 * @param aasRepoId
+	 * @param idEncoder
+	 */
+	public MqttV2AASServerDecorator(MqttClient client, String aasRepoId, IEncoder idEncoder) {
 		this.client = client;
-		this.aasServerId = aasServerId;
+		this.aasRepoId = aasRepoId;
+		this.idEncoder = idEncoder;
 	}
 
 	@Override
 	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client, this.aasServerId);
+		return new MqttV2DecoratingSubmodelAPIFactory(submodelAPIFactory, client, this.aasRepoId, new MqttV2SubmodelAPITopicFactory(idEncoder));
 	}
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client, this.aasServerId);
+		return new MqttV2DecoratingSubmodelAggregatorFactory(submodelAggregatorFactory, client, this.aasRepoId, new MqttV2SubmodelAggregatorTopicFactory(idEncoder));
 	}
 
 	@Override
 	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
-		return new MqttDecoratingAASAPIFactory(aasAPIFactory, client);
+		return aasAPIFactory;
 	}
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client, this.aasServerId);
+		return new MqttV2DecoratingAASAggregatorFactory(aasAggregatorFactory, client, this.aasRepoId, new MqttV2AASAggregatorTopicFactory(new Base64URLEncoder()));
 	}
 
 }
