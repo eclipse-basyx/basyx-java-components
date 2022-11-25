@@ -24,10 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.HashMap;
-
 import javax.servlet.http.HttpServlet;
 import org.apache.commons.collections4.map.HashedMap;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
@@ -38,8 +36,11 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirectoryFactory;
-import org.eclipse.basyx.components.registry.authorization.AuthorizedRegistryFeature;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
+import org.eclipse.basyx.components.registry.authorization.GrantedAuthoritySecurityFeature;
+import org.eclipse.basyx.components.registry.authorization.IJwtBearerTokenAuthenticationConfigurationProvider;
+import org.eclipse.basyx.components.registry.authorization.SecurityFeature;
+import org.eclipse.basyx.components.registry.authorization.SimpleRbacSecurityFeature;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
@@ -47,9 +48,6 @@ import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFactory;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFeature;
 import org.eclipse.basyx.components.registry.mqtt.MqttV2RegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
@@ -57,7 +55,6 @@ import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
@@ -89,8 +86,6 @@ public class RegistryComponent implements IComponent {
 	private BaSyxSQLConfiguration sqlConfig;
 	private BaSyxMqttConfiguration mqttConfig;
 	private BaSyxSecurityConfiguration securityConfig;
-
-	private List<IAASRegistryFeature> registryFeatureList = new ArrayList<>();
 
 	/**
 	 * Default constructor that loads default configurations
@@ -194,11 +189,10 @@ public class RegistryComponent implements IComponent {
 	@Override
 	public void startComponent() {
 		loadRegistryFeaturesFromConfig();
-		initializeRegistryFeatures();
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createRegistryServlet());
-		addRegistryFeaturesToContext(context);
+		configureContextForAuthorization(context);
 
 		server = new BaSyxHTTPServer(context);
 		server.start();
@@ -245,28 +239,6 @@ public class RegistryComponent implements IComponent {
 		return config;
 	}
 
-	public void addRegistryFeature(IAASRegistryFeature registryFeature) {
-		registryFeatureList.add(registryFeature);
-	}
-
-	private void initializeRegistryFeatures() {
-		for (IAASRegistryFeature registryFeature : registryFeatureList) {
-			registryFeature.initialize();
-		}
-	}
-
-	private void cleanUpRegistryFeatures() {
-		for (IAASRegistryFeature registryFeature : registryFeatureList) {
-			registryFeature.cleanUp();
-		}
-	}
-
-	private void addRegistryFeaturesToContext(BaSyxContext context) {
-		for (IAASRegistryFeature registryFeature : registryFeatureList) {
-			registryFeature.addToContext(context);
-		}
-	}
-
 	private HttpServlet createRegistryServlet() {
 		if (this.registryConfig.isTaggedDirectoryEnabled()) {
 			return createTaggedRegistryServlet();
@@ -296,14 +268,8 @@ public class RegistryComponent implements IComponent {
 			decoratedTaggedDirectory = configureMqttTagged(decoratedTaggedDirectory);
 		}
 		if (securityConfig.isAuthorizationEnabled()) {
-			decoratedTaggedDirectory = configureAuthorizationTagged(decoratedTaggedDirectory);
+			decoratedTaggedDirectory = decorateWithAuthorization(decoratedTaggedDirectory);
 		}
-		return decoratedTaggedDirectory;
-	}
-
-	private IAASTaggedDirectory configureAuthorizationTagged(IAASTaggedDirectory decoratedTaggedDirectory) {
-		logger.info("Authorization enabled for TaggedDirectory.");
-		decoratedTaggedDirectory = new AuthorizedTaggedDirectoryFactory().create(decoratedTaggedDirectory);
 		return decoratedTaggedDirectory;
 	}
 
@@ -359,16 +325,6 @@ public class RegistryComponent implements IComponent {
 		return new MongoDBRegistry(mongoDBConfiguration);
 	}
 
-	private List<IAASRegistryDecorator> createRegistryDecoratorList() {
-		List<IAASRegistryDecorator> registryDecoratorList = new ArrayList<>();
-
-		for (IAASRegistryFeature registryFeature : registryFeatureList) {
-			registryDecoratorList.add(registryFeature.getDecorator());
-		}
-
-		return registryDecoratorList;
-	}
-
 	private IAASRegistry decorate(IAASRegistry aasRegistry) {
 		IAASRegistry decoratedRegistry = aasRegistry;
 
@@ -377,27 +333,65 @@ public class RegistryComponent implements IComponent {
 		}
 
 		if (securityConfig.isAuthorizationEnabled()) {
-			decoratedRegistry = configureAuthorization(decoratedRegistry);
+			decoratedRegistry = decorateWithAuthorization(decoratedRegistry);
 		}
 
-		final IAASRegistry innerRegistry = decoratedRegistry;
-
-		IAASRegistryFactory decoratedRegistryFactory = () -> innerRegistry;
-
-		final List<IAASRegistryDecorator> decorators = createRegistryDecoratorList();
-
-		for (IAASRegistryDecorator decorator : decorators) {
-			decoratedRegistryFactory = decorator.decorateRegistryFactory(decoratedRegistryFactory);
-		}
-
-		return decoratedRegistryFactory.create();
+		return decoratedRegistry;
 	}
 
-	private IAASRegistry configureAuthorization(IAASRegistry decoratedRegistry) {
+	private SecurityFeature getSecurityFeature() {
+		final String strategyString = securityConfig.getAuthorizationStrategy();
+
+		if (strategyString == null) {
+			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in aas.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
+		}
+
+		AuthorizationStrategy strategy;
+		try {
+			strategy = AuthorizationStrategy.valueOf(strategyString);
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in aas.properties, available options: %s", strategyString, Arrays
+					.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
+		}
+
+		switch (strategy) {
+			case SimpleRbac: {
+				return new SimpleRbacSecurityFeature(securityConfig);
+			}
+			case GrantedAuthority: {
+				return new GrantedAuthoritySecurityFeature(securityConfig);
+			}
+			case Custom: {
+				return new SecurityFeature(securityConfig);
+			}
+			default:
+				throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
+		}
+	}
+
+	private void configureContextForAuthorization(final BaSyxContext context) {
+		if (securityConfig.isAuthorizationEnabled()) {
+			final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
+			if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
+				context.setJwtBearerTokenAuthenticationConfiguration(
+						jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig)
+				);
+			}
+		}
+	}
+
+	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
+		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
+	}
+
+	private IAASRegistry decorateWithAuthorization(IAASRegistry registry) {
 		logger.info("Enable Authorization for Registry");
-		securityConfig = new BaSyxSecurityConfiguration();
-		decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
-		return decoratedRegistry;
+		return getSecurityFeature().getDecorator().decorateRegistry(registry);
+	}
+
+	private IAASTaggedDirectory decorateWithAuthorization(IAASTaggedDirectory taggedDirectory) {
+		logger.info("Enable Authorization for TaggedDirectory");
+		return getSecurityFeature().getDecorator().decorateTaggedDirectory(taggedDirectory);
 	}
 
 	private IAASRegistry configureMqtt(IAASRegistry decoratedRegistry) {
@@ -430,15 +424,10 @@ public class RegistryComponent implements IComponent {
 	private void configureAuthorization() {
 		securityConfig = new BaSyxSecurityConfiguration();
 		securityConfig.loadFromDefaultSource();
-		if (securityConfig.isAuthorizationEnabled()) {
-			addRegistryFeature(new AuthorizedRegistryFeature(securityConfig));
-		}
 	}
 
 	@Override
 	public void stopComponent() {
-		cleanUpRegistryFeatures();
-
 		server.shutdown();
 		logger.info("Registry server stopped");
 	}

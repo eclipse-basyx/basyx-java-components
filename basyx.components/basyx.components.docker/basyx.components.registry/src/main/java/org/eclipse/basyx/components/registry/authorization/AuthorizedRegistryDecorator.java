@@ -24,8 +24,11 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.authorization;
 
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryFactory;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.AuthorizedTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 
@@ -38,23 +41,26 @@ import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProv
  */
 public class AuthorizedRegistryDecorator<SubjectInformationType> implements IAASRegistryDecorator {
 	protected final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer;
+	protected final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
 	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
 	public AuthorizedRegistryDecorator(
 			final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer,
+			final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer,
 			final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider
 	) {
 		this.registryAuthorizer = registryAuthorizer;
+		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
 		this.subjectInformationProvider = subjectInformationProvider;
 	}
 
 	@Override
-	public IAASRegistryFactory decorateRegistryFactory(IAASRegistryFactory registryFactory) {
-		return new AuthorizedDecoratingAASRegistryFactory<>(
-				registryFactory,
-				registryAuthorizer,
-				subjectInformationProvider
-		);
+	public IAASRegistry decorateRegistry(IAASRegistry registry) {
+		return new AuthorizedAASRegistry<>(registry, registryAuthorizer, subjectInformationProvider);
 	}
 
+	@Override
+	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory) {
+		return new AuthorizedTaggedDirectory<>(taggedDirectory, taggedDirectoryAuthorizer, subjectInformationProvider);
+	}
 }

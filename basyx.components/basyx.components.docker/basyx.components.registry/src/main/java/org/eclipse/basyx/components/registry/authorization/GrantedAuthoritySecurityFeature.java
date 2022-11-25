@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.GrantedAuthorityTaggedDirectoryAuthorizer;
 import org.eclipse.basyx.extensions.aas.registration.authorization.GrantedAuthorityAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.IGrantedAuthorityAuthenticator;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
@@ -45,13 +45,14 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
   }
 
   @Override
-  public  <SubjectInformationType> IAASRegistryDecorator getDecorator() {
+  public <SubjectInformationType> AuthorizedRegistryDecorator<SubjectInformationType> getDecorator() {
     logger.info("use GrantedAuthority authorization strategy");
     final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
     final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
 
     return new AuthorizedRegistryDecorator<>(
         new GrantedAuthorityAASRegistryAuthorizer<>(grantedAuthorityAuthenticator),
+        new GrantedAuthorityTaggedDirectoryAuthorizer<>(grantedAuthorityAuthenticator),
         subjectInformationProvider
     );
   }

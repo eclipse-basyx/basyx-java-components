@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2022 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,21 +22,20 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-
-package org.eclipse.basyx.components.registry.registrycomponent;
+package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 
 /**
- * Interface for providing a Registry
+ * 
+ * Interface for registry/tagged directory decoration
  * 
  * @author wege
  *
  */
-public interface IAASRegistryFactory {
-	/**
-	 * Return a constructed Registry
-	 *
-	 */
-	public IAASRegistry create();
+public interface IAASRegistryDecorator {
+	public IAASRegistry decorateRegistry(IAASRegistry aasRegistry);
+
+	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory);
 }

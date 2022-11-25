@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.SimpleRbacTaggedDirectoryAuthorizer;
 import org.eclipse.basyx.extensions.aas.registration.authorization.SimpleRbacAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.IRbacRuleChecker;
 import org.eclipse.basyx.extensions.shared.authorization.IRoleAuthenticator;
@@ -48,7 +48,7 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
   }
 
   @Override
-  public  <SubjectInformationType> IAASRegistryDecorator getDecorator() {
+  public <SubjectInformationType> IAASRegistryDecorator getDecorator() {
     logger.info("use SimpleRbac authorization strategy");
     final RbacRuleSet rbacRuleSet = RbacRuleSet.fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
     final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
@@ -57,6 +57,7 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
 
     return new AuthorizedRegistryDecorator<>(
         new SimpleRbacAASRegistryAuthorizer<>(rbacRuleChecker, roleAuthenticator),
+        new SimpleRbacTaggedDirectoryAuthorizer<>(rbacRuleChecker, roleAuthenticator),
         subjectInformationProvider
     );
   }

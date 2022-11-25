@@ -24,12 +24,13 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.authorization;
 
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.ITaggedDirectoryAuthorizer;
 import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
 
 /**
  *
  * The different authorizers for the registry server to use when calling BaSyx objects like
- * the aas registry.
+ * the aas registry or the tagged directory.
  *
  * @author wege
  *
@@ -41,9 +42,17 @@ public class Authorizers<SubjectInformationType> {
     return aasRegistryAuthorizer;
   }
 
+  private final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
+
+  public ITaggedDirectoryAuthorizer<SubjectInformationType> getTaggedDirectoryAuthorizer() {
+    return taggedDirectoryAuthorizer;
+  }
+
   public Authorizers(
-      final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer
+      final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer,
+      final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer
   ) {
     this.aasRegistryAuthorizer = aasRegistryAuthorizer;
+    this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
   }
 }

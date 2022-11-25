@@ -22,15 +22,33 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.registrycomponent;
+package org.eclipse.basyx.components.registry.authorization;
+
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.AuthorizedTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 
 /**
  * 
- * Interface for RegistryFactory Decoration
+ * Decorator for Authorization of Submodel and Shell access
  * 
  * @author wege
  *
  */
-public interface IAASRegistryDecorator {
-	public IAASRegistryFactory decorateRegistryFactory(IAASRegistryFactory registryFactory);
+public class AuthorizedTaggedDirectoryDecorator<SubjectInformationType> {
+	protected final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
+	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
+
+	public AuthorizedTaggedDirectoryDecorator(
+			final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer,
+			final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider
+	) {
+		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
+		this.subjectInformationProvider = subjectInformationProvider;
+	}
+
+	public IAASTaggedDirectory decorate(IAASTaggedDirectory taggedDirectory) {
+		return new AuthorizedTaggedDirectory<>(taggedDirectory, taggedDirectoryAuthorizer, subjectInformationProvider);
+	}
 }

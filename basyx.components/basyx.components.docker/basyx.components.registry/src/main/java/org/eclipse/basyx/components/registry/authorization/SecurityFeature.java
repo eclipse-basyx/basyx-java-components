@@ -25,13 +25,12 @@
 package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.registry.registrycomponent.IAASRegistryDecorator;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides the {@link IAASRegistryDecorator} instance that is required for authorization.
+ * Provides the {@link AuthorizedRegistryDecorator} and {@link AuthorizedTaggedDirectoryDecorator} instance that are required for authorization.
  * This base class uses the custom authorization configuration properties to load classes.
  *
  * @author wege
@@ -45,7 +44,7 @@ public class SecurityFeature {
     this.securityConfig = securityConfig;
   }
 
-  public  <SubjectInformationType> IAASRegistryDecorator getDecorator() {
+  public <SubjectInformationType> IAASRegistryDecorator getDecorator() {
     logger.info("use Custom authorization strategy");
     final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
     final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
@@ -54,6 +53,7 @@ public class SecurityFeature {
 
     return new AuthorizedRegistryDecorator<>(
         authorizers.getAasRegistryAuthorizer(),
+        authorizers.getTaggedDirectoryAuthorizer(),
         subjectInformationProvider
     );
   }
