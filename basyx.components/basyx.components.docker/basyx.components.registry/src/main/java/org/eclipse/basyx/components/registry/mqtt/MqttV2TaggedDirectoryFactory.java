@@ -23,21 +23,29 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.basyx.regression.registry;
+package org.eclipse.basyx.components.registry.mqtt;
 
-import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.registry.RegistryComponent;
+import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
-import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryServiceV2;
+import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
 
-public class TestInMemoryMqttRegistryBackend extends TestMqttRegistryBackend {
-	@Override
-	public RegistryComponent createRegistryComponent() {
-		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
-		registryConfig.setRegistryBackend(RegistryBackend.INMEMORY);
-		registryConfig.setRegistryEvents(RegistryEventBackend.MQTT);
+/**
+ * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
+ * implementations
+ * 
+ * @author espen, siebert
+ * 
+ */
+public class MqttV2TaggedDirectoryFactory extends MqttV2RegistryFactory {
+	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig, IEncoder idEncoder) {
+		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig, registryConfig, idEncoder);
+	}
 
-		return new RegistryComponent(new BaSyxContextConfiguration(), registryConfig);
+	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig, IEncoder idEncoder) {
+		ObservableAASTaggedDirectoryServiceV2 observedAPI = new ObservableAASTaggedDirectoryServiceV2(taggedDirectory, registryConfig.getRegistryId());
+		addAASRegistryServiceObserver(observedAPI, mqttConfig, idEncoder);
+		return observedAPI;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2022 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,51 +22,42 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.configuration;
+package org.eclipse.basyx.components.aas.delegation;
 
-import org.eclipse.basyx.submodel.metamodel.enumhelper.StandardizedLiteralEnumHelper;
-
-import com.google.common.base.Strings;
+import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
+import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.extensions.submodel.delegation.DelegatingDecoratingSubmodelAPIFactory;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
+import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
 /**
- * Possible types for AAS event backends.
  * 
- * @author espen
+ * Decorator for Property Delegation of Submodel
+ * 
+ * @author danish
  *
  */
-public enum AASEventBackend {
-	NONE("NONE"), MQTT("MQTT"), MQTTV2("MQTTV2"), MQTTV2_SIMPLE_ENCODING("MQTTV2_SIMPLE_ENCODING");
+public class DelegationAASServerDecorator implements IAASServerDecorator{
 
-	private String literal;
-
-	private AASEventBackend(String literal) {
-		this.literal = literal;
+	@Override
+	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
+		return new DelegatingDecoratingSubmodelAPIFactory(submodelAPIFactory);
 	}
 
 	@Override
-	public String toString() {
-		return literal;
+	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(
+			ISubmodelAggregatorFactory submodelAggregatorFactory) {
+		return submodelAggregatorFactory;
 	}
 
-	/**
-	 * Method to transform string literal to AAS event enum.
-	 * 
-	 * @see StandardizedLiteralEnumHelper StandardizedLiteralEnumHelper
-	 * 
-	 * @param literal
-	 * @return
-	 */
-	public static AASEventBackend fromString(String literal) {
-		if (Strings.isNullOrEmpty(literal)) {
-			return null;
-		}
+	@Override
+	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
+		return aasAPIFactory;
+	}
 
-		AASEventBackend[] enumConstants = AASEventBackend.class.getEnumConstants();
-		for (AASEventBackend constant : enumConstants) {
-			if (constant.toString().equals(literal)) {
-				return constant;
-			}
-		}
-		throw new IllegalArgumentException("The literal '" + literal + "' is not a valid EventBackend");
+	@Override
+	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
+		return aasAggregatorFactory;
 	}
 }

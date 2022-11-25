@@ -69,12 +69,14 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_CLIENT_ID = "";
 	public static final String DEFAULT_CLIENT_SECRET = "";
 	public static final String DEFAULT_CLIENT_SCOPES = "[]";
+	public static final String DEFAULT_PROPERTY_DELEGATION = FEATURE_ENABLED;
 
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
 	public static final String HOSTPATH = "registry.host";
 	public static final String SUBMODELS = "registry.submodels";
+	public static final String ID = "aas.id";
 	public static final String BACKEND = "aas.backend";
 	public static final String SOURCE = "aas.source";
 	public static final String EVENTS = "aas.events";
@@ -91,16 +93,17 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.grantedAuthority.subjectInformationProvider";
 	public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "aas.authorization.strategy.custom.authorizersProvider";
 	public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.custom.subjectInformationProvider";
+	public static final String TOKEN_ENDPOINT = "tokenEndpoint";
+	public static final String CLIENT_ID = "clientId";
+	public static final String CLIENT_SECRET = "clientSecret";
+	public static final String CLIENT_SCOPES = "clientScopes";
+	public static final String PROPERTY_DELEGATION = "aas.delegation";
 
 	public enum AuthorizationStrategy {
 		SimpleRbac,
 		GrantedAuthority,
 		Custom
 	}
-	public static final String TOKEN_ENDPOINT = "tokenEndpoint";
-	public static final String CLIENT_ID = "clientId";
-	public static final String CLIENT_SECRET = "clientSecret";
-	public static final String CLIENT_SCOPES = "clientScopes";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -125,6 +128,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(CLIENT_ID, DEFAULT_CLIENT_ID);
 		defaultProps.put(CLIENT_SECRET, DEFAULT_CLIENT_SECRET);
 		defaultProps.put(CLIENT_SCOPES, DEFAULT_CLIENT_SCOPES);
+		defaultProps.put(PROPERTY_DELEGATION, DEFAULT_PROPERTY_DELEGATION);
 		return defaultProps;
 	}
 
@@ -208,7 +212,12 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 				AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR,
 				AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER,
 				AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER,
-				AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER
+				AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER,
+				TOKEN_ENDPOINT,
+				CLIENT_ID,
+				CLIENT_SECRET,
+				CLIENT_SCOPES,
+				PROPERTY_DELEGATION
 		};
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
@@ -224,6 +233,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		}
 
 		return new OAuth2ClientCredentialsBasedAuthorizationSupplier(getTokenEndpoint(), getClientId(), getClientSecret(), getClientScopes());
+	}
+
+	public String getAASId() {
+	  return getProperty(ID);
 	}
 
 	public AASServerBackend getAASBackend() {
@@ -470,6 +483,18 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	public void setClientScopes(String clientScopes) {
 		setProperty(CLIENT_SCOPES, clientScopes);
+	}
+
+	public void enablePropertyDelegation() {
+		setProperty(PROPERTY_DELEGATION, FEATURE_ENABLED);
+	}
+
+	public void disablePropertyDelegation() {
+		setProperty(PROPERTY_DELEGATION, FEATURE_DISABLED);
+	}
+
+	public boolean isPropertyDelegationEnabled() {
+		return getProperty(PROPERTY_DELEGATION).equals(FEATURE_ENABLED);
 	}
 
 	public boolean isAuthorizationCredentialsForSecuredRegistryConfigured() {

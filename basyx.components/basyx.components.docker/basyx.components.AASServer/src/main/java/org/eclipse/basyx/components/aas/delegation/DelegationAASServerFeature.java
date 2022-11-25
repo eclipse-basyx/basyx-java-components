@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2022 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,22 +22,31 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
+package org.eclipse.basyx.components.aas.delegation;
 
-package org.eclipse.basyx.regression.registry;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 
-import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
-import org.eclipse.basyx.components.registry.RegistryComponent;
-import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
-import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
+/**
+ * 
+ * Feature for Property Delegation of Submodel
+ * 
+ * @author danish
+ *
+ */
+public class DelegationAASServerFeature implements IAASServerFeature {
 
-public class TestInMemoryMqttRegistryBackend extends TestMqttRegistryBackend {
 	@Override
-	public RegistryComponent createRegistryComponent() {
-		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
-		registryConfig.setRegistryBackend(RegistryBackend.INMEMORY);
-		registryConfig.setRegistryEvents(RegistryEventBackend.MQTT);
-
-		return new RegistryComponent(new BaSyxContextConfiguration(), registryConfig);
+	public void initialize() {
 	}
+
+	@Override
+	public void cleanUp() {
+	}
+
+	@Override
+	public IAASServerDecorator getDecorator() {
+		return new DelegationAASServerDecorator();
+	}
+
 }
