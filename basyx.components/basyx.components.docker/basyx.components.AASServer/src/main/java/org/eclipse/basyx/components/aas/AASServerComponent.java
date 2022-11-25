@@ -318,8 +318,8 @@ public class AASServerComponent implements IComponent {
 	private void loadAASServerFeaturesFromConfig() {
 		if (isEventingEnabled()) {
 			configureMqttFeature();
-    }
-    
+		}
+
 		if(aasConfig.isPropertyDelegationEnabled()) {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
