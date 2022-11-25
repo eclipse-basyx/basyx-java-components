@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
@@ -47,7 +48,6 @@ import org.eclipse.basyx.aas.factory.aasx.FileLoaderHelper;
 import org.eclipse.basyx.aas.factory.aasx.SubmodelFileEndpointLoader;
 import org.eclipse.basyx.aas.factory.json.JSONAASBundleFactory;
 import org.eclipse.basyx.aas.factory.xml.XMLAASBundleFactory;
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
@@ -64,7 +64,6 @@ import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedDefaultServlet;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedDefaultServletParams;
-import org.eclipse.basyx.components.aas.authorization.IFilesAuthorizer;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -77,12 +76,12 @@ import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
+import org.eclipse.basyx.extensions.shared.authorization.ElevatedCodeAuthentication;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
-import org.eclipse.basyx.extensions.shared.authorization.CodeAuthentication;
-import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -119,6 +118,7 @@ public class AASServerComponent implements IComponent {
 	private BaSyxContextConfiguration contextConfig;
 	private BaSyxAASServerConfiguration aasConfig;
 	private BaSyxMongoDBConfiguration mongoDBConfig;
+	private BaSyxSecurityConfiguration securityConfig;
 
 	private List<IAASServerFeature> aasServerFeatureList = new ArrayList<IAASServerFeature>();
 
@@ -130,8 +130,6 @@ public class AASServerComponent implements IComponent {
 	private boolean isAASXUploadEnabled = false;
 	
 	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
-
-	private ConnectedAssetAdministrationShellManager manager;
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -234,8 +232,6 @@ public class AASServerComponent implements IComponent {
 
 		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
 
-		manager = new ConnectedAssetAdministrationShellManager(registry, connectorFactory);
-
 		loadAASServerFeaturesFromConfig();
 		initializeAASServerFeatures();
 
@@ -246,7 +242,7 @@ public class AASServerComponent implements IComponent {
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
 			// 1. Also provide the files
-			context.addServletMapping("/files/*", new AuthorizedDefaultServlet<>(getAuthorizedDefaultServletParams(aasConfig)));
+			context.addServletMapping("/files/*", createDefaultServlet());
 
 			// 2. Fix the file paths according to the servlet configuration
 			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
@@ -262,14 +258,21 @@ public class AASServerComponent implements IComponent {
 		registerPreexistingAASAndSMIfPossible();
 	}
 
-	private AuthorizedDefaultServletParams<?> getAuthorizedDefaultServletParams(final BaSyxAASServerConfiguration aasConfig) {
-		final AuthorizedAASServerFeature authorizedAASServerFeature = new AuthorizedAASServerFeature(aasConfig);
+	private DefaultServlet createDefaultServlet() {
+		if (securityConfig.isAuthorizationEnabled()) {
+			return new AuthorizedDefaultServlet<>(getAuthorizedDefaultServletParams());
+		}
+		return new DefaultServlet();
+	}
+
+	private AuthorizedDefaultServletParams<?> getAuthorizedDefaultServletParams() {
+		final AuthorizedAASServerFeature authorizedAASServerFeature = new AuthorizedAASServerFeature(securityConfig);
 
 		return authorizedAASServerFeature.getFilesAuthorizerParams();
 	}
 
 	private void registerPreexistingAASAndSMIfPossible() {
-		if(!shouldRegisterPreexistingAASAndSM()) {
+		if (!shouldRegisterPreexistingAASAndSM()) {
 			return;
 		}
 		
@@ -342,10 +345,7 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
-
-		if (aasConfig.isAuthorizationEnabled()) {
-			configureAuthorization();
-		}
+		configureAuthorization();
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
@@ -353,7 +353,9 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private void configureAuthorization() {
-		addAASServerFeature(new AuthorizedAASServerFeature(aasConfig));
+		securityConfig = new BaSyxSecurityConfiguration();
+		securityConfig.loadFromDefaultSource();
+		addAASServerFeature(new AuthorizedAASServerFeature(securityConfig));
 	}
 
 	private boolean isEventingEnabled() {
@@ -496,7 +498,7 @@ public class AASServerComponent implements IComponent {
 
 	private void addAASServerFeaturesToContext(BaSyxContext context) {
 		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
-			aasServerFeature.addToContext(context, aasConfig);
+			aasServerFeature.addToContext(context);
 		}
 	}
 
@@ -505,12 +507,8 @@ public class AASServerComponent implements IComponent {
 		loadAASBundles();
 		
 		if (aasBundles != null) {
-			try {
-				CodeAuthentication.setCodeAuthentication();
-
+			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
 				AASBundleHelper.integrate(aggregator, aasBundles);
-			} finally {
-				CodeAuthentication.unsetCodeAuthentication();
 			}
 		}
 

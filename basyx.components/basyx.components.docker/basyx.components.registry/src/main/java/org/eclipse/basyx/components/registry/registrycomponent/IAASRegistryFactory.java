@@ -38,5 +38,5 @@ public interface IAASRegistryFactory {
 	 * Return a constructed Registry
 	 *
 	 */
-	IAASRegistry create();
+	public IAASRegistry create();
 }

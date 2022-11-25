@@ -28,13 +28,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.IOUtils;
+import org.eclipse.basyx.extensions.shared.authorization.AuthenticationContextProvider;
+import org.eclipse.basyx.extensions.shared.authorization.AuthenticationGrantedAuthorityAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.JWTAuthenticationContextProvider;
+import org.eclipse.basyx.extensions.shared.authorization.KeycloakRoleAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -287,5 +292,36 @@ public class BaSyxConfiguration {
 	 */
 	public String getProperty(String name) {
 		return values.get(name);
+	}
+
+	private static Map<String, String> classesBySimpleNameMap = new HashMap<>();
+
+	static {
+		classesBySimpleNameMap.put(KeycloakRoleAuthenticator.class.getSimpleName(), KeycloakRoleAuthenticator.class.getName());
+		classesBySimpleNameMap.put(AuthenticationGrantedAuthorityAuthenticator.class.getSimpleName(), AuthenticationGrantedAuthorityAuthenticator.class.getName());
+		classesBySimpleNameMap.put(JWTAuthenticationContextProvider.class.getSimpleName(), JWTAuthenticationContextProvider.class.getName());
+		classesBySimpleNameMap.put(AuthenticationContextProvider.class.getSimpleName(), AuthenticationContextProvider.class.getName());
+	}
+
+	public <T> T loadInstanceDynamically(final String propertyName, final Class<T> requiredInterface) {
+		try {
+			final String className = getProperty(propertyName);
+			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
+
+			if (effectiveClassName == null) {
+				throw new IllegalArgumentException("granted authority subject information provider class is null");
+			}
+
+			final Class<?> clazz = Class.forName(effectiveClassName);
+
+			if (!requiredInterface.isAssignableFrom(clazz)) {
+				throw new IllegalArgumentException(String.format("given %s -> %s does not implement the interface %s.", propertyName, effectiveClassName, requiredInterface.getName()));
+			}
+
+			return (T) clazz.getDeclaredConstructor().newInstance();
+		} catch (final ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+			logger.error(e.getMessage(), e);
+			throw new IllegalArgumentException(e);
+		}
 	}
 }

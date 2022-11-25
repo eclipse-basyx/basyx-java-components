@@ -32,5 +32,5 @@ package org.eclipse.basyx.components.registry.registrycomponent;
  *
  */
 public interface IAASRegistryDecorator {
-	IAASRegistryFactory decorateRegistryFactory(IAASRegistryFactory registryFactory);
+	public IAASRegistryFactory decorateRegistryFactory(IAASRegistryFactory registryFactory);
 }

@@ -36,7 +36,7 @@ import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProv
 /**
  * Api provider for constructing a new Submodel aggregator that is authorized
  * 
- * @author espen
+ * @author wege
  */
 public class AuthorizedDecoratingAASRegistryFactory<SubjectInformationType> implements
     IAASRegistryFactory {

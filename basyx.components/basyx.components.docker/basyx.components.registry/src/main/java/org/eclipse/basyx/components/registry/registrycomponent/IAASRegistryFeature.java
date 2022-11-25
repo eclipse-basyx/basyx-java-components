@@ -24,7 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.registrycomponent;
 
-import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 /**
@@ -35,11 +34,11 @@ import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
  *
  */
 public interface IAASRegistryFeature {
-	void initialize();
+	public void initialize();
 
-	void cleanUp();
+	public void cleanUp();
 
-	IAASRegistryDecorator getDecorator();
+	public IAASRegistryDecorator getDecorator();
 
-	void addToContext(BaSyxContext context, BaSyxRegistryConfiguration aasConfig);
+	public void addToContext(BaSyxContext context);
 }

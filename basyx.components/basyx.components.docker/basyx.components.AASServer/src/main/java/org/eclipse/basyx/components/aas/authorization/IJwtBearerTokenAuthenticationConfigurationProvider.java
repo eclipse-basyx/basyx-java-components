@@ -24,17 +24,28 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
  *
  * Provider for {@link JwtBearerTokenAuthenticationConfiguration}, which will be passed
- * into the BaSyx context to be used as a security filter.
+ * into the BaSyx server context to be used as a security filter and set up the security context
+ * for incoming requests. Uses the aas server configuration.
  *
  * @author wege
  *
  */
 public interface IJwtBearerTokenAuthenticationConfigurationProvider {
-  JwtBearerTokenAuthenticationConfiguration get(BaSyxAASServerConfiguration aasConfig);
+  /**
+   * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be passed to the
+   * BaSyx server context to install a security filter and validate and set up the security context
+   * from access tokens included in incoming requests.
+   *
+   * @param securityConfig
+   *                  the configuration of the aas server which should have information on how to determine the {@link JwtBearerTokenAuthenticationConfiguration}.
+   *
+   * @return the {@link JwtBearerTokenAuthenticationConfiguration} object
+   */
+  public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig);
 }

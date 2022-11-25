@@ -24,7 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.authorization;
 
-import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.KeycloakService;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
@@ -35,9 +35,9 @@ import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationCo
  */
 public class KeycloakJwtBearerTokenAuthenticationConfigurationProvider implements IJwtBearerTokenAuthenticationConfigurationProvider {
   @Override
-  public JwtBearerTokenAuthenticationConfiguration get(BaSyxRegistryConfiguration registryConfig) {
-    final String serverUrl = registryConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
-    final String realm = registryConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
+  public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig) {
+    final String serverUrl = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
+    final String realm = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
 
     final KeycloakService keycloakService = new KeycloakService(serverUrl, realm);
 

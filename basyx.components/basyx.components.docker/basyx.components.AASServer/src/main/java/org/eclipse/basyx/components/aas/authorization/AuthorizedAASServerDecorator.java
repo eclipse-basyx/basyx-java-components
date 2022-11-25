@@ -79,7 +79,7 @@ public class AuthorizedAASServerDecorator<SubjectInformationType> implements IAA
 
 	@Override
 	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new AuthorizedDecoratingSubmodelAggregatorFactory(
+		return new AuthorizedDecoratingSubmodelAggregatorFactory<>(
 				null,
 				submodelAggregatorFactory,
 				submodelAggregatorAuthorizer,
@@ -89,7 +89,7 @@ public class AuthorizedAASServerDecorator<SubjectInformationType> implements IAA
 
 	@Override
 	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
-		return new AuthorizedDecoratingAASAPIFactory(
+		return new AuthorizedDecoratingAASAPIFactory<>(
 				aasAPIFactory,
 				aasAPIAuthorizer,
 				subjectInformationProvider
@@ -98,7 +98,7 @@ public class AuthorizedAASServerDecorator<SubjectInformationType> implements IAA
 
 	@Override
 	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return new AuthorizedDecoratingAASAggregatorFactory(
+		return new AuthorizedDecoratingAASAggregatorFactory<>(
 				aasAggregatorFactory,
 				aasAggregatorAuthorizer,
 				subjectInformationProvider

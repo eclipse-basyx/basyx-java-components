@@ -37,6 +37,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.authorization.AuthorizedRegistryFeature;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
@@ -87,6 +88,7 @@ public class RegistryComponent implements IComponent {
 	private BaSyxMongoDBConfiguration mongoDBConfig;
 	private BaSyxSQLConfiguration sqlConfig;
 	private BaSyxMqttConfiguration mqttConfig;
+	private BaSyxSecurityConfiguration securityConfig;
 
 	private List<IAASRegistryFeature> registryFeatureList = new ArrayList<>();
 
@@ -261,7 +263,7 @@ public class RegistryComponent implements IComponent {
 
 	private void addRegistryFeaturesToContext(BaSyxContext context) {
 		for (IAASRegistryFeature registryFeature : registryFeatureList) {
-			registryFeature.addToContext(context, registryConfig);
+			registryFeature.addToContext(context);
 		}
 	}
 
@@ -293,7 +295,7 @@ public class RegistryComponent implements IComponent {
 		if (isMQTTEnabled()) {
 			decoratedTaggedDirectory = configureMqttTagged(decoratedTaggedDirectory);
 		}
-		if (registryConfig.isAuthorizationEnabled()) {
+		if (securityConfig.isAuthorizationEnabled()) {
 			decoratedTaggedDirectory = configureAuthorizationTagged(decoratedTaggedDirectory);
 		}
 		return decoratedTaggedDirectory;
@@ -374,7 +376,7 @@ public class RegistryComponent implements IComponent {
 			decoratedRegistry = configureMqtt(decoratedRegistry);
 		}
 
-		if (this.registryConfig.isAuthorizationEnabled()) {
+		if (securityConfig.isAuthorizationEnabled()) {
 			decoratedRegistry = configureAuthorization(decoratedRegistry);
 		}
 
@@ -393,6 +395,7 @@ public class RegistryComponent implements IComponent {
 
 	private IAASRegistry configureAuthorization(IAASRegistry decoratedRegistry) {
 		logger.info("Enable Authorization for Registry");
+		securityConfig = new BaSyxSecurityConfiguration();
 		decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
 		return decoratedRegistry;
 	}
@@ -421,8 +424,14 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private void loadRegistryFeaturesFromConfig() {
-		if (registryConfig.isAuthorizationEnabled()) {
-			addRegistryFeature(new AuthorizedRegistryFeature(registryConfig));
+		configureAuthorization();
+	}
+
+	private void configureAuthorization() {
+		securityConfig = new BaSyxSecurityConfiguration();
+		securityConfig.loadFromDefaultSource();
+		if (securityConfig.isAuthorizationEnabled()) {
+			addRegistryFeature(new AuthorizedRegistryFeature(securityConfig));
 		}
 	}
 

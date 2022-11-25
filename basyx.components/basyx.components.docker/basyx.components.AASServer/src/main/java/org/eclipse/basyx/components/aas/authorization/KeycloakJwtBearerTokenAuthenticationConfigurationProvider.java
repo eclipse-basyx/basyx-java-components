@@ -24,20 +24,26 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.KeycloakService;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
+ *
+ * Implementation of the {@link IJwtBearerTokenAuthenticationConfigurationProvider} interface.
+ *
+ * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be used to configure
+ * the BaSyx server to accept tokens from a specific Keycloak server and realm and set up the
+ * security context on an incoming request.
  *
  * @author wege
  *
  */
 public class KeycloakJwtBearerTokenAuthenticationConfigurationProvider implements IJwtBearerTokenAuthenticationConfigurationProvider {
   @Override
-  public JwtBearerTokenAuthenticationConfiguration get(BaSyxAASServerConfiguration aasConfig) {
-    final String serverUrl = aasConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
-    final String realm = aasConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
+  public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig) {
+    final String serverUrl = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
+    final String realm = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
 
     final KeycloakService keycloakService = new KeycloakService(serverUrl, realm);
 

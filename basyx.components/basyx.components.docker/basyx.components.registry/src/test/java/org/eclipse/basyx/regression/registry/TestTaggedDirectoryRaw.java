@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
@@ -38,6 +39,7 @@ import org.junit.Test;
 public class TestTaggedDirectoryRaw {
 	private BaSyxContextConfiguration contextConfig;
 	private BaSyxRegistryConfiguration registryConfig;
+	private BaSyxSecurityConfiguration securityConfig;
 
 	protected static AASRegistryProxy aasRegistryProxy;
 
@@ -46,6 +48,7 @@ public class TestTaggedDirectoryRaw {
 		contextConfig = new BaSyxContextConfiguration();
 		registryConfig = new BaSyxRegistryConfiguration();
 		registryConfig.enableTaggedDirectory();
+		securityConfig = new BaSyxSecurityConfiguration();
 	}
 
 	@Test
@@ -58,7 +61,7 @@ public class TestTaggedDirectoryRaw {
 
 	@Test
 	public void startsWithAuthorization() {
-		registryConfig.enableAuthorization();
+		securityConfig.enableAuthorization();
 		RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 		taggedDirectoryComponent.startComponent();
 		taggedDirectoryComponent.stopComponent();
