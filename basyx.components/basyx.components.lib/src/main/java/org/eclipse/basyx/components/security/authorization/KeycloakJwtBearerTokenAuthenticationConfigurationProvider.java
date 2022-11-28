@@ -22,13 +22,19 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.security.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.KeycloakService;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
+ *
+ * Implementation of the {@link IJwtBearerTokenAuthenticationConfigurationProvider} interface.
+ *
+ * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be used to configure
+ * the BaSyx server to accept tokens from a specific Keycloak server and realm and set up the
+ * security context on an incoming request.
  *
  * @author wege
  *

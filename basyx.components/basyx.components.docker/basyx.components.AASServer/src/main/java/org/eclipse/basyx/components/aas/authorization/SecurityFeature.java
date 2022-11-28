@@ -25,7 +25,6 @@
 package org.eclipse.basyx.components.aas.authorization;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.slf4j.Logger;

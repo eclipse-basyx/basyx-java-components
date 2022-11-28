@@ -76,11 +76,11 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 
   @SuppressWarnings("unchecked")
   private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
-    return (IGrantedAuthorityAuthenticator<SubjectInformationType>) securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
+    return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
   }
 
   @SuppressWarnings("unchecked")
   private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
-    return (ISubjectInformationProvider<SubjectInformationType>) securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
+    return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
   }
 }

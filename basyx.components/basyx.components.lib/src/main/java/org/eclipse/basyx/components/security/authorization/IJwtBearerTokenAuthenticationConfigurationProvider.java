@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.security.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;

@@ -75,7 +75,7 @@ public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultSer
     Path path = Paths.get(getRelativePath(request, true));
 
     try {
-      enforceDoGet(path);
+      authorizeDoGet(path);
 
       super.doGet(request, response);
     } catch (final NotAuthorized e) {
@@ -85,7 +85,7 @@ public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultSer
     }
   }
 
-  protected void enforceDoGet(final Path path) {
+  protected void authorizeDoGet(final Path path) {
     try {
       filesAuthorizer.authorizeDownloadFile(subjectInformationProvider.get(), path);
     } catch (final InhibitException e) {
