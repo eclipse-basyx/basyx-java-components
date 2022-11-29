@@ -272,6 +272,11 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private IAASTaggedDirectory configureMqttTagged(IAASTaggedDirectory decoratedTaggedDirectory) {
+		if (mqttConfig == null) {
+			mqttConfig = new BaSyxMqttConfiguration();
+			mqttConfig.loadFromDefaultSource();
+		}
+
 		logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
 		if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
 			decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
