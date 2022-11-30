@@ -267,6 +267,16 @@
 	<!-- Specifies dependency settings for all submodules using these dependencies -->
 	<dependencyManagement>
 		<dependencies>
+		
+		
+			<!-- Logger -->
+			<dependency>
+	    		<groupId>ch.qos.logback</groupId>
+	    		<artifactId>logback-classic</artifactId>
+	    		<version>1.4.5</version>
+			</dependency>
+		
+		
 			<!-- BaSyx SDK -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>

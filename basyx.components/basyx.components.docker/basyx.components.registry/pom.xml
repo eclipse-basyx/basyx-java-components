@@ -67,6 +67,12 @@
 	</build>
 
 	<dependencies>
+	
+		<dependency>
+    		<groupId>ch.qos.logback</groupId>
+    		<artifactId>logback-classic</artifactId>
+    	</dependency>
+	
 		<!-- Use MongoDB Java Drivers for db connections -->
 		<dependency>
 			<groupId>org.mongodb</groupId>
