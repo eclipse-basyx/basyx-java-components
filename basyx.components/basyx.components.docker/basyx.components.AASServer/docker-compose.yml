@@ -6,12 +6,6 @@ services:
     container_name: ${BASYX_CONTAINER_NAME}
     ports:
       - ${BASYX_HOST_PORT}:${BASYX_CONTAINER_PORT}
-    healthcheck:
-      test: curl --fail http://127.0.0.1:${BASYX_HOST_PORT}/health || exit 1
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 5s
     depends_on:
       mongodb:
         condition: service_healthy

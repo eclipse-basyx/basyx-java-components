@@ -8,9 +8,6 @@ COPY src/main/resources/context.properties /usr/share/config/context.properties
 COPY src/main/resources/registry.properties /usr/share/config/registry.properties
 COPY src/test/resources/dockerSQL.properties /usr/share/config/sql.properties
 COPY src/test/resources/dockerMongodb.properties /usr/share/config/mongodb.properties
-
-# Install dependency for curl
-RUN apt update && apt install -y curl && apt clean
  
 # Expose the appropriate port. In case of Tomcat, this is 8080.
 ARG PORT
