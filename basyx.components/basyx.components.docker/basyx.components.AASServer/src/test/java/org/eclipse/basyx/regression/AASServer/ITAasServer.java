@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Using AASServerSuite as integration test for docker
+ * Executes AASServerSuite as integration test for docker
  * 
  * @author danish
  *
