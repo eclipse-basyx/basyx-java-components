@@ -78,6 +78,8 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
+import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
+import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -318,24 +320,36 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 		
-		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
-			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
-			mqttConfig.loadFromDefaultSource();
-			addAASServerFeature(new MqttAASServerFeature(mqttConfig, mqttConfig.getClientId()));
-		}
-		
-		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTTV2)) {
-			BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
-			mqttConfig.loadFromDefaultSource();
-			addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, mqttConfig.getClientId(), aasConfig.getAASId()));
+		if (isEventingEnabled()) {
+			configureMqttFeature();
 		}
 		
 		if (aasConfig.isAuthorizationEnabled()) {
-			addAASServerFeature(new AuthorizedAASServerFeature());
+			configureAuthorization();
 		}
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
+		}
+	}
+
+	private void configureAuthorization() {
+		addAASServerFeature(new AuthorizedAASServerFeature());
+	}
+
+	private boolean isEventingEnabled() {
+		return !aasConfig.getAASEvents().equals(AASEventBackend.NONE);
+	}
+
+	private void configureMqttFeature() {
+		BaSyxMqttConfiguration mqttConfig = new BaSyxMqttConfiguration();
+		mqttConfig.loadFromDefaultSource();
+		if (aasConfig.getAASEvents().equals(AASEventBackend.MQTT)) {
+			addAASServerFeature(new MqttAASServerFeature(mqttConfig, mqttConfig.getClientId()));
+		} else if (aasConfig.getAASEvents().equals(AASEventBackend.MQTTV2)) {
+			addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, mqttConfig.getClientId(), aasConfig.getAASId(), new Base64URLEncoder()));
+		} else if (aasConfig.getAASEvents().equals(AASEventBackend.MQTTV2_SIMPLE_ENCODING)) {
+			addAASServerFeature(new MqttV2AASServerFeature(mqttConfig, mqttConfig.getClientId(), aasConfig.getAASId(), new URLEncoder()));
 		}
 	}
 

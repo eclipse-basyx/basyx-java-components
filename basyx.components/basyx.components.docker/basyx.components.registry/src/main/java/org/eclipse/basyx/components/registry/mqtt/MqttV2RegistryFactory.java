@@ -26,17 +26,17 @@
 package org.eclipse.basyx.components.registry.mqtt;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryService;
 import org.eclipse.basyx.aas.registration.observing.ObservableAASRegistryServiceV2;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
-import org.eclipse.basyx.components.configuration.MqttPersistence;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttAASRegistryServiceObserver;
 import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryServiceObserver;
+import org.eclipse.basyx.extensions.aas.registration.mqtt.MqttV2AASRegistryTopicFactory;
+import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,24 +50,38 @@ public class MqttV2RegistryFactory {
 
 	private static Logger logger = LoggerFactory.getLogger(MqttV2RegistryFactory.class);
 
-	public IAASRegistry create(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
-		return wrapRegistryInMqttObserver(registry, mqttConfig, registryConfig);
+	public IAASRegistry create(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig, IEncoder idEncoder) {
+		return wrapRegistryInMqttObserver(registry, mqttConfig, registryConfig, idEncoder);
 	}
 
-	private static IAASRegistry wrapRegistryInMqttObserver(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
+	private static IAASRegistry wrapRegistryInMqttObserver(IAASRegistry registry, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig, IEncoder idEncoder) {
 		ObservableAASRegistryServiceV2 observedAPI = new ObservableAASRegistryServiceV2(registry, registryConfig.getRegistryId());
-		addAASRegistryServiceObserver(observedAPI, mqttConfig);
+		addAASRegistryServiceObserver(observedAPI, mqttConfig, idEncoder);
 		return observedAPI;
 	}
 
-	protected static void addAASRegistryServiceObserver(ObservableAASRegistryServiceV2 observedAPI, BaSyxMqttConfiguration mqttConfig) {
-		String brokerEndpoint = mqttConfig.getServer();
-		MqttClientPersistence mqttPersistence = MqttRegistryFactory.getMqttPersistenceFromConfig(mqttConfig);
+	protected static void addAASRegistryServiceObserver(ObservableAASRegistryServiceV2 observedAPI, BaSyxMqttConfiguration mqttConfig, IEncoder idEncoder) {
 		try {
-			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(brokerEndpoint, mqttConfig.getClientId(), mqttConfig.getUser(), mqttConfig.getPass().toCharArray(), mqttPersistence);
+			MqttClient mqttClient = createAndConnectMqttClient(mqttConfig);
+
+			MqttV2AASRegistryServiceObserver mqttObserver = new MqttV2AASRegistryServiceObserver(mqttClient,
+					new MqttV2AASRegistryTopicFactory(idEncoder));
 			observedAPI.addObserver(mqttObserver);
 		} catch (MqttException e) {
 			logger.error("Could not establish MQTT connection for MqttAASRegistry", e);
 		}
+	}
+
+	private static MqttClient createAndConnectMqttClient(BaSyxMqttConfiguration mqttConfig) throws MqttException, MqttSecurityException {
+		MqttClientPersistence mqttPersistence = MqttRegistryFactory.getMqttPersistenceFromConfig(mqttConfig);
+
+		MqttClient mqttClient = new MqttClient(mqttConfig.getServer(), mqttConfig.getClientId(), mqttPersistence);
+		
+		MqttConnectOptions options = new MqttConnectOptions();
+		options.setUserName(mqttConfig.getUser());
+		options.setPassword(mqttConfig.getPass().toCharArray());
+		
+		mqttClient.connect(options);
+		return mqttClient;
 	}
 }

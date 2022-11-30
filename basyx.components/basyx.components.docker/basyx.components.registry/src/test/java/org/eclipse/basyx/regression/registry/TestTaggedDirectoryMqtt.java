@@ -34,6 +34,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
+import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.TaggedAASDescriptor;
 import org.eclipse.basyx.extensions.aas.directory.tagged.proxy.TaggedDirectoryProxy;
 import org.junit.Test;
@@ -43,9 +44,9 @@ public class TestTaggedDirectoryMqtt extends TestMqttRegistryBackend {
 	public RegistryComponent createRegistryComponent() {
 		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
 		registryConfig.enableTaggedDirectory();
-		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
-		RegistryComponent registryComponent = new RegistryComponent(contextConfig, registryConfig);
-		return registryComponent;
+		registryConfig.setRegistryEvents(RegistryEventBackend.MQTT);
+
+		return new RegistryComponent(new BaSyxContextConfiguration(), registryConfig);
 	}
 
 	@Test

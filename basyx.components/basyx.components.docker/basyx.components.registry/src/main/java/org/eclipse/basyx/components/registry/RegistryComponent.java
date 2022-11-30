@@ -43,8 +43,8 @@ import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistry;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBTaggedDirectory;
 import org.eclipse.basyx.components.registry.mqtt.MqttRegistryFactory;
-import org.eclipse.basyx.components.registry.mqtt.MqttV2RegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttTaggedDirectoryFactory;
+import org.eclipse.basyx.components.registry.mqtt.MqttV2RegistryFactory;
 import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
@@ -52,6 +52,8 @@ import org.eclipse.basyx.components.registry.sql.SQLRegistry;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
+import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
+import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.slf4j.Logger;
@@ -118,6 +120,22 @@ public class RegistryComponent implements IComponent {
 
 	/**
 	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with a MongoDB backend.
+	 * 
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param registryConfig
+	 * @param mongoDBConfig
+	 *            The mongoDB configuration
+	 */
+	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
+		this.contextConfig = contextConfig;
+		this.registryConfig = registryConfig;
+		this.mongoDBConfig = mongoDBConfig;
+	}
+
+	/**
+	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create a registry with an SQL backend.
 	 * 
 	 * @param contextConfig
@@ -128,6 +146,22 @@ public class RegistryComponent implements IComponent {
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
 		this.registryConfig = new BaSyxRegistryConfiguration(RegistryBackend.SQL);
+		this.sqlConfig = sqlConfig;
+	}
+
+	/**
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with an SQL backend.
+	 * 
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param registryConfig
+	 * @param sqlConfig
+	 *            The sql configuration
+	 */
+	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxSQLConfiguration sqlConfig) {
+		this.contextConfig = contextConfig;
+		this.registryConfig = registryConfig;
 		this.sqlConfig = sqlConfig;
 	}
 
@@ -222,21 +256,37 @@ public class RegistryComponent implements IComponent {
 
 	private IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory) {
 		IAASTaggedDirectory decoratedTaggedDirectory = taggedDirectory;
-		if (this.mqttConfig != null) {
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
-				decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
-				logger.info("MQTT event backend for " + this.registryConfig.getRegistryId());
-			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
-				decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, mqttConfig, this.registryConfig);
-				logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
-			} else {
-			  decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
-			}
+		if (isMQTTEnabled()) {
+			decoratedTaggedDirectory = configureMqttTagged(decoratedTaggedDirectory);
 		}
 		if (registryConfig.isAuthorizationEnabled()) {
-			logger.info("Authorization enabled for TaggedDirectory.");
-			decoratedTaggedDirectory = new AuthorizedTaggedDirectoryFactory().create(decoratedTaggedDirectory);
+			decoratedTaggedDirectory = configureAuthorizationTagged(decoratedTaggedDirectory);
+		}
+		return decoratedTaggedDirectory;
+	}
+
+	private IAASTaggedDirectory configureAuthorizationTagged(IAASTaggedDirectory decoratedTaggedDirectory) {
+		logger.info("Authorization enabled for TaggedDirectory.");
+		decoratedTaggedDirectory = new AuthorizedTaggedDirectoryFactory().create(decoratedTaggedDirectory);
+		return decoratedTaggedDirectory;
+	}
+
+	private IAASTaggedDirectory configureMqttTagged(IAASTaggedDirectory decoratedTaggedDirectory) {
+		if (mqttConfig == null) {
+			mqttConfig = new BaSyxMqttConfiguration();
+			mqttConfig.loadFromDefaultSource();
+		}
+
+		logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+		if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
+			decoratedTaggedDirectory = new MqttTaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig);
+			logger.info("MQTT event backend for " + this.registryConfig.getRegistryId());
+		} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
+			decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, mqttConfig, this.registryConfig, new Base64URLEncoder());
+			logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
+		} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2_SIMPLE_ENCODING)) {
+			logger.info("MQTTV2_SIMPLE_ENCODING event backend for " + this.registryConfig.getRegistryId());
+			decoratedTaggedDirectory = new MqttV2TaggedDirectoryFactory().create(decoratedTaggedDirectory, this.mqttConfig, this.registryConfig, new URLEncoder());
 		}
 		return decoratedTaggedDirectory;
 	}
@@ -280,23 +330,46 @@ public class RegistryComponent implements IComponent {
 
 	private IAASRegistry decorate(IAASRegistry aasRegistry) {
 		IAASRegistry decoratedRegistry = aasRegistry;
-		if (this.mqttConfig != null) {
-			logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
-			if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
-				decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
-				logger.info("MQTT event backend for " + this.registryConfig.getRegistryId());
-			} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
-				decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig, this.registryConfig);
-				logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
-			} else {			  
-			  decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
-			}
+
+		if (isMQTTEnabled()) {
+			decoratedRegistry = configureMqtt(decoratedRegistry);
 		}
+
 		if (this.registryConfig.isAuthorizationEnabled()) {
-			logger.info("Enable Authorization for Registry");
-			decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
+			decoratedRegistry = configureAuthorization(decoratedRegistry);
+		}
+
+		return decoratedRegistry;
+	}
+
+	private IAASRegistry configureAuthorization(IAASRegistry decoratedRegistry) {
+		logger.info("Enable Authorization for Registry");
+		decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
+		return decoratedRegistry;
+	}
+
+	private IAASRegistry configureMqtt(IAASRegistry decoratedRegistry) {
+		if (mqttConfig == null) {
+			mqttConfig = new BaSyxMqttConfiguration();
+			mqttConfig.loadFromDefaultSource();
+		}
+
+		logger.info("Enable MQTT events for broker " + this.mqttConfig.getServer());
+		if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT)) {
+			decoratedRegistry = new MqttRegistryFactory().create(decoratedRegistry, this.mqttConfig);
+			logger.info("MQTT event backend for " + this.registryConfig.getRegistryId());
+		} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2)) {
+			decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig, this.registryConfig, new Base64URLEncoder());
+			logger.info("MQTTV2 event backend for " + this.registryConfig.getRegistryId());
+		} else if (registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2_SIMPLE_ENCODING)) {
+			logger.info("MQTTV2_SIMPLE_ENCODING event backend for " + this.registryConfig.getRegistryId());
+			decoratedRegistry = new MqttV2RegistryFactory().create(decoratedRegistry, this.mqttConfig, this.registryConfig, new URLEncoder());
 		}
 		return decoratedRegistry;
+	}
+
+	private boolean isMQTTEnabled() {
+		return !registryConfig.getRegistryEvents().equals(RegistryEventBackend.NONE);
 	}
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {

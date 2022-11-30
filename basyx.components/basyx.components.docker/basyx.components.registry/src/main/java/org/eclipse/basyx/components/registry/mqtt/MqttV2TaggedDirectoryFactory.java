@@ -28,8 +28,8 @@ package org.eclipse.basyx.components.registry.mqtt;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryService;
 import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAASTaggedDirectoryServiceV2;
+import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
 
 /**
  * Factory for building a Mqtt-Registry model provider for AASTaggedDirectory
@@ -39,13 +39,13 @@ import org.eclipse.basyx.extensions.aas.directory.tagged.observing.ObservableAAS
  * 
  */
 public class MqttV2TaggedDirectoryFactory extends MqttV2RegistryFactory {
-	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
-		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig, registryConfig);
+	public IAASTaggedDirectory create(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig, IEncoder idEncoder) {
+		return wrapRegistryInMqttObserver(taggedDirectory, mqttConfig, registryConfig, idEncoder);
 	}
 
-	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig) {
+	private static IAASTaggedDirectory wrapRegistryInMqttObserver(IAASTaggedDirectory taggedDirectory, BaSyxMqttConfiguration mqttConfig, BaSyxRegistryConfiguration registryConfig, IEncoder idEncoder) {
 		ObservableAASTaggedDirectoryServiceV2 observedAPI = new ObservableAASTaggedDirectoryServiceV2(taggedDirectory, registryConfig.getRegistryId());
-		addAASRegistryServiceObserver(observedAPI, mqttConfig);
+		addAASRegistryServiceObserver(observedAPI, mqttConfig, idEncoder);
 		return observedAPI;
 	}
 }
