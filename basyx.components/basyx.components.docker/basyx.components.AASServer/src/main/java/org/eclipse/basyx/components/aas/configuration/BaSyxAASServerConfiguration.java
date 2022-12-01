@@ -175,7 +175,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION };
+		String[] properties = {
+				REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT,
+				CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION, ID
+		};
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
