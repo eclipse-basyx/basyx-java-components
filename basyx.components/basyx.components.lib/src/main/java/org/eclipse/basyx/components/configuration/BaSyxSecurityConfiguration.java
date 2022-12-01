@@ -36,22 +36,20 @@ public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
   public static final String FEATURE_DISABLED = "Disabled";
 
   // Default BaSyx Security configuration
-  public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
   public static final String DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "/rbac_rules.json";
 
   // Configuration keys
-  public static final String AUTHORIZATION = "aas.authorization";
-  public static final String AUTHORIZATION_STRATEGY = "aas.authorization.strategy";
-  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER = "aas.authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider";
-  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL = "aas.authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.serverUrl";
-  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM = "aas.authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.realm";
-  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "aas.authorization.strategy.simpleRbac.rulesFilePath";
-  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR = "aas.authorization.strategy.simpleRbac.roleAuthenticator";
-  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.simpleRbac.subjectInformationProvider";
-  public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR = "registry.authorization.strategy.grantedAuthority.grantedAuthorityAuthenticator";
-  public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.grantedAuthority.subjectInformationProvider";
-  public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "aas.authorization.strategy.custom.authorizersProvider";
-  public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "aas.authorization.strategy.custom.subjectInformationProvider";
+  public static final String AUTHORIZATION_STRATEGY = "authorization.strategy";
+  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider";
+  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.serverUrl";
+  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.realm";
+  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "authorization.strategy.simpleRbac.rulesFilePath";
+  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR = "authorization.strategy.simpleRbac.roleAuthenticator";
+  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.simpleRbac.subjectInformationProvider";
+  public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR = "authorization.strategy.grantedAuthority.grantedAuthorityAuthenticator";
+  public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.grantedAuthority.subjectInformationProvider";
+  public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "authorization.strategy.custom.authorizersProvider";
+  public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.custom.subjectInformationProvider";
 
   public enum AuthorizationStrategy {
     SimpleRbac,
@@ -67,7 +65,6 @@ public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
 
   public static Map<String, String> getDefaultProperties() {
     Map<String, String> defaultProps = new HashMap<>();
-    defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
     defaultProps.put(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
     return defaultProps;
   }
@@ -91,7 +88,6 @@ public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
    */
   public void loadFromEnvironmentVariables() {
     String[] properties = {
-        AUTHORIZATION,
         AUTHORIZATION_STRATEGY,
         AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER,
         AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL,
@@ -110,18 +106,6 @@ public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
   public void loadFromDefaultSource() {
     loadFileOrDefaultResource(DEFAULT_FILE_KEY, DEFAULT_CONFIG_PATH);
     loadFromEnvironmentVariables();
-  }
-
-  public boolean isAuthorizationEnabled() {
-    return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
-  }
-
-  public void enableAuthorization() {
-    setProperty(AUTHORIZATION, FEATURE_ENABLED);
-  }
-
-  public void disableAuthorization() {
-    setProperty(AUTHORIZATION, FEATURE_DISABLED);
   }
 
   public String getAuthorizationStrategy() {

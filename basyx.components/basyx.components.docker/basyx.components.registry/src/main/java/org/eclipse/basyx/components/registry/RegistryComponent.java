@@ -192,7 +192,9 @@ public class RegistryComponent implements IComponent {
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createRegistryServlet());
-		configureContextForAuthorization(context);
+		if (registryConfig.isAuthorizationEnabled()) {
+			configureContextForAuthorization(context);
+		}
 
 		server = new BaSyxHTTPServer(context);
 		server.start();
@@ -267,7 +269,7 @@ public class RegistryComponent implements IComponent {
 		if (isMQTTEnabled()) {
 			decoratedTaggedDirectory = configureMqttTagged(decoratedTaggedDirectory);
 		}
-		if (securityConfig.isAuthorizationEnabled()) {
+		if (registryConfig.isAuthorizationEnabled()) {
 			decoratedTaggedDirectory = decorateWithAuthorization(decoratedTaggedDirectory);
 		}
 		return decoratedTaggedDirectory;
@@ -332,7 +334,7 @@ public class RegistryComponent implements IComponent {
 			decoratedRegistry = configureMqtt(decoratedRegistry);
 		}
 
-		if (securityConfig.isAuthorizationEnabled()) {
+		if (registryConfig.isAuthorizationEnabled()) {
 			decoratedRegistry = decorateWithAuthorization(decoratedRegistry);
 		}
 
@@ -370,13 +372,11 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private void configureContextForAuthorization(final BaSyxContext context) {
-		if (securityConfig.isAuthorizationEnabled()) {
-			final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
-			if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
-				context.setJwtBearerTokenAuthenticationConfiguration(
-						jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig)
-				);
-			}
+		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
+		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
+			context.setJwtBearerTokenAuthenticationConfiguration(
+					jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig)
+			);
 		}
 	}
 

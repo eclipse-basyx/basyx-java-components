@@ -48,6 +48,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_BACKEND = RegistryBackend.INMEMORY.toString();
 	public static final String DEFAULT_EVENTS = RegistryEventBackend.NONE.toString();
 	public static final String DEFAULT_TAGGED_DIRECTORY = FEATURE_DISABLED;
+	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
 
 	// Configuration keys
 	public static final String ID = "registry.id";
@@ -55,6 +56,8 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	public static final String EVENTS = "registry.events";
 
 	private static final String TAGGED_DIRECTORY = "registry.taggedDirectory";
+
+	public static final String AUTHORIZATION = "registry.authorization";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "registry.properties";
@@ -67,6 +70,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 		defaultProps.put(BACKEND, DEFAULT_BACKEND);
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
 		defaultProps.put(TAGGED_DIRECTORY, DEFAULT_TAGGED_DIRECTORY);
+		defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
 		return defaultProps;
 	}
 
@@ -127,5 +131,17 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 
 	public void disableTaggedDirectory() {
 		setProperty(TAGGED_DIRECTORY, FEATURE_DISABLED);
+	}
+
+	public boolean isAuthorizationEnabled() {
+		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
+	}
+
+	public void enableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_ENABLED);
+	}
+
+	public void disableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_DISABLED);
 	}
 }

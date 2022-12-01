@@ -68,7 +68,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_CLIENT_SECRET = "";
 	public static final String DEFAULT_CLIENT_SCOPES = "[]";
 	public static final String DEFAULT_PROPERTY_DELEGATION = FEATURE_ENABLED;
-
+	public static final String DEFAULT_AUTHORIZATION = FEATURE_DISABLED;
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
@@ -84,6 +84,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String CLIENT_SECRET = "clientSecret";
 	public static final String CLIENT_SCOPES = "clientScopes";
 	public static final String PROPERTY_DELEGATION = "aas.delegation";
+	public static final String AUTHORIZATION = "aas.authorization";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "aas.properties";
@@ -107,6 +108,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(CLIENT_SECRET, DEFAULT_CLIENT_SECRET);
 		defaultProps.put(CLIENT_SCOPES, DEFAULT_CLIENT_SCOPES);
 		defaultProps.put(PROPERTY_DELEGATION, DEFAULT_PROPERTY_DELEGATION);
+		defaultProps.put(AUTHORIZATION, DEFAULT_AUTHORIZATION);
 		return defaultProps;
 	}
 
@@ -183,7 +185,8 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 				CLIENT_ID,
 				CLIENT_SECRET,
 				CLIENT_SCOPES,
-				PROPERTY_DELEGATION
+				PROPERTY_DELEGATION,
+				AUTHORIZATION
 		};
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
@@ -381,5 +384,17 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	private boolean isScopeConfigured() {
 		return getProperty(CLIENT_SCOPES) != null && !getProperty(CLIENT_SCOPES).isEmpty();
+	}
+
+	public boolean isAuthorizationEnabled() {
+		return getProperty(AUTHORIZATION).equals(FEATURE_ENABLED);
+	}
+
+	public void enableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_ENABLED);
+	}
+
+	public void disableAuthorization() {
+		setProperty(AUTHORIZATION, FEATURE_DISABLED);
 	}
 }

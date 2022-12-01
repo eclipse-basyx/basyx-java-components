@@ -61,7 +61,7 @@ public class TestTaggedDirectoryRaw {
 
 	@Test
 	public void startsWithAuthorization() {
-		securityConfig.enableAuthorization();
+		registryConfig.enableAuthorization();
 		RegistryComponent taggedDirectoryComponent = new RegistryComponent(contextConfig, registryConfig);
 		taggedDirectoryComponent.startComponent();
 		taggedDirectoryComponent.stopComponent();

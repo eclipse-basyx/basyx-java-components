@@ -139,8 +139,7 @@ public class TestAASServerWithSecuredRegistry {
 	
 	private static void startRegistryServer() {
 		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration(RegistryBackend.INMEMORY);
-		BaSyxSecurityConfiguration securityConfig = new BaSyxSecurityConfiguration(Collections.singletonMap(BaSyxSecurityConfiguration.AUTHORIZATION, BaSyxSecurityConfiguration.FEATURE_ENABLED));
-		securityConfig.enableAuthorization();
+		registryConfig.enableAuthorization();
 		
 		registryComponent = new RegistryComponent(configureBasyxContext("registryContext.properties"), registryConfig);
 		registryComponent.startComponent();

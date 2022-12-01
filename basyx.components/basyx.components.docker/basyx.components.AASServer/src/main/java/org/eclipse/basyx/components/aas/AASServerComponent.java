@@ -259,7 +259,7 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private DefaultServlet createDefaultServlet() {
-		if (securityConfig.isAuthorizationEnabled()) {
+		if (aasConfig.isAuthorizationEnabled()) {
 			return new AuthorizedDefaultServlet<>(getAuthorizedDefaultServletParams());
 		}
 		return new DefaultServlet();
@@ -341,11 +341,13 @@ public class AASServerComponent implements IComponent {
 			configureMqttFeature();
 		}
 
-		if(aasConfig.isPropertyDelegationEnabled()) {
+		if (aasConfig.isPropertyDelegationEnabled()) {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
-		configureAuthorization();
+		if (aasConfig.isAuthorizationEnabled()) {
+			configureAuthorization();
+		}
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
