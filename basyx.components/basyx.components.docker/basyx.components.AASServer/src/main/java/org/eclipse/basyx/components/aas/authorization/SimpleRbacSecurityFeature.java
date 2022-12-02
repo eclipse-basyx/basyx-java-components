@@ -50,59 +50,47 @@ import org.slf4j.LoggerFactory;
  * @author wege
  */
 public class SimpleRbacSecurityFeature extends SecurityFeature {
-  private static Logger logger = LoggerFactory.getLogger(SimpleRbacSecurityFeature.class);
+	private static Logger logger = LoggerFactory.getLogger(SimpleRbacSecurityFeature.class);
 
-  public SimpleRbacSecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
-    super(securityConfig);
-  }
+	public SimpleRbacSecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
+		super(securityConfig);
+	}
 
-  @Override
-  public <SubjectInformationType> IAASServerDecorator getDecorator() {
-    logger.info("use SimpleRbac authorization strategy");
-    final RbacRuleSet rbacRuleSet = getRbacRuleSet();
-    final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
-    final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
-    final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
+	@Override public <SubjectInformationType> IAASServerDecorator getDecorator() {
+		logger.info("use SimpleRbac authorization strategy");
+		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
+		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
+		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
 
-    return new AuthorizedAASServerDecorator<>(
-        new SimpleRbacSubmodelAPIAuthorizer<>(rbacRuleChecker, roleAuthenticator),
-        new SimpleRbacSubmodelAggregatorAuthorizer<>(rbacRuleChecker, roleAuthenticator),
-        new SimpleRbacAASAPIAuthorizer<>(rbacRuleChecker, roleAuthenticator),
-        new SimpleRbacAASAggregatorAuthorizer<>(rbacRuleChecker, roleAuthenticator),
-        subjectInformationProvider
-    );
-  }
+		return new AuthorizedAASServerDecorator<>(new SimpleRbacSubmodelAPIAuthorizer<>(rbacRuleChecker, roleAuthenticator), new SimpleRbacSubmodelAggregatorAuthorizer<>(rbacRuleChecker, roleAuthenticator),
+				new SimpleRbacAASAPIAuthorizer<>(rbacRuleChecker, roleAuthenticator), new SimpleRbacAASAggregatorAuthorizer<>(rbacRuleChecker, roleAuthenticator), subjectInformationProvider);
+	}
 
-  @Override
-  public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
-    logger.info("use SimpleRbac authorization strategy");
-    final RbacRuleSet rbacRuleSet = getRbacRuleSet();
-    final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
-    final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
-    final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
+	@Override public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+		logger.info("use SimpleRbac authorization strategy");
+		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
+		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
+		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
 
-    return new AuthorizedDefaultServletParams<>(
-        new SimpleRbacFilesAuthorizer<>(rbacRuleChecker, roleAuthenticator),
-        subjectInformationProvider
-    );
-  }
+		return new AuthorizedDefaultServletParams<>(new SimpleRbacFilesAuthorizer<>(rbacRuleChecker, roleAuthenticator), subjectInformationProvider);
+	}
 
-  public RbacRuleSet getRbacRuleSet() {
-    try {
-      final Consumer<ObjectMapper> mapperAddIn = mapper -> mapper.registerSubtypes(new NamedType(PathTargetInformation.class, "path"));
-      return new RbacRuleSetDeserializer(mapperAddIn).fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
+	public RbacRuleSet getRbacRuleSet() {
+		try {
+			final Consumer<ObjectMapper> mapperAddIn = mapper -> mapper.registerSubtypes(new NamedType(PathTargetInformation.class, "path"));
+			return new RbacRuleSetDeserializer(mapperAddIn).fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+		} catch (final IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
-  @SuppressWarnings("unchecked")
-  private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getSimpleRbacRoleAuthenticator() {
-    return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
-  }
+	@SuppressWarnings("unchecked") private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getSimpleRbacRoleAuthenticator() {
+		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
+	}
 
-  @SuppressWarnings("unchecked")
-  private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSimpleRbacSubjectInformationProvider() {
-    return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
-  }
+	@SuppressWarnings("unchecked") private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSimpleRbacSubjectInformationProvider() {
+		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
+	}
 }

@@ -28,171 +28,160 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
-  // Prefix for environment variables
-  public static final String ENV_PREFIX = "BaSyxSecurity_";
+	// Prefix for environment variables
+	public static final String ENV_PREFIX = "BaSyxSecurity_";
 
-  // Feature enabling options
-  public static final String FEATURE_ENABLED = "Enabled";
-  public static final String FEATURE_DISABLED = "Disabled";
+	// Feature enabling options
+	public static final String FEATURE_ENABLED = "Enabled";
+	public static final String FEATURE_DISABLED = "Disabled";
 
-  // Default BaSyx Security configuration
-  public static final String DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "/rbac_rules.json";
+	// Default BaSyx Security configuration
+	public static final String DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "/rbac_rules.json";
 
-  // Configuration keys
-  public static final String AUTHORIZATION_STRATEGY = "authorization.strategy";
-  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider";
-  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.serverUrl";
-  public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.realm";
-  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "authorization.strategy.simpleRbac.rulesFilePath";
-  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR = "authorization.strategy.simpleRbac.roleAuthenticator";
-  public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.simpleRbac.subjectInformationProvider";
-  public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR = "authorization.strategy.grantedAuthority.grantedAuthorityAuthenticator";
-  public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.grantedAuthority.subjectInformationProvider";
-  public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "authorization.strategy.custom.authorizersProvider";
-  public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.custom.subjectInformationProvider";
+	// Configuration keys
+	public static final String AUTHORIZATION_STRATEGY = "authorization.strategy";
+	public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider";
+	public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.serverUrl";
+	public static final String AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM = "authorization.strategy.jwtBearerTokenAuthenticationConfigurationProvider.keycloak.realm";
+	public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH = "authorization.strategy.simpleRbac.rulesFilePath";
+	public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR = "authorization.strategy.simpleRbac.roleAuthenticator";
+	public static final String AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.simpleRbac.subjectInformationProvider";
+	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR = "authorization.strategy.grantedAuthority.grantedAuthorityAuthenticator";
+	public static final String AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.grantedAuthority.subjectInformationProvider";
+	public static final String AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER = "authorization.strategy.custom.authorizersProvider";
+	public static final String AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER = "authorization.strategy.custom.subjectInformationProvider";
 
-  public enum AuthorizationStrategy {
-    SimpleRbac,
-    GrantedAuthority,
-    Custom
-  }
+	public enum AuthorizationStrategy {
+		SimpleRbac, GrantedAuthority, Custom
+	}
 
-  // The default path for the context properties file
-  public static final String DEFAULT_CONFIG_PATH = "security.properties";
+	// The default path for the context properties file
+	public static final String DEFAULT_CONFIG_PATH = "security.properties";
 
-  // The default key for variables pointing to the configuration file
-  public static final String DEFAULT_FILE_KEY = "BASYX_SECURITY";
+	// The default key for variables pointing to the configuration file
+	public static final String DEFAULT_FILE_KEY = "BASYX_SECURITY";
 
-  public static Map<String, String> getDefaultProperties() {
-    Map<String, String> defaultProps = new HashMap<>();
-    defaultProps.put(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
-    return defaultProps;
-  }
+	public static Map<String, String> getDefaultProperties() {
+		Map<String, String> defaultProps = new HashMap<>();
+		defaultProps.put(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, DEFAULT_AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
+		return defaultProps;
+	}
 
-  /**
-   * Constructor with predefined value map
-   */
-  public BaSyxSecurityConfiguration(Map<String, String> values) {
-    super(values);
-  }
+	/**
+	 * Constructor with predefined value map
+	 */
+	public BaSyxSecurityConfiguration(Map<String, String> values) {
+		super(values);
+	}
 
-  /**
-   * Empty Constructor - use default values
-   */
-  public BaSyxSecurityConfiguration() {
-    super(getDefaultProperties());
-  }
+	/**
+	 * Empty Constructor - use default values
+	 */
+	public BaSyxSecurityConfiguration() {
+		super(getDefaultProperties());
+	}
 
-  /**
-   * Load all settings except of the whitelist config part
-   */
-  public void loadFromEnvironmentVariables() {
-    String[] properties = {
-        AUTHORIZATION_STRATEGY,
-        AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER,
-        AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL,
-        AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM,
-        AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH,
-        AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR,
-        AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER,
-        AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR,
-        AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER,
-        AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER,
-        AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER,
-    };
-    loadFromEnvironmentVariables(ENV_PREFIX, properties);
-  }
+	/**
+	 * Load all settings except of the whitelist config part
+	 */
+	public void loadFromEnvironmentVariables() {
+		String[] properties = { AUTHORIZATION_STRATEGY, AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL,
+				AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM, AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR,
+				AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER,
+				AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, };
+		loadFromEnvironmentVariables(ENV_PREFIX, properties);
+	}
 
-  public void loadFromDefaultSource() {
-    loadFileOrDefaultResource(DEFAULT_FILE_KEY, DEFAULT_CONFIG_PATH);
-    loadFromEnvironmentVariables();
-  }
+	public void loadFromDefaultSource() {
+		loadFileOrDefaultResource(DEFAULT_FILE_KEY, DEFAULT_CONFIG_PATH);
+		loadFromEnvironmentVariables();
+	}
 
-  public String getAuthorizationStrategy() {
-    return getProperty(AUTHORIZATION_STRATEGY);
-  }
+	public String getAuthorizationStrategy() {
+		return getProperty(AUTHORIZATION_STRATEGY);
+	}
 
-  public void setAuthorizationStrategy(String authorizationStrategy) {
-    setProperty(AUTHORIZATION_STRATEGY, authorizationStrategy);
-  }
+	public void setAuthorizationStrategy(String authorizationStrategy) {
+		setProperty(AUTHORIZATION_STRATEGY, authorizationStrategy);
+	}
 
-  public String getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider() {
-    return getProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER);
-  }
+	public String getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER);
+	}
 
-  public void setAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider(String jwtBearerTokenAuthenticationConfigurationProvider) {
-    setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, jwtBearerTokenAuthenticationConfigurationProvider);
-  }
+	public void setAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider(String jwtBearerTokenAuthenticationConfigurationProvider) {
+		setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, jwtBearerTokenAuthenticationConfigurationProvider);
+	}
 
-  public String getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl() {
-    return getProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL);
-  }
+	public String getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl() {
+		return getProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL);
+	}
 
-  public void setAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl(String authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl) {
-    setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL, authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl);
-  }
+	public void setAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl(String authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl) {
+		setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_SERVER_URL, authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl);
+	}
 
-  public String getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm() {
-    return getProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM);
-  }
+	public String getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm() {
+		return getProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM);
+	}
 
-  public void setAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm(String authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm) {
-    setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM, authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm);
-  }
+	public void setAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm(String authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm) {
+		setProperty(AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER_KEYCLOAK_REALM, authorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm);
+	}
 
-  public String getAuthorizationStrategySimpleRbacRulesFilePath() {
-    return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
-  }
+	public String getAuthorizationStrategySimpleRbacRulesFilePath() {
+		return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH);
+	}
 
-  public void setAuthorizationStrategySimpleRbacRulesFilePath(String authorizationStrategySimpleRbacRulesFilePath) {
-    setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, authorizationStrategySimpleRbacRulesFilePath);
-  }
+	public void setAuthorizationStrategySimpleRbacRulesFilePath(String authorizationStrategySimpleRbacRulesFilePath) {
+		setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_RULES_FILE_PATH, authorizationStrategySimpleRbacRulesFilePath);
+	}
 
-  public String getAuthorizationStrategySimpleRbacSubjectInformationProvider() {
-    return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER);
-  }
+	public String getAuthorizationStrategySimpleRbacSubjectInformationProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER);
+	}
 
-  public void setAuthorizationStrategySimpleRbacSubjectInformationProvider(String authorizationStrategySimpleRbacSubjectInformationProvider) {
-    setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, authorizationStrategySimpleRbacSubjectInformationProvider);
-  }
+	public void setAuthorizationStrategySimpleRbacSubjectInformationProvider(String authorizationStrategySimpleRbacSubjectInformationProvider) {
+		setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, authorizationStrategySimpleRbacSubjectInformationProvider);
+	}
 
-  public String getAuthorizationStrategySimpleRbacRoleAuthenticator() {
-    return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR);
-  }
+	public String getAuthorizationStrategySimpleRbacRoleAuthenticator() {
+		return getProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR);
+	}
 
-  public void setAuthorizationStrategySimpleRbacRoleAuthenticator(String authorizationStrategySimpleRbacRoleAuthenticator) {
-    setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, authorizationStrategySimpleRbacRoleAuthenticator);
-  }
+	public void setAuthorizationStrategySimpleRbacRoleAuthenticator(String authorizationStrategySimpleRbacRoleAuthenticator) {
+		setProperty(AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, authorizationStrategySimpleRbacRoleAuthenticator);
+	}
 
-  public String getAuthorizationStrategyGrantedAuthoritySubjectInformationProvider() {
-    return getProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER);
-  }
+	public String getAuthorizationStrategyGrantedAuthoritySubjectInformationProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER);
+	}
 
-  public void setAuthorizationStrategyGrantedAuthoritySubjectInformationProvider(String authorizationStrategyGrantedAuthoritySubjectInformationProvider) {
-    setProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, authorizationStrategyGrantedAuthoritySubjectInformationProvider);
-  }
+	public void setAuthorizationStrategyGrantedAuthoritySubjectInformationProvider(String authorizationStrategyGrantedAuthoritySubjectInformationProvider) {
+		setProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, authorizationStrategyGrantedAuthoritySubjectInformationProvider);
+	}
 
-  public String getAuthorizationStrategyGrantedAuthorityGrantedAuthorityGrantedAuthorityAuthenticator() {
-    return getProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR);
-  }
+	public String getAuthorizationStrategyGrantedAuthorityGrantedAuthorityGrantedAuthorityAuthenticator() {
+		return getProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR);
+	}
 
-  public void setAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator(String authorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator) {
-    setProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, authorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator);
-  }
+	public void setAuthorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator(String authorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator) {
+		setProperty(AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, authorizationStrategyGrantedAuthorityGrantedAuthorityAuthenticator);
+	}
 
-  public String getAuthorizationStrategyCustomAuthorizersProvider() {
-    return getProperty(AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER);
-  }
+	public String getAuthorizationStrategyCustomAuthorizersProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER);
+	}
 
-  public void setAuthorizationStrategyCustomAuthorizersProvider(String authorizationStrategyCustomAuthorizers) {
-    setProperty(AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, authorizationStrategyCustomAuthorizers);
-  }
+	public void setAuthorizationStrategyCustomAuthorizersProvider(String authorizationStrategyCustomAuthorizers) {
+		setProperty(AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, authorizationStrategyCustomAuthorizers);
+	}
 
-  public String getAuthorizationStrategyCustomSubjectInformationProvider() {
-    return getProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER);
-  }
+	public String getAuthorizationStrategyCustomSubjectInformationProvider() {
+		return getProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER);
+	}
 
-  public void setAuthorizationStrategyCustomSubjectInformationProvider(String authorizationStrategyCustomSubjectInformationProvider) {
-    setProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, authorizationStrategyCustomSubjectInformationProvider);
-  }
+	public void setAuthorizationStrategyCustomSubjectInformationProvider(String authorizationStrategyCustomSubjectInformationProvider) {
+		setProperty(AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, authorizationStrategyCustomSubjectInformationProvider);
+	}
 }

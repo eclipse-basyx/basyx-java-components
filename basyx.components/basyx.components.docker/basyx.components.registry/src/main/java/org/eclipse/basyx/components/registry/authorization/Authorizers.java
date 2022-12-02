@@ -28,31 +28,25 @@ import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITa
 import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 
 /**
- *
- * The different authorizers for the registry server to use when calling BaSyx objects like
- * the aas registry or the tagged directory.
+ * The different authorizers for the registry server to use when calling BaSyx objects like the aas registry or the tagged directory.
  *
  * @author wege
- *
  */
 public class Authorizers<SubjectInformationType> {
-  private final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer;
+	private final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer;
 
-  public IAASRegistryAuthorizer<SubjectInformationType> getAasRegistryAuthorizer() {
-    return aasRegistryAuthorizer;
-  }
+	public IAASRegistryAuthorizer<SubjectInformationType> getAasRegistryAuthorizer() {
+		return aasRegistryAuthorizer;
+	}
 
-  private final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
+	private final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
 
-  public ITaggedDirectoryAuthorizer<SubjectInformationType> getTaggedDirectoryAuthorizer() {
-    return taggedDirectoryAuthorizer;
-  }
+	public ITaggedDirectoryAuthorizer<SubjectInformationType> getTaggedDirectoryAuthorizer() {
+		return taggedDirectoryAuthorizer;
+	}
 
-  public Authorizers(
-      final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer,
-      final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer
-  ) {
-    this.aasRegistryAuthorizer = aasRegistryAuthorizer;
-    this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
-  }
+	public Authorizers(final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer, final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer) {
+		this.aasRegistryAuthorizer = aasRegistryAuthorizer;
+		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
+	}
 }

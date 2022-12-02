@@ -30,55 +30,48 @@ import org.eclipse.basyx.extensions.submodel.aggregator.authorization.internal.I
 import org.eclipse.basyx.extensions.submodel.authorization.internal.ISubmodelAPIAuthorizer;
 
 /**
- *
- * The different authorizers for the aas server to use when calling BaSyx objects like
- * the aas aggregator or the file download functionality of the aas server.
+ * The different authorizers for the aas server to use when calling BaSyx objects like the aas aggregator or the file download functionality of the aas server.
  *
  * @author wege
- *
  */
 public class Authorizers<SubjectInformationType> {
-  private final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer;
+	private final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer;
 
-  public IAASAggregatorAuthorizer<SubjectInformationType> getAasAggregatorAuthorizer() {
-    return aasAggregatorAuthorizer;
-  }
+	public IAASAggregatorAuthorizer<SubjectInformationType> getAasAggregatorAuthorizer() {
+		return aasAggregatorAuthorizer;
+	}
 
-  private final IAASAPIAuthorizer<SubjectInformationType> aasApiAuthorizer;
+	private final IAASAPIAuthorizer<SubjectInformationType> aasApiAuthorizer;
 
-  public IAASAPIAuthorizer<SubjectInformationType> getAasApiAuthorizer() {
-    return aasApiAuthorizer;
-  }
+	public IAASAPIAuthorizer<SubjectInformationType> getAasApiAuthorizer() {
+		return aasApiAuthorizer;
+	}
 
-  private final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer;
+	private final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer;
 
-  public ISubmodelAggregatorAuthorizer<SubjectInformationType> getSubmodelAggregatorAuthorizer() {
-    return submodelAggregatorAuthorizer;
-  }
+	public ISubmodelAggregatorAuthorizer<SubjectInformationType> getSubmodelAggregatorAuthorizer() {
+		return submodelAggregatorAuthorizer;
+	}
 
-  private final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer;
+	private final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer;
 
-  public ISubmodelAPIAuthorizer<SubjectInformationType> getSubmodelAPIAuthorizer() {
-    return submodelAPIAuthorizer;
-  }
+	public ISubmodelAPIAuthorizer<SubjectInformationType> getSubmodelAPIAuthorizer() {
+		return submodelAPIAuthorizer;
+	}
 
-  private final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
+	private final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
 
-  public IFilesAuthorizer<SubjectInformationType> getFilesAuthorizer() {
-    return filesAuthorizer;
-  }
+	public IFilesAuthorizer<SubjectInformationType> getFilesAuthorizer() {
+		return filesAuthorizer;
+	}
 
-  public Authorizers(
-      final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer,
-      final IAASAPIAuthorizer<SubjectInformationType> aasApiAuthorizer,
-      final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer,
-      final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer,
-      final IFilesAuthorizer<SubjectInformationType> filesAuthorizer
-  ) {
-    this.aasAggregatorAuthorizer = aasAggregatorAuthorizer;
-    this.aasApiAuthorizer = aasApiAuthorizer;
-    this.submodelAggregatorAuthorizer = submodelAggregatorAuthorizer;
-    this.submodelAPIAuthorizer = submodelAPIAuthorizer;
-    this.filesAuthorizer = filesAuthorizer;
-  }
+	public Authorizers(final IAASAggregatorAuthorizer<SubjectInformationType> aasAggregatorAuthorizer, final IAASAPIAuthorizer<SubjectInformationType> aasApiAuthorizer,
+			final ISubmodelAggregatorAuthorizer<SubjectInformationType> submodelAggregatorAuthorizer, final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer,
+			final IFilesAuthorizer<SubjectInformationType> filesAuthorizer) {
+		this.aasAggregatorAuthorizer = aasAggregatorAuthorizer;
+		this.aasApiAuthorizer = aasApiAuthorizer;
+		this.submodelAggregatorAuthorizer = submodelAggregatorAuthorizer;
+		this.submodelAPIAuthorizer = submodelAPIAuthorizer;
+		this.filesAuthorizer = filesAuthorizer;
+	}
 }

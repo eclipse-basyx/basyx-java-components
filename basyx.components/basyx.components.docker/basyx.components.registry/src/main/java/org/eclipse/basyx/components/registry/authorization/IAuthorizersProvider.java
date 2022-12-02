@@ -27,20 +27,16 @@ package org.eclipse.basyx.components.registry.authorization;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 
 /**
- *
  * Provides the authorizers for the different common to be authorized BaSyx objects using the registry server configuration.
  *
  * @author wege
- *
  */
 public interface IAuthorizersProvider<SubjectInformationType> {
-  /**
-   * Provides the authorizers for the different common to be authorized BaSyx objects using the AAS server configuration.
-   *
-   * @param securityConfig
-   *                               the aas server configuration that holds information about how to determine the authorizers.
-   *
-   * @return the different authorizers bundled in an {@link Authorizers}
-   */
-  Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
+	/**
+	 * Provides the authorizers for the different common to be authorized BaSyx objects using the AAS server configuration.
+	 *
+	 * @param securityConfig the aas server configuration that holds information about how to determine the authorizers.
+	 * @return the different authorizers bundled in an {@link Authorizers}
+	 */
+	Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
 }

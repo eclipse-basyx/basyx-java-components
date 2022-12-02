@@ -36,20 +36,15 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.SimpleRbacHelp
  * @author wege
  */
 public class SimpleRbacFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
-  protected IRbacRuleChecker rbacRuleChecker;
-  protected IRoleAuthenticator<SubjectInformationType> roleAuthenticator;
+	protected IRbacRuleChecker rbacRuleChecker;
+	protected IRoleAuthenticator<SubjectInformationType> roleAuthenticator;
 
-  public SimpleRbacFilesAuthorizer(final IRbacRuleChecker rbacRuleChecker, final IRoleAuthenticator<SubjectInformationType> roleAuthenticator) {
-    this.rbacRuleChecker = rbacRuleChecker;
-    this.roleAuthenticator = roleAuthenticator;
-  }
+	public SimpleRbacFilesAuthorizer(final IRbacRuleChecker rbacRuleChecker, final IRoleAuthenticator<SubjectInformationType> roleAuthenticator) {
+		this.rbacRuleChecker = rbacRuleChecker;
+		this.roleAuthenticator = roleAuthenticator;
+	}
 
-  @Override
-  public void authorizeDownloadFile(
-      SubjectInformationType subjectInformation,
-      Path path
-  ) throws InhibitException {
-    SimpleRbacHelper
-        .checkRule(rbacRuleChecker, roleAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_SCOPE, new PathTargetInformation(path));
-  }
+	@Override public void authorizeDownloadFile(SubjectInformationType subjectInformation, Path path) throws InhibitException {
+		SimpleRbacHelper.checkRule(rbacRuleChecker, roleAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_SCOPE, new PathTargetInformation(path));
+	}
 }

@@ -42,59 +42,47 @@ import org.eclipse.basyx.vab.coder.json.serialization.GSONTools;
 import org.eclipse.basyx.vab.protocol.http.server.ExceptionToHTTPCodeMapper;
 
 /**
- *
- * A decorated variant of the {@link DefaultServlet} that checks authorization
- * when downloading files from the Tomcat server.
+ * A decorated variant of the {@link DefaultServlet} that checks authorization when downloading files from the Tomcat server.
  *
  * @author wege
- *
  */
 public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultServlet {
-  protected final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
-  protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
+	protected final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
+	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
-  public AuthorizedDefaultServlet(
-      final IFilesAuthorizer<SubjectInformationType> filesAuthorizer,
-      final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider
-  ) {
-    this.filesAuthorizer = filesAuthorizer;
-    this.subjectInformationProvider = subjectInformationProvider;
-  }
+	public AuthorizedDefaultServlet(final IFilesAuthorizer<SubjectInformationType> filesAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
+		this.filesAuthorizer = filesAuthorizer;
+		this.subjectInformationProvider = subjectInformationProvider;
+	}
 
-  public AuthorizedDefaultServlet(
-      final AuthorizedDefaultServletParams<SubjectInformationType> params
-  ) {
-    this(
-      params.getFilesAuthorizer(),
-      params.getSubjectInformationProvider()
-    );
-  }
+	public AuthorizedDefaultServlet(final AuthorizedDefaultServletParams<SubjectInformationType> params) {
+		this(params.getFilesAuthorizer(), params.getSubjectInformationProvider());
+	}
 
-  @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    Path path = Paths.get(getRelativePath(request, true));
+	@Override protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		Path path = Paths.get(getRelativePath(request, true));
 
-    try {
-      authorizeDoGet(path);
+		try {
+			authorizeDoGet(path);
 
-      super.doGet(request, response);
-    } catch (final NotAuthorized e) {
-      int httpCode = ExceptionToHTTPCodeMapper.mapFromException(e);
-      response.setStatus(httpCode);
-      sendException(response.getOutputStream(), e);
-    }
-  }
+			super.doGet(request, response);
+		} catch (final NotAuthorized e) {
+			int httpCode = ExceptionToHTTPCodeMapper.mapFromException(e);
+			response.setStatus(httpCode);
+			sendException(response.getOutputStream(), e);
+		}
+	}
 
-  protected void authorizeDoGet(final Path path) {
-    try {
-      filesAuthorizer.authorizeDownloadFile(subjectInformationProvider.get(), path);
-    } catch (final InhibitException e) {
-      throw new NotAuthorized(e);
-    }
-  }
+	protected void authorizeDoGet(final Path path) {
+		try {
+			filesAuthorizer.authorizeDownloadFile(subjectInformationProvider.get(), path);
+		} catch (final InhibitException e) {
+			throw new NotAuthorized(e);
+		}
+	}
 
-  private void sendException(OutputStream outputStream, Exception e) throws IOException {
-    final String eString = new GSONTools(new DefaultTypeFactory()).serialize(new Result(e));
-    outputStream.write(eString.getBytes(StandardCharsets.UTF_8));
-  }
+	private void sendException(OutputStream outputStream, Exception e) throws IOException {
+		final String eString = new GSONTools(new DefaultTypeFactory()).serialize(new Result(e));
+		outputStream.write(eString.getBytes(StandardCharsets.UTF_8));
+	}
 }

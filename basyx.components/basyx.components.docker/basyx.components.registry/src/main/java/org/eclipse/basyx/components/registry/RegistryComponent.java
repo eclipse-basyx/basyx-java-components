@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2022 the Eclipse BaSyx Authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -8,10 +8,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -19,7 +19,7 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
+ *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.registry;
@@ -63,13 +63,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generic registry that can start and stop a registry with different kinds of
- * backends. Currently supports MongoDB and SQL. For development purposes, the
- * component can also start a registry without a backend and without
- * persistency.
- * 
- * @author espen, wege
+ * Generic registry that can start and stop a registry with different kinds of backends. Currently supports MongoDB and SQL. For development purposes, the component can also start a registry without a backend and without persistency.
  *
+ * @author espen, wege
  */
 public class RegistryComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(RegistryComponent.class);
@@ -96,11 +92,9 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context.
-	 * This constructor will create an InMemory registry.
-	 * 
-	 * @param contextConfig
-	 *            The context configuration
+	 * Constructor with given configuration for the registry and its server context. This constructor will create an InMemory registry.
+	 *
+	 * @param contextConfig The context configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig) {
 		this.contextConfig = contextConfig;
@@ -108,13 +102,10 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context.
-	 * This constructor will create a registry with a MongoDB backend.
-	 * 
-	 * @param contextConfig
-	 *            The context configuration
-	 * @param mongoDBConfig
-	 *            The mongoDB configuration
+	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with a MongoDB backend.
+	 *
+	 * @param contextConfig The context configuration
+	 * @param mongoDBConfig The mongoDB configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
@@ -123,14 +114,11 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context.
-	 * This constructor will create a registry with a MongoDB backend.
+	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with a MongoDB backend.
 	 *
-	 * @param contextConfig
-	 *            The context configuration
+	 * @param contextConfig  The context configuration
 	 * @param registryConfig
-	 * @param mongoDBConfig
-	 *            The mongoDB configuration
+	 * @param mongoDBConfig  The mongoDB configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
@@ -139,13 +127,10 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context.
-	 * This constructor will create a registry with an SQL backend.
-	 * 
-	 * @param contextConfig
-	 *            The context configuration
-	 * @param sqlConfig
-	 *            The sql configuration
+	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with an SQL backend.
+	 *
+	 * @param contextConfig The context configuration
+	 * @param sqlConfig     The sql configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
@@ -154,14 +139,11 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context.
-	 * This constructor will create a registry with an SQL backend.
+	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with an SQL backend.
 	 *
-	 * @param contextConfig
-	 *            The context configuration
+	 * @param contextConfig  The context configuration
 	 * @param registryConfig
-	 * @param sqlConfig
-	 *            The sql configuration
+	 * @param sqlConfig      The sql configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
@@ -170,13 +152,10 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context.
-	 * Will load the backend configuration using the default load process.
-	 * 
-	 * @param contextConfig
-	 *            The context configuration
-	 * @param registryConfig
-	 *            The registry configuration
+	 * Constructor with given configuration for the registry and its server context. Will load the backend configuration using the default load process.
+	 *
+	 * @param contextConfig  The context configuration
+	 * @param registryConfig The registry configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig) {
 		this.contextConfig = contextConfig;
@@ -186,8 +165,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Starts the context at http://${hostName}:${port}/${path}
 	 */
-	@Override
-	public void startComponent() {
+	@Override public void startComponent() {
 		loadRegistryFeaturesFromConfig();
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
@@ -202,9 +180,8 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Sets and enables mqtt connection configuration for this component. Has to be
-	 * called before the component is started.
-	 * 
+	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is started.
+	 *
 	 * @param configuration
 	 */
 	public void enableMQTT(BaSyxMqttConfiguration configuration) {
@@ -212,8 +189,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Disables mqtt configuration. Has to be called before the component is
-	 * started.
+	 * Disables mqtt configuration. Has to be called before the component is started.
 	 */
 	public void disableMQTT() {
 		this.mqttConfig = null;
@@ -299,14 +275,14 @@ public class RegistryComponent implements IComponent {
 	private IAASRegistry createRegistryBackend() {
 		final RegistryBackend backendType = registryConfig.getRegistryBackend();
 		switch (backendType) {
-			case MONGODB:
-				return createMongoDBRegistryBackend();
-			case SQL:
-				return createSQLRegistryBackend();
-			case INMEMORY:
-				return createInMemoryRegistryBackend();
-			default:
-				throw new RuntimeException("Unknown backend type " + backendType);
+		case MONGODB:
+			return createMongoDBRegistryBackend();
+		case SQL:
+			return createSQLRegistryBackend();
+		case INMEMORY:
+			return createInMemoryRegistryBackend();
+		default:
+			throw new RuntimeException("Unknown backend type " + backendType);
 		}
 	}
 
@@ -352,31 +328,29 @@ public class RegistryComponent implements IComponent {
 		try {
 			strategy = AuthorizationStrategy.valueOf(strategyString);
 		} catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays
-					.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
+			throw new IllegalArgumentException(
+					String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
 		}
 
 		switch (strategy) {
-			case SimpleRbac: {
-				return new SimpleRbacSecurityFeature(securityConfig);
-			}
-			case GrantedAuthority: {
-				return new GrantedAuthoritySecurityFeature(securityConfig);
-			}
-			case Custom: {
-				return new SecurityFeature(securityConfig);
-			}
-			default:
-				throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
+		case SimpleRbac: {
+			return new SimpleRbacSecurityFeature(securityConfig);
+		}
+		case GrantedAuthority: {
+			return new GrantedAuthoritySecurityFeature(securityConfig);
+		}
+		case Custom: {
+			return new SecurityFeature(securityConfig);
+		}
+		default:
+			throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
 		}
 	}
 
 	private void configureContextForAuthorization(final BaSyxContext context) {
 		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
 		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
-			context.setJwtBearerTokenAuthenticationConfiguration(
-					jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig)
-			);
+			context.setJwtBearerTokenAuthenticationConfiguration(jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig));
 		}
 	}
 
@@ -426,8 +400,7 @@ public class RegistryComponent implements IComponent {
 		securityConfig.loadFromDefaultSource();
 	}
 
-	@Override
-	public void stopComponent() {
+	@Override public void stopComponent() {
 		server.shutdown();
 		logger.info("Registry server stopped");
 	}

@@ -28,23 +28,16 @@ import java.nio.file.Path;
 import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
 
 /**
- *
  * The authorizer for downloading files from the aas server.
  *
  * @author wege
- *
  */
 public interface IFilesAuthorizer<SubjectInformationType> {
-  /**
-   * Checks authorization for the download of a specific file by its path.
-   *
-   * @param subjectInformation
-   *                           information of the requester.
-   * @param path
-   *                           the path of the file
-   */
-  void authorizeDownloadFile(
-      final SubjectInformationType subjectInformation,
-      final Path path
-  ) throws InhibitException;
+	/**
+	 * Checks authorization for the download of a specific file by its path.
+	 *
+	 * @param subjectInformation information of the requester.
+	 * @param path               the path of the file
+	 */
+	void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
 }

@@ -35,18 +35,13 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitExcepti
  * @author wege
  */
 public class GrantedAuthorityFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
-  protected IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator;
+	protected IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator;
 
-  public GrantedAuthorityFilesAuthorizer(final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator) {
-    this.grantedAuthorityAuthenticator = grantedAuthorityAuthenticator;
-  }
+	public GrantedAuthorityFilesAuthorizer(final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator) {
+		this.grantedAuthorityAuthenticator = grantedAuthorityAuthenticator;
+	}
 
-  @Override
-  public void authorizeDownloadFile(
-      final SubjectInformationType subjectInformation,
-      final Path path
-  ) throws InhibitException {
-    GrantedAuthorityHelper
-        .checkAuthority(grantedAuthorityAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_AUTHORITY);
-  }
+	@Override public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException {
+		GrantedAuthorityHelper.checkAuthority(grantedAuthorityAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_AUTHORITY);
+	}
 }

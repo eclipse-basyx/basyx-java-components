@@ -36,62 +36,50 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.TagTargetInfor
 import org.eclipse.basyx.extensions.shared.authorization.internal.TargetInformation;
 
 /**
- *
  * Target information for {@link SimpleRbacFilesAuthorizer} file paths for RBAC authorization scheme.
  *
  * @author wege
- *
  */
 public class PathTargetInformation implements TargetInformation {
-  private Path path;
+	private Path path;
 
-  public Path getPath() {
-    return path;
-  }
+	public Path getPath() {
+		return path;
+	}
 
-  public PathTargetInformation(final Path path) {
-    this.path = path;
-  }
+	public PathTargetInformation(final Path path) {
+		this.path = path;
+	}
 
-  @JsonCreator
-  public PathTargetInformation(final @JsonProperty("path") String path) {
-    this(Paths.get(path));
-  }
+	@JsonCreator public PathTargetInformation(final @JsonProperty("path") String path) {
+		this(Paths.get(path));
+	}
 
-  @Override
-  public Map<String, String> toMap() {
-    final Map<String, String> map = new HashMap<>();
-    map.put("path", path.toString());
-    return map;
-  }
+	@Override public Map<String, String> toMap() {
+		final Map<String, String> map = new HashMap<>();
+		map.put("path", path.toString());
+		return map;
+	}
 
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o)
-      return true;
+	@Override public boolean equals(final Object o) {
+      if (this == o) {
+        return true;
+      }
 
-    if (!(o instanceof TagTargetInformation))
-      return false;
+      if (!(o instanceof TagTargetInformation)) {
+        return false;
+      }
 
-    final PathTargetInformation other = (PathTargetInformation) o;
+		final PathTargetInformation other = (PathTargetInformation) o;
 
-    return new EqualsBuilder()
-        .append(getPath(), other.getPath())
-        .isEquals();
-  }
+		return new EqualsBuilder().append(getPath(), other.getPath()).isEquals();
+	}
 
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(getPath())
-        .toHashCode();
-  }
+	@Override public int hashCode() {
+		return new HashCodeBuilder(17, 37).append(getPath()).toHashCode();
+	}
 
-  @Override
-  public String toString() {
-    return new StringBuilder("BaSyxObjectTargetInformation{")
-        .append("tag='").append(path).append('\'')
-        .append('}')
-        .toString();
-  }
+	@Override public String toString() {
+		return new StringBuilder("BaSyxObjectTargetInformation{").append("tag='").append(path).append('\'').append('}').toString();
+	}
 }

@@ -29,24 +29,19 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.KeycloakServic
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
- *
  * Implementation of the {@link IJwtBearerTokenAuthenticationConfigurationProvider} interface.
- *
- * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be used to configure
- * the BaSyx server to accept tokens from a specific Keycloak server and realm and set up the
- * security context on an incoming request.
+ * <p>
+ * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be used to configure the BaSyx server to accept tokens from a specific Keycloak server and realm and set up the security context on an incoming request.
  *
  * @author wege
- *
  */
 public class KeycloakJwtBearerTokenAuthenticationConfigurationProvider implements IJwtBearerTokenAuthenticationConfigurationProvider {
-  @Override
-  public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig) {
-    final String serverUrl = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
-    final String realm = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
+	@Override public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig) {
+		final String serverUrl = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
+		final String realm = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
 
-    final KeycloakService keycloakService = new KeycloakService(serverUrl, realm);
+		final KeycloakService keycloakService = new KeycloakService(serverUrl, realm);
 
-    return keycloakService.createJwtBearerTokenAuthenticationConfiguration();
-  }
+		return keycloakService.createJwtBearerTokenAuthenticationConfiguration();
+	}
 }

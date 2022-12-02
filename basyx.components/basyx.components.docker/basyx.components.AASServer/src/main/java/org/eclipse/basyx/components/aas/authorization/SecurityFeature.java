@@ -31,55 +31,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides the {@link IAASServerDecorator} and {@link AuthorizedDefaultServletParams} instances that are required for authorization.
- * This base class uses the custom authorization configuration properties to load classes.
+ * Provides the {@link IAASServerDecorator} and {@link AuthorizedDefaultServletParams} instances that are required for authorization. This base class uses the custom authorization configuration properties to load classes.
  *
  * @author wege
  */
 public class SecurityFeature {
-  private static Logger logger = LoggerFactory.getLogger(SecurityFeature.class);
+	private static Logger logger = LoggerFactory.getLogger(SecurityFeature.class);
 
-  protected final BaSyxSecurityConfiguration securityConfig;
+	protected final BaSyxSecurityConfiguration securityConfig;
 
-  public SecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
-    this.securityConfig = securityConfig;
-  }
+	public SecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
+		this.securityConfig = securityConfig;
+	}
 
-  public  <SubjectInformationType> IAASServerDecorator getDecorator() {
-    logger.info("use Custom authorization strategy");
-    final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
-    final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
+	public <SubjectInformationType> IAASServerDecorator getDecorator() {
+		logger.info("use Custom authorization strategy");
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
+		final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
 
-    final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(securityConfig);
+		final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(securityConfig);
 
-    return new AuthorizedAASServerDecorator<>(
-        authorizers.getSubmodelAPIAuthorizer(),
-        authorizers.getSubmodelAggregatorAuthorizer(),
-        authorizers.getAasApiAuthorizer(),
-        authorizers.getAasAggregatorAuthorizer(),
-        subjectInformationProvider
-    );
-  }
+		return new AuthorizedAASServerDecorator<>(authorizers.getSubmodelAPIAuthorizer(), authorizers.getSubmodelAggregatorAuthorizer(), authorizers.getAasApiAuthorizer(), authorizers.getAasAggregatorAuthorizer(),
+				subjectInformationProvider);
+	}
 
-  public  <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
-    logger.info("use Custom authorization strategy for files authorizer");
-    final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
-    final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(securityConfig);
-    final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
+	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+		logger.info("use Custom authorization strategy for files authorizer");
+		final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
+		final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(securityConfig);
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
 
-    return new AuthorizedDefaultServletParams<>(
-        authorizers.getFilesAuthorizer(),
-        subjectInformationProvider
-    );
-  }
+		return new AuthorizedDefaultServletParams<>(authorizers.getFilesAuthorizer(), subjectInformationProvider);
+	}
 
-  @SuppressWarnings("unchecked")
-  private <SubjectInformationType> IAuthorizersProvider<SubjectInformationType> getAuthorizersProvider() {
-    return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, IAuthorizersProvider.class);
-  }
+	@SuppressWarnings("unchecked") private <SubjectInformationType> IAuthorizersProvider<SubjectInformationType> getAuthorizersProvider() {
+		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, IAuthorizersProvider.class);
+	}
 
-  @SuppressWarnings("unchecked")
-  private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
-    return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
-  }
+	@SuppressWarnings("unchecked") private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
+	}
 }
