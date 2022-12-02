@@ -24,6 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.authorization;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.SimpleRbacTaggedDirectoryAuthorizer;
 import org.eclipse.basyx.extensions.aas.registration.authorization.SimpleRbacAASRegistryAuthorizer;
@@ -32,6 +34,7 @@ import org.eclipse.basyx.extensions.shared.authorization.IRoleAuthenticator;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.eclipse.basyx.extensions.shared.authorization.PredefinedSetRbacRuleChecker;
 import org.eclipse.basyx.extensions.shared.authorization.RbacRuleSet;
+import org.eclipse.basyx.extensions.shared.authorization.RbacRuleSetDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +53,7 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
   @Override
   public <SubjectInformationType> IAASRegistryDecorator getDecorator() {
     logger.info("use SimpleRbac authorization strategy");
-    final RbacRuleSet rbacRuleSet = RbacRuleSet.fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+    final RbacRuleSet rbacRuleSet = getRbacRuleSet();
     final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
     final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getRoleAuthenticator();
     final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
@@ -60,6 +63,14 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
         new SimpleRbacTaggedDirectoryAuthorizer<>(rbacRuleChecker, roleAuthenticator),
         subjectInformationProvider
     );
+  }
+
+  public RbacRuleSet getRbacRuleSet() {
+    try {
+      return new RbacRuleSetDeserializer().fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   @SuppressWarnings("unchecked")

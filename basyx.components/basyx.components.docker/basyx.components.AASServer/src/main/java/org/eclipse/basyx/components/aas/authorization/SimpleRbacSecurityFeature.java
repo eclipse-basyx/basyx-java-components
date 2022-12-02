@@ -24,6 +24,11 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.function.Consumer;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.SimpleRbacAASAggregatorAuthorizer;
@@ -33,6 +38,7 @@ import org.eclipse.basyx.extensions.shared.authorization.IRoleAuthenticator;
 import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
 import org.eclipse.basyx.extensions.shared.authorization.PredefinedSetRbacRuleChecker;
 import org.eclipse.basyx.extensions.shared.authorization.RbacRuleSet;
+import org.eclipse.basyx.extensions.shared.authorization.RbacRuleSetDeserializer;
 import org.eclipse.basyx.extensions.submodel.aggregator.authorization.SimpleRbacSubmodelAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.submodel.authorization.SimpleRbacSubmodelAPIAuthorizer;
 import org.slf4j.Logger;
@@ -53,7 +59,7 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
   @Override
   public <SubjectInformationType> IAASServerDecorator getDecorator() {
     logger.info("use SimpleRbac authorization strategy");
-    final RbacRuleSet rbacRuleSet = RbacRuleSet.fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+    final RbacRuleSet rbacRuleSet = getRbacRuleSet();
     final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
     final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
     final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
@@ -70,7 +76,7 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
   @Override
   public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
     logger.info("use SimpleRbac authorization strategy");
-    final RbacRuleSet rbacRuleSet = RbacRuleSet.fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+    final RbacRuleSet rbacRuleSet = getRbacRuleSet();
     final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
     final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getSimpleRbacRoleAuthenticator();
     final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSimpleRbacSubjectInformationProvider();
@@ -79,6 +85,15 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
         new SimpleRbacFilesAuthorizer<>(rbacRuleChecker, roleAuthenticator),
         subjectInformationProvider
     );
+  }
+
+  public RbacRuleSet getRbacRuleSet() {
+    try {
+      final Consumer<ObjectMapper> mapperAddIn = mapper -> mapper.registerSubtypes(new NamedType(PathTargetInformation.class, "path"));
+      return new RbacRuleSetDeserializer(mapperAddIn).fromFile(securityConfig.getAuthorizationStrategySimpleRbacRulesFilePath());
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   @SuppressWarnings("unchecked")

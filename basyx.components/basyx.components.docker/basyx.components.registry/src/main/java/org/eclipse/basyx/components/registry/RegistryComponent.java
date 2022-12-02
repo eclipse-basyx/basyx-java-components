@@ -345,14 +345,14 @@ public class RegistryComponent implements IComponent {
 		final String strategyString = securityConfig.getAuthorizationStrategy();
 
 		if (strategyString == null) {
-			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in aas.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
+			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in security.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
 		}
 
 		AuthorizationStrategy strategy;
 		try {
 			strategy = AuthorizationStrategy.valueOf(strategyString);
 		} catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in aas.properties, available options: %s", strategyString, Arrays
+			throw new IllegalArgumentException(String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays
 					.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
 		}
 
