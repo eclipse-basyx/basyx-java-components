@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.aas.authorization;
 
 import java.nio.file.Path;
-import org.eclipse.basyx.extensions.shared.authorization.InhibitException;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
 
 /**
  *

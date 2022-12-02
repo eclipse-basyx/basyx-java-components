@@ -26,11 +26,11 @@ package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.AuthorizedTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.ITaggedDirectoryAuthorizer;
-import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
-import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
-import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.AuthorizedTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.AuthorizedAASRegistry;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
  * 

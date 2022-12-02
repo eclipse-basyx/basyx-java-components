@@ -24,8 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.authorization;
 
-import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.ITaggedDirectoryAuthorizer;
-import org.eclipse.basyx.extensions.aas.registration.authorization.IAASRegistryAuthorizer;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 
 /**
  *

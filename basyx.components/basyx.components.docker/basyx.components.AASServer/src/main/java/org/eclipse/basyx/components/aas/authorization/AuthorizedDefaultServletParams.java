@@ -24,8 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
-import org.apache.catalina.servlets.DefaultServlet;
-import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
  *

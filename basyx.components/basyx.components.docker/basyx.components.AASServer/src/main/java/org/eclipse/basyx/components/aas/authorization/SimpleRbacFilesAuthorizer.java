@@ -25,10 +25,10 @@
 package org.eclipse.basyx.components.aas.authorization;
 
 import java.nio.file.Path;
-import org.eclipse.basyx.extensions.shared.authorization.IRbacRuleChecker;
-import org.eclipse.basyx.extensions.shared.authorization.IRoleAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.InhibitException;
-import org.eclipse.basyx.extensions.shared.authorization.SimpleRbacHelper;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IRbacRuleChecker;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IRoleAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
+import org.eclipse.basyx.extensions.shared.authorization.internal.SimpleRbacHelper;
 
 /**
  * Simple role based implementation for {@link IFilesAuthorizer}.

@@ -26,12 +26,12 @@ package org.eclipse.basyx.components.aas.authorization;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.extensions.aas.aggregator.authorization.GrantedAuthorityAASAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.aas.api.authorization.GrantedAuthorityAASAPIAuthorizer;
-import org.eclipse.basyx.extensions.shared.authorization.IGrantedAuthorityAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
-import org.eclipse.basyx.extensions.submodel.aggregator.authorization.GrantedAuthoritySubmodelAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.submodel.authorization.GrantedAuthoritySubmodelAPIAuthorizer;
+import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.GrantedAuthorityAASAggregatorAuthorizer;
+import org.eclipse.basyx.extensions.aas.api.authorization.internal.GrantedAuthorityAASAPIAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IGrantedAuthorityAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
+import org.eclipse.basyx.extensions.submodel.aggregator.authorization.internal.GrantedAuthoritySubmodelAggregatorAuthorizer;
+import org.eclipse.basyx.extensions.submodel.authorization.internal.GrantedAuthoritySubmodelAPIAuthorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

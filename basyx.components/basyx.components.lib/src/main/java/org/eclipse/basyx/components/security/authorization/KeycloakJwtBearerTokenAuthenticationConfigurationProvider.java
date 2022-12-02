@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.security.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.extensions.shared.authorization.KeycloakService;
+import org.eclipse.basyx.extensions.shared.authorization.internal.KeycloakService;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**

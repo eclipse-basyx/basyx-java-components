@@ -25,7 +25,7 @@
 package org.eclipse.basyx.components.registry.authorization;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.extensions.shared.authorization.ISubjectInformationProvider;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

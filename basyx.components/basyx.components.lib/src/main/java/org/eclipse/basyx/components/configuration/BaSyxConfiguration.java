@@ -36,10 +36,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.basyx.extensions.shared.authorization.AuthenticationContextProvider;
-import org.eclipse.basyx.extensions.shared.authorization.AuthenticationGrantedAuthorityAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.JWTAuthenticationContextProvider;
-import org.eclipse.basyx.extensions.shared.authorization.KeycloakRoleAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.AuthenticationContextProvider;
+import org.eclipse.basyx.extensions.shared.authorization.internal.AuthenticationGrantedAuthorityAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.JWTAuthenticationContextProvider;
+import org.eclipse.basyx.extensions.shared.authorization.internal.KeycloakRoleAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

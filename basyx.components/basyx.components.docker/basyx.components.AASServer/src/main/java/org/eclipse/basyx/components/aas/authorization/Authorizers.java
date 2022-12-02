@@ -24,10 +24,10 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
-import org.eclipse.basyx.extensions.aas.aggregator.authorization.IAASAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.aas.api.authorization.IAASAPIAuthorizer;
-import org.eclipse.basyx.extensions.submodel.aggregator.authorization.ISubmodelAggregatorAuthorizer;
-import org.eclipse.basyx.extensions.submodel.authorization.ISubmodelAPIAuthorizer;
+import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.IAASAggregatorAuthorizer;
+import org.eclipse.basyx.extensions.aas.api.authorization.internal.IAASAPIAuthorizer;
+import org.eclipse.basyx.extensions.submodel.aggregator.authorization.internal.ISubmodelAggregatorAuthorizer;
+import org.eclipse.basyx.extensions.submodel.authorization.internal.ISubmodelAPIAuthorizer;
 
 /**
  *
