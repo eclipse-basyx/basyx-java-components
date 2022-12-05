@@ -43,6 +43,8 @@ public interface IAASRegistryDecorator {
 
 	/**
 	 * Decorates a tagged directory according to this decorator.
+	 * 
+	 * @param taggedDirectory
 	 *                              the tagged directory to be decorated.
 	 */
 	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory);
