@@ -42,5 +42,5 @@ public interface IAuthorizersProvider<SubjectInformationType> {
 	 *            determine the authorizers.
 	 * @return the different authorizers bundled in an {@link Authorizers}
 	 */
-	Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
+	public Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
 }

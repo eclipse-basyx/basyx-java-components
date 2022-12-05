@@ -33,7 +33,17 @@ import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory
  * @author wege
  */
 public interface IAASRegistryDecorator {
+	/**
+	 * Decorates an AAS registry according to this decorator.
+	 * 
+	 * @param aasRegistry
+	 *                   the aas registry to be decorated.
+	 */
 	public IAASRegistry decorateRegistry(IAASRegistry aasRegistry);
 
+	/**
+	 * Decorates a tagged directory according to this decorator.
+	 *                              the tagged directory to be decorated.
+	 */
 	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory);
 }

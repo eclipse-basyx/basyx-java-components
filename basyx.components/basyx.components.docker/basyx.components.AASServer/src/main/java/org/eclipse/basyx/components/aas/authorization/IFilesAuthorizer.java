@@ -41,5 +41,5 @@ public interface IFilesAuthorizer<SubjectInformationType> {
 	 * @param path
 	 *            the path of the file
 	 */
-	void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
+	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
 }
