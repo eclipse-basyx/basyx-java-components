@@ -41,7 +41,8 @@ public class GrantedAuthorityFilesAuthorizer<SubjectInformationType> implements 
 		this.grantedAuthorityAuthenticator = grantedAuthorityAuthenticator;
 	}
 
-	@Override public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException {
+	@Override
+	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException {
 		GrantedAuthorityHelper.checkAuthority(grantedAuthorityAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_AUTHORITY);
 	}
 }

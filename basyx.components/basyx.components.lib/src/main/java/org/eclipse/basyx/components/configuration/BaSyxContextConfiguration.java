@@ -59,8 +59,8 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_ISSUER_URI = "jwtBearerTokenAuthenticationIssuerUri";
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_JWK_SET_URI = "jwtBearerTokenAuthenticationJwkSetUri";
 	public static final String JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD = "jwtBearerTokenAuthenticationRequiredAud";
-	
-	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "accessControlAllowOrigin"; 
+
+	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "accessControlAllowOrigin";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "context.properties";
@@ -160,14 +160,14 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 		if (atLeastOneJwtPropertyIsSet()) {
 			configureJwtAuthentication(baSyxContext);
 		}
-		
+
 		enableCORSIfConfigured(baSyxContext);
 
 		return baSyxContext;
 	}
 
 	private void enableCORSIfConfigured(final BaSyxContext baSyxContext) {
-		if(!isCorsConfigured()) {
+		if (!isCorsConfigured()) {
 			return;
 		}
 
@@ -262,14 +262,14 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	public void setJwtBearerTokenAuthenticationRequiredAud(String jwtBearerAuthRequiredAud) {
 		setProperty(JWT_BEARER_TOKEN_AUTHENTICATION_REQUIRED_AUD, jwtBearerAuthRequiredAud);
 	}
-	
-	public String getAccessControlAllowOrigin() { 
-        return getProperty(ACCESS_CONTROL_ALLOW_ORIGIN); 
-    }
 
-    public void setAccessControlAllowOrigin(String accessControlAllowOrigin) { 
-        setProperty(ACCESS_CONTROL_ALLOW_ORIGIN, accessControlAllowOrigin); 
-    } 
+	public String getAccessControlAllowOrigin() {
+		return getProperty(ACCESS_CONTROL_ALLOW_ORIGIN);
+	}
+
+	public void setAccessControlAllowOrigin(String accessControlAllowOrigin) {
+		setProperty(ACCESS_CONTROL_ALLOW_ORIGIN, accessControlAllowOrigin);
+	}
 
 	public String getUrl() {
 		String contextPath = getContextPath();

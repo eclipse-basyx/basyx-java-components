@@ -41,7 +41,8 @@ import org.eclipse.basyx.vab.protocol.http.connector.OAuth2ClientCredentialsBase
 import com.google.gson.Gson;
 
 /**
- * Represents a BaSyx server configuration for an AAS Server with any backend, that can be loaded from a properties file.
+ * Represents a BaSyx server configuration for an AAS Server with any backend,
+ * that can be loaded from a properties file.
  *
  * @author espen, danish, wege
  */
@@ -120,8 +121,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	/**
 	 * Constructor with initial configuration
 	 *
-	 * @param backend The backend for the AASServer
-	 * @param source  The file source for the AASServer (e.g. an .aasx file)
+	 * @param backend
+	 *            The backend for the AASServer
+	 * @param source
+	 *            The file source for the AASServer (e.g. an .aasx file)
 	 */
 	public BaSyxAASServerConfiguration(AASServerBackend backend, String source) {
 		super(getDefaultProperties());
@@ -132,9 +135,12 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	/**
 	 * Constructor with initial configuration values
 	 *
-	 * @param backend     The backend for the AASServer
-	 * @param source      The file source for the AASServer (e.g. an .aasx file)
-	 * @param registryUrl The url to the registry
+	 * @param backend
+	 *            The backend for the AASServer
+	 * @param source
+	 *            The file source for the AASServer (e.g. an .aasx file)
+	 * @param registryUrl
+	 *            The url to the registry
 	 */
 	public BaSyxAASServerConfiguration(AASServerBackend backend, String source, String registryUrl) {
 		this(backend, source);
@@ -144,10 +150,15 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	/**
 	 * Constructor with initial configuration values
 	 *
-	 * @param backend     The backend for the AASServer
-	 * @param source      The file source for the AASServer (e.g. an .aasx file)
-	 * @param registryUrl The url to the registry
-	 * @param hostPath    The root path to the aas component, when it is deployed. Address could be used for registration at a registry.
+	 * @param backend
+	 *            The backend for the AASServer
+	 * @param source
+	 *            The file source for the AASServer (e.g. an .aasx file)
+	 * @param registryUrl
+	 *            The url to the registry
+	 * @param hostPath
+	 *            The root path to the aas component, when it is deployed. Address
+	 *            could be used for registration at a registry.
 	 */
 	public BaSyxAASServerConfiguration(AASServerBackend backend, String source, String registryUrl, String hostPath) {
 		this(backend, source, registryUrl);
@@ -212,9 +223,13 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method {@link #getAASSourceAsList() } to get the list of source path/paths of serialized AAS.
+	 * @deprecated This method is deprecated due to a new implementation to support
+	 *             multiple serialized AAS. Use new method
+	 *             {@link #getAASSourceAsList() } to get the list of source
+	 *             path/paths of serialized AAS.
 	 */
-	@Deprecated public String getAASSource() {
+	@Deprecated
+	public String getAASSource() {
 		return getProperty(SOURCE);
 	}
 
@@ -231,9 +246,13 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	/**
-	 * @deprecated This method is deprecated due to a new implementation to support multiple serialized AAS. Use new method {@link #setAASSourceAsList(String) } to get the list of source path/paths of serialized AAS.
+	 * @deprecated This method is deprecated due to a new implementation to support
+	 *             multiple serialized AAS. Use new method
+	 *             {@link #setAASSourceAsList(String) } to get the list of source
+	 *             path/paths of serialized AAS.
 	 */
-	@Deprecated public void setAASSource(String source) {
+	@Deprecated
+	public void setAASSource(String source) {
 		setProperty(SOURCE, source);
 	}
 
@@ -265,7 +284,8 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(HOSTPATH, hostPath);
 	}
 
-	@SuppressWarnings("unchecked") private List<String> parseFromJson(String property) {
+	@SuppressWarnings("unchecked")
+	private List<String> parseFromJson(String property) {
 		List<String> fromJson = new Gson().fromJson(property, List.class);
 		if (fromJson == null) {
 			return new ArrayList<>();
@@ -311,7 +331,8 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		setProperty(CLIENT_SECRET, clientSecret);
 	}
 
-	@SuppressWarnings("unchecked") public Set<String> getClientScopes() {
+	@SuppressWarnings("unchecked")
+	public Set<String> getClientScopes() {
 		return parseFromJson(getProperty(CLIENT_SCOPES), Set.class);
 	}
 

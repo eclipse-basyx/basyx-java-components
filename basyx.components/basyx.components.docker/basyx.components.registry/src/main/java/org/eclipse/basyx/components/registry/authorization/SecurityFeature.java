@@ -30,7 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides the {@link AuthorizedRegistryDecorator} and {@link AuthorizedTaggedDirectoryDecorator} instance that are required for authorization. This base class uses the custom authorization configuration properties to load classes.
+ * Provides the {@link AuthorizedRegistryDecorator} and
+ * {@link AuthorizedTaggedDirectoryDecorator} instance that are required for
+ * authorization. This base class uses the custom authorization configuration
+ * properties to load classes.
  *
  * @author wege
  */
@@ -53,11 +56,13 @@ public class SecurityFeature {
 		return new AuthorizedRegistryDecorator<>(authorizers.getAasRegistryAuthorizer(), authorizers.getTaggedDirectoryAuthorizer(), subjectInformationProvider);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> IAuthorizersProvider<SubjectInformationType> getAuthorizersProvider() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> IAuthorizersProvider<SubjectInformationType> getAuthorizersProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, IAuthorizersProvider.class);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

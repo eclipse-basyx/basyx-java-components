@@ -44,7 +44,8 @@ public class SimpleRbacFilesAuthorizer<SubjectInformationType> implements IFiles
 		this.roleAuthenticator = roleAuthenticator;
 	}
 
-	@Override public void authorizeDownloadFile(SubjectInformationType subjectInformation, Path path) throws InhibitException {
+	@Override
+	public void authorizeDownloadFile(SubjectInformationType subjectInformation, Path path) throws InhibitException {
 		SimpleRbacHelper.checkRule(rbacRuleChecker, roleAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_SCOPE, new PathTargetInformation(path));
 	}
 }

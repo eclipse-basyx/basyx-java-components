@@ -63,7 +63,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generic registry that can start and stop a registry with different kinds of backends. Currently supports MongoDB and SQL. For development purposes, the component can also start a registry without a backend and without persistency.
+ * Generic registry that can start and stop a registry with different kinds of
+ * backends. Currently supports MongoDB and SQL. For development purposes, the
+ * component can also start a registry without a backend and without
+ * persistency.
  *
  * @author espen, wege
  */
@@ -92,9 +95,11 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create an InMemory registry.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create an InMemory registry.
 	 *
-	 * @param contextConfig The context configuration
+	 * @param contextConfig
+	 *            The context configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig) {
 		this.contextConfig = contextConfig;
@@ -102,10 +107,13 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with a MongoDB backend.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with a MongoDB backend.
 	 *
-	 * @param contextConfig The context configuration
-	 * @param mongoDBConfig The mongoDB configuration
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param mongoDBConfig
+	 *            The mongoDB configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
@@ -114,11 +122,14 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with a MongoDB backend.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with a MongoDB backend.
 	 *
-	 * @param contextConfig  The context configuration
+	 * @param contextConfig
+	 *            The context configuration
 	 * @param registryConfig
-	 * @param mongoDBConfig  The mongoDB configuration
+	 * @param mongoDBConfig
+	 *            The mongoDB configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxMongoDBConfiguration mongoDBConfig) {
 		this.contextConfig = contextConfig;
@@ -127,10 +138,13 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with an SQL backend.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with an SQL backend.
 	 *
-	 * @param contextConfig The context configuration
-	 * @param sqlConfig     The sql configuration
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param sqlConfig
+	 *            The sql configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
@@ -139,11 +153,14 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. This constructor will create a registry with an SQL backend.
+	 * Constructor with given configuration for the registry and its server context.
+	 * This constructor will create a registry with an SQL backend.
 	 *
-	 * @param contextConfig  The context configuration
+	 * @param contextConfig
+	 *            The context configuration
 	 * @param registryConfig
-	 * @param sqlConfig      The sql configuration
+	 * @param sqlConfig
+	 *            The sql configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig, BaSyxSQLConfiguration sqlConfig) {
 		this.contextConfig = contextConfig;
@@ -152,10 +169,13 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Constructor with given configuration for the registry and its server context. Will load the backend configuration using the default load process.
+	 * Constructor with given configuration for the registry and its server context.
+	 * Will load the backend configuration using the default load process.
 	 *
-	 * @param contextConfig  The context configuration
-	 * @param registryConfig The registry configuration
+	 * @param contextConfig
+	 *            The context configuration
+	 * @param registryConfig
+	 *            The registry configuration
 	 */
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig) {
 		this.contextConfig = contextConfig;
@@ -165,7 +185,8 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Starts the context at http://${hostName}:${port}/${path}
 	 */
-	@Override public void startComponent() {
+	@Override
+	public void startComponent() {
 		loadRegistryFeaturesFromConfig();
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
@@ -180,7 +201,8 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is started.
+	 * Sets and enables mqtt connection configuration for this component. Has to be
+	 * called before the component is started.
 	 *
 	 * @param configuration
 	 */
@@ -189,7 +211,8 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
-	 * Disables mqtt configuration. Has to be called before the component is started.
+	 * Disables mqtt configuration. Has to be called before the component is
+	 * started.
 	 */
 	public void disableMQTT() {
 		this.mqttConfig = null;
@@ -400,7 +423,8 @@ public class RegistryComponent implements IComponent {
 		securityConfig.loadFromDefaultSource();
 	}
 
-	@Override public void stopComponent() {
+	@Override
+	public void stopComponent() {
 		server.shutdown();
 		logger.info("Registry server stopped");
 	}

@@ -25,10 +25,13 @@
 package org.eclipse.basyx.components.aas.authorization;
 
 /**
- * Constants for the permission scopes to the {@link GrantedAuthorityFilesAuthorizer} and {@link SimpleRbacFilesAuthorizer}.
+ * Constants for the permission scopes to the
+ * {@link GrantedAuthorityFilesAuthorizer} and
+ * {@link SimpleRbacFilesAuthorizer}.
  *
  * @author wege
- * @see <a href= "https://tools.ietf.org/html/rfc6749#section-3.3">https://tools.ietf.org/html/rfc6749#section-3.3</a>
+ * @see <a href=
+ *      "https://tools.ietf.org/html/rfc6749#section-3.3">https://tools.ietf.org/html/rfc6749#section-3.3</a>
  */
 public class FilesAuthorizerScopes {
 	private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";

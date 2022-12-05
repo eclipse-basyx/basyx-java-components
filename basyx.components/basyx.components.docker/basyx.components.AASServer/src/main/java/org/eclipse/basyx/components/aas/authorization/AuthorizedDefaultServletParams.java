@@ -27,7 +27,8 @@ package org.eclipse.basyx.components.aas.authorization;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
- * Parameters that can be used for instantiating {@link AuthorizedDefaultServlet}.
+ * Parameters that can be used for instantiating
+ * {@link AuthorizedDefaultServlet}.
  *
  * @author wege
  */

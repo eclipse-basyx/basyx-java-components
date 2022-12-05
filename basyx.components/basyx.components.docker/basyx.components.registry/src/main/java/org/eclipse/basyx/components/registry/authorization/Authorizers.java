@@ -28,7 +28,8 @@ import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITa
 import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 
 /**
- * The different authorizers for the registry server to use when calling BaSyx objects like the aas registry or the tagged directory.
+ * The different authorizers for the registry server to use when calling BaSyx
+ * objects like the aas registry or the tagged directory.
  *
  * @author wege
  */

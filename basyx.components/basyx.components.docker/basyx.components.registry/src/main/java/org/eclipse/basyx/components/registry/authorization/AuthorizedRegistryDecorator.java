@@ -49,11 +49,13 @@ public class AuthorizedRegistryDecorator<SubjectInformationType> implements IAAS
 		this.subjectInformationProvider = subjectInformationProvider;
 	}
 
-	@Override public IAASRegistry decorateRegistry(IAASRegistry registry) {
+	@Override
+	public IAASRegistry decorateRegistry(IAASRegistry registry) {
 		return new AuthorizedAASRegistry<>(registry, registryAuthorizer, subjectInformationProvider);
 	}
 
-	@Override public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory) {
+	@Override
+	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory) {
 		return new AuthorizedTaggedDirectory<>(taggedDirectory, taggedDirectoryAuthorizer, subjectInformationProvider);
 	}
 }

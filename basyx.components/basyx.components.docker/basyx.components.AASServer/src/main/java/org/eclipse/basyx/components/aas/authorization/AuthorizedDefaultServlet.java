@@ -42,7 +42,8 @@ import org.eclipse.basyx.vab.coder.json.serialization.GSONTools;
 import org.eclipse.basyx.vab.protocol.http.server.ExceptionToHTTPCodeMapper;
 
 /**
- * A decorated variant of the {@link DefaultServlet} that checks authorization when downloading files from the Tomcat server.
+ * A decorated variant of the {@link DefaultServlet} that checks authorization
+ * when downloading files from the Tomcat server.
  *
  * @author wege
  */
@@ -59,7 +60,8 @@ public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultSer
 		this(params.getFilesAuthorizer(), params.getSubjectInformationProvider());
 	}
 
-	@Override protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		Path path = Paths.get(getRelativePath(request, true));
 
 		try {

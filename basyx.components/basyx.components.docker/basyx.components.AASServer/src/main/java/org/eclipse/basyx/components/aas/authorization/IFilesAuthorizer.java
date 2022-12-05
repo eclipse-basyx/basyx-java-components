@@ -36,8 +36,10 @@ public interface IFilesAuthorizer<SubjectInformationType> {
 	/**
 	 * Checks authorization for the download of a specific file by its path.
 	 *
-	 * @param subjectInformation information of the requester.
-	 * @param path               the path of the file
+	 * @param subjectInformation
+	 *            information of the requester.
+	 * @param path
+	 *            the path of the file
 	 */
 	void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
 }

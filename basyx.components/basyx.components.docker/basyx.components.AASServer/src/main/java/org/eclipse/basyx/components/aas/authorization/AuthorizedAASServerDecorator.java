@@ -61,19 +61,23 @@ public class AuthorizedAASServerDecorator<SubjectInformationType> implements IAA
 		this.subjectInformationProvider = subjectInformationProvider;
 	}
 
-	@Override public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
+	@Override
+	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
 		return new AuthorizedDecoratingSubmodelAPIFactory<>(null, submodelAPIFactory, submodelAPIAuthorizer, subjectInformationProvider);
 	}
 
-	@Override public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
+	@Override
+	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		return new AuthorizedDecoratingSubmodelAggregatorFactory<>(null, submodelAggregatorFactory, submodelAggregatorAuthorizer, subjectInformationProvider);
 	}
 
-	@Override public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
+	@Override
+	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
 		return new AuthorizedDecoratingAASAPIFactory<>(aasAPIFactory, aasAPIAuthorizer, subjectInformationProvider);
 	}
 
-	@Override public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
+	@Override
+	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
 		return new AuthorizedDecoratingAASAggregatorFactory<>(aasAggregatorFactory, aasAggregatorAuthorizer, subjectInformationProvider);
 	}
 

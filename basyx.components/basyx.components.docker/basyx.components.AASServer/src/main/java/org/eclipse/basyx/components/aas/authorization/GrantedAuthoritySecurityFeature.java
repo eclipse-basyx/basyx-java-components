@@ -36,7 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the GrantedAuthority authorization scheme.
+ * Specialization of {@link SecurityFeature} for the GrantedAuthority
+ * authorization scheme.
  *
  * @author wege
  */
@@ -47,7 +48,8 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 		super(securityConfig);
 	}
 
-	@Override public <SubjectInformationType> IAASServerDecorator getDecorator() {
+	@Override
+	public <SubjectInformationType> IAASServerDecorator getDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
@@ -56,7 +58,8 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 				new GrantedAuthorityAASAPIAuthorizer<>(grantedAuthorityAuthenticator), new GrantedAuthorityAASAggregatorAuthorizer<>(grantedAuthorityAuthenticator), subjectInformationProvider);
 	}
 
-	@Override public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+	@Override
+	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
 		logger.info("use GrantedAuthority authorization strategy for files authorizer");
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
@@ -64,11 +67,13 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 		return new AuthorizedDefaultServletParams<>(new GrantedAuthorityFilesAuthorizer<>(grantedAuthorityAuthenticator), subjectInformationProvider);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

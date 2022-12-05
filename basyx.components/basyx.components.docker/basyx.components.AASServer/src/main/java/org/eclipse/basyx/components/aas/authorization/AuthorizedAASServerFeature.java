@@ -44,21 +44,25 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 		this.securityConfig = securityConfig;
 	}
 
-	@Override public void initialize() {
+	@Override
+	public void initialize() {
 		// nothing to do regarding initialization for this feature at the moment
 	}
 
-	@Override public void cleanUp() {
+	@Override
+	public void cleanUp() {
 		// nothing to do regarding cleanup for this feature at the moment
 	}
 
-	@Override public IAASServerDecorator getDecorator() {
+	@Override
+	public IAASServerDecorator getDecorator() {
 		final SecurityFeature securityFeature = getSecurityFeature();
 
 		return securityFeature.getDecorator();
 	}
 
-	@Override public void addToContext(BaSyxContext context) {
+	@Override
+	public void addToContext(BaSyxContext context) {
 		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
 		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
 			context.setJwtBearerTokenAuthenticationConfiguration(jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig));

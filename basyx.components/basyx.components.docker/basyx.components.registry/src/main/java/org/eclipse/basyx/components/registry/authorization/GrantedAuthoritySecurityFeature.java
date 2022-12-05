@@ -33,7 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the GrantedAuthority authorization scheme.
+ * Specialization of {@link SecurityFeature} for the GrantedAuthority
+ * authorization scheme.
  *
  * @author wege
  */
@@ -44,7 +45,8 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 		super(securityConfig);
 	}
 
-	@Override public <SubjectInformationType> AuthorizedRegistryDecorator<SubjectInformationType> getDecorator() {
+	@Override
+	public <SubjectInformationType> AuthorizedRegistryDecorator<SubjectInformationType> getDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
@@ -52,11 +54,13 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 		return new AuthorizedRegistryDecorator<>(new GrantedAuthorityAASRegistryAuthorizer<>(grantedAuthorityAuthenticator), new GrantedAuthorityTaggedDirectoryAuthorizer<>(grantedAuthorityAuthenticator), subjectInformationProvider);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getGrantedAuthoritySubjectInformationProvider() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getGrantedAuthoritySubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

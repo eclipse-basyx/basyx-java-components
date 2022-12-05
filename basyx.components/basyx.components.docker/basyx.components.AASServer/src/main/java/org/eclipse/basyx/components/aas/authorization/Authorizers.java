@@ -30,7 +30,9 @@ import org.eclipse.basyx.extensions.submodel.aggregator.authorization.internal.I
 import org.eclipse.basyx.extensions.submodel.authorization.internal.ISubmodelAPIAuthorizer;
 
 /**
- * The different authorizers for the aas server to use when calling BaSyx objects like the aas aggregator or the file download functionality of the aas server.
+ * The different authorizers for the aas server to use when calling BaSyx
+ * objects like the aas aggregator or the file download functionality of the aas
+ * server.
  *
  * @author wege
  */

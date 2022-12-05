@@ -39,7 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the SimpleRbac authorization scheme.
+ * Specialization of {@link SecurityFeature} for the SimpleRbac authorization
+ * scheme.
  *
  * @author wege
  */
@@ -50,7 +51,8 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
 		super(securityConfig);
 	}
 
-	@Override public <SubjectInformationType> IAASRegistryDecorator getDecorator() {
+	@Override
+	public <SubjectInformationType> IAASRegistryDecorator getDecorator() {
 		logger.info("use SimpleRbac authorization strategy");
 		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
 		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
@@ -68,11 +70,13 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
 		}
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getRoleAuthenticator() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getRoleAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
 	}
 
-	@SuppressWarnings("unchecked") private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+	@SuppressWarnings("unchecked")
+	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

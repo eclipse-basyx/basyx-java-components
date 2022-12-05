@@ -99,11 +99,14 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Component providing an empty AAS server that is able to receive AAS/SMs from remote. It uses the Aggregator API, i.e. AAS should be pushed to ${URL}/shells
+ * Component providing an empty AAS server that is able to receive AAS/SMs from
+ * remote. It uses the Aggregator API, i.e. AAS should be pushed to
+ * ${URL}/shells
  *
  * @author schnicke, espen, fried, fischer, danish, wege
  */
-@SuppressWarnings("deprecation") public class AASServerComponent implements IComponent {
+@SuppressWarnings("deprecation")
+public class AASServerComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(AASServerComponent.class);
 
 	// The server with the servlet that will be created
@@ -154,21 +157,26 @@ import org.xml.sax.SAXException;
 	}
 
 	/**
-	 * Sets and enables mqtt connection configuration for this component. Has to be called before the component is started. Currently only works for InMemory backend.
+	 * Sets and enables mqtt connection configuration for this component. Has to be
+	 * called before the component is started. Currently only works for InMemory
+	 * backend.
 	 *
 	 * @param configuration
 	 * @deprecated Add MQTT via {@link MqttAASServerFeature} instead.
 	 */
-	@Deprecated public void enableMQTT(BaSyxMqttConfiguration configuration) {
+	@Deprecated
+	public void enableMQTT(BaSyxMqttConfiguration configuration) {
 		aasServerFeatureList.add(new MqttAASServerFeature(configuration, getMqttSubmodelClientId()));
 	}
 
 	/**
-	 * Disables mqtt configuration. Has to be called before the component is started.
+	 * Disables mqtt configuration. Has to be called before the component is
+	 * started.
 	 *
 	 * @deprecated remove MQTT from the feature list instead.
 	 */
-	@Deprecated public void disableMQTT() {
+	@Deprecated
+	public void disableMQTT() {
 		aasServerFeatureList.forEach(f -> {
 			if (f instanceof MqttAASServerFeature) {
 				aasServerFeatureList.remove(f);
@@ -195,7 +203,8 @@ import org.xml.sax.SAXException;
 	/**
 	 * Explicitly sets AAS bundles that should be loaded during startup
 	 *
-	 * @param aasBundles The bundles that will be loaded during startup
+	 * @param aasBundles
+	 *            The bundles that will be loaded during startup
 	 */
 	public void setAASBundles(Collection<AASBundle> aasBundles) {
 		this.aasBundles = aasBundles;
@@ -204,7 +213,8 @@ import org.xml.sax.SAXException;
 	/**
 	 * Explicitly sets an AAS bundle that should be loaded during startup
 	 *
-	 * @param aasBundle The bundle that will be loaded during startup
+	 * @param aasBundle
+	 *            The bundle that will be loaded during startup
 	 */
 	public void setAASBundle(AASBundle aasBundle) {
 		this.aasBundles = Collections.singleton(aasBundle);
@@ -213,7 +223,8 @@ import org.xml.sax.SAXException;
 	/**
 	 * Starts the AASX component at http://${hostName}:${port}/${path}
 	 */
-	@Override public void startComponent() {
+	@Override
+	public void startComponent() {
 		logger.info("Create the server...");
 		registry = createRegistryFromConfig(aasConfig);
 
@@ -308,7 +319,8 @@ import org.xml.sax.SAXException;
 	private List<ISubmodel> getSubmodelFromAggregator(IAASAggregator aggregator, IIdentifier iIdentifier) {
 		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(iIdentifier);
 
-		@SuppressWarnings("unchecked") List<Object> submodelObject = (List<Object>) aasProvider.getValue(PREFIX_SUBMODEL_PATH);
+		@SuppressWarnings("unchecked")
+		List<Object> submodelObject = (List<Object>) aasProvider.getValue(PREFIX_SUBMODEL_PATH);
 
 		List<ISubmodel> persistentSubmodelList = new ArrayList<>();
 
@@ -317,7 +329,8 @@ import org.xml.sax.SAXException;
 		return persistentSubmodelList;
 	}
 
-	@SuppressWarnings("unchecked") private ISubmodel getSubmodel(Object submodelObject) {
+	@SuppressWarnings("unchecked")
+	private ISubmodel getSubmodel(Object submodelObject) {
 		return Submodel.createAsFacade((Map<String, Object>) submodelObject);
 	}
 
@@ -374,7 +387,8 @@ import org.xml.sax.SAXException;
 		return basePath;
 	}
 
-	@Override public void stopComponent() {
+	@Override
+	public void stopComponent() {
 		deregisterAASAndSmAddedDuringRuntime();
 
 		cleanUpAASServerFeatures();
@@ -689,7 +703,8 @@ import org.xml.sax.SAXException;
 	}
 
 	/**
-	 * Fixes the File submodel element value paths according to the given endpoint configuration
+	 * Fixes the File submodel element value paths according to the given endpoint
+	 * configuration
 	 */
 	private void modifyFilePaths(String hostName, int port, String rootPath) {
 		rootPath = rootPath + "/files";
