@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.SimpleRbacAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.internal.SimpleRbacAASAPIAuthorizer;
@@ -45,20 +46,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the SimpleRbac authorization
- * scheme.
+ * Specialization of {@link AuthorizedAASServerFeature} for the SimpleRbac
+ * authorization scheme.
  *
  * @author wege
  */
-public class SimpleRbacSecurityFeature extends SecurityFeature {
-	private static Logger logger = LoggerFactory.getLogger(SimpleRbacSecurityFeature.class);
+public class SimpleRbacAuthorizedAASServerFeature<SubjectInformationType> extends AuthorizedAASServerFeature<SubjectInformationType> {
+	private static Logger logger = LoggerFactory.getLogger(SimpleRbacAuthorizedAASServerFeature.class);
 
-	public SimpleRbacSecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
+	public SimpleRbacAuthorizedAASServerFeature(final BaSyxSecurityConfiguration securityConfig) {
 		super(securityConfig);
 	}
 
 	@Override
-	public <SubjectInformationType> IAASServerDecorator getDecorator() {
+	public IAASServerDecorator getDecorator() {
 		logger.info("use SimpleRbac authorization strategy");
 		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
 		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
@@ -70,7 +71,7 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
 	}
 
 	@Override
-	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+	public AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
 		logger.info("use SimpleRbac authorization strategy");
 		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
 		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
@@ -90,12 +91,12 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getSimpleRbacRoleAuthenticator() {
+	private IRoleAuthenticator<SubjectInformationType> getSimpleRbacRoleAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSimpleRbacSubjectInformationProvider() {
+	private ISubjectInformationProvider<SubjectInformationType> getSimpleRbacSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

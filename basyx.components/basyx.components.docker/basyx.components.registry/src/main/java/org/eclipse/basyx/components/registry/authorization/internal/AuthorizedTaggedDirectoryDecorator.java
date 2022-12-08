@@ -22,14 +22,11 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.AuthorizedTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
-import org.eclipse.basyx.extensions.aas.registration.authorization.internal.AuthorizedAASRegistry;
-import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
@@ -37,25 +34,17 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInform
  *
  * @author wege
  */
-public class AuthorizedRegistryDecorator<SubjectInformationType> implements IAASRegistryDecorator {
-	protected final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer;
+public class AuthorizedTaggedDirectoryDecorator<SubjectInformationType> implements ITaggedDirectoryDecorator {
 	protected final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
 	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
-	public AuthorizedRegistryDecorator(final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer, final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer,
-			final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
-		this.registryAuthorizer = registryAuthorizer;
+	public AuthorizedTaggedDirectoryDecorator(final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
 		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
 		this.subjectInformationProvider = subjectInformationProvider;
 	}
 
 	@Override
-	public IAASRegistry decorateRegistry(IAASRegistry registry) {
-		return new AuthorizedAASRegistry<>(registry, registryAuthorizer, subjectInformationProvider);
-	}
-
-	@Override
-	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory) {
+	public IAASTaggedDirectory decorate(IAASTaggedDirectory taggedDirectory) {
 		return new AuthorizedTaggedDirectory<>(taggedDirectory, taggedDirectoryAuthorizer, subjectInformationProvider);
 	}
 }

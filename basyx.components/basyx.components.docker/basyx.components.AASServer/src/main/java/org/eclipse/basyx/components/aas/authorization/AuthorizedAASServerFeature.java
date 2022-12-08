@@ -24,12 +24,11 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization;
 
-import java.util.Arrays;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
-import org.eclipse.basyx.components.security.authorization.IJwtBearerTokenAuthenticationConfigurationProvider;
+import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 /**
@@ -37,8 +36,18 @@ import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
  *
  * @author fischer, fried, wege
  */
-public class AuthorizedAASServerFeature implements IAASServerFeature {
+public class AuthorizedAASServerFeature<SubjectInformationType> implements IAASServerFeature {
 	protected final BaSyxSecurityConfiguration securityConfig;
+
+	/**
+	 * @deprecated Please use
+	 *             {@link AuthorizedAASServerFeature#AuthorizedAASServerFeature(BaSyxSecurityConfiguration)}
+	 *             instead.
+	 */
+	@Deprecated
+	public AuthorizedAASServerFeature() {
+		securityConfig = null;
+	}
 
 	public AuthorizedAASServerFeature(final BaSyxSecurityConfiguration securityConfig) {
 		this.securityConfig = securityConfig;
@@ -56,54 +65,31 @@ public class AuthorizedAASServerFeature implements IAASServerFeature {
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		final SecurityFeature securityFeature = getSecurityFeature();
-
-		return securityFeature.getDecorator();
+		// use this default decorator for backwards compatibility
+		return new AuthorizedAASServerDecorator();
 	}
 
 	@Override
-	public void addToContext(BaSyxContext context) {
+	public void addToContext(final BaSyxContext context) {
+		if (securityConfig == null) {
+			return;
+		}
+
 		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
 		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
 			context.setJwtBearerTokenAuthenticationConfiguration(jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig));
 		}
 	}
 
-	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
-		return getSecurityFeature().getFilesAuthorizerParams();
+	public AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+		return null;
 	}
 
-	private SecurityFeature getSecurityFeature() {
-		final String strategyString = securityConfig.getAuthorizationStrategy();
-
-		if (strategyString == null) {
-			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in security.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
+	public IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
+		if (securityConfig == null) {
+			return null;
 		}
 
-		AuthorizationStrategy strategy;
-		try {
-			strategy = AuthorizationStrategy.valueOf(strategyString);
-		} catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException(
-					String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
-		}
-
-		switch (strategy) {
-		case SimpleRbac: {
-			return new SimpleRbacSecurityFeature(securityConfig);
-		}
-		case GrantedAuthority: {
-			return new GrantedAuthoritySecurityFeature(securityConfig);
-		}
-		case Custom: {
-			return new SecurityFeature(securityConfig);
-		}
-		default:
-			throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
-		}
-	}
-
-	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
 	}
 }

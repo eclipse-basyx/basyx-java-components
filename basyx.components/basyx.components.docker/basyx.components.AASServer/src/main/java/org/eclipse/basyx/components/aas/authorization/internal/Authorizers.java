@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.IAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.internal.IAASAPIAuthorizer;

@@ -22,30 +22,32 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.AuthorizedTaggedDirectory;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.AuthorizedAASRegistry;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
- * Parameters that can be used for instantiating
- * {@link AuthorizedDefaultServlet}.
+ * Decorator for Authorization of Submodel and Shell access
  *
  * @author wege
  */
-public class AuthorizedDefaultServletParams<SubjectInformationType> {
-	private final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
-	private final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
+public class AuthorizedAASRegistryDecorator<SubjectInformationType> implements IAASRegistryDecorator {
+	protected final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer;
+	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
-	public IFilesAuthorizer<SubjectInformationType> getFilesAuthorizer() {
-		return filesAuthorizer;
-	}
-
-	public ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
-		return subjectInformationProvider;
-	}
-
-	public AuthorizedDefaultServletParams(final IFilesAuthorizer<SubjectInformationType> filesAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
-		this.filesAuthorizer = filesAuthorizer;
+	public AuthorizedAASRegistryDecorator(final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
+		this.registryAuthorizer = registryAuthorizer;
 		this.subjectInformationProvider = subjectInformationProvider;
+	}
+
+	@Override
+	public IAASRegistry decorate(IAASRegistry registry) {
+		return new AuthorizedAASRegistry<>(registry, registryAuthorizer, subjectInformationProvider);
 	}
 }

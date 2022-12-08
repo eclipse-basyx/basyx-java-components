@@ -22,24 +22,30 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import java.nio.file.Path;
-import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
- * The authorizer for downloading files from the aas server.
+ * Parameters that can be used for instantiating
+ * {@link AuthorizedDefaultServlet}.
  *
  * @author wege
  */
-public interface IFilesAuthorizer<SubjectInformationType> {
-	/**
-	 * Checks authorization for the download of a specific file by its path.
-	 *
-	 * @param subjectInformation
-	 *            information of the requester.
-	 * @param path
-	 *            the path of the file
-	 */
-	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
+public class AuthorizedDefaultServletParams<SubjectInformationType> {
+	private final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
+	private final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
+
+	public IFilesAuthorizer<SubjectInformationType> getFilesAuthorizer() {
+		return filesAuthorizer;
+	}
+
+	public ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+		return subjectInformationProvider;
+	}
+
+	public AuthorizedDefaultServletParams(final IFilesAuthorizer<SubjectInformationType> filesAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
+		this.filesAuthorizer = filesAuthorizer;
+		this.subjectInformationProvider = subjectInformationProvider;
+	}
 }

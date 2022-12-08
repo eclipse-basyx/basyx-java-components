@@ -22,25 +22,32 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
-import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 
 /**
- * Provides the authorizers for the different common to be authorized BaSyx
- * objects using the AAS server configuration.
+ * The different authorizers for the registry server to use when calling BaSyx
+ * objects like the aas registry or the tagged directory.
  *
  * @author wege
  */
-public interface IAuthorizersProvider<SubjectInformationType> {
-	/**
-	 * Provides the authorizers for the different common to be authorized BaSyx
-	 * objects using the AAS server configuration.
-	 *
-	 * @param securityConfig
-	 *            the aas server configuration that holds information about how to
-	 *            determine the authorizers.
-	 * @return the different authorizers bundled in an {@link Authorizers}
-	 */
-	public Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
+public class Authorizers<SubjectInformationType> {
+	private final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer;
+
+	public IAASRegistryAuthorizer<SubjectInformationType> getAasRegistryAuthorizer() {
+		return aasRegistryAuthorizer;
+	}
+
+	private final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
+
+	public ITaggedDirectoryAuthorizer<SubjectInformationType> getTaggedDirectoryAuthorizer() {
+		return taggedDirectoryAuthorizer;
+	}
+
+	public Authorizers(final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer, final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer) {
+		this.aasRegistryAuthorizer = aasRegistryAuthorizer;
+		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
+	}
 }

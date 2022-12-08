@@ -22,9 +22,10 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.GrantedAuthorityAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.internal.GrantedAuthorityAASAPIAuthorizer;
@@ -36,20 +37,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the GrantedAuthority
+ * Specialization of {@link AuthorizedAASServerFeature} for the GrantedAuthority
  * authorization scheme.
  *
  * @author wege
  */
-public class GrantedAuthoritySecurityFeature extends SecurityFeature {
-	private static Logger logger = LoggerFactory.getLogger(GrantedAuthoritySecurityFeature.class);
+public class GrantedAuthorityAuthorizedAASServerFeature<SubjectInformationType> extends AuthorizedAASServerFeature<SubjectInformationType> {
+	private static Logger logger = LoggerFactory.getLogger(GrantedAuthorityAuthorizedAASServerFeature.class);
 
-	public GrantedAuthoritySecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
+	public GrantedAuthorityAuthorizedAASServerFeature(final BaSyxSecurityConfiguration securityConfig) {
 		super(securityConfig);
 	}
 
 	@Override
-	public <SubjectInformationType> IAASServerDecorator getDecorator() {
+	public IAASServerDecorator getDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
@@ -59,7 +60,7 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 	}
 
 	@Override
-	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+	public AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
 		logger.info("use GrantedAuthority authorization strategy for files authorizer");
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
@@ -68,12 +69,12 @@ public class GrantedAuthoritySecurityFeature extends SecurityFeature {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
+	private IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+	private ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

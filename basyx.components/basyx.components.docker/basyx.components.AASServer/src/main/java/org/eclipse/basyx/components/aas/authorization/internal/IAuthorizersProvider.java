@@ -22,27 +22,26 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import java.nio.file.Path;
-import org.eclipse.basyx.extensions.shared.authorization.internal.GrantedAuthorityHelper;
-import org.eclipse.basyx.extensions.shared.authorization.internal.IGrantedAuthorityAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
+import org.eclipse.basyx.components.aas.authorization.internal.Authorizers;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 
 /**
- * Scope based implementation for {@link IFilesAuthorizer}.
+ * Provides the authorizers for the different common to be authorized BaSyx
+ * objects using the AAS server configuration.
  *
  * @author wege
  */
-public class GrantedAuthorityFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
-	protected IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator;
-
-	public GrantedAuthorityFilesAuthorizer(final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator) {
-		this.grantedAuthorityAuthenticator = grantedAuthorityAuthenticator;
-	}
-
-	@Override
-	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException {
-		GrantedAuthorityHelper.checkAuthority(grantedAuthorityAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_AUTHORITY);
-	}
+public interface IAuthorizersProvider<SubjectInformationType> {
+	/**
+	 * Provides the authorizers for the different common to be authorized BaSyx
+	 * objects using the AAS server configuration.
+	 *
+	 * @param securityConfig
+	 *            the aas server configuration that holds information about how to
+	 *            determine the authorizers.
+	 * @return the different authorizers bundled in an {@link Authorizers}
+	 */
+	public Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
 }

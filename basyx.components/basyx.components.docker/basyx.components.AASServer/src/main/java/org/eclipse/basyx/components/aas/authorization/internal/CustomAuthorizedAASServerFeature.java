@@ -22,32 +22,30 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides the {@link IAASServerDecorator} and
- * {@link AuthorizedDefaultServletParams} instances that are required for
- * authorization. This base class uses the custom authorization configuration
- * properties to load classes.
+ * Specialization of {@link AuthorizedAASServerFeature} for the custom
+ * authorization scheme.
  *
  * @author wege
  */
-public class SecurityFeature {
-	private static Logger logger = LoggerFactory.getLogger(SecurityFeature.class);
+public class CustomAuthorizedAASServerFeature<SubjectInformationType> extends AuthorizedAASServerFeature<SubjectInformationType> {
+	private static Logger logger = LoggerFactory.getLogger(CustomAuthorizedAASServerFeature.class);
 
-	protected final BaSyxSecurityConfiguration securityConfig;
-
-	public SecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
-		this.securityConfig = securityConfig;
+	public CustomAuthorizedAASServerFeature(final BaSyxSecurityConfiguration securityConfig) {
+		super(securityConfig);
 	}
 
-	public <SubjectInformationType> IAASServerDecorator getDecorator() {
+	@Override
+	public IAASServerDecorator getDecorator() {
 		logger.info("use Custom authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
 		final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
@@ -58,7 +56,8 @@ public class SecurityFeature {
 				subjectInformationProvider);
 	}
 
-	public <SubjectInformationType> AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
+	@Override
+	public AuthorizedDefaultServletParams<SubjectInformationType> getFilesAuthorizerParams() {
 		logger.info("use Custom authorization strategy for files authorizer");
 		final IAuthorizersProvider<SubjectInformationType> authorizersProvider = getAuthorizersProvider();
 		final Authorizers<SubjectInformationType> authorizers = authorizersProvider.get(securityConfig);
@@ -68,12 +67,12 @@ public class SecurityFeature {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> IAuthorizersProvider<SubjectInformationType> getAuthorizersProvider() {
+	private IAuthorizersProvider<SubjectInformationType> getAuthorizersProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_AUTHORIZERS_PROVIDER, IAuthorizersProvider.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+	private ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_CUSTOM_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

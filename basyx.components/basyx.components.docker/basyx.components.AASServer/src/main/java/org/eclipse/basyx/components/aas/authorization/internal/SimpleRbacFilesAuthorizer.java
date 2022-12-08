@@ -22,32 +22,30 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
-import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
+import java.nio.file.Path;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IRbacRuleChecker;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IRoleAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
+import org.eclipse.basyx.extensions.shared.authorization.internal.SimpleRbacHelper;
 
 /**
- * The different authorizers for the registry server to use when calling BaSyx
- * objects like the aas registry or the tagged directory.
+ * Simple role based implementation for {@link IFilesAuthorizer}.
  *
  * @author wege
  */
-public class Authorizers<SubjectInformationType> {
-	private final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer;
+public class SimpleRbacFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
+	protected IRbacRuleChecker rbacRuleChecker;
+	protected IRoleAuthenticator<SubjectInformationType> roleAuthenticator;
 
-	public IAASRegistryAuthorizer<SubjectInformationType> getAasRegistryAuthorizer() {
-		return aasRegistryAuthorizer;
+	public SimpleRbacFilesAuthorizer(final IRbacRuleChecker rbacRuleChecker, final IRoleAuthenticator<SubjectInformationType> roleAuthenticator) {
+		this.rbacRuleChecker = rbacRuleChecker;
+		this.roleAuthenticator = roleAuthenticator;
 	}
 
-	private final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
-
-	public ITaggedDirectoryAuthorizer<SubjectInformationType> getTaggedDirectoryAuthorizer() {
-		return taggedDirectoryAuthorizer;
-	}
-
-	public Authorizers(final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer, final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer) {
-		this.aasRegistryAuthorizer = aasRegistryAuthorizer;
-		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
+	@Override
+	public void authorizeDownloadFile(SubjectInformationType subjectInformation, Path path) throws InhibitException {
+		SimpleRbacHelper.checkRule(rbacRuleChecker, roleAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_SCOPE, new PathTargetInformation(path));
 	}
 }

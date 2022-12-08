@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
-import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorized;
+import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorizedException;
 import org.eclipse.basyx.vab.coder.json.metaprotocol.Result;
 import org.eclipse.basyx.vab.coder.json.serialization.DefaultTypeFactory;
 import org.eclipse.basyx.vab.coder.json.serialization.GSONTools;
@@ -68,7 +68,7 @@ public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultSer
 			authorizeDoGet(path);
 
 			super.doGet(request, response);
-		} catch (final NotAuthorized e) {
+		} catch (final NotAuthorizedException e) {
 			int httpCode = ExceptionToHTTPCodeMapper.mapFromException(e);
 			response.setStatus(httpCode);
 			sendException(response.getOutputStream(), e);
@@ -79,7 +79,7 @@ public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultSer
 		try {
 			filesAuthorizer.authorizeDownloadFile(subjectInformationProvider.get(), path);
 		} catch (final InhibitException e) {
-			throw new NotAuthorized(e);
+			throw new NotAuthorizedException(e);
 		}
 	}
 

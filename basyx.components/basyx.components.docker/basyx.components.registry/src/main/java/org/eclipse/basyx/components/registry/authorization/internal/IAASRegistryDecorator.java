@@ -22,13 +22,12 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 
 /**
- * Interface for registry/tagged directory decoration
+ * Interface for registry decoration
  *
  * @author wege
  */
@@ -37,15 +36,7 @@ public interface IAASRegistryDecorator {
 	 * Decorates an AAS registry according to this decorator.
 	 * 
 	 * @param aasRegistry
-	 *                   the aas registry to be decorated.
+	 *            the aas registry to be decorated.
 	 */
-	public IAASRegistry decorateRegistry(IAASRegistry aasRegistry);
-
-	/**
-	 * Decorates a tagged directory according to this decorator.
-	 * 
-	 * @param taggedDirectory
-	 *                              the tagged directory to be decorated.
-	 */
-	public IAASTaggedDirectory decorateTaggedDirectory(IAASTaggedDirectory taggedDirectory);
+	public IAASRegistry decorate(IAASRegistry aasRegistry);
 }

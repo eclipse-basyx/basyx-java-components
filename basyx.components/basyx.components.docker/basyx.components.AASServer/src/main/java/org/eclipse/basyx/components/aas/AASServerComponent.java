@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,8 +63,11 @@ import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentF
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
-import org.eclipse.basyx.components.aas.authorization.AuthorizedDefaultServlet;
-import org.eclipse.basyx.components.aas.authorization.AuthorizedDefaultServletParams;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
+import org.eclipse.basyx.components.aas.authorization.internal.CustomAuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.authorization.internal.GrantedAuthorityAuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.authorization.internal.SimpleRbacAuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -77,6 +81,7 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ElevatedCodeAuthentication;
@@ -89,8 +94,6 @@ import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
-import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
@@ -256,15 +259,48 @@ public class AASServerComponent implements IComponent {
 
 	private DefaultServlet createDefaultServlet() {
 		if (aasConfig.isAuthorizationEnabled()) {
-			return new AuthorizedDefaultServlet<>(getAuthorizedDefaultServletParams());
+			final AuthorizedDefaultServletParams<?> params = getAuthorizedDefaultServletParams();
+			if (params != null) {
+				return new AuthorizedDefaultServlet<>(params);
+			}
 		}
 		return new DefaultServlet();
 	}
 
 	private AuthorizedDefaultServletParams<?> getAuthorizedDefaultServletParams() {
-		final AuthorizedAASServerFeature authorizedAASServerFeature = new AuthorizedAASServerFeature(securityConfig);
+		final AuthorizedAASServerFeature authorizedAASServerFeature = getAuthorizedAASServerFeature();
 
 		return authorizedAASServerFeature.getFilesAuthorizerParams();
+	}
+
+	private AuthorizedAASServerFeature getAuthorizedAASServerFeature() {
+		final String strategyString = securityConfig.getAuthorizationStrategy();
+
+		if (strategyString == null) {
+			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in security.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
+		}
+
+		AuthorizationStrategy strategy;
+		try {
+			strategy = AuthorizationStrategy.valueOf(strategyString);
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException(
+					String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
+		}
+
+		switch (strategy) {
+		case SimpleRbac: {
+			return new SimpleRbacAuthorizedAASServerFeature<>(securityConfig);
+		}
+		case GrantedAuthority: {
+			return new GrantedAuthorityAuthorizedAASServerFeature<>(securityConfig);
+		}
+		case Custom: {
+			return new CustomAuthorizedAASServerFeature<>(securityConfig);
+		}
+		default:
+			throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
+		}
 	}
 
 	private void registerPreexistingAASAndSMIfPossible() {
@@ -353,7 +389,7 @@ public class AASServerComponent implements IComponent {
 	private void configureAuthorization() {
 		securityConfig = new BaSyxSecurityConfiguration();
 		securityConfig.loadFromDefaultSource();
-		addAASServerFeature(new AuthorizedAASServerFeature(securityConfig));
+		addAASServerFeature(getAuthorizedAASServerFeature());
 	}
 
 	private boolean isEventingEnabled() {

@@ -37,9 +37,10 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
-import org.eclipse.basyx.components.registry.authorization.GrantedAuthoritySecurityFeature;
-import org.eclipse.basyx.components.registry.authorization.SecurityFeature;
-import org.eclipse.basyx.components.registry.authorization.SimpleRbacSecurityFeature;
+import org.eclipse.basyx.components.registry.authorization.internal.CustomAuthorizedAASRegistryFeature;
+import org.eclipse.basyx.components.registry.authorization.internal.GrantedAuthorityAuthorizedAASRegistryFeature;
+import org.eclipse.basyx.components.registry.authorization.internal.AuthorizedAASRegistryFeature;
+import org.eclipse.basyx.components.registry.authorization.internal.SimpleRbacAuthorizedAASRegistryFeature;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
@@ -52,7 +53,7 @@ import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
-import org.eclipse.basyx.components.security.authorization.IJwtBearerTokenAuthenticationConfigurationProvider;
+import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
@@ -340,7 +341,7 @@ public class RegistryComponent implements IComponent {
 		return decoratedRegistry;
 	}
 
-	private SecurityFeature getSecurityFeature() {
+	private AuthorizedAASRegistryFeature getAuthorizedAASRegistryFeature() {
 		final String strategyString = securityConfig.getAuthorizationStrategy();
 
 		if (strategyString == null) {
@@ -357,13 +358,13 @@ public class RegistryComponent implements IComponent {
 
 		switch (strategy) {
 		case SimpleRbac: {
-			return new SimpleRbacSecurityFeature(securityConfig);
+			return new SimpleRbacAuthorizedAASRegistryFeature<>(securityConfig);
 		}
 		case GrantedAuthority: {
-			return new GrantedAuthoritySecurityFeature(securityConfig);
+			return new GrantedAuthorityAuthorizedAASRegistryFeature<>(securityConfig);
 		}
 		case Custom: {
-			return new SecurityFeature(securityConfig);
+			return new CustomAuthorizedAASRegistryFeature<>(securityConfig);
 		}
 		default:
 			throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
@@ -383,12 +384,12 @@ public class RegistryComponent implements IComponent {
 
 	private IAASRegistry decorateWithAuthorization(IAASRegistry registry) {
 		logger.info("Enable Authorization for Registry");
-		return getSecurityFeature().getDecorator().decorateRegistry(registry);
+		return getAuthorizedAASRegistryFeature().getAASRegistryDecorator().decorate(registry);
 	}
 
 	private IAASTaggedDirectory decorateWithAuthorization(IAASTaggedDirectory taggedDirectory) {
 		logger.info("Enable Authorization for TaggedDirectory");
-		return getSecurityFeature().getDecorator().decorateTaggedDirectory(taggedDirectory);
+		return getAuthorizedAASRegistryFeature().getTaggedDirectoryDecorator().decorate(taggedDirectory);
 	}
 
 	private IAASRegistry configureMqtt(IAASRegistry decoratedRegistry) {

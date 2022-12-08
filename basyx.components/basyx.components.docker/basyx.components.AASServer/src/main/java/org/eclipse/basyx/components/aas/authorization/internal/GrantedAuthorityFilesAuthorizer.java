@@ -22,28 +22,27 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.AuthorizedTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
-import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
+import java.nio.file.Path;
+import org.eclipse.basyx.extensions.shared.authorization.internal.GrantedAuthorityHelper;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IGrantedAuthorityAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
 
 /**
- * Decorator for Authorization of Submodel and Shell access
+ * Scope based implementation for {@link IFilesAuthorizer}.
  *
  * @author wege
  */
-public class AuthorizedTaggedDirectoryDecorator<SubjectInformationType> {
-	protected final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
-	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
+public class GrantedAuthorityFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
+	protected IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator;
 
-	public AuthorizedTaggedDirectoryDecorator(final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
-		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
-		this.subjectInformationProvider = subjectInformationProvider;
+	public GrantedAuthorityFilesAuthorizer(final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator) {
+		this.grantedAuthorityAuthenticator = grantedAuthorityAuthenticator;
 	}
 
-	public IAASTaggedDirectory decorate(IAASTaggedDirectory taggedDirectory) {
-		return new AuthorizedTaggedDirectory<>(taggedDirectory, taggedDirectoryAuthorizer, subjectInformationProvider);
+	@Override
+	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException {
+		GrantedAuthorityHelper.checkAuthority(grantedAuthorityAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_AUTHORITY);
 	}
 }

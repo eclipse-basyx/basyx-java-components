@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.GrantedAuthorityTaggedDirectoryAuthorizer;
@@ -33,34 +33,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the GrantedAuthority
- * authorization scheme.
+ * Specialization of {@link AuthorizedAASRegistryFeature} for the
+ * GrantedAuthority authorization scheme.
  *
  * @author wege
  */
-public class GrantedAuthoritySecurityFeature extends SecurityFeature {
-	private static Logger logger = LoggerFactory.getLogger(GrantedAuthoritySecurityFeature.class);
+public class GrantedAuthorityAuthorizedAASRegistryFeature<SubjectInformationType> extends AuthorizedAASRegistryFeature {
+	private static Logger logger = LoggerFactory.getLogger(GrantedAuthorityAuthorizedAASRegistryFeature.class);
 
-	public GrantedAuthoritySecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
+	public GrantedAuthorityAuthorizedAASRegistryFeature(final BaSyxSecurityConfiguration securityConfig) {
 		super(securityConfig);
 	}
 
 	@Override
-	public <SubjectInformationType> AuthorizedRegistryDecorator<SubjectInformationType> getDecorator() {
+	public AuthorizedAASRegistryDecorator<SubjectInformationType> getAASRegistryDecorator() {
 		logger.info("use GrantedAuthority authorization strategy");
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
 		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
 
-		return new AuthorizedRegistryDecorator<>(new GrantedAuthorityAASRegistryAuthorizer<>(grantedAuthorityAuthenticator), new GrantedAuthorityTaggedDirectoryAuthorizer<>(grantedAuthorityAuthenticator), subjectInformationProvider);
+		return new AuthorizedAASRegistryDecorator<>(new GrantedAuthorityAASRegistryAuthorizer<>(grantedAuthorityAuthenticator), subjectInformationProvider);
+	}
+
+	@Override
+	public AuthorizedTaggedDirectoryDecorator<SubjectInformationType> getTaggedDirectoryDecorator() {
+		logger.info("use GrantedAuthority authorization strategy");
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getGrantedAuthoritySubjectInformationProvider();
+		final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator = getGrantedAuthorityAuthenticator();
+
+		return new AuthorizedTaggedDirectoryDecorator<>(new GrantedAuthorityTaggedDirectoryAuthorizer<>(grantedAuthorityAuthenticator), subjectInformationProvider);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
+	private IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getGrantedAuthoritySubjectInformationProvider() {
+	private ISubjectInformationProvider<SubjectInformationType> getGrantedAuthoritySubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

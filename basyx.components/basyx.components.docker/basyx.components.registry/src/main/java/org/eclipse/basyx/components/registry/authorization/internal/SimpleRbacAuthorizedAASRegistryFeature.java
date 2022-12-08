@@ -22,7 +22,7 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -39,27 +39,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialization of {@link SecurityFeature} for the SimpleRbac authorization
- * scheme.
+ * Specialization of {@link AuthorizedAASRegistryFeature} for the SimpleRbac
+ * authorization scheme.
  *
  * @author wege
  */
-public class SimpleRbacSecurityFeature extends SecurityFeature {
-	private static Logger logger = LoggerFactory.getLogger(SimpleRbacSecurityFeature.class);
+public class SimpleRbacAuthorizedAASRegistryFeature<SubjectInformationType> extends AuthorizedAASRegistryFeature {
+	private static Logger logger = LoggerFactory.getLogger(SimpleRbacAuthorizedAASRegistryFeature.class);
 
-	public SimpleRbacSecurityFeature(final BaSyxSecurityConfiguration securityConfig) {
+	public SimpleRbacAuthorizedAASRegistryFeature(final BaSyxSecurityConfiguration securityConfig) {
 		super(securityConfig);
 	}
 
 	@Override
-	public <SubjectInformationType> IAASRegistryDecorator getDecorator() {
+	public IAASRegistryDecorator getAASRegistryDecorator() {
 		logger.info("use SimpleRbac authorization strategy");
 		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
 		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
 		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getRoleAuthenticator();
 		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
 
-		return new AuthorizedRegistryDecorator<>(new SimpleRbacAASRegistryAuthorizer<>(rbacRuleChecker, roleAuthenticator), new SimpleRbacTaggedDirectoryAuthorizer<>(rbacRuleChecker, roleAuthenticator), subjectInformationProvider);
+		return new AuthorizedAASRegistryDecorator<>(new SimpleRbacAASRegistryAuthorizer<>(rbacRuleChecker, roleAuthenticator), subjectInformationProvider);
+	}
+
+	@Override
+	public ITaggedDirectoryDecorator getTaggedDirectoryDecorator() {
+		logger.info("use SimpleRbac authorization strategy");
+		final RbacRuleSet rbacRuleSet = getRbacRuleSet();
+		final IRbacRuleChecker rbacRuleChecker = new PredefinedSetRbacRuleChecker(rbacRuleSet);
+		final IRoleAuthenticator<SubjectInformationType> roleAuthenticator = getRoleAuthenticator();
+		final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider = getSubjectInformationProvider();
+
+		return new AuthorizedTaggedDirectoryDecorator<>(new SimpleRbacTaggedDirectoryAuthorizer<>(rbacRuleChecker, roleAuthenticator), subjectInformationProvider);
 	}
 
 	public RbacRuleSet getRbacRuleSet() {
@@ -71,12 +82,12 @@ public class SimpleRbacSecurityFeature extends SecurityFeature {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> IRoleAuthenticator<SubjectInformationType> getRoleAuthenticator() {
+	private IRoleAuthenticator<SubjectInformationType> getRoleAuthenticator() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <SubjectInformationType> ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
+	private ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
 		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

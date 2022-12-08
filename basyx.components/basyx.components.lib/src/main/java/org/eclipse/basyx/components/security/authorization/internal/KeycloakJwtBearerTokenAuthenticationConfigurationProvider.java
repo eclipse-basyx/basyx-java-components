@@ -22,30 +22,26 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.security.authorization.internal;
 
-import java.nio.file.Path;
-import org.eclipse.basyx.extensions.shared.authorization.internal.IRbacRuleChecker;
-import org.eclipse.basyx.extensions.shared.authorization.internal.IRoleAuthenticator;
-import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
-import org.eclipse.basyx.extensions.shared.authorization.internal.SimpleRbacHelper;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
+import org.eclipse.basyx.extensions.shared.authorization.internal.KeycloakService;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
- * Simple role based implementation for {@link IFilesAuthorizer}.
+ * Implementation of the {@link IJwtBearerTokenAuthenticationConfigurationProvider} interface.
+ * <p>
+ * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be used to configure the BaSyx server to accept tokens from a specific Keycloak server and realm and set up the security context on an incoming request.
  *
  * @author wege
  */
-public class SimpleRbacFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
-	protected IRbacRuleChecker rbacRuleChecker;
-	protected IRoleAuthenticator<SubjectInformationType> roleAuthenticator;
+public class KeycloakJwtBearerTokenAuthenticationConfigurationProvider implements IJwtBearerTokenAuthenticationConfigurationProvider {
+	@Override public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig) {
+		final String serverUrl = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakServerUrl();
+		final String realm = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderKeycloakRealm();
 
-	public SimpleRbacFilesAuthorizer(final IRbacRuleChecker rbacRuleChecker, final IRoleAuthenticator<SubjectInformationType> roleAuthenticator) {
-		this.rbacRuleChecker = rbacRuleChecker;
-		this.roleAuthenticator = roleAuthenticator;
-	}
+		final KeycloakService keycloakService = new KeycloakService(serverUrl, realm);
 
-	@Override
-	public void authorizeDownloadFile(SubjectInformationType subjectInformation, Path path) throws InhibitException {
-		SimpleRbacHelper.checkRule(rbacRuleChecker, roleAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_SCOPE, new PathTargetInformation(path));
+		return keycloakService.createJwtBearerTokenAuthenticationConfiguration();
 	}
 }

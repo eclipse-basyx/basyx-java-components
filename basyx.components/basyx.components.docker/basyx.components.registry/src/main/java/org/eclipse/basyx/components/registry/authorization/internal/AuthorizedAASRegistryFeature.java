@@ -22,25 +22,25 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.registry.authorization;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 
 /**
- * Provides the authorizers for the different common to be authorized BaSyx
- * objects using the registry server configuration.
+ * Provides the {@link AuthorizedAASRegistryDecorator} and
+ * {@link AuthorizedTaggedDirectoryDecorator} instances that are required for
+ * authorization.
  *
  * @author wege
  */
-public interface IAuthorizersProvider<SubjectInformationType> {
-	/**
-	 * Provides the authorizers for the different common to be authorized BaSyx
-	 * objects using the AAS server configuration.
-	 *
-	 * @param securityConfig
-	 *            the aas server configuration that holds information about how to
-	 *            determine the authorizers.
-	 * @return the different authorizers bundled in an {@link Authorizers}
-	 */
-	public Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
+public abstract class AuthorizedAASRegistryFeature {
+	protected final BaSyxSecurityConfiguration securityConfig;
+
+	public AuthorizedAASRegistryFeature(final BaSyxSecurityConfiguration securityConfig) {
+		this.securityConfig = securityConfig;
+	}
+
+	public abstract IAASRegistryDecorator getAASRegistryDecorator();
+
+	public abstract ITaggedDirectoryDecorator getTaggedDirectoryDecorator();
 }

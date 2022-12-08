@@ -22,24 +22,24 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.authorization;
+package org.eclipse.basyx.components.aas.authorization.internal;
+
+import java.nio.file.Path;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
 
 /**
- * Constants for the permission scopes to the
- * {@link GrantedAuthorityFilesAuthorizer} and
- * {@link SimpleRbacFilesAuthorizer}.
+ * The authorizer for downloading files from the aas server.
  *
  * @author wege
- * @see <a href=
- *      "https://tools.ietf.org/html/rfc6749#section-3.3">https://tools.ietf.org/html/rfc6749#section-3.3</a>
  */
-public class FilesAuthorizerScopes {
-	private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
-	public static final String READ_SCOPE = "urn:org.eclipse.basyx:scope:files:read";
-	public static final String READ_AUTHORITY = SCOPE_AUTHORITY_PREFIX + READ_SCOPE;
-
-	private FilesAuthorizerScopes() {
-		// This class should not be instantiated as it serves as a holder for constants
-		// only
-	}
+public interface IFilesAuthorizer<SubjectInformationType> {
+	/**
+	 * Checks authorization for the download of a specific file by its path.
+	 *
+	 * @param subjectInformation
+	 *            information of the requester.
+	 * @param path
+	 *            the path of the file
+	 */
+	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
 }

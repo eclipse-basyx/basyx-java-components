@@ -46,7 +46,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorized;
+import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorizedException;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
@@ -541,7 +541,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return aasProviderMap.values().stream().map(p -> {
 			try {
 				return p.getValue("/aas");
-			} catch (NotAuthorized e) {
+			} catch (NotAuthorizedException e) {
 				return null;
 			} catch (Exception e1) {
 				e1.printStackTrace();
