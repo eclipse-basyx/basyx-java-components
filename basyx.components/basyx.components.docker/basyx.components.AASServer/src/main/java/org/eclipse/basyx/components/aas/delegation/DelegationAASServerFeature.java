@@ -26,7 +26,6 @@ package org.eclipse.basyx.components.aas.delegation;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 /**
  * 
@@ -39,22 +38,15 @@ public class DelegationAASServerFeature implements IAASServerFeature {
 
 	@Override
 	public void initialize() {
-		// nothing to do regarding initialization for this feature at the moment
 	}
 
 	@Override
 	public void cleanUp() {
-		// nothing to do regarding cleanup for this feature at the moment
 	}
 
 	@Override
 	public IAASServerDecorator getDecorator() {
 		return new DelegationAASServerDecorator();
-	}
-
-	@Override
-	public void addToContext(BaSyxContext context) {
-		// nothing to add to the context for this feature at the moment
 	}
 
 }

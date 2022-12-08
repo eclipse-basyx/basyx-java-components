@@ -25,11 +25,11 @@
 package org.eclipse.basyx.components.aas.mqtt;
 
 import java.security.ProviderException;
+
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -79,17 +79,11 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 
 	@Override
 	public void cleanUp() {
-		// nothing to do regarding cleanup for this feature at the moment
 	}
 
 	@Override
 	public IAASServerDecorator getDecorator() {
 		return new MqttV2AASServerDecorator(client, this.aasRepoId, idEncoder);
-	}
-
-	@Override
-	public void addToContext(BaSyxContext context) {
-		// nothing to add to the context for this feature at the moment
 	}
 
 }
