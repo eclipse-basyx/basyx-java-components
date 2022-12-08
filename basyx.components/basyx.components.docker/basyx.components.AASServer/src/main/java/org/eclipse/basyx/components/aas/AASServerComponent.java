@@ -228,8 +228,6 @@ public class AASServerComponent implements IComponent {
 		logger.info("Create the server...");
 		registry = createRegistryFromConfig(aasConfig);
 
-		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
-
 		loadAASServerFeaturesFromConfig();
 		initializeAASServerFeatures();
 
