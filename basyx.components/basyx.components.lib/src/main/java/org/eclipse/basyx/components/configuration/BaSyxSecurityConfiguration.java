@@ -27,6 +27,12 @@ package org.eclipse.basyx.components.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a BaSyx configuration for security features like authorization.
+ * 
+ * @author wege
+ *
+ */
 public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
 	// Prefix for environment variables
 	public static final String ENV_PREFIX = "BaSyxSecurity_";

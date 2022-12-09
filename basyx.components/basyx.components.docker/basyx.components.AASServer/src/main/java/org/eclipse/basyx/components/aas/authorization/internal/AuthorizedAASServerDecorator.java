@@ -42,7 +42,7 @@ import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 /**
  * Decorator for Authorization of Submodel and Shell access
  *
- * @author fischer, fried, wege
+ * @author wege
  */
 public class AuthorizedAASServerDecorator<SubjectInformationType> implements IAASServerDecorator {
 	protected final ISubmodelAPIAuthorizer<SubjectInformationType> submodelAPIAuthorizer;
