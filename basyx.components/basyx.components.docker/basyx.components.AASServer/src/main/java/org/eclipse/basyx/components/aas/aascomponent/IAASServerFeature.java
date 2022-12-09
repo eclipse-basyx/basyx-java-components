@@ -32,11 +32,11 @@ import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
  * @author fischer, fried, wege
  */
 public interface IAASServerFeature {
-	void initialize();
+	public void initialize();
 
-	void cleanUp();
+	public void cleanUp();
 
-	IAASServerDecorator getDecorator();
+	public IAASServerDecorator getDecorator();
 
 	/**
 	 * This can be used when a feature needs to add something to the
