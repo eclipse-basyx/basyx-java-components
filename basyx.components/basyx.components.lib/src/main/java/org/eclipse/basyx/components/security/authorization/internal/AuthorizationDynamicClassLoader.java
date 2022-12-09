@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class that can load classes implementing a specific interface
  * dynamically for authorization purposes using the class name from a
- * {@link BasyxConfiguration} property.
+ * {@link BaSyxConfiguration} property.
  * 
  * @author wege
  *
