@@ -53,6 +53,7 @@ import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
+import org.eclipse.basyx.components.security.authorization.internal.DynamicClassLoader;
 import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
@@ -379,7 +380,7 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
-		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
+		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
 	}
 
 	private IAASRegistry decorateWithAuthorization(IAASRegistry registry) {

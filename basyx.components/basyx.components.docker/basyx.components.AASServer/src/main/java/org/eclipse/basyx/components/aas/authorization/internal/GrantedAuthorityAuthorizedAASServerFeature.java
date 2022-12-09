@@ -27,6 +27,7 @@ package org.eclipse.basyx.components.aas.authorization.internal;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
+import org.eclipse.basyx.components.security.authorization.internal.DynamicClassLoader;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.GrantedAuthorityAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.internal.GrantedAuthorityAASAPIAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.internal.IGrantedAuthorityAuthenticator;
@@ -70,11 +71,11 @@ public class GrantedAuthorityAuthorizedAASServerFeature<SubjectInformationType> 
 
 	@SuppressWarnings("unchecked")
 	private IGrantedAuthorityAuthenticator<SubjectInformationType> getGrantedAuthorityAuthenticator() {
-		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
+		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_GRANTED_AUTHORITY_GRANTED_AUTHORITY_AUTHENTICATOR, IGrantedAuthorityAuthenticator.class);
 	}
 
 	@SuppressWarnings("unchecked")
 	private ISubjectInformationProvider<SubjectInformationType> getSubjectInformationProvider() {
-		return securityConfig.loadInstanceDynamically(BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
+		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_GRANTEDAUTHORITY_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }
