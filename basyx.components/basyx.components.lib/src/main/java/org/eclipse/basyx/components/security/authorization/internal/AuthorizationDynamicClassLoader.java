@@ -11,8 +11,8 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.KeycloakRoleAu
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DynamicClassLoader {
-	private static Logger logger = LoggerFactory.getLogger(DynamicClassLoader.class);
+public class AuthorizationDynamicClassLoader {
+	private static Logger logger = LoggerFactory.getLogger(AuthorizationDynamicClassLoader.class);
 
 	private static Map<String, String> classesBySimpleNameMap = new HashMap<>();
 
@@ -21,6 +21,9 @@ public class DynamicClassLoader {
 		classesBySimpleNameMap.put(AuthenticationGrantedAuthorityAuthenticator.class.getSimpleName(), AuthenticationGrantedAuthorityAuthenticator.class.getName());
 		classesBySimpleNameMap.put(JWTAuthenticationContextProvider.class.getSimpleName(), JWTAuthenticationContextProvider.class.getName());
 		classesBySimpleNameMap.put(AuthenticationContextProvider.class.getSimpleName(), AuthenticationContextProvider.class.getName());
+	}
+
+	private AuthorizationDynamicClassLoader() {
 	}
 
 	public static <T> T loadInstanceDynamically(final BaSyxConfiguration config, final String propertyName, final Class<T> requiredInterface) {
