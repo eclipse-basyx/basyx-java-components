@@ -87,7 +87,7 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { BACKEND, EVENTS, TAGGED_DIRECTORY };
+		String[] properties = { BACKEND, EVENTS, TAGGED_DIRECTORY, AUTHORIZATION };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
