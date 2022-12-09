@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.security.authorization.internal.DynamicClassLoader;
+import org.eclipse.basyx.components.security.authorization.internal.AuthorizationDynamicClassLoader;
 import org.eclipse.basyx.extensions.aas.aggregator.authorization.internal.SimpleRbacAASAggregatorAuthorizer;
 import org.eclipse.basyx.extensions.aas.api.authorization.internal.SimpleRbacAASAPIAuthorizer;
 import org.eclipse.basyx.extensions.shared.authorization.internal.IRbacRuleChecker;
@@ -93,11 +93,11 @@ public class SimpleRbacAuthorizedAASServerFeature<SubjectInformationType> extend
 
 	@SuppressWarnings("unchecked")
 	private IRoleAuthenticator<SubjectInformationType> getSimpleRbacRoleAuthenticator() {
-		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
+		return AuthorizationDynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_ROLE_AUTHENTICATOR, IRoleAuthenticator.class);
 	}
 
 	@SuppressWarnings("unchecked")
 	private ISubjectInformationProvider<SubjectInformationType> getSimpleRbacSubjectInformationProvider() {
-		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
+		return AuthorizationDynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_SIMPLERBAC_SUBJECT_INFORMATION_PROVIDER, ISubjectInformationProvider.class);
 	}
 }

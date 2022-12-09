@@ -28,7 +28,7 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.security.authorization.internal.DynamicClassLoader;
+import org.eclipse.basyx.components.security.authorization.internal.AuthorizationDynamicClassLoader;
 import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
@@ -91,6 +91,7 @@ public class AuthorizedAASServerFeature<SubjectInformationType> implements IAASS
 			return null;
 		}
 
-		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
+		return AuthorizationDynamicClassLoader
+				.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
 	}
 }

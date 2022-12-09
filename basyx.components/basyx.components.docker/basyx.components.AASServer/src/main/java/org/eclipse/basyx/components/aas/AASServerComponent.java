@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,9 +65,6 @@ import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedAASServerFeatureFactory;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
-import org.eclipse.basyx.components.aas.authorization.internal.CustomAuthorizedAASServerFeature;
-import org.eclipse.basyx.components.aas.authorization.internal.GrantedAuthorityAuthorizedAASServerFeature;
-import org.eclipse.basyx.components.aas.authorization.internal.SimpleRbacAuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -82,7 +78,6 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ElevatedCodeAuthentication;
@@ -359,16 +354,18 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
-		if (aasConfig.isAuthorizationEnabled()) {
-			configureAuthorization();
-		}
+		configureSecurity();
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
 	}
 
-	private void configureAuthorization() {
+	private void configureSecurity() {
+		if (!aasConfig.isAuthorizationEnabled()) {
+			return;
+		}
+
 		if (securityConfig == null) {
 			securityConfig = new BaSyxSecurityConfiguration();
 			securityConfig.loadFromDefaultSource();

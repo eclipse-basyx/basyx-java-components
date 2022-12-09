@@ -24,7 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import javax.servlet.http.HttpServlet;
 import org.apache.commons.collections4.map.HashedMap;
@@ -36,12 +35,7 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
 import org.eclipse.basyx.components.registry.authorization.internal.AuthorizedAASRegistryFeatureFactory;
-import org.eclipse.basyx.components.registry.authorization.internal.CustomAuthorizedAASRegistryFeature;
-import org.eclipse.basyx.components.registry.authorization.internal.GrantedAuthorityAuthorizedAASRegistryFeature;
-import org.eclipse.basyx.components.registry.authorization.internal.AuthorizedAASRegistryFeature;
-import org.eclipse.basyx.components.registry.authorization.internal.SimpleRbacAuthorizedAASRegistryFeature;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
@@ -54,7 +48,7 @@ import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
-import org.eclipse.basyx.components.security.authorization.internal.DynamicClassLoader;
+import org.eclipse.basyx.components.security.authorization.internal.AuthorizationDynamicClassLoader;
 import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
@@ -201,7 +195,7 @@ public class RegistryComponent implements IComponent {
 	 */
 	@Override
 	public void startComponent() {
-		loadRegistryFeaturesFromConfig();
+		configureSecurity();
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createRegistryServlet());
@@ -362,7 +356,8 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
-		return DynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
+		return AuthorizationDynamicClassLoader
+				.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER, IJwtBearerTokenAuthenticationConfigurationProvider.class);
 	}
 
 	private IAASRegistry decorateWithAuthorization(IAASRegistry registry) {
@@ -398,11 +393,11 @@ public class RegistryComponent implements IComponent {
 		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL));
 	}
 
-	private void loadRegistryFeaturesFromConfig() {
-		configureAuthorization();
-	}
+	private void configureSecurity() {
+		if (!registryConfig.isAuthorizationEnabled()) {
+			return;
+		}
 
-	private void configureAuthorization() {
 		if (securityConfig == null) {
 			securityConfig = new BaSyxSecurityConfiguration();
 			securityConfig.loadFromDefaultSource();
