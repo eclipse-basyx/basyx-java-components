@@ -1,10 +1,34 @@
+/*******************************************************************************
+ * Copyright (C) 2021-2022 the Eclipse BaSyx Authors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
+ ******************************************************************************/
 package org.eclipse.basyx.regression.registry;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +55,7 @@ public class TestMongoDBTaggedDirectory extends TestTaggedDirectorySuite {
 
 	@Override
 	protected IAASTaggedDirectory getDirectory() {
-		return new MongoDBTaggedDirectory(new BaSyxMongoDBConfiguration(), new HashMap<>());
+		return new MongoDBTaggedDirectory(new BaSyxMongoDBConfiguration());
 	}
 
 	@Override
@@ -47,24 +71,21 @@ public class TestMongoDBTaggedDirectory extends TestTaggedDirectorySuite {
 	}
 
 	/**
-	 * Test tags are store persistenly in MongoDB
+	 * Test tags are stored persistently in MongoDB
 	 */
 	@Test
 	public void testTagPersistency() {
+		int expectedNumberOfTags = 9;
+		
 		super.init();
+		
+		Set<TaggedAASDescriptor> deviceDescriptors = getDirectory().lookupTag(DEVICE);
+		List<TaggedAASDescriptor> taggedDescriptors = getTaggedAASDescriptorWithNewMongoDBConnection();
+		Set<String> allTags = extractAllTagsFromAASDescriptors(taggedDescriptors);	
 
-		List<TaggedAASDescriptor> result = getTaggedAASDescriptorWithNewMongoDBConnection();
-
-		Set<String> allTags = extractAllTagsFromAASDescriptors(result);
-
-		assertEquals(9, allTags.size());
+		assertFalse(deviceDescriptors.isEmpty());
 		assertTrue(allTags.contains(DEVICE));
-		assertTrue(allTags.contains(SUPPLIER_A));
-		assertTrue(allTags.contains(SUPPLIER_B));
-		assertTrue(allTags.contains(MILL));
-		assertTrue(allTags.contains(PACKAGER));
-		assertTrue(allTags.contains(BASYS_READY));
-		assertTrue(allTags.contains(INTERNAL));
+		assertEquals(expectedNumberOfTags, allTags.size());
 	}
 
 	@Test
