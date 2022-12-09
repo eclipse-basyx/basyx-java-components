@@ -63,6 +63,7 @@ import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentF
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedAASServerFeatureFactory;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
 import org.eclipse.basyx.components.aas.authorization.internal.CustomAuthorizedAASServerFeature;
@@ -224,6 +225,17 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
+	 * Sets the security configuration for this component. Has to be called before
+	 * the component is started.
+	 *
+	 * @param configuration
+	 *            the configuration to be set
+	 */
+	public void setSecurityConfiguration(final BaSyxSecurityConfiguration configuration) {
+		securityConfig = configuration;
+	}
+
+	/**
 	 * Starts the AASX component at http://${hostName}:${port}/${path}
 	 */
 	@Override
@@ -268,39 +280,9 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private AuthorizedDefaultServletParams<?> getAuthorizedDefaultServletParams() {
-		final AuthorizedAASServerFeature authorizedAASServerFeature = getAuthorizedAASServerFeature();
+		final AuthorizedAASServerFeature<?> authorizedAASServerFeature = new AuthorizedAASServerFeatureFactory(securityConfig).create();
 
 		return authorizedAASServerFeature.getFilesAuthorizerParams();
-	}
-
-	private AuthorizedAASServerFeature getAuthorizedAASServerFeature() {
-		final String strategyString = securityConfig.getAuthorizationStrategy();
-
-		if (strategyString == null) {
-			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in security.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
-		}
-
-		AuthorizationStrategy strategy;
-		try {
-			strategy = AuthorizationStrategy.valueOf(strategyString);
-		} catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException(
-					String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
-		}
-
-		switch (strategy) {
-		case SimpleRbac: {
-			return new SimpleRbacAuthorizedAASServerFeature<>(securityConfig);
-		}
-		case GrantedAuthority: {
-			return new GrantedAuthorityAuthorizedAASServerFeature<>(securityConfig);
-		}
-		case Custom: {
-			return new CustomAuthorizedAASServerFeature<>(securityConfig);
-		}
-		default:
-			throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
-		}
 	}
 
 	private void registerPreexistingAASAndSMIfPossible() {
@@ -387,9 +369,12 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private void configureAuthorization() {
-		securityConfig = new BaSyxSecurityConfiguration();
-		securityConfig.loadFromDefaultSource();
-		addAASServerFeature(getAuthorizedAASServerFeature());
+		if (securityConfig == null) {
+			securityConfig = new BaSyxSecurityConfiguration();
+			securityConfig.loadFromDefaultSource();
+		}
+
+		addAASServerFeature(new AuthorizedAASServerFeatureFactory(securityConfig).create());
 	}
 
 	private boolean isEventingEnabled() {

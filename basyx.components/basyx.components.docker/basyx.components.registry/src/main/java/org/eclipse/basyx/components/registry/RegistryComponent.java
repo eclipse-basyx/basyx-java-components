@@ -37,6 +37,7 @@ import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration.AuthorizationStrategy;
+import org.eclipse.basyx.components.registry.authorization.internal.AuthorizedAASRegistryFeatureFactory;
 import org.eclipse.basyx.components.registry.authorization.internal.CustomAuthorizedAASRegistryFeature;
 import org.eclipse.basyx.components.registry.authorization.internal.GrantedAuthorityAuthorizedAASRegistryFeature;
 import org.eclipse.basyx.components.registry.authorization.internal.AuthorizedAASRegistryFeature;
@@ -182,6 +183,17 @@ public class RegistryComponent implements IComponent {
 	public RegistryComponent(BaSyxContextConfiguration contextConfig, BaSyxRegistryConfiguration registryConfig) {
 		this.contextConfig = contextConfig;
 		this.registryConfig = registryConfig;
+	}
+
+	/**
+	 * Sets the security configuration for this component. Has to be called before
+	 * the component is started.
+	 *
+	 * @param configuration
+	 *            the configuration to be set
+	 */
+	public void setSecurityConfiguration(final BaSyxSecurityConfiguration configuration) {
+		securityConfig = configuration;
 	}
 
 	/**
@@ -342,36 +354,6 @@ public class RegistryComponent implements IComponent {
 		return decoratedRegistry;
 	}
 
-	private AuthorizedAASRegistryFeature getAuthorizedAASRegistryFeature() {
-		final String strategyString = securityConfig.getAuthorizationStrategy();
-
-		if (strategyString == null) {
-			throw new IllegalArgumentException(String.format("no authorization strategy set, please set %s in security.properties", BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY));
-		}
-
-		AuthorizationStrategy strategy;
-		try {
-			strategy = AuthorizationStrategy.valueOf(strategyString);
-		} catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException(
-					String.format("unknown authorization strategy %s set in security.properties, available options: %s", strategyString, Arrays.toString(BaSyxSecurityConfiguration.AuthorizationStrategy.values())));
-		}
-
-		switch (strategy) {
-		case SimpleRbac: {
-			return new SimpleRbacAuthorizedAASRegistryFeature<>(securityConfig);
-		}
-		case GrantedAuthority: {
-			return new GrantedAuthorityAuthorizedAASRegistryFeature<>(securityConfig);
-		}
-		case Custom: {
-			return new CustomAuthorizedAASRegistryFeature<>(securityConfig);
-		}
-		default:
-			throw new UnsupportedOperationException("no handler for authorization strategy " + strategyString);
-		}
-	}
-
 	private void configureContextForAuthorization(final BaSyxContext context) {
 		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
 		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
@@ -385,12 +367,12 @@ public class RegistryComponent implements IComponent {
 
 	private IAASRegistry decorateWithAuthorization(IAASRegistry registry) {
 		logger.info("Enable Authorization for Registry");
-		return getAuthorizedAASRegistryFeature().getAASRegistryDecorator().decorate(registry);
+		return new AuthorizedAASRegistryFeatureFactory(securityConfig).create().getAASRegistryDecorator().decorate(registry);
 	}
 
 	private IAASTaggedDirectory decorateWithAuthorization(IAASTaggedDirectory taggedDirectory) {
 		logger.info("Enable Authorization for TaggedDirectory");
-		return getAuthorizedAASRegistryFeature().getTaggedDirectoryDecorator().decorate(taggedDirectory);
+		return new AuthorizedAASRegistryFeatureFactory(securityConfig).create().getTaggedDirectoryDecorator().decorate(taggedDirectory);
 	}
 
 	private IAASRegistry configureMqtt(IAASRegistry decoratedRegistry) {
@@ -421,8 +403,10 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private void configureAuthorization() {
-		securityConfig = new BaSyxSecurityConfiguration();
-		securityConfig.loadFromDefaultSource();
+		if (securityConfig == null) {
+			securityConfig = new BaSyxSecurityConfiguration();
+			securityConfig.loadFromDefaultSource();
+		}
 	}
 
 	@Override
