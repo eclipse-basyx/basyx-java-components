@@ -8,10 +8,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -34,7 +34,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -126,7 +128,7 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator aggregator;
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
-
+	
 	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
 
 	/**
@@ -161,6 +163,7 @@ public class AASServerComponent implements IComponent {
 	 * backend.
 	 *
 	 * @param configuration
+	 * 
 	 * @deprecated Add MQTT via {@link MqttAASServerFeature} instead.
 	 */
 	@Deprecated
@@ -171,7 +174,7 @@ public class AASServerComponent implements IComponent {
 	/**
 	 * Disables mqtt configuration. Has to be called before the component is
 	 * started.
-	 *
+	 * 
 	 * @deprecated remove MQTT from the feature list instead.
 	 */
 	@Deprecated
@@ -201,7 +204,7 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Explicitly sets AAS bundles that should be loaded during startup
-	 *
+	 * 
 	 * @param aasBundles
 	 *            The bundles that will be loaded during startup
 	 */
@@ -211,7 +214,7 @@ public class AASServerComponent implements IComponent {
 
 	/**
 	 * Explicitly sets an AAS bundle that should be loaded during startup
-	 *
+	 * 
 	 * @param aasBundle
 	 *            The bundle that will be loaded during startup
 	 */
@@ -260,7 +263,7 @@ public class AASServerComponent implements IComponent {
 		logger.info("Start the server");
 		server = new BaSyxHTTPServer(context);
 		server.start();
-
+		
 		registerPreexistingAASAndSMIfPossible();
 	}
 
@@ -281,20 +284,20 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private void registerPreexistingAASAndSMIfPossible() {
-		if (!shouldRegisterPreexistingAASAndSM()) {
+		if(!shouldRegisterPreexistingAASAndSM()) {
 			return;
 		}
-
+		
 		aggregator.getAASList().stream().forEach(this::registerAASAndSubmodels);
 	}
 
 	private boolean shouldRegisterPreexistingAASAndSM() {
 		return isMongoDBBackend() && registry != null;
 	}
-
+	
 	private void registerAASAndSubmodels(IAssetAdministrationShell aas) {
 		registerAAS(aas);
-
+		
 		registerSubmodels(aas);
 	}
 
@@ -303,7 +306,7 @@ public class AASServerComponent implements IComponent {
 			String combinedEndpoint = getAASAccessPath(aas);
 			registry.register(new AASDescriptor(aas, combinedEndpoint));
 			logger.info("The AAS " + aas.getIdShort() + " is Successfully Registered from DB");
-		} catch (Exception e) {
+		} catch(Exception e) {
 			logger.info("The AAS " + aas.getIdShort() + " could not be Registered from DB" + e);
 		}
 	}
@@ -317,11 +320,11 @@ public class AASServerComponent implements IComponent {
 		try {
 			submodels.stream().forEach(submodel -> registerSubmodel(aas, submodel));
 			logger.info("The submodels from AAS " + aas.getIdShort() + " are Successfully Registered from DB");
-		} catch (Exception e) {
+		} catch(Exception e) {
 			logger.info("The submodel from AAS " + aas.getIdShort() + " could not be Registered from DB " + e);
 		}
 	}
-
+	
 	private void registerSubmodel(IAssetAdministrationShell aas, ISubmodel submodel) {
 		String smEndpoint = VABPathTools.concatenatePaths(getAASAccessPath(aas), AssetAdministrationShell.SUBMODELS, submodel.getIdShort(), SubmodelProvider.SUBMODEL);
 		registry.register(aas.getIdentification(), new SubmodelDescriptor(submodel, smEndpoint));
@@ -332,26 +335,26 @@ public class AASServerComponent implements IComponent {
 
 		@SuppressWarnings("unchecked")
 		List<Object> submodelObject = (List<Object>) aasProvider.getValue(PREFIX_SUBMODEL_PATH);
-
+		
 		List<ISubmodel> persistentSubmodelList = new ArrayList<>();
-
-		submodelObject.stream().map(this::getSubmodel).forEach(persistentSubmodelList::add);
+		
+		submodelObject.stream().map(this::getSubmodel).forEach(persistentSubmodelList::add);		
 
 		return persistentSubmodelList;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private ISubmodel getSubmodel(Object submodelObject) {
-		return Submodel.createAsFacade((Map<String, Object>) submodelObject);
+		return Submodel.createAsFacade((Map<String, Object>) submodelObject);	
 	}
 
 	private void loadAASServerFeaturesFromConfig() {
-		if (isEventingEnabled()) {
-			configureMqttFeature();
+		if(aasConfig.isPropertyDelegationEnabled()) {
+			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
-		if (aasConfig.isPropertyDelegationEnabled()) {
-			addAASServerFeature(new DelegationAASServerFeature());
+		if (isEventingEnabled()) {
+			configureMqttFeature();
 		}
 
 		configureSecurity();
@@ -406,39 +409,39 @@ public class AASServerComponent implements IComponent {
 	@Override
 	public void stopComponent() {
 		deregisterAASAndSmAddedDuringRuntime();
-
+		
 		cleanUpAASServerFeatures();
 
 		server.shutdown();
 	}
-
+	
 	private void deregisterAASAndSmAddedDuringRuntime() {
-		if (registry == null) {
+		if(registry == null) {
 			return;
 		}
-
+		
 		try {
 			aggregator.getAASList().stream().forEach(this::deregisterAASAndAccompanyingSM);
-		} catch (RuntimeException e) {
+		} catch(RuntimeException e) {
 			logger.info("The resource could not be found in the aggregator " + e);
 		}
-
+		
 	}
-
-	private void deregisterAASAndAccompanyingSM(IAssetAdministrationShell aas) {
+	
+	private void deregisterAASAndAccompanyingSM(IAssetAdministrationShell aas) {	
 		getSubmodelDescriptors(aas.getIdentification()).stream().forEach(submodelDescriptor -> deregisterSubmodel(aas.getIdentification(), submodelDescriptor));
-
+		
 		deregisterAAS(aas.getIdentification());
 	}
 
 	private List<SubmodelDescriptor> getSubmodelDescriptors(IIdentifier aasIdentifier) {
 		try {
 			return registry.lookupSubmodels(aasIdentifier);
-		} catch (ResourceNotFoundException e) {
+		} catch(ResourceNotFoundException e) {
 			return Collections.emptyList();
 		}
 	}
-
+	
 	private void deregisterSubmodel(IIdentifier aasIdentifier, SubmodelDescriptor submodelDescriptor) {
 		try {
 			registry.delete(aasIdentifier, submodelDescriptor.getIdentifier());
@@ -521,7 +524,7 @@ public class AASServerComponent implements IComponent {
 	private VABHTTPInterface<?> createAggregatorServlet() {
 		aggregator = createAASAggregator();
 		loadAASBundles();
-
+		
 		if (aasBundles != null) {
 			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
 				AASBundleHelper.integrate(aggregator, aasBundles);
@@ -545,7 +548,7 @@ public class AASServerComponent implements IComponent {
 	private boolean isMongoDBBackend() {
 		return aasConfig.getAASBackend().equals(AASServerBackend.MONGODB);
 	}
-
+	
 	private BaSyxMongoDBConfiguration createMongoDbConfiguration() {
 		BaSyxMongoDBConfiguration config;
 		if (this.mongoDBConfig == null) {
@@ -616,11 +619,11 @@ public class AASServerComponent implements IComponent {
 		if (registryUrl == null || registryUrl.isEmpty()) {
 			return null;
 		}
-
+		
 		// Load registry url from config
 		logger.info("Registry loaded at \"" + registryUrl + "\"");
-
-		if (shouldUseSecuredRegistryConnection(aasConfig)) {
+		
+		if(shouldUseSecuredRegistryConnection(aasConfig)) {
 			return new AuthorizedAASRegistryProxy(registryUrl, aasConfig.configureAndGetAuthorizationSupplier());
 		} else {
 			return new AASRegistryProxy(registryUrl);
