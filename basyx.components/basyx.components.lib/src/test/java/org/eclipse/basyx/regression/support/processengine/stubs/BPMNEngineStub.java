@@ -58,6 +58,7 @@ public class BPMNEngineStub {
 		fieldInjections.put("submodelId", submodelid);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void callJavaDelegate() throws Exception {
 		// create the class of the java-delegate
 		@SuppressWarnings("rawtypes")

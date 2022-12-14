@@ -89,6 +89,7 @@ public class CFGBaSyxConnection {
 	/**
 	 * Instantiate the directory class
 	 */
+	@SuppressWarnings("deprecation")
 	public IVABRegistryService createDirectoryInstance() {
 		// Try to create instance
 		try {

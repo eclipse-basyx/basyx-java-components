@@ -24,16 +24,18 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization.internal;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.basyx.extensions.shared.authorization.internal.TagTargetInformation;
 import org.eclipse.basyx.extensions.shared.authorization.internal.TargetInformation;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Target information for {@link SimpleRbacFilesAuthorizer} file paths for RBAC
@@ -41,6 +43,7 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.TargetInformat
  *
  * @author wege
  */
+@SuppressWarnings("serial")
 public class PathTargetInformation implements TargetInformation {
 	private Path path;
 

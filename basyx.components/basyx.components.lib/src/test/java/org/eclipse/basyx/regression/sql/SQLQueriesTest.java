@@ -60,6 +60,7 @@ public class SQLQueriesTest {
 	/**
 	 * Test basic queries
 	 */
+	@SuppressWarnings("unused")
 	@Test
 	@Ignore
 	public void test() throws Exception {

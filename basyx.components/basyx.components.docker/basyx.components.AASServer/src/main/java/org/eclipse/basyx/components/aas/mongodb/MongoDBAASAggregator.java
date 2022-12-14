@@ -417,6 +417,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @deprecated This method is used with the old, deprecated Constructors. Use
 	 *             {@link MongoDBAASServerComponentFactory} instead
 	 */
+	@SuppressWarnings("deprecation")
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
 		// set mongoDB configuration
@@ -455,6 +456,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		aasProviderMap.clear();
 	}
 
+	@SuppressWarnings("deprecation")
 	private void init() {
 		List<AssetAdministrationShell> data = mongoOps.findAll(AssetAdministrationShell.class, aasCollection);
 		for (AssetAdministrationShell aas : data) {
@@ -529,6 +531,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void addSubmodelProvidersById(String smId, MultiSubmodelProvider provider) {
 		ISubmodelAPI smApi = new MongoDBSubmodelAPI(config, smId);
 		SubmodelProvider smProvider = new SubmodelProvider(smApi);
