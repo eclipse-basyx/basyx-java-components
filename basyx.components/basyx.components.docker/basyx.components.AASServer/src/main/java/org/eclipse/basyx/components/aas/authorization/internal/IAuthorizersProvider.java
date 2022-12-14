@@ -24,7 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.components.aas.authorization.internal.Authorizers;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 
 /**

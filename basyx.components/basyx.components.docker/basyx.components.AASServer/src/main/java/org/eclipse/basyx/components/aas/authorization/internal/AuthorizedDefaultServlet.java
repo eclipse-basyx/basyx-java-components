@@ -29,9 +29,11 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.catalina.servlets.DefaultServlet;
 import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
@@ -47,6 +49,7 @@ import org.eclipse.basyx.vab.protocol.http.server.ExceptionToHTTPCodeMapper;
  *
  * @author wege
  */
+@SuppressWarnings("serial")
 public class AuthorizedDefaultServlet<SubjectInformationType> extends DefaultServlet {
 	protected final IFilesAuthorizer<SubjectInformationType> filesAuthorizer;
 	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;

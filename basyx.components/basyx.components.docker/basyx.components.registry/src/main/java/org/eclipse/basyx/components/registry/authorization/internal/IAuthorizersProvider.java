@@ -25,7 +25,6 @@
 package org.eclipse.basyx.components.registry.authorization.internal;
 
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
-import org.eclipse.basyx.components.registry.authorization.internal.Authorizers;
 
 /**
  * Provides the authorizers for the different common to be authorized BaSyx

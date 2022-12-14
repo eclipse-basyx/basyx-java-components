@@ -27,6 +27,7 @@ package org.eclipse.basyx.components.security.authorization.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.internal.AuthenticationContextProvider;
 import org.eclipse.basyx.extensions.shared.authorization.internal.AuthenticationGrantedAuthorityAuthenticator;
@@ -58,6 +59,7 @@ public class AuthorizationDynamicClassLoader {
 	private AuthorizationDynamicClassLoader() {
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> T loadInstanceDynamically(final BaSyxConfiguration config, final String propertyName, final Class<T> requiredInterface) {
 		try {
 			final String className = config.getProperty(propertyName);

@@ -137,6 +137,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testInvokeDelegatedOperation() {
 		createAssetAdministrationShell();
@@ -159,12 +160,14 @@ public class TestMongoDBServer extends AASServerSuite {
 		assertTrue(executed);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void checkIfSubmodelHasBeenPersisted(Identifier smIdentification) {
 		MongoDBSubmodelAPI smAPI = new MongoDBSubmodelAPI(mongoDBConfig, smIdentification.getId());
 		ISubmodel persistentSM = smAPI.getSubmodel();
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());
 	}
 
+	@SuppressWarnings("deprecation")
 	private void checkSubmodelReferencesSize(int expectedSize) {
 		MongoDBAASAPI aasAPI = new MongoDBAASAPI(mongoDBConfig, shellIdentifier.getId());
 		Collection<IReference> submodelReferences = aasAPI.getAAS().getSubmodelReferences();
