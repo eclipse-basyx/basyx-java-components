@@ -361,6 +361,9 @@ public class RegistryComponent implements IComponent {
 	}
 
 	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
+		if (securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProvider() == null) {
+			return null;
+		}
 		return AuthorizationDynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER,
 				IJwtBearerTokenAuthenticationConfigurationProvider.class);
 	}
