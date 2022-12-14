@@ -28,7 +28,6 @@ import java.io.Serializable;
 
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -36,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 
 /**
  * Helper class that supports invocation of remote web services. The class sets
@@ -55,7 +55,7 @@ public class WebServiceRawClient implements Serializable {
 	/**
 	 * Web service client instance for invoking service calls via web services
 	 */
-	protected Client client = ClientBuilder.newClient();
+	protected Client client = new JerseyClientBuilder().build();
 
 	/**
 	 * Execute a web service, return JSON string

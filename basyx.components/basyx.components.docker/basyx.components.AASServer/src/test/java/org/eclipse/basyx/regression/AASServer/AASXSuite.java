@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -52,6 +51,7 @@ import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.ConnectedS
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.dataelement.ConnectedFile;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public abstract class AASXSuite {
 	private ConnectedAssetAdministrationShellManager manager;
 
 	// create a REST client
-	private Client client = ClientBuilder.newClient();
+	private Client client = new JerseyClientBuilder().build();
 
 	/**
 	 * Before each test, a dummy registry is created and an AAS is added in the
