@@ -22,31 +22,31 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.security.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
+import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 /**
- * Interface for AASServerFeatures
+ * Provider for {@link JwtBearerTokenAuthenticationConfiguration}, which will be
+ * passed into the BaSyx server context to be used as a security filter and set
+ * up the security context for incoming requests. Uses the aas server
+ * configuration.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
-
-	public void cleanUp();
-
-	public IAASServerDecorator getDecorator();
-
+public interface IJwtBearerTokenAuthenticationConfigurationProvider {
 	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
+	 * Provides the {@link JwtBearerTokenAuthenticationConfiguration} that can be
+	 * passed to the BaSyx server context to install a security filter and validate
+	 * and set up the security context from access tokens included in incoming
+	 * requests.
 	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
+	 * @param securityConfig
+	 *            the configuration of the aas server which should have information
+	 *            on how to determine the
+	 *            {@link JwtBearerTokenAuthenticationConfiguration}.
+	 * @return the {@link JwtBearerTokenAuthenticationConfiguration} object
 	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
-	}
+	public JwtBearerTokenAuthenticationConfiguration get(BaSyxSecurityConfiguration securityConfig);
 }

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.eclipse.basyx.aas.aggregator.AASAggregator;
@@ -45,6 +46,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorizedException;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
@@ -77,7 +79,7 @@ import com.mongodb.client.MongoClients;
  *
  * @see AASAggregator AASAggregator for the "InMemory"-variant
  *
- * @author espen
+ * @author espen, wege
  *
  */
 public class MongoDBAASAggregator implements IAASAggregator {
@@ -539,11 +541,13 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return aasProviderMap.values().stream().map(p -> {
 			try {
 				return p.getValue("/aas");
+			} catch (NotAuthorizedException e) {
+				return null;
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				throw new RuntimeException();
 			}
-		}).map(m -> {
+		}).filter(Objects::nonNull).map(m -> {
 			AssetAdministrationShell aas = new AssetAdministrationShell();
 			aas.putAll((Map<? extends String, ? extends Object>) m);
 			return aas;

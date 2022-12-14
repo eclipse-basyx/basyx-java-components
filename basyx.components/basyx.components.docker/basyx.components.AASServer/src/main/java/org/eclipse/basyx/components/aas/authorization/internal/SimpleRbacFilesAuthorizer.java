@@ -22,31 +22,30 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import java.nio.file.Path;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IRbacRuleChecker;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IRoleAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
+import org.eclipse.basyx.extensions.shared.authorization.internal.SimpleRbacHelper;
 
 /**
- * Interface for AASServerFeatures
+ * Simple role based implementation for {@link IFilesAuthorizer}.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
+public class SimpleRbacFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
+	protected IRbacRuleChecker rbacRuleChecker;
+	protected IRoleAuthenticator<SubjectInformationType> roleAuthenticator;
 
-	public void cleanUp();
+	public SimpleRbacFilesAuthorizer(final IRbacRuleChecker rbacRuleChecker, final IRoleAuthenticator<SubjectInformationType> roleAuthenticator) {
+		this.rbacRuleChecker = rbacRuleChecker;
+		this.roleAuthenticator = roleAuthenticator;
+	}
 
-	public IAASServerDecorator getDecorator();
-
-	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
-	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
+	@Override
+	public void authorizeDownloadFile(SubjectInformationType subjectInformation, Path path) throws InhibitException {
+		SimpleRbacHelper.checkRule(rbacRuleChecker, roleAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_SCOPE, new PathTargetInformation(path));
 	}
 }

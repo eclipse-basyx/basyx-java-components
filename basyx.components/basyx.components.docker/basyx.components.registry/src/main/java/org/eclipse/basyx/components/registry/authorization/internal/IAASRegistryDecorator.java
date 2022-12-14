@@ -22,31 +22,21 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 
 /**
- * Interface for AASServerFeatures
+ * Interface for registry decoration
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
-
-	public void cleanUp();
-
-	public IAASServerDecorator getDecorator();
-
+public interface IAASRegistryDecorator {
 	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
+	 * Decorates an AAS registry according to this decorator.
+	 * 
+	 * @param aasRegistry
+	 *            the aas registry to be decorated.
 	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
-	}
+	public IAASRegistry decorate(IAASRegistry aasRegistry);
 }

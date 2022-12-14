@@ -1,0 +1,32 @@
+[
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:scope:aas-registry:read",
+    "targetInformation": {
+      "@type": "basyx",
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
+  },
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:scope:aas-registry:write",
+    "targetInformation": {
+      "@type": "basyx",
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
+  },
+  {
+    "role": "user",
+    "action": "urn:org.eclipse.basyx:scope:aas-registry:read",
+    "targetInformation": {
+      "@type": "basyx",
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
+  }
+]

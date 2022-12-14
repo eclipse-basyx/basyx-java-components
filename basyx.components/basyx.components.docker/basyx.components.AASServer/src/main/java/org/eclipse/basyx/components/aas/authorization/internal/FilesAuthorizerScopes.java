@@ -22,31 +22,24 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
-
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
 /**
- * Interface for AASServerFeatures
+ * Constants for the permission scopes to the
+ * {@link GrantedAuthorityFilesAuthorizer} and
+ * {@link SimpleRbacFilesAuthorizer}.
  *
- * @author fischer, fried, wege
+ * @author wege
+ * @see <a href=
+ *      "https://tools.ietf.org/html/rfc6749#section-3.3">https://tools.ietf.org/html/rfc6749#section-3.3</a>
  */
-public interface IAASServerFeature {
-	public void initialize();
+public class FilesAuthorizerScopes {
+	private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
+	public static final String READ_SCOPE = "urn:org.eclipse.basyx:scope:files:read";
+	public static final String READ_AUTHORITY = SCOPE_AUTHORITY_PREFIX + READ_SCOPE;
 
-	public void cleanUp();
-
-	public IAASServerDecorator getDecorator();
-
-	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
-	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
+	private FilesAuthorizerScopes() {
+		// This class should not be instantiated as it serves as a holder for constants
+		// only
 	}
 }

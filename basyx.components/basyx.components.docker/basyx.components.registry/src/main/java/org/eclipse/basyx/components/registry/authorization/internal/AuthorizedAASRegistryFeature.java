@@ -22,31 +22,25 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 
 /**
- * Interface for AASServerFeatures
+ * Provides the {@link AuthorizedAASRegistryDecorator} and
+ * {@link AuthorizedTaggedDirectoryDecorator} instances that are required for
+ * authorization.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
+public abstract class AuthorizedAASRegistryFeature {
+	protected final BaSyxSecurityConfiguration securityConfig;
 
-	public void cleanUp();
-
-	public IAASServerDecorator getDecorator();
-
-	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
-	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
+	public AuthorizedAASRegistryFeature(final BaSyxSecurityConfiguration securityConfig) {
+		this.securityConfig = securityConfig;
 	}
+
+	public abstract IAASRegistryDecorator getAASRegistryDecorator();
+
+	public abstract ITaggedDirectoryDecorator getTaggedDirectoryDecorator();
 }

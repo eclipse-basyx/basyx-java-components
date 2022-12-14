@@ -22,31 +22,26 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.components.aas.authorization.internal.Authorizers;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 
 /**
- * Interface for AASServerFeatures
+ * Provides the authorizers for the different common to be authorized BaSyx
+ * objects using the AAS server configuration.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
-
-	public void cleanUp();
-
-	public IAASServerDecorator getDecorator();
-
+public interface IAuthorizersProvider<SubjectInformationType> {
 	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
+	 * Provides the authorizers for the different common to be authorized BaSyx
+	 * objects using the AAS server configuration.
 	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
+	 * @param securityConfig
+	 *            the aas server configuration that holds information about how to
+	 *            determine the authorizers.
+	 * @return the different authorizers bundled in an {@link Authorizers}
 	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
-	}
+	public Authorizers<SubjectInformationType> get(BaSyxSecurityConfiguration securityConfig);
 }

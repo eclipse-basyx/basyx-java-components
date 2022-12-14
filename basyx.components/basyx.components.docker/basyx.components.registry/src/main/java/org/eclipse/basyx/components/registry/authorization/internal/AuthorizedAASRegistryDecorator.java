@@ -22,31 +22,29 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.AuthorizedAASRegistry;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ISubjectInformationProvider;
 
 /**
- * Interface for AASServerFeatures
+ * Decorator for Authorization of Submodel and Shell access
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
+public class AuthorizedAASRegistryDecorator<SubjectInformationType> implements IAASRegistryDecorator {
+	protected final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer;
+	protected final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider;
 
-	public void cleanUp();
+	public AuthorizedAASRegistryDecorator(final IAASRegistryAuthorizer<SubjectInformationType> registryAuthorizer, final ISubjectInformationProvider<SubjectInformationType> subjectInformationProvider) {
+		this.registryAuthorizer = registryAuthorizer;
+		this.subjectInformationProvider = subjectInformationProvider;
+	}
 
-	public IAASServerDecorator getDecorator();
-
-	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
-	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
+	@Override
+	public IAASRegistry decorate(IAASRegistry registry) {
+		return new AuthorizedAASRegistry<>(registry, registryAuthorizer, subjectInformationProvider);
 	}
 }

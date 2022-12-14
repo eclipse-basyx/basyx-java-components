@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2022 the Eclipse BaSyx Authors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -8,10 +8,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -19,15 +19,13 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
+ *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 package org.eclipse.basyx.components.registry;
 
 import java.util.HashMap;
-
 import javax.servlet.http.HttpServlet;
-
 import org.apache.commons.collections4.map.HashedMap;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
@@ -36,7 +34,8 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxSQLConfiguration;
-import org.eclipse.basyx.components.registry.authorization.AuthorizedTaggedDirectoryFactory;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
+import org.eclipse.basyx.components.registry.authorization.internal.AuthorizedAASRegistryFeatureFactory;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.components.registry.configuration.RegistryEventBackend;
@@ -49,9 +48,10 @@ import org.eclipse.basyx.components.registry.mqtt.MqttV2TaggedDirectoryFactory;
 import org.eclipse.basyx.components.registry.servlet.RegistryServlet;
 import org.eclipse.basyx.components.registry.servlet.TaggedDirectoryServlet;
 import org.eclipse.basyx.components.registry.sql.SQLRegistry;
+import org.eclipse.basyx.components.security.authorization.internal.AuthorizationDynamicClassLoader;
+import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
-import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistry;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
@@ -64,9 +64,8 @@ import org.slf4j.LoggerFactory;
  * backends. Currently supports MongoDB and SQL. For development purposes, the
  * component can also start a registry without a backend and without
  * persistency.
- * 
- * @author espen
  *
+ * @author espen, wege
  */
 public class RegistryComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(RegistryComponent.class);
@@ -82,6 +81,7 @@ public class RegistryComponent implements IComponent {
 	private BaSyxMongoDBConfiguration mongoDBConfig;
 	private BaSyxSQLConfiguration sqlConfig;
 	private BaSyxMqttConfiguration mqttConfig;
+	private BaSyxSecurityConfiguration securityConfig;
 
 	/**
 	 * Default constructor that loads default configurations
@@ -94,7 +94,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create an InMemory registry.
-	 * 
+	 *
 	 * @param contextConfig
 	 *            The context configuration
 	 */
@@ -106,7 +106,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create a registry with a MongoDB backend.
-	 * 
+	 *
 	 * @param contextConfig
 	 *            The context configuration
 	 * @param mongoDBConfig
@@ -121,7 +121,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create a registry with a MongoDB backend.
-	 * 
+	 *
 	 * @param contextConfig
 	 *            The context configuration
 	 * @param registryConfig
@@ -137,7 +137,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create a registry with an SQL backend.
-	 * 
+	 *
 	 * @param contextConfig
 	 *            The context configuration
 	 * @param sqlConfig
@@ -152,7 +152,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Constructor with given configuration for the registry and its server context.
 	 * This constructor will create a registry with an SQL backend.
-	 * 
+	 *
 	 * @param contextConfig
 	 *            The context configuration
 	 * @param registryConfig
@@ -168,7 +168,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Constructor with given configuration for the registry and its server context.
 	 * Will load the backend configuration using the default load process.
-	 * 
+	 *
 	 * @param contextConfig
 	 *            The context configuration
 	 * @param registryConfig
@@ -180,12 +180,29 @@ public class RegistryComponent implements IComponent {
 	}
 
 	/**
+	 * Sets the security configuration for this component. Has to be called before
+	 * the component is started.
+	 *
+	 * @param configuration
+	 *            the configuration to be set
+	 */
+	public void setSecurityConfiguration(final BaSyxSecurityConfiguration configuration) {
+		securityConfig = configuration;
+	}
+
+	/**
 	 * Starts the context at http://${hostName}:${port}/${path}
 	 */
 	@Override
 	public void startComponent() {
+		configureSecurity();
+
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createRegistryServlet());
+		if (registryConfig.isAuthorizationEnabled()) {
+			configureContextForAuthorization(context);
+		}
+
 		server = new BaSyxHTTPServer(context);
 		server.start();
 		logger.info("Registry server started");
@@ -194,7 +211,7 @@ public class RegistryComponent implements IComponent {
 	/**
 	 * Sets and enables mqtt connection configuration for this component. Has to be
 	 * called before the component is started.
-	 * 
+	 *
 	 * @param configuration
 	 */
 	public void enableMQTT(BaSyxMqttConfiguration configuration) {
@@ -260,14 +277,8 @@ public class RegistryComponent implements IComponent {
 			decoratedTaggedDirectory = configureMqttTagged(decoratedTaggedDirectory);
 		}
 		if (registryConfig.isAuthorizationEnabled()) {
-			decoratedTaggedDirectory = configureAuthorizationTagged(decoratedTaggedDirectory);
+			decoratedTaggedDirectory = decorateWithAuthorization(decoratedTaggedDirectory);
 		}
-		return decoratedTaggedDirectory;
-	}
-
-	private IAASTaggedDirectory configureAuthorizationTagged(IAASTaggedDirectory decoratedTaggedDirectory) {
-		logger.info("Authorization enabled for TaggedDirectory.");
-		decoratedTaggedDirectory = new AuthorizedTaggedDirectoryFactory().create(decoratedTaggedDirectory);
 		return decoratedTaggedDirectory;
 	}
 
@@ -335,17 +346,33 @@ public class RegistryComponent implements IComponent {
 			decoratedRegistry = configureMqtt(decoratedRegistry);
 		}
 
-		if (this.registryConfig.isAuthorizationEnabled()) {
-			decoratedRegistry = configureAuthorization(decoratedRegistry);
+		if (registryConfig.isAuthorizationEnabled()) {
+			decoratedRegistry = decorateWithAuthorization(decoratedRegistry);
 		}
 
 		return decoratedRegistry;
 	}
 
-	private IAASRegistry configureAuthorization(IAASRegistry decoratedRegistry) {
+	private void configureContextForAuthorization(final BaSyxContext context) {
+		final IJwtBearerTokenAuthenticationConfigurationProvider jwtBearerTokenAuthenticationConfigurationProvider = getJwtBearerTokenAuthenticationConfigurationProvider();
+		if (jwtBearerTokenAuthenticationConfigurationProvider != null) {
+			context.setJwtBearerTokenAuthenticationConfiguration(jwtBearerTokenAuthenticationConfigurationProvider.get(securityConfig));
+		}
+	}
+
+	private IJwtBearerTokenAuthenticationConfigurationProvider getJwtBearerTokenAuthenticationConfigurationProvider() {
+		return AuthorizationDynamicClassLoader.loadInstanceDynamically(securityConfig, BaSyxSecurityConfiguration.AUTHORIZATION_STRATEGY_JWT_BEARER_TOKEN_AUTHENTICATION_CONFIGURATION_PROVIDER,
+				IJwtBearerTokenAuthenticationConfigurationProvider.class);
+	}
+
+	private IAASRegistry decorateWithAuthorization(IAASRegistry registry) {
 		logger.info("Enable Authorization for Registry");
-		decoratedRegistry = new AuthorizedAASRegistry(decoratedRegistry);
-		return decoratedRegistry;
+		return new AuthorizedAASRegistryFeatureFactory(securityConfig).create().getAASRegistryDecorator().decorate(registry);
+	}
+
+	private IAASTaggedDirectory decorateWithAuthorization(IAASTaggedDirectory taggedDirectory) {
+		logger.info("Enable Authorization for TaggedDirectory");
+		return new AuthorizedAASRegistryFeatureFactory(securityConfig).create().getTaggedDirectoryDecorator().decorate(taggedDirectory);
 	}
 
 	private IAASRegistry configureMqtt(IAASRegistry decoratedRegistry) {
@@ -374,6 +401,17 @@ public class RegistryComponent implements IComponent {
 
 	private boolean isConfigurationSuitableForTaggedDirectory() {
 		return !(registryConfig.getRegistryBackend().equals(RegistryBackend.SQL));
+	}
+
+	private void configureSecurity() {
+		if (!registryConfig.isAuthorizationEnabled()) {
+			return;
+		}
+
+		if (securityConfig == null) {
+			securityConfig = new BaSyxSecurityConfiguration();
+			securityConfig.loadFromDefaultSource();
+		}
 	}
 
 	@Override

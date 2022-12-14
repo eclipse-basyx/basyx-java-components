@@ -22,31 +22,24 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import java.nio.file.Path;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
 
 /**
- * Interface for AASServerFeatures
+ * The authorizer for downloading files from the aas server.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
-
-	public void cleanUp();
-
-	public IAASServerDecorator getDecorator();
-
+public interface IFilesAuthorizer<SubjectInformationType> {
 	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
+	 * Checks authorization for the download of a specific file by its path.
 	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
+	 * @param subjectInformation
+	 *            information of the requester.
+	 * @param path
+	 *            the path of the file
 	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
-	}
+	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException;
 }

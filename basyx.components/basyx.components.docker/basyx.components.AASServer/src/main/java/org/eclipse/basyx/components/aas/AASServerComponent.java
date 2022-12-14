@@ -64,6 +64,9 @@ import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentF
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedAASServerFeatureFactory;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
+import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -76,8 +79,10 @@ import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.aas.aggregator.aasxupload.AASAggregatorAASXUpload;
 import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAASRegistryProxy;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ElevatedCodeAuthentication;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
@@ -99,8 +104,7 @@ import org.xml.sax.SAXException;
  * remote. It uses the Aggregator API, i.e. AAS should be pushed to
  * ${URL}/shells
  *
- * @author schnicke, espen, fried, fischer, danish
- *
+ * @author schnicke, espen, fried, fischer, danish, wege
  */
 @SuppressWarnings("deprecation")
 public class AASServerComponent implements IComponent {
@@ -114,6 +118,7 @@ public class AASServerComponent implements IComponent {
 	private BaSyxContextConfiguration contextConfig;
 	private BaSyxAASServerConfiguration aasConfig;
 	private BaSyxMongoDBConfiguration mongoDBConfig;
+	private BaSyxSecurityConfiguration securityConfig;
 
 	private List<IAASServerFeature> aasServerFeatureList = new ArrayList<IAASServerFeature>();
 
@@ -218,6 +223,17 @@ public class AASServerComponent implements IComponent {
 	}
 
 	/**
+	 * Sets the security configuration for this component. Has to be called before
+	 * the component is started.
+	 *
+	 * @param configuration
+	 *            the configuration to be set
+	 */
+	public void setSecurityConfiguration(final BaSyxSecurityConfiguration configuration) {
+		securityConfig = configuration;
+	}
+
+	/**
 	 * Starts the AASX component at http://${hostName}:${port}/${path}
 	 */
 	@Override
@@ -230,11 +246,12 @@ public class AASServerComponent implements IComponent {
 
 		BaSyxContext context = contextConfig.createBaSyxContext();
 		context.addServletMapping("/*", createAggregatorServlet());
+		addAASServerFeaturesToContext(context);
 
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
 			// 1. Also provide the files
-			context.addServletMapping("/files/*", new DefaultServlet());
+			context.addServletMapping("/files/*", createDefaultServlet());
 
 			// 2. Fix the file paths according to the servlet configuration
 			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
@@ -249,7 +266,23 @@ public class AASServerComponent implements IComponent {
 		
 		registerPreexistingAASAndSMIfPossible();
 	}
-	
+
+	private DefaultServlet createDefaultServlet() {
+		if (aasConfig.isAuthorizationEnabled()) {
+			final AuthorizedDefaultServletParams<?> params = getAuthorizedDefaultServletParams();
+			if (params != null) {
+				return new AuthorizedDefaultServlet<>(params);
+			}
+		}
+		return new DefaultServlet();
+	}
+
+	private AuthorizedDefaultServletParams<?> getAuthorizedDefaultServletParams() {
+		final AuthorizedAASServerFeature<?> authorizedAASServerFeature = new AuthorizedAASServerFeatureFactory(securityConfig).create();
+
+		return authorizedAASServerFeature.getFilesAuthorizerParams();
+	}
+
 	private void registerPreexistingAASAndSMIfPossible() {
 		if(!shouldRegisterPreexistingAASAndSM()) {
 			return;
@@ -319,22 +352,29 @@ public class AASServerComponent implements IComponent {
 		if(aasConfig.isPropertyDelegationEnabled()) {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
-		
+
 		if (isEventingEnabled()) {
 			configureMqttFeature();
 		}
-		
-		if (aasConfig.isAuthorizationEnabled()) {
-			configureAuthorization();
-		}
+
+		configureSecurity();
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
 	}
 
-	private void configureAuthorization() {
-		addAASServerFeature(new AuthorizedAASServerFeature());
+	private void configureSecurity() {
+		if (!aasConfig.isAuthorizationEnabled()) {
+			return;
+		}
+
+		if (securityConfig == null) {
+			securityConfig = new BaSyxSecurityConfiguration();
+			securityConfig.loadFromDefaultSource();
+		}
+
+		addAASServerFeature(new AuthorizedAASServerFeatureFactory(securityConfig).create());
 	}
 
 	private boolean isEventingEnabled() {
@@ -475,12 +515,20 @@ public class AASServerComponent implements IComponent {
 		return packageManager.retrieveAASBundles();
 	}
 
+	private void addAASServerFeaturesToContext(BaSyxContext context) {
+		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
+			aasServerFeature.addToContext(context);
+		}
+	}
+
 	private VABHTTPInterface<?> createAggregatorServlet() {
 		aggregator = createAASAggregator();
 		loadAASBundles();
 		
 		if (aasBundles != null) {
-			AASBundleHelper.integrate(aggregator, aasBundles);
+			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
+				AASBundleHelper.integrate(aggregator, aasBundles);
+			}
 		}
 
 		if (isAASXUploadEnabled) {
@@ -513,7 +561,7 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private List<IAASServerDecorator> createAASServerDecoratorList() {
-		List<IAASServerDecorator> aasServerDecoratorList = new ArrayList<IAASServerDecorator>();
+		List<IAASServerDecorator> aasServerDecoratorList = new ArrayList<>();
 
 		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
 			aasServerDecoratorList.add(aasServerFeature.getDecorator());

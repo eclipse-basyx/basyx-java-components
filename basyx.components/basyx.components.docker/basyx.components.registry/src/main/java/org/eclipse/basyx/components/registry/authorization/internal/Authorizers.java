@@ -22,31 +22,32 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.registry.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import org.eclipse.basyx.extensions.aas.directory.tagged.authorized.internal.ITaggedDirectoryAuthorizer;
+import org.eclipse.basyx.extensions.aas.registration.authorization.internal.IAASRegistryAuthorizer;
 
 /**
- * Interface for AASServerFeatures
+ * The different authorizers for the registry server to use when calling BaSyx
+ * objects like the aas registry or the tagged directory.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
+public class Authorizers<SubjectInformationType> {
+	private final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer;
 
-	public void cleanUp();
+	public IAASRegistryAuthorizer<SubjectInformationType> getAasRegistryAuthorizer() {
+		return aasRegistryAuthorizer;
+	}
 
-	public IAASServerDecorator getDecorator();
+	private final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer;
 
-	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
-	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
+	public ITaggedDirectoryAuthorizer<SubjectInformationType> getTaggedDirectoryAuthorizer() {
+		return taggedDirectoryAuthorizer;
+	}
+
+	public Authorizers(final IAASRegistryAuthorizer<SubjectInformationType> aasRegistryAuthorizer, final ITaggedDirectoryAuthorizer<SubjectInformationType> taggedDirectoryAuthorizer) {
+		this.aasRegistryAuthorizer = aasRegistryAuthorizer;
+		this.taggedDirectoryAuthorizer = taggedDirectoryAuthorizer;
 	}
 }

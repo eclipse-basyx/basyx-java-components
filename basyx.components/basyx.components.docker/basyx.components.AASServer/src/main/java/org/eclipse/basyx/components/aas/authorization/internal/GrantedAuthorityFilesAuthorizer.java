@@ -22,31 +22,27 @@
  *
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.aascomponent;
+package org.eclipse.basyx.components.aas.authorization.internal;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
+import java.nio.file.Path;
+import org.eclipse.basyx.extensions.shared.authorization.internal.GrantedAuthorityHelper;
+import org.eclipse.basyx.extensions.shared.authorization.internal.IGrantedAuthorityAuthenticator;
+import org.eclipse.basyx.extensions.shared.authorization.internal.InhibitException;
 
 /**
- * Interface for AASServerFeatures
+ * Scope based implementation for {@link IFilesAuthorizer}.
  *
- * @author fischer, fried, wege
+ * @author wege
  */
-public interface IAASServerFeature {
-	public void initialize();
+public class GrantedAuthorityFilesAuthorizer<SubjectInformationType> implements IFilesAuthorizer<SubjectInformationType> {
+	protected IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator;
 
-	public void cleanUp();
+	public GrantedAuthorityFilesAuthorizer(final IGrantedAuthorityAuthenticator<SubjectInformationType> grantedAuthorityAuthenticator) {
+		this.grantedAuthorityAuthenticator = grantedAuthorityAuthenticator;
+	}
 
-	public IAASServerDecorator getDecorator();
-
-	/**
-	 * This can be used when a feature needs to add something to the
-	 * {@link BaSyxContext} to be able to function.
-	 *
-	 * @param context
-	 *            the {@link BaSyxContext}
-	 */
-	default void addToContext(BaSyxContext context) {
-		// do nothing on default
-		// (the method is default to avoid introducing a breaking the interface)
+	@Override
+	public void authorizeDownloadFile(final SubjectInformationType subjectInformation, final Path path) throws InhibitException {
+		GrantedAuthorityHelper.checkAuthority(grantedAuthorityAuthenticator, subjectInformation, FilesAuthorizerScopes.READ_AUTHORITY);
 	}
 }
