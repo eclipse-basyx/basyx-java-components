@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.security.authorization.internal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.basyx.components.configuration.BaSyxSecurityConfiguration;
 import org.eclipse.basyx.extensions.shared.authorization.internal.KeycloakService;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
@@ -46,6 +47,23 @@ public class KeycloakJwtBearerTokenAuthenticationConfigurationProvider implement
 
 		final KeycloakService keycloakService = new KeycloakService(serverUrl, realm);
 
-		return keycloakService.createJwtBearerTokenAuthenticationConfiguration();
+		final String audience = getAudience(securityConfig);
+
+		final JwtBearerTokenAuthenticationConfiguration keycloakServiceJwtBearerTokenAuthenticationConfiguration = keycloakService.createJwtBearerTokenAuthenticationConfiguration();
+
+		final String issuerUri = keycloakServiceJwtBearerTokenAuthenticationConfiguration.getIssuerUri();
+		final String jwkSetUri = keycloakServiceJwtBearerTokenAuthenticationConfiguration.getJwkSetUri();
+
+		return JwtBearerTokenAuthenticationConfiguration.of(issuerUri, jwkSetUri, audience);
+	}
+
+	private String getAudience(final BaSyxSecurityConfiguration securityConfig) {
+		final String audience = securityConfig.getAuthorizationStrategyJwtBearerTokenAuthenticationConfigurationProviderAudience();
+
+		if (audience == null || StringUtils.isBlank(audience)) {
+			return null;
+		}
+
+		return audience;
 	}
 }
