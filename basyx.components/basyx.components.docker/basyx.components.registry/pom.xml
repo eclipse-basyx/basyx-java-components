@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components.docker</artifactId>
-		<version>1.2.0</version>
+		<version>1.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>basyx.components.registry</artifactId>
@@ -67,18 +67,24 @@
 	</build>
 
 	<dependencies>
+	
+		<dependency>
+    		<groupId>ch.qos.logback</groupId>
+    		<artifactId>logback-classic</artifactId>
+    	</dependency>
+	
 		<!-- Use MongoDB Java Drivers for db connections -->
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-sync</artifactId>
-			<version>4.2.3</version>
+			<version>4.8.1</version>
 		</dependency>
 
 		<!-- Use Spring Data MongoDB for db data management -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.2.6</version>
+			<version>3.4.6</version>
 		</dependency>
 
 		<!-- Moquette MQTT broker for testing MQTT events -->
@@ -100,6 +106,20 @@
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.sdk</artifactId>
 			<classifier>tests</classifier>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.14.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.14.1</version>
 		</dependency>
 	</dependencies>
 

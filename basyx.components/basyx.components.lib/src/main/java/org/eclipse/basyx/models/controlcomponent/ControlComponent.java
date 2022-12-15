@@ -187,6 +187,7 @@ public abstract class ControlComponent extends HashMap<String, Object> {
 	/**
 	 * Constructor
 	 */
+	@SuppressWarnings("unchecked")
 	public ControlComponent() {
 		// Add control component output signals to map
 		// - "status" sub structure

@@ -60,6 +60,7 @@ public class TestMongoDBSubmodelProvider extends SubmodelProviderTest {
 	protected VABConnectionManager getConnectionManager() {
 		if (connManager == null) {
 			connManager = new VABConnectionManager(new TestsuiteDirectory(), new ConnectorFactory() {
+				@SuppressWarnings("deprecation")
 				@Override
 				protected IModelProvider createProvider(String addr) {
 					SimpleNoOpAASSubmodel submodel = new SimpleNoOpAASSubmodel();

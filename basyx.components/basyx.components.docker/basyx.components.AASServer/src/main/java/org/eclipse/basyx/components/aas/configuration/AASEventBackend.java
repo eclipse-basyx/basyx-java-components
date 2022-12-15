@@ -35,7 +35,7 @@ import com.google.common.base.Strings;
  *
  */
 public enum AASEventBackend {
-	NONE("NONE"), MQTT("MQTT");
+	NONE("NONE"), MQTT("MQTT"), MQTTV2("MQTTV2"), MQTTV2_SIMPLE_ENCODING("MQTTV2_SIMPLE_ENCODING");
 
 	private String literal;
 

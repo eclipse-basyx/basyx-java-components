@@ -13,7 +13,7 @@ services:
       - mongodb
 
   mongodb:
-    image: mongo:latest
+    image: mongo:5.0.10
     container_name: mongodb
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo mongodb:27017/test --quiet

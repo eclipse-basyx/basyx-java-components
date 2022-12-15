@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components</artifactId>
-		<version>1.2.0</version>
+		<version>1.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>basyx.components.docker</artifactId>
@@ -28,7 +28,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>properties-maven-plugin</artifactId>
-					<version>1.0.0</version>
+					<version>1.1.0</version>
 					<executions>
 						<execution>
 							<phase>initialize</phase>
@@ -50,7 +50,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.3.0</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -95,7 +95,7 @@
 				<plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.39.1</version>
+                    <version>0.40.2</version>
                     <configuration>
                         <images>
                             <image>
@@ -134,7 +134,7 @@
 				<plugin>
 					<groupId>com.dkanejs.maven.plugins</groupId>
 					<artifactId>docker-compose-maven-plugin</artifactId>
-					<version>2.5.1</version>
+					<version>4.0.0</version>
 					<configuration>
 						<composeFile>${project.basedir}/docker-compose.yml</composeFile>
 						<detachedMode>true</detachedMode>
@@ -170,7 +170,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.20.1</version>
+					<version>3.0.0-M7</version>
 					<executions>
 						<execution>
 							<goals>
@@ -223,7 +223,7 @@
 		<dependency>
 			<groupId>org.eclipse.basyx</groupId>
 			<artifactId>basyx.components.lib</artifactId>
-			<version>1.2.0</version>
+			<version>1.3.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

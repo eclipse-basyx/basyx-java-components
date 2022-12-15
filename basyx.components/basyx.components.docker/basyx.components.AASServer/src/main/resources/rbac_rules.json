@@ -1,0 +1,41 @@
+[
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:scope:aas-aggregator:read",
+    "targetInformation": {
+      "@type": "basyx",
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
+  },
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:action:aas-api:read",
+    "targetInformation": {
+      "@type": "basyx",
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
+  },
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:scope:sm-aggregator:read",
+    "targetInformation": {
+      "@type": "basyx",
+      "aasId": "*",
+      "smId": "*",
+      "smElIdShortPath": "*"
+    }
+  },
+
+  {
+    "role": "admin",
+    "action": "urn:org.eclipse.basyx:scope:files:read",
+    "targetInformation": {
+      "@type": "path",
+      "path": "secret.pdf"
+    }
+  }
+]
