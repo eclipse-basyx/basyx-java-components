@@ -5,7 +5,7 @@
 
 	<groupId>org.eclipse.basyx</groupId>
 	<artifactId>basyx.components</artifactId>
-	<version>1.3.0-SNAPSHOT</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<name>BaSyx Components</name>
 	<description>BaSyx Off-the-Shelf Components</description>
 	<url>https://www.eclipse.org/basyx/</url>
@@ -281,14 +281,14 @@
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.3.0-SNAPSHOT</version>
+				<version>1.4.0-SNAPSHOT</version>
 			</dependency>
 
 			<!-- BaSyx SDK tests -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.3.0-SNAPSHOT</version>
+				<version>1.4.0-SNAPSHOT</version>
 				<classifier>tests</classifier>
 				<scope>test</scope>
 			</dependency>
