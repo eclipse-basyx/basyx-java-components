@@ -1,7 +1,8 @@
 FROM openjdk:11-slim-bullseye
 
-# Install dependency for wait-for-it-env.sh
+# Install dependency for wait-for-it-env.sh & wget for health check
 RUN apt update && apt install -y jq && apt clean
+RUN apt install -y wget
 
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
