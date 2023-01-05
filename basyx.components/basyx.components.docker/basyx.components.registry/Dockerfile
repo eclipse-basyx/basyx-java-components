@@ -1,5 +1,8 @@
 FROM openjdk:11-slim-bullseye
 
+#Install wget for health check
+RUN apt update && apt install -y wget && apt clean
+
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
 COPY target/${JAR_FILE} /usr/share/basyxExecutable.jar
@@ -7,7 +10,7 @@ COPY target/lib /usr/share/lib
 COPY src/main/resources/context.properties /usr/share/config/context.properties
 COPY src/main/resources/registry.properties /usr/share/config/registry.properties
 COPY src/test/resources/dockerSQL.properties /usr/share/config/sql.properties
-COPY src/test/resources/dockerMongodb.properties /usr/share/config/mongodb.properties
+COPY src/test/resources/dockerMongodb.properties /usr/share/config/mongodb.properties 
  
 # Expose the appropriate port. In case of Tomcat, this is 8080.
 ARG PORT
