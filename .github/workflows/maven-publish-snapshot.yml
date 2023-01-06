@@ -58,7 +58,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
 
     - name: Delete old sdk package
-      uses: actions/delete-package-versions@v3
+      uses: actions/delete-package-versions@v4
       continue-on-error: true
       with:
         package-name: 'org.eclipse.basyx.basyx.sdk'
