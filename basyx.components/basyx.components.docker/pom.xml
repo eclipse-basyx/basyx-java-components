@@ -140,7 +140,7 @@
 						<detachedMode>true</detachedMode>
 						<envFile>${project.basedir}/src/test/resources/.env</envFile>
 						<envVars>
-							<BASYX_IMAGE_TAG>${project.version}</BASYX_IMAGE_TAG>
+							<BASYX_IMAGE_TAG>${BASYX_IMAGE_TAG}</BASYX_IMAGE_TAG>
 							<BASYX_IMAGE_NAME>${BASYX_IMAGE_NAME}</BASYX_IMAGE_NAME>
 							<BASYX_CONTAINER_NAME>${BASYX_CONTAINER_NAME}</BASYX_CONTAINER_NAME>
 							<BASYX_CONTAINER_PORT>${BASYX_CONTAINER_PORT}</BASYX_CONTAINER_PORT>
