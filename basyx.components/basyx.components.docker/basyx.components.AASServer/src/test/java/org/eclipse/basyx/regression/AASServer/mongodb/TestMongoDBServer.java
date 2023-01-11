@@ -72,7 +72,6 @@ public class TestMongoDBServer extends AASServerSuite {
 	private static final String SM_IDSHORT = "MongoDB";
 
 	private static final String DELEGATE_OP_ID_SHORT = "delegateOp";
-	private static final String DELEGATE_OP_INVOKE_PATH = "delegateOp/invoke";
 	private static final String OP_ID_SHORT = "op";
 
 	private static AASServerComponent component;
@@ -155,7 +154,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(mongoDBConfig, SM_IDENTIFICATION.getId(), new DelegatedInvocationManager(connector));
 
 		executed = false;
-		api.invokeOperation(DELEGATE_OP_INVOKE_PATH);
+		api.invokeOperation(DELEGATE_OP_ID_SHORT);
 
 		assertTrue(executed);
 	}

@@ -482,10 +482,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object invokeOperation(String idShortPath, Object... params) {
-
-		String elementPath = VABPathTools.getParentPath(idShortPath);
-
-		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(elementPath));
+		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(idShortPath));
 		if (!DelegatedInvocationManager.isDelegatingOperation(operation)) {
 			throw new MalformedRequestException("This backend supports only delegating operations.");
 		}
