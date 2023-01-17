@@ -70,6 +70,7 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 		try {
 			String serverEndpoint = mqttConfig.getServer();
 			MqttConnectOptions options = mqttAASServerFeature.createMqttConnectOptions();
+			options.setAutomaticReconnect(true);
 			client = new MqttClient(serverEndpoint, clientId);
 			client.connect(options);
 		} catch (MqttException e) {
