@@ -66,6 +66,7 @@ public class MqttAASServerFeature implements IAASServerFeature {
 
 	protected MqttConnectOptions createMqttConnectOptions() {
 		MqttConnectOptions options = new MqttConnectOptions();
+		options.setAutomaticReconnect(true);
 		if (!Strings.isNullOrEmpty(mqttConfig.getUser())) {
 			options.setUserName(mqttConfig.getUser());
 			options.setPassword(mqttConfig.getPass().toCharArray());
