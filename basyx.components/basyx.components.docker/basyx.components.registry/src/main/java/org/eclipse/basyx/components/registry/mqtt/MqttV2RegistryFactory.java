@@ -78,6 +78,7 @@ public class MqttV2RegistryFactory {
 		MqttClient mqttClient = new MqttClient(mqttConfig.getServer(), mqttConfig.getClientId(), mqttPersistence);
 		
 		MqttConnectOptions options = new MqttConnectOptions();
+		options.setAutomaticReconnect(true);
 		options.setUserName(mqttConfig.getUser());
 		options.setPassword(mqttConfig.getPass().toCharArray());
 		
