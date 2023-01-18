@@ -210,7 +210,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		if (replaced == null) {
 			mongoOps.insert(sm, collection);
 		}
-
+		// Remove mongoDB-specific map attribute from SM
+		// mongoOps modify sm on save - thus _id has to be removed here...
 		sm.remove("_id");
 	}
 

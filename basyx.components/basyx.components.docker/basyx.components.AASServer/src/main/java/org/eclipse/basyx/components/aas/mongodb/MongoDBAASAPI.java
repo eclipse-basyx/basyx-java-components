@@ -161,6 +161,9 @@ public class MongoDBAASAPI implements IAASAPI {
 		if (replaced == null) {
 			mongoOps.insert(aas, collection);
 		}
+		// Remove mongoDB-specific map attribute from AAS.
+		// mongoOps modify aas on save - thus _id has to be removed here...
+		aas.remove("_id");
 	}
 
 	@Override
@@ -170,7 +173,7 @@ public class MongoDBAASAPI implements IAASAPI {
 		if (aas == null) {
 			throw new ResourceNotFoundException("The AAS " + aasId + " could not be found in the database.");
 		}
-		// Remove mongoDB-specific map attribute from AASDescriptor
+		// Remove mongoDB-specific map attribute from AAS
 		aas.remove("_id");
 		return aas;
 	}
