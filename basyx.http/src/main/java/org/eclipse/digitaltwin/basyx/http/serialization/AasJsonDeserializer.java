@@ -23,37 +23,39 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
+package org.eclipse.digitaltwin.basyx.http.serialization;
 
-package org.eclipse.digitaltwin.basyx.aasrepository.http;
+import java.io.IOException;
 
+import org.eclipse.digitaltwin.aas4j.v3.dataformat.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-import org.eclipse.digitaltwin.aas4j.v3.model.Referable;
-import org.eclipse.digitaltwin.basyx.aasrepository.http.serialization.AASJsonDeserializer;
-import org.eclipse.digitaltwin.basyx.aasrepository.http.serialization.ReferableJsonSerializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Handles the mapping between Spring and AAS4J
+ * Handles the mapping between a passed AAS payload and AAS4J
  * 
  * @author schnicke
  *
  */
-@Configuration
-public class HTTPAPIConfiguration {
+public class AasJsonDeserializer extends JsonDeserializer<AssetAdministrationShell> {
 
-	@Bean
-	public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
-		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder().serializationInclusion(JsonInclude.Include.NON_NULL);
+	@Override
+	public AssetAdministrationShell deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+		try {
+			ObjectMapper mapper = (ObjectMapper) p.getCodec();
+			JsonNode node = mapper.readTree(p);
+			String serialized = mapper.writeValueAsString(node);
 
-		builder.serializerByType(Referable.class, new ReferableJsonSerializer());
-
-		// TODO: Extend with further Referable types
-		builder.deserializerByType(AssetAdministrationShell.class, new AASJsonDeserializer());
-
-		return builder;
+			return new org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer().readReferable(serialized, AssetAdministrationShell.class);
+		} catch (DeserializationException | IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
+
 }

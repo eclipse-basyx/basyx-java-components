@@ -26,7 +26,7 @@
 
 package org.eclipse.digitaltwin.basyx.aasrepository.feature.consoleprinter;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
@@ -41,33 +41,33 @@ public class ConsolePrintingAasRepository implements AasRepository {
 	}
 
 	@Override
-	public List<AssetAdministrationShell> getAASList() {
+	public Collection<AssetAdministrationShell> getAllAas() {
 		System.out.println("Getting all shells");
-		return decorated.getAASList();
+		return decorated.getAllAas();
 	}
 
 	@Override
-	public AssetAdministrationShell getAAS(String aasId) throws ElementDoesNotExistException {
+	public AssetAdministrationShell getAas(String aasId) throws ElementDoesNotExistException {
 		System.out.println("Getting single shell with id " + aasId);
-		return decorated.getAAS(aasId);
+		return decorated.getAas(aasId);
 	}
 
 	@Override
-	public void createAAS(AssetAdministrationShell aas) throws CollidingIdentifierException {
+	public void createAas(AssetAdministrationShell aas) throws CollidingIdentifierException {
 		System.out.println("Creating shell with id " + aas.getId());
-		decorated.createAAS(aas);
+		decorated.createAas(aas);
 	}
 
 	@Override
-	public void updateAAS(AssetAdministrationShell aas) {
+	public void updateAas(AssetAdministrationShell aas) {
 		System.out.println("Updating shell with id " + aas.getId());
-		decorated.updateAAS(aas);
+		decorated.updateAas(aas);
 	}
 
 	@Override
-	public void deleteAAS(String aasId) {
+	public void deleteAas(String aasId) {
 		System.out.println("Deleting shell with id " + aasId);
-		decorated.deleteAAS(aasId);
+		decorated.deleteAas(aasId);
 	}
 
 }

@@ -26,6 +26,7 @@
 package org.eclipse.digitaltwin.basyx.aasrepository.http;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,9 +55,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-01-10T15:59:05.892Z[GMT]")
 @RestController
-public class ShellsApiController implements ShellsApi {
+public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 
-	private static final Logger log = LoggerFactory.getLogger(ShellsApiController.class);
+	private static final Logger log = LoggerFactory.getLogger(AasRepositoryApiHTTPController.class);
 
 	private final ObjectMapper objectMapper;
 
@@ -65,7 +66,7 @@ public class ShellsApiController implements ShellsApi {
 	private final AasRepository aasRepository;
 
 	@Autowired
-	public ShellsApiController(ObjectMapper objectMapper, HttpServletRequest request, AasRepository aasRepository) {
+	public AasRepositoryApiHTTPController(ObjectMapper objectMapper, HttpServletRequest request, AasRepository aasRepository) {
 		this.objectMapper = objectMapper;
 		this.request = request;
 		this.aasRepository = aasRepository;
@@ -124,7 +125,7 @@ public class ShellsApiController implements ShellsApi {
 	public ResponseEntity<AssetAdministrationShell> getAssetAdministrationShellById(
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") String aasIdentifier) {
 		try {
-			return new ResponseEntity<AssetAdministrationShell>(aasRepository.getAAS(aasIdentifier), HttpStatus.OK);
+			return new ResponseEntity<AssetAdministrationShell>(aasRepository.getAas(aasIdentifier), HttpStatus.OK);
 		} catch (ElementDoesNotExistException e) {
 			return new ResponseEntity<AssetAdministrationShell>(HttpStatus.NOT_FOUND);
 		}
@@ -136,7 +137,7 @@ public class ShellsApiController implements ShellsApi {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				aasRepository.createAAS(body);
+				aasRepository.createAas(body);
 				return new ResponseEntity<AssetAdministrationShell>(body, HttpStatus.CREATED);
 			} catch (CollidingIdentifierException e) {
 				return new ResponseEntity<AssetAdministrationShell>(HttpStatus.BAD_REQUEST);
@@ -184,6 +185,6 @@ public class ShellsApiController implements ShellsApi {
 	@Override
 	public ResponseEntity<List<AssetAdministrationShell>> getAllAssetAdministrationShells(
 			@Parameter(in = ParameterIn.QUERY, description = "The Asset Administration Shell’s IdShort", schema = @Schema()) @Valid @RequestParam(value = "idShort", required = false) String idShort) {
-		return new ResponseEntity<List<AssetAdministrationShell>>(aasRepository.getAASList(), HttpStatus.OK);
+		return new ResponseEntity<List<AssetAdministrationShell>>(new ArrayList<>(aasRepository.getAllAas()), HttpStatus.OK);
 	}
 }

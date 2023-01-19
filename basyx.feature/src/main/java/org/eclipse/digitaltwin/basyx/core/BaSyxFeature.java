@@ -31,10 +31,10 @@ package org.eclipse.digitaltwin.basyx.core;
  * 
  * @author schnicke
  *
- * @param <Component>
- *            the type of component extended by this feature
+ * @param <ComponentFactory>
+ *            the componentFactory type extended by this feature
  */
-public interface BaSyxFeature<Component> {
+public interface BaSyxFeature<ComponentFactory> {
 
 	/**
 	 * Initializes the feature, e.g., by creating backend connections
@@ -66,5 +66,5 @@ public interface BaSyxFeature<Component> {
 	 *            to be decorated
 	 * @return decorated component
 	 */
-	Component decorate(Component component);
+	ComponentFactory decorate(ComponentFactory component);
 }

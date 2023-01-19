@@ -24,32 +24,38 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.http.serialization;
+package org.eclipse.digitaltwin.basyx.http.serialization;
 
 import java.io.IOException;
 
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.SerializationException;
-import org.eclipse.digitaltwin.aas4j.v3.model.Referable;
+import org.eclipse.digitaltwin.aas4j.v3.dataformat.DeserializationException;
+import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Handles the mapping between a Referable to-be-returned and AAS4J
+ * Handles the mapping between a passed Submodel payload and AAS4J
  * 
  * @author schnicke
  *
  */
-public class ReferableJsonSerializer extends JsonSerializer<Referable> {
+public class SubmodelJsonDeserializer extends JsonDeserializer<Submodel> {
 
 	@Override
-	public void serialize(Referable value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+	public Submodel deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
 		try {
-			String str = new org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer().write(value);
-			gen.writeRaw(str);
-		} catch (SerializationException e) {
-			e.printStackTrace();
+			ObjectMapper mapper = (ObjectMapper) p.getCodec();
+			JsonNode node = mapper.readTree(p);
+			String serialized = mapper.writeValueAsString(node);
+
+			return new org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer().readReferable(serialized, Submodel.class);
+		} catch (DeserializationException | IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

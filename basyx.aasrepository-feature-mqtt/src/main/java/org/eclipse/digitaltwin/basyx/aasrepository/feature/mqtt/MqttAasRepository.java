@@ -24,7 +24,7 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.SerializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
@@ -61,31 +61,31 @@ public class MqttAasRepository implements AasRepository {
 	}
 
 	@Override
-	public List<AssetAdministrationShell> getAASList() {
-		return decorated.getAASList();
+	public Collection<AssetAdministrationShell> getAllAas() {
+		return decorated.getAllAas();
 	}
 
 	@Override
-	public AssetAdministrationShell getAAS(String aasId) throws ElementDoesNotExistException {
-		return decorated.getAAS(aasId);
+	public AssetAdministrationShell getAas(String aasId) throws ElementDoesNotExistException {
+		return decorated.getAas(aasId);
 	}
 
 	@Override
-	public void createAAS(AssetAdministrationShell aas) throws CollidingIdentifierException {
-		decorated.createAAS(aas);
+	public void createAas(AssetAdministrationShell aas) throws CollidingIdentifierException {
+		decorated.createAas(aas);
 		aasCreated(aas, getName());
 	}
 
 	@Override
-	public void updateAAS(AssetAdministrationShell aas) {
-		decorated.updateAAS(aas);
+	public void updateAas(AssetAdministrationShell aas) {
+		decorated.updateAas(aas);
 		aasUpdated(aas, getName());
 	}
 
 	@Override
-	public void deleteAAS(String aasId) {
-		AssetAdministrationShell shell = decorated.getAAS(aasId);
-		decorated.deleteAAS(aasId);
+	public void deleteAas(String aasId) {
+		AssetAdministrationShell shell = decorated.getAas(aasId);
+		decorated.deleteAas(aasId);
 		aasDeleted(shell, getName());
 	}
 

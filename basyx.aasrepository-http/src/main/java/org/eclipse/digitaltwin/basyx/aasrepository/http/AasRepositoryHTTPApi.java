@@ -56,7 +56,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-01-10T15:59:05.892Z[GMT]")
 @Validated
-public interface ShellsApi {
+public interface AasRepositoryHTTPApi {
 
 	@Operation(summary = "Deletes an Asset Administration Shell", description = "", tags = { "Asset Administration Shell Repository" })
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Asset Administration Shell deleted successfully") })
