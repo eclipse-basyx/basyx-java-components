@@ -33,5 +33,15 @@ package org.eclipse.digitaltwin.basyx.core.exceptions;
  */
 @SuppressWarnings("serial")
 public class CollidingIdentifierException extends RuntimeException {
+	public CollidingIdentifierException() {
+	}
+
+	public CollidingIdentifierException(String id) {
+		super(getMsg(id));
+	}
+
+	private static String getMsg(String id) {
+		return "Duplicate element id detected with id " + id;
+	}
 
 }

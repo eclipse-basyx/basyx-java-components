@@ -26,10 +26,14 @@
 
 package org.eclipse.digitaltwin.basyx.submodelrepository;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
+import org.eclipse.digitaltwin.basyx.submodelrepository.core.DummySubmodelFactory;
 import org.eclipse.digitaltwin.basyx.submodelrepository.core.SubmodelRepositorySuite;
+import org.junit.Test;
 
 public class TestInMemorySubmodelRepository extends SubmodelRepositorySuite {
 
@@ -41,5 +45,15 @@ public class TestInMemorySubmodelRepository extends SubmodelRepositorySuite {
 	@Override
 	protected SubmodelRepositoryFactory getSubmodelRepositoryFactory(Collection<Submodel> submodels) {
 		return new InMemorySubmodelRepositoryFactory(submodels);
+	}
+
+	@Test(expected = CollidingIdentifierException.class)
+	public void idCollisionDuringConstruction() {
+		Collection<Submodel> submodelsWithCollidingIds = createSubmodelCollectionWithCollidingIds();
+		new InMemorySubmodelRepository(submodelsWithCollidingIds);
+	}
+
+	private Collection<Submodel> createSubmodelCollectionWithCollidingIds() {
+		return Arrays.asList(DummySubmodelFactory.createTechnicalDataSubmodel(), DummySubmodelFactory.createTechnicalDataSubmodel());
 	}
 }

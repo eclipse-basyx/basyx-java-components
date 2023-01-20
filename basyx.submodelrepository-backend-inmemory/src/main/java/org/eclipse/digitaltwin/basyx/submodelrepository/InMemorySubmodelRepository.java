@@ -23,14 +23,16 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.digitaltwin.basyx.submodelrepository;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
@@ -52,7 +54,30 @@ public class InMemorySubmodelRepository implements SubmodelRepository {
 	 * @param submodels
 	 */
 	public InMemorySubmodelRepository(Collection<Submodel> submodels) {
-		submodels.forEach(s -> this.submodels.put(s.getId(), s));
+		assertIdUniqueness(submodels);
+
+		this.submodels = convertToMap(submodels);
+	}
+
+
+	private Map<String, Submodel> convertToMap(Collection<Submodel> submodels) {
+		Map<String, Submodel> map = new LinkedHashMap<>();
+		submodels.forEach(s -> map.put(s.getId(), s));
+
+		return map;
+	}
+
+	private static void assertIdUniqueness(Collection<Submodel> submodelsToCheck) {
+		Set<String> ids = new HashSet<>();
+
+		for (Submodel submodel : submodelsToCheck) {
+			String submodelId =submodel.getId();
+			boolean unique = ids.add(submodelId);
+
+			if (!unique) {
+				throw new CollidingIdentifierException(submodelId);
+			}
+		}
 	}
 
 	@Override
