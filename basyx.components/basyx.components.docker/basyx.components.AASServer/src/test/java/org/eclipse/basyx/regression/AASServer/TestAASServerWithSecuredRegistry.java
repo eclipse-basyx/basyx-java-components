@@ -25,6 +25,7 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertFalse;
+import static com.tngtech.keycloakmock.api.ServerConfig.aServerConfig;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +44,6 @@ import org.eclipse.basyx.extensions.aas.registration.authorization.AuthorizedAAS
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,6 @@ import com.tngtech.keycloakmock.api.KeycloakMock;
  *
  * @author danish
  */
-@Ignore("The requested changes in Keycloak Mock server is pending")
 public class TestAASServerWithSecuredRegistry {
 	private static Logger logger = LoggerFactory.getLogger(TestAASServerWithSecuredRegistry.class);
 	
@@ -144,11 +143,7 @@ public class TestAASServerWithSecuredRegistry {
 	}
 	
 	private static void configureAndStartKeyCloakMockServer(Set<String> scopes) {
-		/* The below instantiation of keyCloakMock is commented because the changes in Keycloak mock is pending, 
-		 * once the changes is merged uncomment this and delete the null declaration of keyCloakMock*/
-		
-//		keyCloakMock = new KeycloakMock(aServerConfig().withPort(9006).withDefaultRealm("basyx-demo").withClientScopes(scopes).build());
-		keyCloakMock = null;
+		keyCloakMock = new KeycloakMock(aServerConfig().withPort(9006).withDefaultRealm("basyx-demo").withDefaultScopes(scopes).build());
 		
 	    keyCloakMock.start();
 	}
