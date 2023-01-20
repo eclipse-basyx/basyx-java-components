@@ -52,7 +52,7 @@ public class DummySubmodelFactory {
 	// SUBMODEL_TECHNICAL_DATA
 	public static final String SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT = MAX_ROTATION_SPEED;
 	public static final String SUBMODEL_TECHNICAL_DATA_ID_SHORT = "TechnicalData";
-	public static final String SUBMODEL_TECHNICAL_DATA_ID = "http://i40.customer.com/type/1/1/7A7104BDAB57E184";
+	public static final String SUBMODEL_TECHNICAL_DATA_ID = "7A7104BDAB57E184";
 	public static final String SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID = "0173-1#01-AFZ615#016";
 	public static final String SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_PROPERTY = _0173_1_02_BAA120_008;
 	public static final String SUBMODEL_TECHNICAL_DATA_PROPERTY_CATEGORY = "PARAMETER";
@@ -61,7 +61,7 @@ public class DummySubmodelFactory {
 
 	// SUBMODEL_OPERATIONAL_DATA
 	private static final String SUBMODEL_OPERATIONAL_DATA_ID_SHORT = "OperationalData";
-	private static final String SUBMODEL_OPERATIONAL_DATA_ID = "http://i40.customer.com/instance/1/1/AC69B1CB44F07935";
+	private static final String SUBMODEL_OPERATIONAL_DATA_ID = "AC69B1CB44F07935";
 	private static final String SUBMODEL_OPERATIONAL_DATA_SEMANTIC_ID_PROPERTY = HTTP_CUSTOMER_COM_CD_1_1_18EBD56F6B43D895;
 	private static final String SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT = ROTATION_SPEED;
 	private static final String SUBMODEL_OPERATIONAL_DATA_PROPERTY_CATEGORY = "VARIABLE";
@@ -69,10 +69,10 @@ public class DummySubmodelFactory {
 	public static final String AAS_3_0_RC_02_DATA_SPECIFICATION_IEC_61360 = "https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360";
 
 	public static Collection<Submodel> getSubmodels() {
-		return Arrays.asList(createSubmodel1(), createSubmodel2());
+		return Arrays.asList(createTechnicalDataSubmodel(), createOperationalDataSubmodel());
 	}
 
-	public static Submodel createSubmodel1() {
+	public static Submodel createTechnicalDataSubmodel() {
 		return new DefaultSubmodel.Builder()
 				.semanticId(new DefaultReference.Builder().keys(new DefaultKey.Builder().type(KeyTypes.GLOBAL_REFERENCE).value(SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID).build()).type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.kind(ModelingKind.INSTANCE).idShort(SUBMODEL_TECHNICAL_DATA_ID_SHORT).id(SUBMODEL_TECHNICAL_DATA_ID)
@@ -82,7 +82,7 @@ public class DummySubmodelFactory {
 				.build();
 	}
 
-	public static Submodel createSubmodel2() {
+	public static Submodel createOperationalDataSubmodel() {
 		return new DefaultSubmodel.Builder().kind(ModelingKind.INSTANCE).idShort(SUBMODEL_OPERATIONAL_DATA_ID_SHORT).id(SUBMODEL_OPERATIONAL_DATA_ID).submodelElements(new DefaultProperty.Builder().kind(ModelingKind.INSTANCE)
 				.semanticId(new DefaultReference.Builder().keys(new DefaultKey.Builder().type(KeyTypes.CONCEPT_DESCRIPTION).value(SUBMODEL_OPERATIONAL_DATA_SEMANTIC_ID_PROPERTY).build()).type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.idShort(SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT).category(SUBMODEL_OPERATIONAL_DATA_PROPERTY_CATEGORY).value(SUBMODEL_OPERATIONAL_DATA_PROPERTY_VALUE).valueType(DataTypeDefXsd.INTEGER).build()).build();

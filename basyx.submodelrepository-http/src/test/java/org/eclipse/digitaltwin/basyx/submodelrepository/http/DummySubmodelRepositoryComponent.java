@@ -40,7 +40,7 @@ public class DummySubmodelRepositoryComponent {
 
 	@Bean
 	public InMemorySubmodelRepository createAasRepository() {
-		Collection<Submodel> submodels = Arrays.asList(DummySubmodelFactory.createSubmodel1(), DummySubmodelFactory.createSubmodel2());
+		Collection<Submodel> submodels = Arrays.asList(DummySubmodelFactory.createTechnicalDataSubmodel(), DummySubmodelFactory.createOperationalDataSubmodel());
 		return new InMemorySubmodelRepository(submodels);
 	}
 }

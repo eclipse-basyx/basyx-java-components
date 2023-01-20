@@ -12,7 +12,7 @@
 			],
 			"type": "GlobalReference"
 		},
-		"id": "http://i40.customer.com/type/1/1/7A7104BDAB57E184",
+		"id": "7A7104BDAB57E184",
 		"idShort": "TechnicalData",
 		"submodelElements": [
 			{
@@ -38,7 +38,7 @@
 	{
 		"modelType": "Submodel",
 		"kind": "Instance",
-		"id": "http://i40.customer.com/instance/1/1/AC69B1CB44F07935",
+		"id": "AC69B1CB44F07935",
 		"idShort": "OperationalData",
 		"submodelElements": [
 			{

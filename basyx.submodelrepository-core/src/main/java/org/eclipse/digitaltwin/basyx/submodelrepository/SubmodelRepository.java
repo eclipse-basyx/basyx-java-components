@@ -29,6 +29,7 @@ package org.eclipse.digitaltwin.basyx.submodelrepository;
 import java.util.Collection;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
  * Specifies the overall SubmodelRepository API
@@ -44,4 +45,13 @@ public interface SubmodelRepository {
 	 * @return a collection of all found Submodels
 	 */
 	public Collection<Submodel> getAllSubmodels();
+
+	/**
+	 * Retrieves the Submodel with the specific id
+	 * 
+	 * @param id
+	 * @return
+	 * @throws ElementDoesNotExistException
+	 */
+	public Submodel getSubmodel(String id) throws ElementDoesNotExistException;
 }

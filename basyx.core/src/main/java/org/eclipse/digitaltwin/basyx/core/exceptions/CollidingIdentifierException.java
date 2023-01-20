@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.digitaltwin.basyx.aasrepository.exceptions;
+package org.eclipse.digitaltwin.basyx.core.exceptions;
 
 /**
  * Indicates that an entity has a identifier that is already in use

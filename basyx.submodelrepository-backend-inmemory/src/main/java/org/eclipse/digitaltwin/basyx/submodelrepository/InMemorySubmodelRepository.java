@@ -27,9 +27,11 @@
 package org.eclipse.digitaltwin.basyx.submodelrepository;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
  * In-memory implementation of the SubmodelRepository
@@ -39,10 +41,9 @@ import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
  */
 public class InMemorySubmodelRepository implements SubmodelRepository {
 
-	private Collection<Submodel> submodels;
+	private Map<String, Submodel> submodels = new LinkedHashMap<>();
 
 	public InMemorySubmodelRepository() {
-		submodels = new HashSet<>();
 	}
 
 	/**
@@ -51,12 +52,20 @@ public class InMemorySubmodelRepository implements SubmodelRepository {
 	 * @param submodels
 	 */
 	public InMemorySubmodelRepository(Collection<Submodel> submodels) {
-		this.submodels = submodels;
+		submodels.forEach(s -> this.submodels.put(s.getId(), s));
 	}
 
 	@Override
 	public Collection<Submodel> getAllSubmodels() {
-		return submodels;
+		return submodels.values();
+	}
+
+	@Override
+	public Submodel getSubmodel(String id) throws ElementDoesNotExistException {
+		if (!submodels.containsKey(id))
+			throw new ElementDoesNotExistException(id);
+
+		return submodels.get(id);
 	}
 
 }

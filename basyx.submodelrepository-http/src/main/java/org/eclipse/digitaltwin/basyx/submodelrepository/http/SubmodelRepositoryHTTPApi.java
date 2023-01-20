@@ -38,6 +38,7 @@ import javax.validation.Valid;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,6 +61,18 @@ public interface SubmodelRepositoryHTTPApi {
 	ResponseEntity<List<Submodel>> getAllSubmodels(
 			@Parameter(in = ParameterIn.QUERY, description = "The value of the semantic id reference (BASE64-URL-encoded)", schema = @Schema()) @Valid @RequestParam(value = "semanticId", required = false) String semanticId,
 			@Parameter(in = ParameterIn.QUERY, description = "The Submodel’s idShort", schema = @Schema()) @Valid @RequestParam(value = "idShort", required = false) String idShort);
+
+	@Operation(summary = "Returns the Submodel", description = "", tags = { "Asset Administration Shell Repository" })
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Requested Submodel", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Submodel.class))) })
+	@RequestMapping(value = "/submodels/{submodelIdentifier}/submodel", produces = { "application/json" }, method = RequestMethod.GET)
+	ResponseEntity<Submodel> getSubmodelSubmodelRepo(
+			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") String submodelIdentifier,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the structural depth of the respective resource content", schema = @Schema(allowableValues = { "deep",
+					"core" }, defaultValue = "deep")) @Valid @RequestParam(value = "level", required = false, defaultValue = "deep") String level,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the request or response kind of the resource", schema = @Schema(allowableValues = { "normal", "trimmed", "value", "reference",
+					"path" }, defaultValue = "normal")) @Valid @RequestParam(value = "content", required = false, defaultValue = "normal") String content,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines to which extent the resource is being serialized", schema = @Schema(allowableValues = { "withBlobValue",
+					"withoutBlobValue" })) @Valid @RequestParam(value = "extent", required = false) String extent);
 
 }
 

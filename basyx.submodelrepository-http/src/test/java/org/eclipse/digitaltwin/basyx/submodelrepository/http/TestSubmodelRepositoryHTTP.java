@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -40,11 +41,13 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.eclipse.digitaltwin.basyx.submodelrepository.core.DummySubmodelFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,28 +72,60 @@ public class TestSubmodelRepositoryHTTP {
 
 	@Test
 	public void getAllSubmodelsPreconfigured() throws IOException, ParseException {
-		String submodelResponseJSON = getAllSubmodelsJSON();
-
-		assertPreconfiguredSubmodelsAreIncluded(submodelResponseJSON);
+		String submodelsJSON = getAllSubmodelsJSON();
+		String expectedSubmodelsJSON = getAllSubmodelJSONExpected();
+		assertSameJSONContent(expectedSubmodelsJSON, submodelsJSON);
 	}
 
-	private void assertPreconfiguredSubmodelsAreIncluded(String submodelResponseJSON) throws IOException, JsonProcessingException, JsonMappingException {
-		String expectedSubmodelJsonContent = getSubmodelJSONString();
-		ObjectMapper mapper = new ObjectMapper();
+	@Test
+	public void getSpecificSubmodel() throws ParseException, IOException {
+		String submodelJSON = getSpecificSubmodelJSON(DummySubmodelFactory.createTechnicalDataSubmodel().getId());
+		String expectedSubmodelJSON = getSpecificSubmodelJSONExpected();
 
-		assertEquals(mapper.readTree(expectedSubmodelJsonContent), mapper.readTree(submodelResponseJSON));
+		assertSameJSONContent(expectedSubmodelJSON, submodelJSON);
 	}
 
-	private String getAllSubmodelsJSON() throws IOException, ParseException {
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpGet submodelRetrievalRequest = new HttpGet(submodelAccessURL);
-		CloseableHttpResponse response = client.execute(submodelRetrievalRequest);
+	@Test
+	public void getSpecificSubmodelNonExisting() throws IOException {
+		CloseableHttpResponse response = executeGetOnURL(submodelAccessURL + "/nonExisting/submodel");
+
+		assertEquals(HttpStatus.NOT_FOUND.value(), response.getCode());
+	}
+
+	private String getSpecificSubmodelJSON(String id) throws IOException, ParseException {
+		CloseableHttpResponse response = executeGetOnURL(submodelAccessURL + "/" + id + "/submodel");
 
 		return getResponseAsString(response);
 	}
 
-	private String getSubmodelJSONString() throws IOException {
-		File file = ResourceUtils.getFile("classpath:SubmodelSimple.json");
+	private CloseableHttpResponse executeGetOnURL(String url) throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpGet submodelRetrievalRequest = new HttpGet(url);
+		return client.execute(submodelRetrievalRequest);
+	}
+
+	private void assertSameJSONContent(String expected, String actual) throws JsonProcessingException, JsonMappingException {
+		ObjectMapper mapper = new ObjectMapper();
+
+		assertEquals(mapper.readTree(expected), mapper.readTree(actual));
+	}
+
+	private String getAllSubmodelsJSON() throws IOException, ParseException {
+		CloseableHttpResponse response = executeGetOnURL(submodelAccessURL);
+
+		return getResponseAsString(response);
+	}
+
+	private String getSpecificSubmodelJSONExpected() throws IOException {
+		return readJSONStringFromFile("classpath:SingleSubmodel.json");
+	}
+
+	private String getAllSubmodelJSONExpected() throws IOException {
+		return readJSONStringFromFile("classpath:MultipleSubmodels.json");
+	}
+
+	private String readJSONStringFromFile(String fileName) throws FileNotFoundException, IOException {
+		File file = ResourceUtils.getFile(fileName);
 		InputStream in = new FileInputStream(file);
 		return IOUtils.toString(in, StandardCharsets.UTF_8.name());
 	}

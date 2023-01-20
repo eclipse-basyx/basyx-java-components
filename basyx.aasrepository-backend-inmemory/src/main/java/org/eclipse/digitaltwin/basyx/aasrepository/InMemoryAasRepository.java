@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-import org.eclipse.digitaltwin.basyx.aasrepository.exceptions.CollidingIdentifierException;
-import org.eclipse.digitaltwin.basyx.aasrepository.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.aasservice.AasService;
 import org.eclipse.digitaltwin.basyx.aasservice.AasServiceFactory;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
  * In-memory implementation of the AasRepository
@@ -65,7 +65,7 @@ public class InMemoryAasRepository implements AasRepository {
 	@Override
 	public AssetAdministrationShell getAas(String aasId) throws ElementDoesNotExistException {
 		if (!aasServices.containsKey(aasId)) {
-			throw new ElementDoesNotExistException();
+			throw new ElementDoesNotExistException(aasId);
 		}
 
 		return aasServices.get(aasId).getAAS();

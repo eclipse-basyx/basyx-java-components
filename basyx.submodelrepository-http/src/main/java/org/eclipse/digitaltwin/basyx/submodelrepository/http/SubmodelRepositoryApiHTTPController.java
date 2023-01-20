@@ -31,10 +31,12 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,4 +60,22 @@ public class SubmodelRepositoryApiHTTPController implements SubmodelRepositoryHT
 			@Parameter(in = ParameterIn.QUERY, description = "The Submodel’s idShort", schema = @Schema()) @Valid @RequestParam(value = "idShort", required = false) String idShort) {
 		return new ResponseEntity<List<Submodel>>(new ArrayList<>(repository.getAllSubmodels()), HttpStatus.OK);
 	}
+
+	@Override
+	public ResponseEntity<Submodel> getSubmodelSubmodelRepo(
+			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") String submodelIdentifier,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the structural depth of the respective resource content", schema = @Schema(allowableValues = { "deep",
+					"core" }, defaultValue = "deep")) @Valid @RequestParam(value = "level", required = false, defaultValue = "deep") String level,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the request or response kind of the resource", schema = @Schema(allowableValues = { "normal", "trimmed", "value", "reference",
+					"path" }, defaultValue = "normal")) @Valid @RequestParam(value = "content", required = false, defaultValue = "normal") String content,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines to which extent the resource is being serialized", schema = @Schema(allowableValues = { "withBlobValue",
+					"withoutBlobValue" })) @Valid @RequestParam(value = "extent", required = false) String extent) {
+		try {
+			Submodel retrieved = repository.getSubmodel(submodelIdentifier);
+			return new ResponseEntity<Submodel>(retrieved, HttpStatus.OK);
+		} catch (ElementDoesNotExistException e) {
+			return new ResponseEntity<Submodel>(HttpStatus.NOT_FOUND);
+		}
+	}
+
 }

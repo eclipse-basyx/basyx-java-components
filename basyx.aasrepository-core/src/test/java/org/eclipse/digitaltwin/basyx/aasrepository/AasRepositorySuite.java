@@ -31,8 +31,8 @@ import java.util.Collection;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
-import org.eclipse.digitaltwin.basyx.aasrepository.exceptions.CollidingIdentifierException;
-import org.eclipse.digitaltwin.basyx.aasrepository.exceptions.ElementDoesNotExistException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.junit.Before;
 import org.junit.Test;
 

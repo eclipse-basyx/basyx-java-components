@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.digitaltwin.basyx.aasrepository.exceptions;
+package org.eclipse.digitaltwin.basyx.core.exceptions;
 
 /**
  * Indicates that the requested element does not exist
@@ -33,5 +33,14 @@ package org.eclipse.digitaltwin.basyx.aasrepository.exceptions;
  */
 @SuppressWarnings("serial")
 public class ElementDoesNotExistException extends RuntimeException {
+	public ElementDoesNotExistException() {
+	}
 
+	public ElementDoesNotExistException(String elementId) {
+		super(getMsg(elementId));
+	}
+
+	private static String getMsg(String elementId) {
+		return "Element with Id " + elementId + " does not exist";
+	}
 }

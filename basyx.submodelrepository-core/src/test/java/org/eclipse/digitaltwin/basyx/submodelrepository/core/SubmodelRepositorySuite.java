@@ -26,11 +26,12 @@
 package org.eclipse.digitaltwin.basyx.submodelrepository.core;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepositoryFactory;
 import org.junit.Test;
@@ -52,7 +53,12 @@ public abstract class SubmodelRepositorySuite {
 		SubmodelRepository repo = getSubmodelRepositoryFactory(expectedSubmodels).create();
 		Collection<Submodel> submodels = repo.getAllSubmodels();
 
-		assertEquals(expectedSubmodels, submodels);
+		assertSubmodelsAreContained(expectedSubmodels, submodels);
+	}
+
+	private void assertSubmodelsAreContained(Collection<Submodel> expectedSubmodels, Collection<Submodel> submodels) {
+		assertEquals(2, submodels.size());
+		assertTrue(submodels.containsAll(expectedSubmodels));
 	}
 
 	@Test
@@ -60,7 +66,33 @@ public abstract class SubmodelRepositorySuite {
 		SubmodelRepository repo = getSubmodelRepositoryFactory().create();
 		Collection<Submodel> submodels = repo.getAllSubmodels();
 
-		assertEquals(Collections.emptySet(), submodels);
+		assertIsEmpty(submodels);
+	}
+
+	@Test
+	public void getSpecificSubmodel() {
+		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
+		
+		Submodel operationalDataSm = DummySubmodelFactory.createOperationalDataSubmodel();
+		Submodel retrieved = repo.getSubmodel(operationalDataSm.getId());
+
+		assertEquals(operationalDataSm, retrieved);
+	}
+
+	@Test(expected = ElementDoesNotExistException.class)
+	public void getSpecificNonExistingSubmodel() {
+		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
+		repo.getSubmodel("doesNotExist");
+	}
+
+	private SubmodelRepository getSubmodelRepositoryWithDummySubmodels() {
+		Collection<Submodel> expectedSubmodels = DummySubmodelFactory.getSubmodels();
+		SubmodelRepository repo = getSubmodelRepositoryFactory(expectedSubmodels).create();
+		return repo;
+	}
+
+	private void assertIsEmpty(Collection<Submodel> submodels) {
+		assertTrue(submodels.isEmpty());
 	}
 
 
