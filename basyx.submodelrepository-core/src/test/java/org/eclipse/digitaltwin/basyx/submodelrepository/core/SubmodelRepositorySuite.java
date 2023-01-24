@@ -123,10 +123,9 @@ public abstract class SubmodelRepositorySuite {
 
 	@Test(expected = CollidingIdentifierException.class)
 	public void createSubmodelWithCollidingId() {
-		String id = DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID;
-		Submodel submodel = buildDummySubmodel(id);
-
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
+		Submodel submodel = repo.getSubmodel(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID);
+
 		repo.createSubmodel(submodel);
 	}
 
