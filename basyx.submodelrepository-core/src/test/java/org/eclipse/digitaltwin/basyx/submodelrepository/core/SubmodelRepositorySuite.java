@@ -34,6 +34,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepositoryFactory;
@@ -106,6 +107,27 @@ public abstract class SubmodelRepositorySuite {
 
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
 		repo.updateSubmodel(id, doesNotExist);
+	}
+
+	@Test
+	public void createSubmodel() {
+		String id = "newSubmodel";
+		Submodel expectedSubmodel = buildDummySubmodel(id);
+
+		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
+		repo.createSubmodel(expectedSubmodel);
+
+		Submodel retrieved = repo.getSubmodel(id);
+		assertEquals(expectedSubmodel, retrieved);
+	}
+
+	@Test(expected = CollidingIdentifierException.class)
+	public void createSubmodelWithCollidingId() {
+		String id = DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID;
+		Submodel submodel = buildDummySubmodel(id);
+
+		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
+		repo.createSubmodel(submodel);
 	}
 
 	private Submodel buildDummySubmodel(String id) {

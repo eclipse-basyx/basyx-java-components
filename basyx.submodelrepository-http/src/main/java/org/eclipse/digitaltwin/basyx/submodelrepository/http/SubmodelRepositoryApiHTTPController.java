@@ -31,6 +31,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,16 @@ public class SubmodelRepositoryApiHTTPController implements SubmodelRepositoryHT
 			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 		} catch (ElementDoesNotExistException e) {
 			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@Override
+	public ResponseEntity<Submodel> postSubmodel(@Parameter(in = ParameterIn.DEFAULT, description = "Submodel object", required = true, schema = @Schema()) @Valid @RequestBody Submodel body) {
+		try {
+			repository.createSubmodel(body);
+			return new ResponseEntity<Submodel>(body, HttpStatus.CREATED);
+		} catch (CollidingIdentifierException e) {
+			return new ResponseEntity<Submodel>(HttpStatus.CONFLICT);
 		}
 	}
 

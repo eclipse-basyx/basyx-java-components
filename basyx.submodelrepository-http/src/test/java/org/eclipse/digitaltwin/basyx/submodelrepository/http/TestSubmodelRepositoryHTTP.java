@@ -36,6 +36,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -75,21 +76,21 @@ public class TestSubmodelRepositoryHTTP {
 	@Test
 	public void getAllSubmodelsPreconfigured() throws IOException, ParseException {
 		String submodelsJSON = getAllSubmodelsJSON();
-		String expectedSubmodelsJSON = getAllSubmodelJSONExpected();
+		String expectedSubmodelsJSON = getAllSubmodelJSON();
 		assertSameJSONContent(expectedSubmodelsJSON, submodelsJSON);
 	}
 
 	@Test
 	public void getSpecificSubmodel() throws ParseException, IOException {
-		String submodelJSON = getSpecificSubmodelJSON(DummySubmodelFactory.createTechnicalDataSubmodel().getId());
-		String expectedSubmodelJSON = getSpecificSubmodelJSONExpected();
+		String submodelJSON = requestSpecificSubmodelJSON(DummySubmodelFactory.createTechnicalDataSubmodel().getId());
+		String expectedSubmodelJSON = getSingleSubmodelJSON();
 
 		assertSameJSONContent(expectedSubmodelJSON, submodelJSON);
 	}
 
 	@Test
 	public void getSpecificSubmodelNonExisting() throws IOException {
-		CloseableHttpResponse response = getSubmodel("nonExisting");
+		CloseableHttpResponse response = requestSubmodel("nonExisting");
 
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getCode());
 	}
@@ -98,24 +99,60 @@ public class TestSubmodelRepositoryHTTP {
 	@Test
 	public void updateExistingSubmodel() throws IOException, ParseException {
 		String id = "7A7104BDAB57E184";
-		String expectedSubmodelJSON = getSubmodelUpdateJSON();
+		String expectedSubmodelJSON = getUpdatedSubmodelJSON();
 
 		CloseableHttpResponse creationResponse = putSubmodel(id, expectedSubmodelJSON);
 
 		assertEquals(HttpStatus.NO_CONTENT.value(), creationResponse.getCode());
 
-		String submodelJSON = getSpecificSubmodelJSON(id);
+		String submodelJSON = requestSpecificSubmodelJSON(id);
 		assertSameJSONContent(expectedSubmodelJSON, submodelJSON);
 	}
 
 	@Test
 	public void updateNonExistingSubmodel() throws IOException {
 		String id = "nonExisting";
-		String expectedSubmodelJSON = getSubmodelUpdateJSON();
+		String expectedSubmodelJSON = getUpdatedSubmodelJSON();
 
-		CloseableHttpResponse creationResponse = putSubmodel(id, expectedSubmodelJSON);
+		CloseableHttpResponse updateResponse = putSubmodel(id, expectedSubmodelJSON);
 
-		assertEquals(HttpStatus.NOT_FOUND.value(), creationResponse.getCode());
+		assertEquals(HttpStatus.NOT_FOUND.value(), updateResponse.getCode());
+	}
+
+	@Test
+	public void createSubmodelNewId() throws IOException, ParseException {
+		String submodelJSON = getNewSubmodelJSON();
+		CloseableHttpResponse creationResponse = createSubmodel(submodelJSON);
+
+		assertSubmodelCreationReponse(submodelJSON, creationResponse);
+
+		String requestedSubmodel = requestSpecificSubmodelJSON("newSubmodel");
+		assertSameJSONContent(submodelJSON, requestedSubmodel);
+	}
+
+	@Test
+	public void createSubmodelCollidingId() throws IOException {
+		String submodelJSON = getSingleSubmodelJSON();
+		CloseableHttpResponse creationResponse = createSubmodel(submodelJSON);
+
+		assertEquals(HttpStatus.CONFLICT.value(), creationResponse.getCode());
+	}
+
+	private void assertSubmodelCreationReponse(String submodelJSON, CloseableHttpResponse creationResponse) throws IOException, ParseException, JsonProcessingException, JsonMappingException {
+		assertEquals(HttpStatus.CREATED.value(), creationResponse.getCode());
+		String response = getResponseAsString(creationResponse);
+		assertSameJSONContent(submodelJSON, response);
+	}
+
+	private CloseableHttpResponse createSubmodel(String submodelJSON) throws IOException {
+		HttpPost submodelCreationRequest = new HttpPost(submodelAccessURL);
+		submodelCreationRequest.setHeader("Content-type", "application/json");
+
+		StringEntity smEntity = new StringEntity(submodelJSON);
+		submodelCreationRequest.setEntity(smEntity);
+
+		CloseableHttpClient client = HttpClients.createDefault();
+		return client.execute(submodelCreationRequest);
 	}
 
 	private CloseableHttpResponse putSubmodel(String id, String submodelJSON) throws IOException {
@@ -129,8 +166,8 @@ public class TestSubmodelRepositoryHTTP {
 		return client.execute(submodelUpdateRequest);
 	}
 
-	private String getSpecificSubmodelJSON(String id) throws IOException, ParseException {
-		CloseableHttpResponse response = getSubmodel(id);
+	private String requestSpecificSubmodelJSON(String id) throws IOException, ParseException {
+		CloseableHttpResponse response = requestSubmodel(id);
 
 		return getResponseAsString(response);
 	}
@@ -141,7 +178,7 @@ public class TestSubmodelRepositoryHTTP {
 		return client.execute(submodelRetrievalRequest);
 	}
 
-	private CloseableHttpResponse getSubmodel(String id) throws IOException {
+	private CloseableHttpResponse requestSubmodel(String id) throws IOException {
 		return executeGetOnURL(submodelAccessURL + "/" + id + "/submodel");
 	}
 
@@ -157,15 +194,19 @@ public class TestSubmodelRepositoryHTTP {
 		return getResponseAsString(response);
 	}
 
-	private String getSubmodelUpdateJSON() throws IOException {
-		return readJSONStringFromFile("classpath:SingleSubmodelForUpdate.json");
+	private String getUpdatedSubmodelJSON() throws IOException {
+		return readJSONStringFromFile("classpath:SingleSubmodelUpdate.json");
 	}
 
-	private String getSpecificSubmodelJSONExpected() throws IOException {
+	private String getNewSubmodelJSON() throws IOException {
+		return readJSONStringFromFile("classpath:SingleSubmodelNew.json");
+	}
+
+	private String getSingleSubmodelJSON() throws IOException {
 		return readJSONStringFromFile("classpath:SingleSubmodel.json");
 	}
 
-	private String getAllSubmodelJSONExpected() throws IOException {
+	private String getAllSubmodelJSON() throws IOException {
 		return readJSONStringFromFile("classpath:MultipleSubmodels.json");
 	}
 
