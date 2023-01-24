@@ -54,4 +54,13 @@ public interface SubmodelRepository {
 	 * @throws ElementDoesNotExistException
 	 */
 	public Submodel getSubmodel(String id) throws ElementDoesNotExistException;
+
+	/**
+	 * Updates an existing Submodel
+	 * 
+	 * @param id
+	 * @param submodel
+	 * @throws ElementDoesNotExistException
+	 */
+	public void updateSubmodel(String id, Submodel submodel) throws ElementDoesNotExistException;
 }

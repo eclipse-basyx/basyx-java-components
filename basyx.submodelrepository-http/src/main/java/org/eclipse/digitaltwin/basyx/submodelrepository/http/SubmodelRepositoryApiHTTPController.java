@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -75,6 +76,24 @@ public class SubmodelRepositoryApiHTTPController implements SubmodelRepositoryHT
 			return new ResponseEntity<Submodel>(retrieved, HttpStatus.OK);
 		} catch (ElementDoesNotExistException e) {
 			return new ResponseEntity<Submodel>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@Override
+	public ResponseEntity<Void> putSubmodelSubmodelRepo(
+			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") String submodelIdentifier,
+			@Parameter(in = ParameterIn.DEFAULT, description = "Submodel object", required = true, schema = @Schema()) @Valid @RequestBody Submodel body,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the structural depth of the respective resource content", schema = @Schema(allowableValues = { "deep",
+					"core" }, defaultValue = "deep")) @Valid @RequestParam(value = "level", required = false, defaultValue = "deep") String level,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the request or response kind of the resource", schema = @Schema(allowableValues = { "normal", "trimmed", "value", "reference",
+					"path" }, defaultValue = "normal")) @Valid @RequestParam(value = "content", required = false, defaultValue = "normal") String content,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines to which extent the resource is being serialized", schema = @Schema(allowableValues = { "withBlobValue",
+					"withoutBlobValue" })) @Valid @RequestParam(value = "extent", required = false) String extent) {
+		try {
+			repository.updateSubmodel(submodelIdentifier, body);
+			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		} catch (ElementDoesNotExistException e) {
+			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		}
 	}
 
