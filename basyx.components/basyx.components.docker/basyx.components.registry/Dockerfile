@@ -6,6 +6,7 @@ COPY target/${JAR_FILE} /usr/share/basyxExecutable.jar
 COPY target/lib /usr/share/lib
 COPY src/main/resources/context.properties /usr/share/config/context.properties
 COPY src/main/resources/registry.properties /usr/share/config/registry.properties
+COPY src/main/resources/mqtt.properties /usr/share/config/mqtt.properties
 COPY src/test/resources/dockerSQL.properties /usr/share/config/sql.properties
 COPY src/test/resources/dockerMongodb.properties /usr/share/config/mongodb.properties
  
