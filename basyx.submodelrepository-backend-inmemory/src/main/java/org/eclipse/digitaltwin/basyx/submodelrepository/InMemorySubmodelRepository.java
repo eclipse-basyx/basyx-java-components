@@ -77,7 +77,7 @@ public class InMemorySubmodelRepository implements SubmodelRepository {
 
 	private Map<String, SubmodelService> createServices(Collection<Submodel> submodels) {
 		Map<String, SubmodelService> map = new LinkedHashMap<>();
-		submodels.forEach(s -> map.put(s.getId(), submodelServiceFactory.create(s)));
+		submodels.forEach(submodel -> map.put(submodel.getId(), submodelServiceFactory.create(submodel)));
 
 		return map;
 	}
