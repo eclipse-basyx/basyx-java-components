@@ -33,15 +33,22 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
+ * Specifies the overall SubmodelService API
+ * 
  * @author schnicke
+ *
  */
 public interface SubmodelService {
 	/**
+	 * Retrieves the Submodel contained in the service
+	 * 
 	 * @return
 	 */
 	public Submodel getSubmodel();
 
 	/**
+	 * Retrieves all submodelElements contained in the Submodel
+	 * 
 	 * @return
 	 */
 	public Collection<SubmodelElement> getSubmodelElements();
