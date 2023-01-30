@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.basyx.regression.AASServer.mongodb;
 
 import static org.junit.Assert.assertEquals;
@@ -40,16 +39,16 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 /**
+ * Tests the ISubmodelAPI implementation of the MongoDB backend
  * 
  * @author schnicke
- *
  */
 public class TestMongoDBSubmodelAPI {
 
 	@Test
 	public void writeAndReadMultiLanguageProperty() {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
-		
+
 		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
 		submodelAPI.addSubmodelElement(mlprop);
 

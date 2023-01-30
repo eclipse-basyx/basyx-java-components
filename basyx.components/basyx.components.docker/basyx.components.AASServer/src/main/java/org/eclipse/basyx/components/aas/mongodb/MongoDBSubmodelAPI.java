@@ -206,8 +206,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		String id = sm.getIdentification().getId();
 		this.setSubmodelId(id);
 
-		Query hasId = query(where(SMIDPATH).is(smId));
-		Object replaced = mongoOps.findAndReplace(hasId, sm, collection);
+		Submodel replaced = writeSubmodelInDB(sm);
 		if (replaced == null) {
 			mongoOps.insert(sm, collection);
 		}
@@ -317,10 +316,10 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		ISubmodelElement element = getNestedSubmodelElement(sm, idShorts);
 
 		IModelProvider mapProvider = new VABLambdaProvider((Map<String, Object>) element);
-		SubmodelElementProvider smProvider = new SubmodelElementProvider(mapProvider);
+		SubmodelElementProvider smeProvider = new SubmodelElementProvider(mapProvider);
 
-		smProvider.setValue(Property.VALUE, newValue);
-		ISubmodelElement updatedElement = SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) smProvider.getValue(""));
+		smeProvider.setValue(Property.VALUE, newValue);
+		ISubmodelElement updatedElement = SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) smeProvider.getValue(""));
 
 		sm.addSubmodelElement(updatedElement);
 
@@ -443,9 +442,15 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		updateSubmodelElementInDB(idShorts, newValue);
 	}
 
-	private void writeSubmodelInDB(Submodel sm) {
+	/**
+	 * Returns the updated Submodel or null if not found
+	 * 
+	 * @param sm
+	 * @return
+	 */
+	private Submodel writeSubmodelInDB(Submodel sm) {
 		Query hasId = query(where(SMIDPATH).is(smId));
-		mongoOps.findAndReplace(hasId, sm, collection);
+		return mongoOps.findAndReplace(hasId, sm, collection);
 	}
 
 	@Override
