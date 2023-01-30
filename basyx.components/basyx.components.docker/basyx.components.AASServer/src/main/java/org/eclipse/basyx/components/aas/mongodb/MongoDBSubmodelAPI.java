@@ -53,6 +53,7 @@ import org.eclipse.basyx.vab.exception.provider.MalformedRequestException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
+import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -250,9 +251,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		Submodel sm = (Submodel) getSubmodel();
 		// Add element
 		sm.addSubmodelElement(elem);
-		// Replace db entry
-		Query hasId = query(where(SMIDPATH).is(smId));
-		mongoOps.findAndReplace(hasId, sm, collection);
+		writeSubmodelInDB(sm);
 	}
 
 	private ISubmodelElement getTopLevelSubmodelElement(String idShort) {
@@ -279,9 +278,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		Submodel sm = (Submodel) getSubmodel();
 		// Remove element
 		sm.getSubmodelElements().remove(idShort);
-		// Replace db entry
-		Query hasId = query(where(SMIDPATH).is(smId));
-		mongoOps.findAndReplace(hasId, sm, collection);
+		writeSubmodelInDB(sm);
 	}
 
 	@Override
@@ -299,16 +296,12 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			ISubmodelElement parentElement = getNestedSubmodelElement(sm, idShorts);
 			if (parentElement instanceof SubmodelElementCollection) {
 				((SubmodelElementCollection) parentElement).addSubmodelElement(elem);
-				// Replace db entry
-				Query hasId = query(where(SMIDPATH).is(smId));
-				mongoOps.findAndReplace(hasId, sm, collection);
+				writeSubmodelInDB(sm);
 			}
 		} else {
 			// else => directly add it to the submodel
 			sm.addSubmodelElement(elem);
-			// Replace db entry
-			Query hasId = query(where(SMIDPATH).is(smId));
-			mongoOps.findAndReplace(hasId, sm, collection);
+			writeSubmodelInDB(sm);
 		}
 	}
 
@@ -318,33 +311,20 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		return sm.getSubmodelElements().values();
 	}
 
-	private void updateTopLevelSubmodelElement(String idShort, Object newValue) {
-		// Get sm from db
-		Submodel sm = (Submodel) getSubmodel();
-		// Unwrap value
-		newValue = unwrapParameter(newValue);
-		// Get and update property value
-		getElementProvider(sm, idShort).setValue(Property.VALUE, newValue);
-		// Replace db entry
-		Query hasId = query(where(SMIDPATH).is(smId));
-		mongoOps.findAndReplace(hasId, sm, collection);
-	}
-
 	@SuppressWarnings("unchecked")
-	private void updateNestedSubmodelElement(List<String> idShorts, Object newValue) {
+	private void updateSubmodelElementInDB(List<String> idShorts, Object newValue) {
 		Submodel sm = (Submodel) getSubmodel();
-
-		// Get parent SM element
 		ISubmodelElement element = getNestedSubmodelElement(sm, idShorts);
 
-		// Update value
-		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) element);
-		IModelProvider elemProvider = SubmodelElementProvider.getElementProvider(mapProvider);
-		elemProvider.setValue(Property.VALUE, newValue);
+		IModelProvider mapProvider = new VABLambdaProvider((Map<String, Object>) element);
+		SubmodelElementProvider smProvider = new SubmodelElementProvider(mapProvider);
 
-		// Replace db entry
-		Query hasId = query(where(SMIDPATH).is(smId));
-		mongoOps.findAndReplace(hasId, sm, collection);
+		smProvider.setValue(Property.VALUE, newValue);
+		ISubmodelElement updatedElement = SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) smProvider.getValue(""));
+
+		sm.addSubmodelElement(updatedElement);
+
+		writeSubmodelInDB(sm);
 	}
 
 	private Object getTopLevelSubmodelElementValue(String idShort) {
@@ -355,8 +335,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	@SuppressWarnings("unchecked")
 	private Object getNestedSubmodelElementValue(List<String> idShorts) {
 		ISubmodelElement lastElement = getNestedSubmodelElement(idShorts);
-		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) lastElement);
-		return SubmodelElementProvider.getElementProvider(mapProvider).getValue("/value");
+		IModelProvider mapProvider = new VABLambdaProvider((Map<String, Object>) lastElement);
+		return new SubmodelElementProvider(mapProvider).getValue("/value");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -374,10 +354,10 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	@SuppressWarnings("unchecked")
-	private IModelProvider getElementProvider(Submodel sm, String idShortPath) {
-		ISubmodelElement elem = sm.getSubmodelElement(idShortPath);
+	private static SubmodelElementProvider getElementProvider(Submodel sm, String idShort) {
+		ISubmodelElement elem = sm.getSubmodelElement(idShort);
 		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) elem);
-		return SubmodelElementProvider.getElementProvider(mapProvider);
+		return new SubmodelElementProvider(mapProvider);
 	}
 
 	private ISubmodelElement getNestedSubmodelElement(Submodel sm, List<String> idShorts) {
@@ -420,9 +400,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		// Remove element
 		SubmodelElementCollection coll = (SubmodelElementCollection) parentElement;
 		coll.deleteSubmodelElement(idShorts.get(idShorts.size() - 1));
-		// Replace db entry
-		Query hasId = query(where(SMIDPATH).is(smId));
-		mongoOps.findAndReplace(hasId, sm, collection);
+		writeSubmodelInDB(sm);
 	}
 
 	private Object invokeNestedOperationAsync(List<String> idShorts, Object... params) {
@@ -460,13 +438,14 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 
 	@Override
 	public void updateSubmodelElement(String idShortPath, Object newValue) {
-		if (idShortPath.contains("/")) {
-			String[] splitted = VABPathTools.splitPath(idShortPath);
-			List<String> idShorts = Arrays.asList(splitted);
-			updateNestedSubmodelElement(idShorts, newValue);
-		} else {
-			updateTopLevelSubmodelElement(idShortPath, newValue);
-		}
+		String[] splitted = VABPathTools.splitPath(idShortPath);
+		List<String> idShorts = Arrays.asList(splitted);
+		updateSubmodelElementInDB(idShorts, newValue);
+	}
+
+	private void writeSubmodelInDB(Submodel sm) {
+		Query hasId = query(where(SMIDPATH).is(smId));
+		mongoOps.findAndReplace(hasId, sm, collection);
 	}
 
 	@Override
