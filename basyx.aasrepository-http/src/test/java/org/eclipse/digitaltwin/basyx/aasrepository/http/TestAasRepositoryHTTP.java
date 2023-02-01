@@ -44,6 +44,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,10 +76,9 @@ public class TestAasRepositoryHTTP {
 
 	@Test
 	public void aasUpload() throws IOException, ParseException {
-		CloseableHttpClient client = HttpClients.createDefault();
 		String aasJsonContent = getAASJSONString();
 
-		CloseableHttpResponse creationResponse = createAASOnServer(client, aasJsonContent);
+		CloseableHttpResponse creationResponse = createAASOnServer(aasJsonContent);
 
 		assertEquals(201, creationResponse.getCode());
 		assertResponseContainsSameAAS(aasJsonContent, creationResponse);
@@ -86,47 +86,38 @@ public class TestAasRepositoryHTTP {
 
 	@Test
 	public void aasRoundtrip() throws JsonMappingException, ParseException, JsonProcessingException, IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
 		String aasJsonContent = getAASJSONString();
 
-		createAASOnServer(client, aasJsonContent);
+		createAASOnServer(aasJsonContent);
 
-		HttpGet aasRetrievalRequest = createSpecificAASGETRequest();
-		CloseableHttpResponse retrievalResponse = client.execute(aasRetrievalRequest);
+		CloseableHttpResponse retrievalResponse = getSpecificAas("customIdentifier");
 		assertResponseContainsSameAAS(aasJsonContent, retrievalResponse);
 	}
 
 	@Test
 	public void aasIdentifierCollision() throws FileNotFoundException, IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
 		String aasJsonContent = getAASJSONString();
 
-		createAASOnServer(client, aasJsonContent);
-		CloseableHttpResponse creationResponse = createAASOnServer(client, aasJsonContent);
+		createAASOnServer(aasJsonContent);
+		CloseableHttpResponse creationResponse = createAASOnServer(aasJsonContent);
 
 		assertEquals(400, creationResponse.getCode());
 	}
 
 	@Test
 	public void getAASByIdentifier() throws FileNotFoundException, IOException, ParseException {
-		CloseableHttpClient client = HttpClients.createDefault();
 		String aasJsonContent = getAASJSONString();
 
-		createAASOnServer(client, aasJsonContent);
+		createAASOnServer(aasJsonContent);
 
-		HttpGet aasRetrievalRequest = createSpecificAASGETRequest();
-		CloseableHttpResponse response = client.execute(aasRetrievalRequest);
+		CloseableHttpResponse response = getSpecificAas("customIdentifier");
 
 		assertResponseContainsSameAAS(aasJsonContent, response);
 	}
 
 	@Test
 	public void getNonExistingAASByIdentifier() throws IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
-
-		String specificAccessURL = aasAccessURL + "/nonExisting";
-		HttpGet aasRetrievalRequest = new HttpGet(specificAccessURL);
-		CloseableHttpResponse response = client.execute(aasRetrievalRequest);
+		CloseableHttpResponse response = getSpecificAas("nonExisting");
 
 		assertEquals(404, response.getCode());
 	}
@@ -142,17 +133,24 @@ public class TestAasRepositoryHTTP {
 		CloseableHttpClient client = HttpClients.createDefault();
 
 		HttpGet aasRetrievalRequest = new HttpGet(aasAccessURL);
-		CloseableHttpResponse retrievalResponse = client.execute(aasRetrievalRequest);
-		return retrievalResponse;
+
+		return client.execute(aasRetrievalRequest);
 	}
 
-	private HttpGet createSpecificAASGETRequest() {
-		return new HttpGet(aasAccessURL + "/customIdentifier");
+	private CloseableHttpResponse getSpecificAas(String aasId) throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
+
+		HttpGet getSpecificAasRequest = new HttpGet(aasAccessURL + "/" + Base64UrlEncodedIdentifier.encodeIdentifier(aasId));
+
+		return client.execute(getSpecificAasRequest);
 	}
 
-	private CloseableHttpResponse createAASOnServer(CloseableHttpClient client, String aasJsonContent) throws IOException {
+	private CloseableHttpResponse createAASOnServer(String aasJsonContent) throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost aasCreateRequest = createValidAASCreationRequest(aasJsonContent);
+
 		CloseableHttpResponse creationResponse = client.execute(aasCreateRequest);
+
 		return creationResponse;
 	}
 
