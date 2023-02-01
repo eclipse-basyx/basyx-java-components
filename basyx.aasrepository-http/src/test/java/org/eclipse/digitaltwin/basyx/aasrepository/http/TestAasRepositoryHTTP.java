@@ -28,34 +28,22 @@ package org.eclipse.digitaltwin.basyx.aasrepository.http;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
+import org.eclipse.digitaltwin.basyx.http.serialization.BaSyxHttpTestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.ResourceUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -81,7 +69,7 @@ public class TestAasRepositoryHTTP {
 		CloseableHttpResponse creationResponse = createAASOnServer(aasJsonContent);
 
 		assertEquals(201, creationResponse.getCode());
-		assertResponseContainsSameAAS(aasJsonContent, creationResponse);
+		BaSyxHttpTestUtils.assertSameJSONContent(aasJsonContent, BaSyxHttpTestUtils.getResponseAsString(creationResponse));
 	}
 
 	@Test
@@ -91,7 +79,7 @@ public class TestAasRepositoryHTTP {
 		createAASOnServer(aasJsonContent);
 
 		CloseableHttpResponse retrievalResponse = getSpecificAas("customIdentifier");
-		assertResponseContainsSameAAS(aasJsonContent, retrievalResponse);
+		BaSyxHttpTestUtils.assertSameJSONContent(aasJsonContent, BaSyxHttpTestUtils.getResponseAsString(retrievalResponse));
 	}
 
 	@Test
@@ -112,7 +100,7 @@ public class TestAasRepositoryHTTP {
 
 		CloseableHttpResponse response = getSpecificAas("customIdentifier");
 
-		assertResponseContainsSameAAS(aasJsonContent, response);
+		BaSyxHttpTestUtils.assertSameJSONContent(aasJsonContent, BaSyxHttpTestUtils.getResponseAsString(response));
 	}
 
 	@Test
@@ -130,58 +118,19 @@ public class TestAasRepositoryHTTP {
 	}
 
 	private CloseableHttpResponse getAllAas() throws IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
-
-		HttpGet aasRetrievalRequest = new HttpGet(aasAccessURL);
-
-		return client.execute(aasRetrievalRequest);
+		return BaSyxHttpTestUtils.executeGetOnURL(aasAccessURL);
 	}
 
 	private CloseableHttpResponse getSpecificAas(String aasId) throws IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
-
-		HttpGet getSpecificAasRequest = new HttpGet(aasAccessURL + "/" + Base64UrlEncodedIdentifier.encodeIdentifier(aasId));
-
-		return client.execute(getSpecificAasRequest);
+		String getUrl = aasAccessURL + "/" + Base64UrlEncodedIdentifier.encodeIdentifier(aasId);
+		return BaSyxHttpTestUtils.executeGetOnURL(getUrl);
 	}
 
 	private CloseableHttpResponse createAASOnServer(String aasJsonContent) throws IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpPost aasCreateRequest = createValidAASCreationRequest(aasJsonContent);
-
-		CloseableHttpResponse creationResponse = client.execute(aasCreateRequest);
-
-		return creationResponse;
-	}
-
-	private String getResponseAsString(CloseableHttpResponse retrievalResponse) throws IOException, ParseException {
-		return EntityUtils.toString(retrievalResponse.getEntity(), "UTF-8");
-	}
-
-	private void assertResponseContainsSameAAS(String aasJsonContent, CloseableHttpResponse response) throws IOException, ParseException, JsonProcessingException, JsonMappingException {
-		String aasResponseJSON = getResponseAsString(response);
-
-		ObjectMapper mapper = new ObjectMapper();
-		assertEquals(mapper.readTree(aasJsonContent), mapper.readTree(aasResponseJSON));
-	}
-
-	private HttpPost createValidAASCreationRequest(String aasJsonContent) {
-		HttpPost aasCreateRequest = createRequestWithHeader();
-		StringEntity aasEntity = new StringEntity(aasJsonContent);
-		aasCreateRequest.setEntity(aasEntity);
-		return aasCreateRequest;
-	}
-
-	private HttpPost createRequestWithHeader() {
-		HttpPost aasCreateRequest = new HttpPost(aasAccessURL);
-		aasCreateRequest.setHeader("Content-type", "application/json");
-		aasCreateRequest.setHeader("Accept", "application/json");
-		return aasCreateRequest;
+		return BaSyxHttpTestUtils.executePostOnServer(aasAccessURL, aasJsonContent);
 	}
 
 	private String getAASJSONString() throws FileNotFoundException, IOException {
-		File file = ResourceUtils.getFile("classpath:AASSimple.json");
-		InputStream in = new FileInputStream(file);
-		return IOUtils.toString(in, StandardCharsets.UTF_8.name());
+		return BaSyxHttpTestUtils.readJSONStringFromFile("classpath:AASSimple.json");
 	}
 }
