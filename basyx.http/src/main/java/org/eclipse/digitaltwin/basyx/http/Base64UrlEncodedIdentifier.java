@@ -50,7 +50,7 @@ public class Base64UrlEncodedIdentifier {
 
 	public static Base64UrlEncodedIdentifier fromEncodedValue(String value) {
 		// Some will encode the padding...
-		if (value.contains("%")) {
+		if (value.contains("%3D")) {
 			value = URLDecoder.decode(value, StandardCharsets.US_ASCII);
 		}
 		// Some will cut the padding...

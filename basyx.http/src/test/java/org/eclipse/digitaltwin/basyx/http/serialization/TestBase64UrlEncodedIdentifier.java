@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.digitaltwin.basyx.http.serialization;
 
 import static org.junit.Assert.assertEquals;
@@ -44,24 +43,20 @@ import org.junit.Test;
 public class TestBase64UrlEncodedIdentifier {
 
 	@Test
-	public void decodingOfPaddedValue() throws UnsupportedEncodingException {
+	public void encodingOfPaddedValue() throws UnsupportedEncodingException {
 		String plainValue = "username:password";
-		byte[] bytes = plainValue.getBytes("UTF-8");
-		String base64urlEncoded = Base64.getUrlEncoder().encodeToString(bytes);
-		assertTrue(base64urlEncoded.endsWith("="));
+		assertBase64UrlEncodingEndsWithEqualsSign(plainValue);
 
 		Base64UrlEncodedIdentifier identifier = new Base64UrlEncodedIdentifier(plainValue);
-
 		String encodedValue = identifier.getEncodedIdentifier();
 
-		Base64UrlEncodedIdentifier restoredIdentifier = Base64UrlEncodedIdentifier.fromEncodedValue(encodedValue);
-
-		assertEquals(plainValue, restoredIdentifier.getIdentifier());
+		assertEquals("dXNlcm5hbWU6cGFzc3dvcmQ", encodedValue);
 	}
 
 	@Test
-	public void encodedStringWithCutOffPadding() {
-		Base64UrlEncodedIdentifier restoredIdentifier = Base64UrlEncodedIdentifier.fromEncodedValue("YQ"); // Was YQ==
+	public void decodingOfCutOffPaddingValue() {
+		// Was YQ==
+		Base64UrlEncodedIdentifier restoredIdentifier = Base64UrlEncodedIdentifier.fromEncodedValue("YQ");
 		assertEquals("a", restoredIdentifier.getIdentifier());
 
 		// Was dXNlcm5hbWU6cGFzc3dvcmQ=
@@ -70,12 +65,19 @@ public class TestBase64UrlEncodedIdentifier {
 	}
 
 	@Test
-	public void encodedStringWithEncodedPadding() {
-		Base64UrlEncodedIdentifier restoredIdentifier = Base64UrlEncodedIdentifier.fromEncodedValue("YQ%3D%3D"); // Was YQ==
+	public void decodingOfEncodedPaddingValue() {
+		// Was YQ==
+		Base64UrlEncodedIdentifier restoredIdentifier = Base64UrlEncodedIdentifier.fromEncodedValue("YQ%3D%3D");
 		assertEquals("a", restoredIdentifier.getIdentifier());
 
 		// Was dXNlcm5hbWU6cGFzc3dvcmQ=
 		restoredIdentifier = Base64UrlEncodedIdentifier.fromEncodedValue("dXNlcm5hbWU6cGFzc3dvcmQ%3D");
 		assertEquals("username:password", restoredIdentifier.getIdentifier());
+	}
+
+	private void assertBase64UrlEncodingEndsWithEqualsSign(String plainValue) throws UnsupportedEncodingException {
+		byte[] bytes = plainValue.getBytes("UTF-8");
+		String base64urlEncoded = Base64.getUrlEncoder().encodeToString(bytes);
+		assertTrue(base64urlEncoded.endsWith("="));
 	}
 }
