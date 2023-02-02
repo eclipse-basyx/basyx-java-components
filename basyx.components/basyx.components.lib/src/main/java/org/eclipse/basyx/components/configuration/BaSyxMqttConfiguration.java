@@ -47,6 +47,7 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_QOS = "1";
 	public static final String DEFAULT_PERSISTENCE_TYPE = MqttPersistence.FILE.toString();
 	public static final String DEFAULT_PERSISTENCE_PATH = "";
+	public static final String DEFAULT_CLIENT_ID = "default-client-id";
 
 	public static final String USER = "user";
 	public static final String PASS = "pass";
@@ -72,7 +73,7 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 		defaultProps.put(QOS, DEFAULT_QOS);
 		defaultProps.put(PERSISTENCE_TYPE, DEFAULT_PERSISTENCE_TYPE);
 		defaultProps.put(PERSISTENCE_PATH, DEFAULT_PERSISTENCE_PATH);
-		defaultProps.put(CLIENT_ID, CLIENT_ID);
+		defaultProps.put(CLIENT_ID, DEFAULT_CLIENT_ID);
 		return defaultProps;
 	}
 
@@ -114,7 +115,7 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	 * Load all settings except of the whitelist config part
 	 */
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { USER, PASS, SERVER, QOS };
+		String[] properties = { USER, PASS, SERVER, QOS, CLIENT_ID };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
