@@ -26,6 +26,7 @@ package org.eclipse.digitaltwin.basyx.aasrepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
@@ -56,26 +57,21 @@ public abstract class AasRepositorySuite {
 	protected abstract AasRepositoryFactory getAasRepositoryFactory();
 
 	@Before
-	public void initSuite() {
+	public void createAasRepoWithDummyAas() {
 		aasRepo = getAasRepositoryFactory().create();
-		createAASDummies();
-	}
 
-	private void createAASDummies() {
-		aas1 = new DefaultAssetAdministrationShell.Builder()
-				.id(aasIdWithNeedForEncoding)
+		aas1 = new DefaultAssetAdministrationShell.Builder().id(aasIdWithNeedForEncoding)
 				.build();
 
-		aas2 = new DefaultAssetAdministrationShell.Builder()
-				.id(aas2Id)
+		aas2 = new DefaultAssetAdministrationShell.Builder().id(aas2Id)
 				.build();
+
+		aasRepo.createAas(aas1);
+		aasRepo.createAas(aas2);
 	}
 
 	@Test
 	public void allAasRetrieval() throws Exception {
-		aasRepo.createAas(aas1);
-		aasRepo.createAas(aas2);
-
 		Collection<AssetAdministrationShell> coll = aasRepo.getAllAas();
 		assertEquals(2, coll.size());
 
@@ -84,20 +80,34 @@ public abstract class AasRepositorySuite {
 	}
 
 	@Test
-	public void getAASByIdentifier() throws CollidingIdentifierException, ElementDoesNotExistException {
-		aasRepo.createAas(aas1);
+	public void getAasByIdentifier() throws CollidingIdentifierException, ElementDoesNotExistException {
 		AssetAdministrationShell retrieved = aasRepo.getAas(aas1.getId());
 		assertEquals(aas1, retrieved);
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
-	public void getNonExistingAASByIdentifier() throws ElementDoesNotExistException {
-		aasRepo.getAas("nonexisting");
+	public void getNonExistingAasByIdentifier() throws ElementDoesNotExistException {
+		aasRepo.getAas("nonExisting");
 	}
 
 	@Test(expected = CollidingIdentifierException.class)
-	public void collidingAASIdentifiers() throws CollidingIdentifierException {
+	public void createWithCollidingAasIdentifiers() throws CollidingIdentifierException {
 		aasRepo.createAas(aas1);
-		aasRepo.createAas(aas1);
+	}
+	
+	@Test
+	public void deleteAas() {
+		aasRepo.deleteAas(aas1.getId());
+		
+		try {
+			aasRepo.getAas(aas1.getId());
+			fail();
+		} catch (ElementDoesNotExistException expected) {
+		}
+	}
+
+	@Test(expected = ElementDoesNotExistException.class)
+	public void deleteNonExistingAas() {
+		aasRepo.deleteAas("nonExisting");
 	}
 }
