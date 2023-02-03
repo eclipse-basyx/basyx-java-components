@@ -63,11 +63,11 @@ public class InMemorySubmodelService implements SubmodelService {
 
 	@Override
 	public SubmodelElement getSubmodelElement(String idShort) {
-		return submodel.getSubmodelElements()
-				.stream()
-				.filter(sme -> sme.getIdShort()
-						.equals(idShort))
-				.findAny()
+		if (SubmodelElementIdShortPathParser.isPath(idShort)) {
+			HierarchicalSubmodelElementParser parser = new HierarchicalSubmodelElementParser(submodel, idShort);
+			return parser.getSubmodelElement();
+		}
+		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShort)).findAny()
 				.orElseThrow(() -> new ElementDoesNotExistException(idShort));
 	}
 
@@ -79,8 +79,13 @@ public class InMemorySubmodelService implements SubmodelService {
 
 	@Override
 	public void setSubmodelElementValue(String idShort, Object value) throws ElementDoesNotExistException {
-		Property property = (Property) getSubmodelElement(idShort);
-		property.setValue((String) value);
+		if (SubmodelElementIdShortPathParser.isPath(idShort)) {
+			HierarchicalSubmodelElementParser parser = new HierarchicalSubmodelElementParser(submodel, idShort);
+			SubmodelElement smElement = parser.getSubmodelElement();
+			setSubmodelElementValue(smElement.getIdShort(), value);
+		} else {
+			Property property = (Property) getSubmodelElement(idShort);
+			property.setValue((String) value);
+		}
 	}
-
 }

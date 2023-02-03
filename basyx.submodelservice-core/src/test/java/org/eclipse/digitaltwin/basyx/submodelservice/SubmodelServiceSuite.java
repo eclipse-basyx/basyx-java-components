@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.digitaltwin.basyx.submodelservice;
 
 import static org.junit.Assert.assertEquals;
@@ -76,6 +75,49 @@ public abstract class SubmodelServiceSuite {
 	}
 
 	@Test
+	public void getDeepNestedSubmodelElement() {
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+		String idShortPath = generateNestedIdShortPath();
+		SubmodelElement submodelElement = getSubmodelService(operationalData).getSubmodelElement(idShortPath);
+		assertEquals(DummySubmodelFactory.SUBMODEL_ELEMENT_FIRST_ID_SHORT, submodelElement.getIdShort());
+	}
+
+	@Test
+	public void getHierachicalSubmodelElementValue() {
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+		String idShortPath = generateIdShortPath();
+		Object submodelElementValue = getSubmodelService(operationalData).getSubmodelElementValue(idShortPath);
+		assertEquals(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_VALUE, submodelElementValue);
+	}
+
+	@Test(expected = ElementDoesNotExistException.class)
+	public void getNonExistentHierachicalSubmodelElementValueThrowsException() {
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+		String idShortPath = generateNonExistentIdShortPath();
+		getSubmodelService(operationalData).getSubmodelElementValue(idShortPath);
+	}
+
+	@Test
+	public void setHierachicalSubmodelElementValue() {
+		String expected = "205";
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+		String idShortPath = generateIdShortPath();
+		Property submodelElement = (Property) getSubmodelService(operationalData).getSubmodelElement(idShortPath);
+		submodelElement.setValue(expected);
+		submodelElement = (Property) getSubmodelService(operationalData).getSubmodelElement(idShortPath);
+		assertEquals(expected, submodelElement.getValue());
+	}
+
+	@Test(expected = ElementDoesNotExistException.class)
+	public void setNonExistentHierachicalSubmodelElementValueThrowsException() {
+		String expected = "205";
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+		String idShortPath = generateNonExistentIdShortPath();
+		Property submodelElement = (Property) getSubmodelService(operationalData).getSubmodelElement(idShortPath);
+		submodelElement.setValue(expected);
+	}
+
+	@Test
 	public void getPropertyValue() {
 		Submodel technicalData = DummySubmodelFactory.createTechnicalDataSubmodel();
 		String expected = getDummySubmodelElement(technicalData).getValue();
@@ -116,5 +158,21 @@ public abstract class SubmodelServiceSuite {
 				.filter(sme -> sme.getIdShort().equals(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT))
 				.findAny().get();
 	}
-	
+
+	private String generateIdShortPath() {
+		return DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ELEMENT_COLLECTION_ID_SHORT + "."
+				+ DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ELEMENT_LIST_ID_SHORT + "[0]";
+	}
+
+	private String generateNonExistentIdShortPath() {
+		return DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ELEMENT_COLLECTION_ID_SHORT + "."
+				+ DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ELEMENT_LIST_ID_SHORT + "[1]";
+	}
+
+	private String generateNestedIdShortPath() {
+		String idShortPath = DummySubmodelFactory.SUBMODEL_ELEMENT_COLLECTION_TOP + "."
+				+ DummySubmodelFactory.SUBMODEL_ELEMENT_FIRST_LIST + "[0][0]."
+				+ DummySubmodelFactory.SUBMODEL_ELEMENT_FIRST_ID_SHORT;
+		return idShortPath;
+	}
 }
