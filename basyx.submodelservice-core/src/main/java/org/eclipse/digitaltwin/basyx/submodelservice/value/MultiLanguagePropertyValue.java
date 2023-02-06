@@ -22,35 +22,29 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
+package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
+import java.util.List;
+import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.LangStringMapper;
 
-package org.eclipse.digitaltwin.basyx.http.serialization;
-
-import java.io.IOException;
-
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.SerializationException;
-import org.eclipse.digitaltwin.aas4j.v3.model.Referable;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Handles the mapping between a Referable to-be-returned and AAS4J
+ * Represents the submodel element {@link MultiLanguageProperty} value
  * 
- * @author schnicke
+ * @author danish
  *
  */
-public class ReferableJsonSerializer extends JsonSerializer<Referable> {
-
-	@Override
-	public void serialize(Referable value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-		try {
-			String str = new org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer().write(value);
-			gen.writeRawValue(str);
-		} catch (SerializationException e) {
-			e.printStackTrace();
-		}
+public class MultiLanguagePropertyValue implements SubmodelElementValue {
+	@JsonValue
+	private List<LangStringMapper> value;
+	
+	public MultiLanguagePropertyValue(List<LangStringMapper> list) {
+		this.value = list;
 	}
 
+	public List<LangStringMapper> getValue() {
+		return this.value;
+	}
 }
