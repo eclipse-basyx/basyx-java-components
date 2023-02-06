@@ -25,10 +25,11 @@
 package org.eclipse.digitaltwin.basyx.aasrepository;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
@@ -46,11 +47,8 @@ import org.junit.Test;
 public abstract class AasRepositorySuite {
 
 	private AssetAdministrationShell aas1;
-
-	private static final String aasIdWithNeedForEncoding = "aas1/s";
-
 	private AssetAdministrationShell aas2;
-	private static final String aas2Id = "aas2";
+	private List<AssetAdministrationShell> preconfiguredShells = new ArrayList<>();
 
 	private AasRepository aasRepo;
 
@@ -60,23 +58,22 @@ public abstract class AasRepositorySuite {
 	public void createAasRepoWithDummyAas() {
 		aasRepo = getAasRepositoryFactory().create();
 
-		aas1 = new DefaultAssetAdministrationShell.Builder().id(aasIdWithNeedForEncoding)
+		aas1 = new DefaultAssetAdministrationShell.Builder().id("aas1/s")
 				.build();
 
-		aas2 = new DefaultAssetAdministrationShell.Builder().id(aas2Id)
+		aas2 = new DefaultAssetAdministrationShell.Builder().id("aas2")
 				.build();
 
-		aasRepo.createAas(aas1);
-		aasRepo.createAas(aas2);
+		preconfiguredShells.add(aas1);
+		preconfiguredShells.add(aas2);
+
+		preconfiguredShells.forEach(shell -> aasRepo.createAas(shell));
 	}
 
 	@Test
 	public void allAasRetrieval() throws Exception {
 		Collection<AssetAdministrationShell> coll = aasRepo.getAllAas();
-		assertEquals(2, coll.size());
-
-		assertTrue(coll.contains(aas1));
-		assertTrue(coll.contains(aas2));
+		assertEquals(preconfiguredShells, coll);
 	}
 
 	@Test
