@@ -52,6 +52,7 @@ import org.eclipse.basyx.components.security.authorization.internal.Authorizatio
 import org.eclipse.basyx.components.security.authorization.internal.IJwtBearerTokenAuthenticationConfigurationProvider;
 import org.eclipse.basyx.extensions.aas.directory.tagged.api.IAASTaggedDirectory;
 import org.eclipse.basyx.extensions.aas.directory.tagged.map.MapTaggedDirectory;
+import org.eclipse.basyx.extensions.shared.authorization.internal.ElevatedCodeAuthentication;
 import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
@@ -263,7 +264,9 @@ public class RegistryComponent implements IComponent {
 		logger.info("Enable tagged directory functionality");
 		IAASTaggedDirectory taggedDirectory;
 		if (registryConfig.getRegistryBackend().equals(RegistryBackend.MONGODB)) {
-			taggedDirectory = new MongoDBTaggedDirectory(loadMongoDBConfiguration(), new HashMap<>());
+			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
+				taggedDirectory = new MongoDBTaggedDirectory(loadMongoDBConfiguration(), new HashMap<>());
+			}
 		} else {
 			taggedDirectory = new MapTaggedDirectory(new HashedMap<>(), new HashedMap<>());
 		}
@@ -336,7 +339,9 @@ public class RegistryComponent implements IComponent {
 	private IAASRegistry createMongoDBRegistryBackend() {
 		logger.info("Creating MongoDBRegistry");
 		final BaSyxMongoDBConfiguration mongoDBConfiguration = loadMongoDBConfiguration();
-		return new MongoDBRegistry(mongoDBConfiguration);
+		try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
+			return new MongoDBRegistry(mongoDBConfiguration);
+		}
 	}
 
 	private IAASRegistry decorate(IAASRegistry aasRegistry) {
