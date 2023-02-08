@@ -51,21 +51,26 @@ public class SubmodelElementIdShortPathParser {
 		List<Integer> indices = new ArrayList<>();
 		for (int i = 0; i < idShort.length(); i++) {
 			if (idShort.charAt(i) == '[') {
-				boolean ended = false;
-				int ix = i;
-				String index = "";
-				while (!ended) {
-					ix++;
-					if (idShort.charAt(ix) == ']') {
-						ended = true;
-					} else {
-						index = index + idShort.charAt(ix);
-					}
-				}
-				indices.add(Integer.parseInt(index));
+				int index = extractIndex(idShort, i);
+				indices.add(index);
 			}
 		}
 		return indices;
+	}
+
+	private static int extractIndex(String idShort, int currentCharIndex) {
+		boolean ended = false;
+		int charIndex = currentCharIndex;
+		String index = "";
+		while (!ended) {
+			charIndex++;
+			if (idShort.charAt(charIndex) == ']') {
+				ended = true;
+			} else {
+				index = index + idShort.charAt(charIndex);
+			}
+		}
+		return Integer.parseInt(index);
 	}
 
 	/**

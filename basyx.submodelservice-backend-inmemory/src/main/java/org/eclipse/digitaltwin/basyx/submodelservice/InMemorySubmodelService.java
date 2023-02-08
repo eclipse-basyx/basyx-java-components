@@ -62,30 +62,20 @@ public class InMemorySubmodelService implements SubmodelService {
 	}
 
 	@Override
-	public SubmodelElement getSubmodelElement(String idShort) {
-		if (SubmodelElementIdShortPathParser.isPath(idShort)) {
-			HierarchicalSubmodelElementParser parser = new HierarchicalSubmodelElementParser(submodel, idShort);
-			return parser.getSubmodelElement();
-		}
-		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShort)).findAny()
-				.orElseThrow(() -> new ElementDoesNotExistException(idShort));
+	public SubmodelElement getSubmodelElement(String idShortPath) {
+		HierarchicalSubmodelElementParser parser = new HierarchicalSubmodelElementParser(submodel);
+		return parser.getSubmodelElementFromIdShortPath(idShortPath);
 	}
 
 	@Override
-	public Object getSubmodelElementValue(String idShort) throws ElementDoesNotExistException {
-		Property property = (Property) getSubmodelElement(idShort);
+	public Object getSubmodelElementValue(String idShortPath) throws ElementDoesNotExistException {
+		Property property = (Property) getSubmodelElement(idShortPath);
 		return property.getValue();
 	}
 
 	@Override
-	public void setSubmodelElementValue(String idShort, Object value) throws ElementDoesNotExistException {
-		if (SubmodelElementIdShortPathParser.isPath(idShort)) {
-			HierarchicalSubmodelElementParser parser = new HierarchicalSubmodelElementParser(submodel, idShort);
-			SubmodelElement smElement = parser.getSubmodelElement();
-			setSubmodelElementValue(smElement.getIdShort(), value);
-		} else {
-			Property property = (Property) getSubmodelElement(idShort);
-			property.setValue((String) value);
-		}
+	public void setSubmodelElementValue(String idShortPath, Object value) throws ElementDoesNotExistException {
+		Property property = (Property) getSubmodelElement(idShortPath);
+		property.setValue((String) value);
 	}
 }

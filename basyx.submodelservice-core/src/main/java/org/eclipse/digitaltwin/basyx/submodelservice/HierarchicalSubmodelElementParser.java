@@ -40,45 +40,62 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
  *
  */
 public class HierarchicalSubmodelElementParser {
-	private String idShortPath;
 	private Submodel submodel;
 
 	/**
 	 * Creates a HierarchicalSubmodelElementParser
 	 * 
-	 * @param submodel    the submodel
-	 * @param idShortPath the idShortPath
+	 * @param submodel the submodel
+	 * 
 	 */
-	public HierarchicalSubmodelElementParser(Submodel submodel, String idShortPath) {
-		this.idShortPath = idShortPath;
+	public HierarchicalSubmodelElementParser(Submodel submodel) {
 		this.submodel = submodel;
 	}
 
 	/**
 	 * Returns the nested SubmodelElement given in the idShortPath
 	 * 
+	 * @param idShortPath the isShortPath of the SubmodelElement
+	 * 
 	 * @return the nested SubmodelElement
 	 */
-	public SubmodelElement getSubmodelElement() {
-		String[] splittedPath = SubmodelElementIdShortPathParser.parsePath(idShortPath);
+	public SubmodelElement getSubmodelElementFromIdShortPath(String idShortPath) {
 
-		SubmodelElement submodelElement = getFirstSubmodelElement(
-				SubmodelElementIdShortPathParser.getIdShortWithoutIndices(getFirstIdShort(splittedPath)));
+		if (SubmodelElementIdShortPathParser.isPath(idShortPath)) {
 
-		for (int i = 0; i < splittedPath.length; i++) {
-			String idShort = splittedPath[i];
-			SubmodelElement currentSubmodelElement = getSubmodelElementInSubmodelElement(submodelElement,
-					SubmodelElementIdShortPathParser.getIdShortWithoutIndices(idShort));
-			if (isSubmodelElementList(currentSubmodelElement)) {
-				List<Integer> indices = SubmodelElementIdShortPathParser.getAllIndices(idShort);
-				for (int index : indices) {
-					currentSubmodelElement = getSubmodelElementFromSubmodelElementList(currentSubmodelElement, index);
+			String[] splittedPath = SubmodelElementIdShortPathParser.parsePath(idShortPath);
+
+			SubmodelElement submodelElement = getFirstSubmodelElement(
+					SubmodelElementIdShortPathParser.getIdShortWithoutIndices(getFirstIdShort(splittedPath)));
+
+			for (int i = 0; i < splittedPath.length; i++) {
+
+				String curentIdShort = splittedPath[i];
+				SubmodelElement currentSubmodelElement = getSubmodelElementInSubmodelElement(submodelElement,
+						SubmodelElementIdShortPathParser.getIdShortWithoutIndices(curentIdShort));
+
+				if (isSubmodelElementList(currentSubmodelElement)) {
+					currentSubmodelElement = getNestedSubmodelElementFromSubmodelElementList(curentIdShort,
+							currentSubmodelElement);
 				}
-			}
-			submodelElement = currentSubmodelElement;
-		}
 
-		return submodelElement;
+				submodelElement = currentSubmodelElement;
+			}
+
+			return submodelElement;
+
+		}
+		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShortPath)).findAny()
+				.orElseThrow(() -> new ElementDoesNotExistException(idShortPath));
+	}
+
+	private SubmodelElement getNestedSubmodelElementFromSubmodelElementList(String cuurentIdShort,
+			SubmodelElement currentSubmodelElement) {
+		List<Integer> indices = SubmodelElementIdShortPathParser.getAllIndices(cuurentIdShort);
+		for (int index : indices) {
+			currentSubmodelElement = getSubmodelElementFromSubmodelElementList(currentSubmodelElement, index);
+		}
+		return currentSubmodelElement;
 	}
 
 	private boolean isSubmodelElementList(SubmodelElement currentSubmodelElement) {
