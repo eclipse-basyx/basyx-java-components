@@ -61,32 +61,32 @@ public class HierarchicalSubmodelElementParser {
 	 */
 	public SubmodelElement getSubmodelElementFromIdShortPath(String idShortPath) {
 
-		if (SubmodelElementIdShortPathParser.isPath(idShortPath)) {
+		if (!SubmodelElementIdShortPathParser.isPath(idShortPath)) {
+			return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShortPath)).findAny()
+					.orElseThrow(() -> new ElementDoesNotExistException(idShortPath));
+		}
 
-			String[] splittedPath = SubmodelElementIdShortPathParser.parsePath(idShortPath);
+		String[] splittedPath = SubmodelElementIdShortPathParser.parsePath(idShortPath);
 
-			SubmodelElement submodelElement = getFirstSubmodelElement(
-					SubmodelElementIdShortPathParser.getIdShortWithoutIndices(getFirstIdShort(splittedPath)));
+		SubmodelElement submodelElement = getFirstSubmodelElement(
+				SubmodelElementIdShortPathParser.getIdShortWithoutIndices(getFirstIdShort(splittedPath)));
 
-			for (int i = 0; i < splittedPath.length; i++) {
+		for (int i = 0; i < splittedPath.length; i++) {
 
-				String curentIdShort = splittedPath[i];
-				SubmodelElement currentSubmodelElement = getSubmodelElementInSubmodelElement(submodelElement,
-						SubmodelElementIdShortPathParser.getIdShortWithoutIndices(curentIdShort));
+			String currentIdShort = splittedPath[i];
+			SubmodelElement currentSubmodelElement = getSubmodelElementInSubmodelElement(submodelElement,
+					SubmodelElementIdShortPathParser.getIdShortWithoutIndices(currentIdShort));
 
-				if (isSubmodelElementList(currentSubmodelElement)) {
-					currentSubmodelElement = getNestedSubmodelElementFromSubmodelElementList(curentIdShort,
-							currentSubmodelElement);
-				}
-
-				submodelElement = currentSubmodelElement;
+			if (isSubmodelElementList(currentSubmodelElement)) {
+				currentSubmodelElement = getNestedSubmodelElementFromSubmodelElementList(currentIdShort,
+						currentSubmodelElement);
 			}
 
-			return submodelElement;
-
+			submodelElement = currentSubmodelElement;
 		}
-		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShortPath)).findAny()
-				.orElseThrow(() -> new ElementDoesNotExistException(idShortPath));
+
+		return submodelElement;
+
 	}
 
 	private SubmodelElement getNestedSubmodelElementFromSubmodelElementList(String cuurentIdShort,

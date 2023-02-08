@@ -31,22 +31,26 @@ import java.util.List;
  * Helper class containing Methods to split a idShortPath
  * 
  * @author fried
- *
+ * 
  */
 public class SubmodelElementIdShortPathParser {
-
+	/**
+	 * Splits an idShortPath
+	 * 
+	 * @param idShortPath
+	 * @return A list containing all idShorts of the idShortPath
+	 */
 	public static String[] parsePath(String idShortPath) {
 		String parsed[] = idShortPath.split("\\.");
 		return parsed;
 	}
 
 	/**
-	 * Returns all Indices of a idShort
+	 * Returns all Indices of an idShort
 	 * 
 	 * @param idShort the idShort
 	 * @return List of indices
 	 */
-
 	public static List<Integer> getAllIndices(String idShort) {
 		List<Integer> indices = new ArrayList<>();
 		for (int i = 0; i < idShort.length(); i++) {
@@ -84,7 +88,7 @@ public class SubmodelElementIdShortPathParser {
 	}
 
 	/**
-	 * Checks if a idShort has indices
+	 * Checks if an idShort has indices
 	 * 
 	 * @param idShort the idShort
 	 * @return
@@ -94,7 +98,7 @@ public class SubmodelElementIdShortPathParser {
 	}
 
 	/**
-	 * Checks if a idShort is a idShortPath
+	 * Checks if an idShort is an idShortPath
 	 * 
 	 * @param idShort the idShort
 	 * @return
