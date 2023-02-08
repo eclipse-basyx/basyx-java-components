@@ -5,7 +5,7 @@
 
 	<groupId>org.eclipse.basyx</groupId>
 	<artifactId>basyx.components</artifactId>
-	<version>1.3.0</version>
+	<version>1.3.1</version>
 	<name>BaSyx Components</name>
 	<description>BaSyx Off-the-Shelf Components</description>
 	<url>https://www.eclipse.org/basyx/</url>
@@ -124,7 +124,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M7</version>
+					<version>3.0.0-M8</version>
 					<configuration>
 						<excludes>
 							<exclude>**/*HTTP*</exclude>
@@ -137,7 +137,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.0.0-M7</version>
+					<version>3.0.0-M8</version>
 					<executions>
 						<execution>
 							<goals>
@@ -277,14 +277,14 @@
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.3.0</version>
+				<version>1.3.1</version>
 			</dependency>
 
 			<!-- BaSyx SDK tests -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.3.0</version>
+				<version>1.3.1</version>
 				<classifier>tests</classifier>
 				<scope>test</scope>
 			</dependency>

@@ -97,18 +97,23 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 	}
 
 	@Test
-	public void shellLifeCycle() {
+	public void shellLifeCycle() throws InterruptedException {
 		MqttV2AASAggregatorTopicFactory aasAggregatorFactory = new MqttV2AASAggregatorTopicFactory(new Base64URLEncoder());
 
 		AssetAdministrationShell shell = createShell(shellIdentifier.getId(), shellIdentifier);
 
 		manager.createAAS(shell, getURL());
 
+		waitForPropagation();
+
 		assertEquals(aasAggregatorFactory.createCreateAASTopic(AAS_SERVER_ID), listener.lastTopic);
 		
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
 		manager.deleteAAS(shellIdentifier);
+
+		waitForPropagation();
+
 		assertEquals(aasAggregatorFactory.createDeleteAASTopic(AAS_SERVER_ID), listener.lastTopic);
 		try {
 			manager.retrieveAAS(shellIdentifier);
@@ -119,7 +124,7 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 	}
 
 	@Test
-	public void submodelLifeCycle() {
+	public void submodelLifeCycle() throws InterruptedException {
 		MqttV2SubmodelAggregatorTopicFactory submodelAggregatorFactory = new MqttV2SubmodelAggregatorTopicFactory(new Base64URLEncoder());
 		IIdentifier shellIdentifierForSubmodel = new CustomId("shellSubmodelId");
 		AssetAdministrationShell shell = createShell(shellIdentifierForSubmodel.getId(), shellIdentifierForSubmodel);
@@ -128,11 +133,15 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		Submodel submodel = createSubmodel(submodelIdentifier.getId(), submodelIdentifier);
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
 
+		waitForPropagation();
+
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(submodelAggregatorFactory.createCreateSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 
 		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
+
+		waitForPropagation();
 
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(submodelAggregatorFactory.createDeleteSubmodelTopic(shell.getIdentification().getId(), AAS_SERVER_ID))));
 
@@ -143,6 +152,10 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 		}
 
 		manager.deleteAAS(shellIdentifierForSubmodel);
+	}
+
+	private void waitForPropagation() throws InterruptedException {
+		Thread.sleep(1000);
 	}
 
 	protected static BaSyxContextConfiguration createBaSyxContextConfiguration() {

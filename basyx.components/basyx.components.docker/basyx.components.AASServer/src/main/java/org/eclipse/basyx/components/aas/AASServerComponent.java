@@ -540,7 +540,9 @@ public class AASServerComponent implements IComponent {
 
 	private IAASAggregator createAASAggregator() {
 		if (isMongoDBBackend()) {
-			return new MongoDBAASServerComponentFactory(createMongoDbConfiguration(), createAASServerDecoratorList(), registry).create();
+			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
+				return new MongoDBAASServerComponentFactory(createMongoDbConfiguration(), createAASServerDecoratorList(), registry).create();
+			}
 		}
 		return new InMemoryAASServerComponentFactory(createAASServerDecoratorList(), registry).create();
 	}

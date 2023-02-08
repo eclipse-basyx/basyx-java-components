@@ -66,7 +66,7 @@ public class AuthorizationDynamicClassLoader {
 			final String effectiveClassName = classesBySimpleNameMap.getOrDefault(className, className);
 
 			if (effectiveClassName == null) {
-				throw new IllegalArgumentException("granted authority subject information provider class is null");
+				throw new IllegalArgumentException(String.format("property %s does not exist or class name obtained from config property (%s) is null", propertyName, className));
 			}
 
 			final Class<?> clazz = Class.forName(effectiveClassName);

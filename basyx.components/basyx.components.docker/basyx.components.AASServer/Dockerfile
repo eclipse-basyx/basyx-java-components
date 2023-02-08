@@ -1,7 +1,8 @@
 FROM openjdk:11-slim-bullseye
 
-# Install dependency for wait-for-it-env.sh
+# Install dependency for wait-for-it-env.sh & wget for health check
 RUN apt update && apt install -y jq && apt clean
+RUN apt install -y wget
 
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
@@ -18,6 +19,7 @@ COPY target/${JAR_FILE} /usr/share/basyxExecutable.jar
 COPY target/lib /usr/share/lib
 COPY src/main/resources/aas.properties /usr/share/config/aas.properties
 COPY src/main/resources/context.properties /usr/share/config/context.properties
+COPY src/main/resources/mqtt.properties /usr/share/config/mqtt.properties
 COPY src/test/resources/dockerMongodb.properties /usr/share/config/mongodb.properties
 
 # Expose the appropriate port. In case of Tomcat, this is 8080.
