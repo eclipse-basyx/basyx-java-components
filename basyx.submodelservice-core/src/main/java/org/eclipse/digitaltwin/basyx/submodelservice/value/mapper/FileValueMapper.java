@@ -35,14 +35,20 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  *
  */
 public class FileValueMapper implements ValueMapper {
-	private FileValue propertyValue;
+	private File file;
 	
 	public FileValueMapper(File file) {
-		this.propertyValue = new FileValue(file.getContentType(), file.getValue());
+		this.file = file;
 	}
 
 	@Override
 	public SubmodelElementValue getValue() {
-		return this.propertyValue;
+		return new FileValue(file.getContentType(), file.getValue());
+	}
+
+	@Override
+	public void setValue(SubmodelElementValue submodelElementValue) {
+		file.setContentType(((FileValue) submodelElementValue).getContentType());
+		file.setValue(((FileValue) submodelElementValue).getValue());
 	}
 }

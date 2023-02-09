@@ -30,10 +30,15 @@ import java.util.Arrays;
 import java.util.List;
 import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
 import org.eclipse.digitaltwin.aas4j.v3.model.File;
+import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Range;
+import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
+import org.eclipse.digitaltwin.basyx.submodelservice.DummySubmodelFactory;
+import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelService;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelServiceUtil;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
@@ -85,6 +90,23 @@ public class TestMappedSubmodelElementValue {
 		assertEquals(expectedValue.get(0).getLanguage(),
 				((MultiLanguagePropertyValue) multiLanguagePropertyValueMapper.getValue()).getValue().get(0)
 						.getLanguage());
+	}
+
+	@Test
+	public void mappedMultiLanguagePropertySetValue() {
+		List<LangString> expectedValue = SubmodelServiceUtil.MULTI_LANGUAGE_VALUE;
+		
+		List<LangStringValue> valueToWrite = Arrays.asList(new LangStringValue("Hello", "en"),
+				new LangStringValue("Hallo", "de"));
+
+		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
+
+		SubmodelElementValue submodelElementValue = new MultiLanguagePropertyValue(valueToWrite);
+
+		ValueMapper multiLanguagePropertyValueMapper = new MultiLanguagePropertyValueMapper(multiLanguageProperty);
+		multiLanguagePropertyValueMapper.setValue(submodelElementValue);
+
+		assertEquals(expectedValue, multiLanguageProperty.getValue());
 	}
 
 	@Test

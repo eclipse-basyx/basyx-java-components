@@ -33,6 +33,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.factory.SubmodelElementValueMapperFactory;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.ValueMapper;
 
 /**
  * Implements the SubmodelService as in-memory variant
@@ -81,9 +82,14 @@ public class InMemorySubmodelService implements SubmodelService {
 	}
 
 	@Override
-	public void setSubmodelElementValue(String idShort, Object value) throws ElementDoesNotExistException {
-		Property property = (Property) getSubmodelElement(idShort);
-		property.setValue((String) value);
+	public void setSubmodelElementValue(String idShort, SubmodelElementValue value) throws ElementDoesNotExistException {
+//		Property property = (Property) getSubmodelElement(idShort);
+//		property.setValue((String) value);
+		
+		SubmodelElementValueMapperFactory submodelElementValueFactory = new SubmodelElementValueMapperFactory();
+		
+		ValueMapper valueMapper = submodelElementValueFactory.create(getSubmodelElement(idShort));
+		
+		valueMapper.setValue(value);	
 	}
-
 }

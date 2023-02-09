@@ -1,7 +1,5 @@
 package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import java.util.AbstractMap.SimpleEntry;
-
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.LangStringValue;

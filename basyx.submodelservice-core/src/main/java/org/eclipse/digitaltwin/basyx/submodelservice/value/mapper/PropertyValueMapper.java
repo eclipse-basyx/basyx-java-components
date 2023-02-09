@@ -35,14 +35,19 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  *
  */
 public class PropertyValueMapper implements ValueMapper {
-	private PropertyValue propertyValue;
+	private Property property;
 	
 	public PropertyValueMapper(Property property) {
-		this.propertyValue = new PropertyValue(property.getValue());
+		this.property = property;
 	}
 
 	@Override
 	public SubmodelElementValue getValue() {
-		return this.propertyValue;
+		return new PropertyValue(property.getValue());
+	}
+
+	@Override
+	public void setValue(SubmodelElementValue submodelElementValue) {
+		property.setValue(((PropertyValue) submodelElementValue).getValue());
 	}
 }

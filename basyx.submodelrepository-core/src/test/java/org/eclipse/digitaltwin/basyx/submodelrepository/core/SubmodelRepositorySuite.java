@@ -41,6 +41,7 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelservice.DummySubmodelFactory;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.junit.Test;
 
 /**
@@ -193,23 +194,32 @@ public abstract class SubmodelRepositorySuite {
 	@Test
 	public void setPropertyValue() {
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
-		Object expected = "200";
-		repo.setSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT, expected);
-		Object value = repo.getSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT);
+		String expected = "200";
+		
+		SubmodelElementValue valueToWrite = new PropertyValue(expected);
+		
+		repo.setSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT, valueToWrite);
+		PropertyValue retrievedValue = (PropertyValue) repo.getSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT);
 
-		assertEquals(expected, ((PropertyValue) value).getValue());
+		assertEquals(expected, retrievedValue.getValue());
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
 	public void setNonExistingSubmodelElementValue() {
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
-		repo.setSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, "nonExisting", "doesNotMatter");
+		
+		SubmodelElementValue valueToWrite = new PropertyValue("400");
+		
+		repo.setSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, "nonExisting", valueToWrite);
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
 	public void setSubmodelElementValueOfNonExistingSubmodel() {
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
-		repo.setSubmodelElementValue("nonExisting", "doesNotMatter", "doesNotMatter");
+		
+		SubmodelElementValue valueToWrite = new PropertyValue("400");
+		
+		repo.setSubmodelElementValue("nonExisting", "doesNotMatter", valueToWrite);
 	}
 
 	private SubmodelElement getExpectedSubmodelElement() {

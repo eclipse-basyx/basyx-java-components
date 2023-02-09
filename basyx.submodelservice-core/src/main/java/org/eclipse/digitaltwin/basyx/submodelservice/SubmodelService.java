@@ -86,6 +86,6 @@ public interface SubmodelService {
 	 * @throws ElementDoesNotExistException
 	 *             if the SubmodelElement does not exist
 	 */
-	public void setSubmodelElementValue(String idShort, Object value) throws ElementDoesNotExistException;
+	public void setSubmodelElementValue(String idShort, SubmodelElementValue value) throws ElementDoesNotExistException;
 
 }

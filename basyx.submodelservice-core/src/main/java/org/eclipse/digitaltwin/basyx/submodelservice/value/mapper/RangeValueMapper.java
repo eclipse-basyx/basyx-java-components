@@ -35,15 +35,29 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  *
  */
 public class RangeValueMapper implements ValueMapper {
-	private RangeValue rangeValue;
+	private Range range;
 	
 	public RangeValueMapper(Range range) {
-		this.rangeValue = new RangeValue(parseIntValue(range.getMin()), parseIntValue(range.getMax()));
+		this.range = range;
 	}
 
 	@Override
 	public SubmodelElementValue getValue() {
-		return this.rangeValue;
+		return new RangeValue(parseIntValue(range.getMin()), parseIntValue(range.getMax()));
+	}
+	
+	@Override
+	public void setValue(SubmodelElementValue submodelElementValue) {
+		range.setMin(getMinValue((RangeValue) submodelElementValue));
+		range.setMax(getMaxValue((RangeValue) submodelElementValue));
+	}
+	
+	private String getMinValue(RangeValue submodelElementValue) {
+		return String.valueOf(submodelElementValue.getMin());
+	}
+	
+	private String getMaxValue(RangeValue submodelElementValue) {
+		return String.valueOf(submodelElementValue.getMax());
 	}
 	
 	private int parseIntValue(String value) {

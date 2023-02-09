@@ -37,12 +37,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  *
  */
 public class LangStringValue {
-//	private SimpleEntry<String, String> language;
 	private String text;
 	private String language;
-
-//	@JsonValue
-//	private Map<String, String> language;
 	
 	public LangStringValue(String text, String language) {
 		this.text = text;
