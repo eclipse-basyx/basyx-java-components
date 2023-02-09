@@ -22,7 +22,7 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice;
+package org.eclipse.digitaltwin.basyx.submodelservice.pathParsing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +45,10 @@ public class SubmodelElementIdShortPathParser {
 	 * @return A stack containing all idShortTokens of the idShortPath
 	 * 
 	 */
-	public Stack<String> parsePathTokens(String idShortPath) {
+	public Stack<PathToken> parsePathTokens(String idShortPath) {
 		try {
 			String splitted[] = splitIdShortPathAtDots(idShortPath);
-			Stack<String> tokenStack = generateTokenStackFromSplittedArray(splitted);
+			Stack<PathToken> tokenStack = generateTokenStackFromSplittedArray(splitted);
 			return tokenStack;
 		} catch (ElementDoesNotExistException e) {
 			throw new ElementDoesNotExistException(idShortPath);
@@ -63,14 +63,14 @@ public class SubmodelElementIdShortPathParser {
 		return idShort.split("\\[")[0];
 	}
 
-	private static Stack<String> generateTokenStackFromSplittedArray(String[] splitted) {
-		Stack<String> tokenStack = new Stack<>();
+	private static Stack<PathToken> generateTokenStackFromSplittedArray(String[] splitted) {
+		Stack<PathToken> tokenStack = new Stack<>();
 		for (int i = splitted.length - 1; i >= 0; i--) {
 			List<Integer> indices = getAllIndices(splitted[i]);
 			for (int ix = indices.size() - 1; ix >= 0; ix--) {
-				tokenStack.push("[" + indices.get(ix) + "]");
+				tokenStack.push(new ListIndexPathToken(indices.get(ix).toString()));
 			}
-			tokenStack.push(getIdShortWithoutIndices(splitted[i]));
+			tokenStack.push(new CollectionIdShortPathToken(getIdShortWithoutIndices(splitted[i])));
 		}
 		return tokenStack;
 	}

@@ -22,14 +22,12 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice;
+package org.eclipse.digitaltwin.basyx.submodelservice.pathParsing;
 
 import java.util.Stack;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
-import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
-import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
@@ -63,50 +61,25 @@ public class HierarchicalSubmodelElementParser {
 	 */
 	public SubmodelElement getSubmodelElementFromIdShortPath(String idShortPath) throws ElementDoesNotExistException {
 		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
-		Stack<String> idShortPathTokenStack = pathParser.parsePathTokens(idShortPath);
+		Stack<PathToken> idShortPathTokenStack = pathParser.parsePathTokens(idShortPath);
 
 		return getLastElementOfStack(idShortPathTokenStack);
 	}
 
-	private SubmodelElement getLastElementOfStack(Stack<String> idShortPathTokenStack) {
-		String rootElementIdShort = idShortPathTokenStack.pop();
-		SubmodelElement rootElement = getFirstSubmodelElementFromStack(rootElementIdShort);
+	private SubmodelElement getLastElementOfStack(Stack<PathToken> idShortPathTokenStack) {
+		PathToken nextToken = idShortPathTokenStack.pop();
+		SubmodelElement nextElement = getFirstSubmodelElementFromStack(nextToken.getToken());
 		while (!idShortPathTokenStack.isEmpty()) {
-			String token = idShortPathTokenStack.pop();
-			rootElement = getNextSubmodelElement(rootElement, token);
+			nextToken = idShortPathTokenStack.pop();
+			nextElement = nextToken.getSubmodelElement(nextElement);
 		}
 
-		return rootElement;
+		return nextElement;
 	}
 
 	private SubmodelElement getFirstSubmodelElementFromStack(String rootElementIdShort) {
 		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(rootElementIdShort))
 				.findAny().orElseThrow(() -> new ElementDoesNotExistException());
-	}
-
-	private SubmodelElement getNextSubmodelElement(SubmodelElement element, String token) {
-		if (isIndex(token)) {
-			SubmodelElementList sml = (SubmodelElementList) element;
-			int index = getIndexFromToken(token);
-			if (index > sml.getValue().size() - 1) {
-				throw new ElementDoesNotExistException(element.getIdShort() + token);
-			}
-			return sml.getValue().get(index);
-		}
-		SubmodelElementCollection smc = (SubmodelElementCollection) element;
-
-		return smc.getValue().stream().filter(sme -> sme.getIdShort().equals(token)).findAny()
-				.orElseThrow(() -> new ElementDoesNotExistException(token));
-	}
-
-	private int getIndexFromToken(String token) {
-		int start = token.indexOf('[');
-		int end = token.indexOf(']');
-		return Integer.valueOf(token.substring(start + 1, end));
-	}
-
-	private boolean isIndex(String token) {
-		return token.contains("[");
 	}
 
 }

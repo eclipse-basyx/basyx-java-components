@@ -29,6 +29,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.Stack;
 
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
+import org.eclipse.digitaltwin.basyx.submodelservice.pathParsing.PathToken;
+import org.eclipse.digitaltwin.basyx.submodelservice.pathParsing.SubmodelElementIdShortPathParser;
 import org.junit.Test;
 
 /**
@@ -56,12 +58,12 @@ public class SubmodelElementIdShortPathParserTest {
 	@Test
 	public void idShortParsedCorrectly() throws ElementDoesNotExistException {
 		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
-		Stack<String> tokenStack = pathParser.parsePathTokens(ID_SHORT_PATH);
-		assertEquals(ID_SHORT_PATH_FIRST_PART, tokenStack.pop());
-		assertEquals(ID_SHORT_PATH_SECOND_PART_ID_SHORT, tokenStack.pop());
-		assertEquals("[" + INDEX_ONE + "]", tokenStack.pop());
-		assertEquals("[" + INDEX_TWO + "]", tokenStack.pop());
-		assertEquals(ID_SHORT_PATH_THIRD_PART, tokenStack.pop());
+		Stack<PathToken> tokenStack = pathParser.parsePathTokens(ID_SHORT_PATH);
+		assertEquals(ID_SHORT_PATH_FIRST_PART, tokenStack.pop().getToken());
+		assertEquals(ID_SHORT_PATH_SECOND_PART_ID_SHORT, tokenStack.pop().getToken());
+		assertEquals(INDEX_ONE, (int) Integer.valueOf(tokenStack.pop().getToken()));
+		assertEquals(INDEX_TWO, (int) Integer.valueOf(tokenStack.pop().getToken()));
+		assertEquals(ID_SHORT_PATH_THIRD_PART, tokenStack.pop().getToken());
 	}
 
 	@Test(expected = Exception.class)
@@ -73,7 +75,7 @@ public class SubmodelElementIdShortPathParserTest {
 	@Test
 	public void idShortWithSpecialCharactersDoesNotThrowError() {
 		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
-		Stack<String> tokenStack = pathParser.parsePathTokens(ID_SHORT_WITH_SPECIAL_CHARACTERS);
-		assertEquals(ID_SHORT_WITH_SPECIAL_CHARACTERS, tokenStack.pop());
+		Stack<PathToken> tokenStack = pathParser.parsePathTokens(ID_SHORT_WITH_SPECIAL_CHARACTERS);
+		assertEquals(ID_SHORT_WITH_SPECIAL_CHARACTERS, tokenStack.pop().getToken());
 	}
 }
