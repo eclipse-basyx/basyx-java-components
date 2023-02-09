@@ -102,7 +102,7 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 		manager.createAAS(shell, getURL());
 
 		assertEquals(MqttAASAggregatorHelper.TOPIC_CREATEAAS, listener.lastTopic);
-		
+
 		assertEquals(shell.getIdShort(), manager.retrieveAAS(shellIdentifier).getIdShort());
 
 		manager.deleteAAS(shellIdentifier);
@@ -123,18 +123,21 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 
 		Submodel submodel = createSubmodel(submodelIdentifier.getId(), submodelIdentifier);
 		manager.createSubmodel(shellIdentifierForSubmodel, submodel);
-
+		System.out.println(listener.getTopics());
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_ADDSUBMODEL)));
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_CREATESUBMODEL)));
+		assertTrue(listener.getTopics().stream()
+				.anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_CREATESUBMODEL)));
 
-		assertEquals(submodel.getIdShort(), manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
+		assertEquals(submodel.getIdShort(),
+				manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier).getIdShort());
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 
 		waitForPropagation();
 
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
-		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL)));
+		assertTrue(listener.getTopics().stream()
+				.anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL)));
 		try {
 			manager.retrieveSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 			fail();
