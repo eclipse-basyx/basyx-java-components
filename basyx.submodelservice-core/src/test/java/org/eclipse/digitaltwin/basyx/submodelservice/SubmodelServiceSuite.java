@@ -26,10 +26,21 @@
 package org.eclipse.digitaltwin.basyx.submodelservice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
+import org.eclipse.digitaltwin.aas4j.v3.model.ModelingKind;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelElementCollection;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelElementList;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.junit.Test;
 
@@ -88,6 +99,48 @@ public abstract class SubmodelServiceSuite {
 		String idShortPath = generateIdShortPath();
 		Object submodelElementValue = getSubmodelService(operationalData).getSubmodelElementValue(idShortPath);
 		assertEquals(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_VALUE, submodelElementValue);
+	}
+
+	@Test
+	public void getHierarchicalSubmodelElementWhenFirstElementIsList() {
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+
+		List<SubmodelElement> submodelElementsList = new ArrayList<>();
+
+		SubmodelElementList submodelElementList = new DefaultSubmodelElementList();
+		submodelElementList.setIdShort("testList");
+		List<SubmodelElement> listElements = new ArrayList<>();
+		Property testProperty = new DefaultProperty.Builder().kind(ModelingKind.INSTANCE).idShort("propIdShort")
+				.category("cat1").value("123").valueType(DataTypeDefXsd.INTEGER).build();
+		listElements.add(testProperty);
+		submodelElementList.setValue(listElements);
+		submodelElementsList.add(submodelElementList);
+
+		operationalData.setSubmodelElements(submodelElementsList);
+		Object submodelElement = getSubmodelService(operationalData).getSubmodelElement("testList[0]");
+		assertTrue(submodelElement instanceof Property);
+	}
+
+	@Test
+	public void getHierarchicalSubmodelElementWithFirstAndSecondSameIdShort() {
+		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
+
+		List<SubmodelElement> submodelElementsCollection = new ArrayList<>();
+
+		SubmodelElementCollection submodelElementCollection = new DefaultSubmodelElementCollection();
+		submodelElementCollection.setIdShort("test");
+		List<SubmodelElement> listElements = new ArrayList<>();
+		Property testProperty = new DefaultProperty.Builder().kind(ModelingKind.INSTANCE).idShort("test")
+				.category("cat1").value("123").valueType(DataTypeDefXsd.INTEGER).build();
+
+		listElements.add(testProperty);
+		submodelElementCollection.setValue(listElements);
+		submodelElementsCollection.add(submodelElementCollection);
+		operationalData.setSubmodelElements(submodelElementsCollection);
+
+		Object submodelElement = getSubmodelService(operationalData).getSubmodelElement("test.test");
+
+		assertTrue(submodelElement instanceof DefaultProperty);
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)

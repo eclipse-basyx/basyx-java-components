@@ -25,11 +25,10 @@
 package org.eclipse.digitaltwin.basyx.submodelservice;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-import java.util.List;
+import java.util.Stack;
 
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.junit.Test;
 
 /**
@@ -44,40 +43,37 @@ public class SubmodelElementIdShortPathParserTest {
 	private static final String ID_SHORT_PATH_FIRST_PART = "SubmodelElement";
 	private static final int INDEX_ONE = 100;
 	private static final int INDEX_TWO = 23;
-	private static final String ID_SHORT_PATH_SECOND_PART = "SubmodelElementList[" + INDEX_ONE + "][" + INDEX_TWO + "]";
+	private static final String ID_SHORT_PATH_SECOND_PART_ID_SHORT = "SubmodelElementList";
+	private static final String ID_SHORT_PATH_SECOND_PART_INDICES = "[" + INDEX_ONE + "][" + INDEX_TWO + "]";
+	private static final String ID_SHORT_PATH_SECOND_PART = ID_SHORT_PATH_SECOND_PART_ID_SHORT
+			+ ID_SHORT_PATH_SECOND_PART_INDICES;
 	private static final String ID_SHORT_PATH_THIRD_PART = "SubmodelElementProperty";
 	private static final String ID_SHORT_PATH = ID_SHORT_PATH_FIRST_PART + "." + ID_SHORT_PATH_SECOND_PART + "."
 			+ ID_SHORT_PATH_THIRD_PART;
-	private static final String ID_SHORT_WITH_SPECIAL_CHARACTERS = "doesNotMatter-,;_'*+~?=)({}&%$§!]";
+	private static final String ID_SHORT_WITH_SPECIAL_CHARACTERS = "doesNotMatter-,;_'*+~?=)({}&%$§!";
+	private static final String INVALID_ID_SHORT_PATH = "test[0].hallo[9.hello";
 
 	@Test
-	public void idShortParsedCorrectly() {
-		String[] parsed = SubmodelElementIdShortPathParser.parsePath(ID_SHORT_PATH);
-		assertEquals(ID_SHORT_PATH_FIRST_PART, parsed[0]);
-		assertEquals(ID_SHORT_PATH_SECOND_PART, parsed[1]);
-		assertEquals(ID_SHORT_PATH_THIRD_PART, parsed[2]);
+	public void idShortParsedCorrectly() throws ElementDoesNotExistException {
+		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
+		Stack<String> tokenStack = pathParser.parsePathTokens(ID_SHORT_PATH);
+		assertEquals(ID_SHORT_PATH_FIRST_PART, tokenStack.pop());
+		assertEquals(ID_SHORT_PATH_SECOND_PART_ID_SHORT, tokenStack.pop());
+		assertEquals("[" + INDEX_ONE + "]", tokenStack.pop());
+		assertEquals("[" + INDEX_TWO + "]", tokenStack.pop());
+		assertEquals(ID_SHORT_PATH_THIRD_PART, tokenStack.pop());
+	}
+
+	@Test(expected = Exception.class)
+	public void invalidIdShortPathThrowsError() throws Exception {
+		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
+		pathParser.parsePathTokens(INVALID_ID_SHORT_PATH);
 	}
 
 	@Test
-	public void indizesExtractedCorrectly() {
-		List<Integer> indices = SubmodelElementIdShortPathParser.getAllIndices(ID_SHORT_PATH_SECOND_PART);
-		assertEquals((int) indices.get(0), INDEX_ONE);
-		assertEquals((int) indices.get(1), INDEX_TWO);
-	}
-
-	@Test
-	public void getAllIndicesOnIdShortWithoutIndicesReturnsEmptyList() {
-		List<Integer> indices = SubmodelElementIdShortPathParser.getAllIndices(ID_SHORT_PATH_FIRST_PART);
-		assertTrue(indices.size() == 0);
-	}
-
-	@Test
-	public void idShortPathCheckReturnsTrue() {
-		assertTrue(SubmodelElementIdShortPathParser.isPath(ID_SHORT_PATH));
-	}
-
-	@Test
-	public void normalIdShortCheckReturnsFalse() {
-		assertFalse(SubmodelElementIdShortPathParser.isPath(ID_SHORT_WITH_SPECIAL_CHARACTERS));
+	public void idShortWithSpecialCharactersDoesNotThrowError() {
+		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
+		Stack<String> tokenStack = pathParser.parsePathTokens(ID_SHORT_WITH_SPECIAL_CHARACTERS);
+		assertEquals(ID_SHORT_WITH_SPECIAL_CHARACTERS, tokenStack.pop());
 	}
 }

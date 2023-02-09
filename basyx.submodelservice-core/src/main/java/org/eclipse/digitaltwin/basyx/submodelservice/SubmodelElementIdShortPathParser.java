@@ -26,86 +26,133 @@ package org.eclipse.digitaltwin.basyx.submodelservice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
+
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
- * Helper class containing Methods to split a idShortPath
+ * Class for parsing an idShortPath
  * 
  * @author fried
  * 
  */
 public class SubmodelElementIdShortPathParser {
+
 	/**
 	 * Splits an idShortPath
 	 * 
 	 * @param idShortPath
-	 * @return A list containing all idShorts of the idShortPath
-	 */
-	public static String[] parsePath(String idShortPath) {
-		String parsed[] = idShortPath.split("\\.");
-		return parsed;
-	}
-
-	/**
-	 * Returns all Indices of an idShort
+	 * @return A stack containing all idShortTokens of the idShortPath
 	 * 
-	 * @param idShort the idShort
-	 * @return List of indices
 	 */
-	public static List<Integer> getAllIndices(String idShort) {
-		List<Integer> indices = new ArrayList<>();
-		for (int i = 0; i < idShort.length(); i++) {
-			if (idShort.charAt(i) == '[') {
-				int index = extractIndex(idShort, i);
-				indices.add(index);
-			}
+	public Stack<String> parsePathTokens(String idShortPath) {
+		try {
+			String splitted[] = splitIdShortPathAtDots(idShortPath);
+			Stack<String> tokenStack = generateTokenStackFromSplittedArray(splitted);
+			return tokenStack;
+		} catch (ElementDoesNotExistException e) {
+			throw new ElementDoesNotExistException(idShortPath);
 		}
-		return indices;
 	}
 
-	private static int extractIndex(String idShort, int currentCharIndex) {
-		boolean ended = false;
-		int charIndex = currentCharIndex;
-		String index = "";
-		while (!ended) {
-			charIndex++;
-			if (idShort.charAt(charIndex) == ']') {
-				ended = true;
-			} else {
-				index = index + idShort.charAt(charIndex);
-			}
-		}
-		return Integer.parseInt(index);
+	private static String[] splitIdShortPathAtDots(String idShortPath) {
+		return idShortPath.split("\\.");
 	}
 
-	/**
-	 * Removes the indices of the idShort
-	 * 
-	 * @param idShort the idShort
-	 * @return
-	 */
-	public static String getIdShortWithoutIndices(String idShort) {
+	private static String getIdShortWithoutIndices(String idShort) {
 		return idShort.split("\\[")[0];
 	}
 
-	/**
-	 * Checks if an idShort has indices
-	 * 
-	 * @param idShort the idShort
-	 * @return
-	 */
-	public static boolean hasIdShortIncides(String idShort) {
-		return idShort.contains("[");
+	private static Stack<String> generateTokenStackFromSplittedArray(String[] splitted) {
+		Stack<String> tokenStack = new Stack<>();
+		for (int i = splitted.length - 1; i >= 0; i--) {
+			List<Integer> indices = getAllIndices(splitted[i]);
+			for (int ix = indices.size() - 1; ix >= 0; ix--) {
+				tokenStack.push("[" + indices.get(ix) + "]");
+			}
+			tokenStack.push(getIdShortWithoutIndices(splitted[i]));
+		}
+		return tokenStack;
 	}
 
-	/**
-	 * Checks if an idShort is an idShortPath
-	 * 
-	 * @param idShort the idShort
-	 * @return
-	 */
+	private static List<Integer> getAllIndices(String idShortToken) throws ElementDoesNotExistException {
+		List<Integer> indices = new ArrayList<>();
+		while (hasOpeningBrackets(idShortToken)) {
 
-	public static boolean isPath(String idShort) {
-		return idShort.contains(".") || idShort.contains("[");
+			int occurance = getIndexOfOpeningBracket(idShortToken);
+			int end = getIndexOfClosingBracket(idShortToken);
+
+			throwExceptionIfClosingBracketIsMissing(end);
+			throwExceptionIfInvalidCharacterAfterClosingBracket(idShortToken, end);
+			throwExceptionIfOpeningBracketIsInsideBrackets(idShortToken, occurance, end);
+
+			int index = extractIndex(idShortToken, occurance, end);
+
+			indices.add(index);
+			idShortToken = idShortToken.substring(end + 1);
+
+		}
+		throwExceptionIfTooManyClosingBracketsExist(idShortToken);
+
+		return indices;
+	}
+
+	private static boolean hasOpeningBrackets(String idShortToken) {
+		return getIndexOfOpeningBracket(idShortToken) != -1;
+	}
+
+	private static int getIndexOfOpeningBracket(String idShortToken) {
+		return idShortToken.indexOf('[');
+	}
+
+	private static int getIndexOfClosingBracket(String idShortToken) {
+		return idShortToken.indexOf(']');
+	}
+
+	private static void throwExceptionIfClosingBracketIsMissing(int end) throws ElementDoesNotExistException {
+		if (end == -1) {
+			throw new ElementDoesNotExistException();
+		}
+	}
+
+	private static void throwExceptionIfInvalidCharacterAfterClosingBracket(String idShort, int end)
+			throws ElementDoesNotExistException {
+		if (idShort.length() - 1 > end) {
+			if (idShort.charAt(end + 1) != '[') {
+				throw new ElementDoesNotExistException();
+			}
+		}
+	}
+
+	private static void throwExceptionIfOpeningBracketIsInsideBrackets(String idShort, int occurance, int end)
+			throws ElementDoesNotExistException {
+		if (idShort.substring(occurance + 1, end).indexOf('[') != -1) {
+			throw new ElementDoesNotExistException();
+		}
+	}
+
+	private static int extractIndex(String idShortToken, int occurance, int end) {
+		String currentIndice = idShortToken.substring(occurance + 1, end);
+		int index;
+		try {
+			index = Integer.valueOf(currentIndice);
+		} catch (NumberFormatException e) {
+			throw new ElementDoesNotExistException();
+		}
+		throwExceptionIfIndexIsInvalid(index);
+		return index;
+	}
+
+	private static void throwExceptionIfIndexIsInvalid(int index) throws ElementDoesNotExistException {
+		if (index < 0) {
+			throw new ElementDoesNotExistException();
+		}
+	}
+
+	private static void throwExceptionIfTooManyClosingBracketsExist(String idShortToken) {
+		if (getIndexOfClosingBracket(idShortToken) != -1) {
+			throw new ElementDoesNotExistException();
+		}
 	}
 
 }

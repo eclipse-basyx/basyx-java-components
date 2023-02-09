@@ -41,7 +41,7 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
 public class InMemorySubmodelService implements SubmodelService {
 
 	private final Submodel submodel;
-	private final HierarchicalSubmodelElementParser parser;
+	private HierarchicalSubmodelElementParser parser;
 
 	/**
 	 * Creates the InMemory SubmodelService containing the passed Submodel
@@ -64,7 +64,7 @@ public class InMemorySubmodelService implements SubmodelService {
 	}
 
 	@Override
-	public SubmodelElement getSubmodelElement(String idShortPath) {
+	public SubmodelElement getSubmodelElement(String idShortPath) throws ElementDoesNotExistException {
 		return parser.getSubmodelElementFromIdShortPath(idShortPath);
 	}
 

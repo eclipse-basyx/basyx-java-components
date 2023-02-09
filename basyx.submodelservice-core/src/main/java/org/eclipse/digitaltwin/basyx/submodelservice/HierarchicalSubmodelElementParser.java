@@ -24,7 +24,7 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice;
 
-import java.util.List;
+import java.util.Stack;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
@@ -58,81 +58,55 @@ public class HierarchicalSubmodelElementParser {
 	 * @param idShortPath the isShortPath of the SubmodelElement
 	 * 
 	 * @return the nested SubmodelElement
+	 * @throws ElementDoesNotExistException
+	 * 
 	 */
-	public SubmodelElement getSubmodelElementFromIdShortPath(String idShortPath) {
+	public SubmodelElement getSubmodelElementFromIdShortPath(String idShortPath) throws ElementDoesNotExistException {
+		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
+		Stack<String> idShortPathTokenStack = pathParser.parsePathTokens(idShortPath);
 
-		if (!SubmodelElementIdShortPathParser.isPath(idShortPath)) {
-			return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShortPath)).findAny()
-					.orElseThrow(() -> new ElementDoesNotExistException(idShortPath));
+		return getLastElementOfStack(idShortPathTokenStack);
+	}
+
+	private SubmodelElement getLastElementOfStack(Stack<String> idShortPathTokenStack) {
+		String rootElementIdShort = idShortPathTokenStack.pop();
+		SubmodelElement rootElement = getFirstSubmodelElementFromStack(rootElementIdShort);
+		while (!idShortPathTokenStack.isEmpty()) {
+			String token = idShortPathTokenStack.pop();
+			rootElement = getNextSubmodelElement(rootElement, token);
 		}
 
-		String[] splittedPath = SubmodelElementIdShortPathParser.parsePath(idShortPath);
+		return rootElement;
+	}
 
-		SubmodelElement submodelElement = getFirstSubmodelElement(
-				SubmodelElementIdShortPathParser.getIdShortWithoutIndices(getFirstIdShort(splittedPath)));
+	private SubmodelElement getFirstSubmodelElementFromStack(String rootElementIdShort) {
+		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(rootElementIdShort))
+				.findAny().orElseThrow(() -> new ElementDoesNotExistException());
+	}
 
-		for (int i = 0; i < splittedPath.length; i++) {
-
-			String currentIdShort = splittedPath[i];
-			SubmodelElement currentSubmodelElement = getSubmodelElementInSubmodelElement(submodelElement,
-					SubmodelElementIdShortPathParser.getIdShortWithoutIndices(currentIdShort));
-
-			if (isSubmodelElementList(currentSubmodelElement)) {
-				currentSubmodelElement = getNestedSubmodelElementFromSubmodelElementList(currentIdShort,
-						currentSubmodelElement);
+	private SubmodelElement getNextSubmodelElement(SubmodelElement element, String token) {
+		if (isIndex(token)) {
+			SubmodelElementList sml = (SubmodelElementList) element;
+			int index = getIndexFromToken(token);
+			if (index > sml.getValue().size() - 1) {
+				throw new ElementDoesNotExistException(element.getIdShort() + token);
 			}
-
-			submodelElement = currentSubmodelElement;
-		}
-
-		return submodelElement;
-
-	}
-
-	private SubmodelElement getNestedSubmodelElementFromSubmodelElementList(String cuurentIdShort,
-			SubmodelElement currentSubmodelElement) {
-		List<Integer> indices = SubmodelElementIdShortPathParser.getAllIndices(cuurentIdShort);
-		for (int index : indices) {
-			currentSubmodelElement = getSubmodelElementFromSubmodelElementList(currentSubmodelElement, index);
-		}
-		return currentSubmodelElement;
-	}
-
-	private boolean isSubmodelElementList(SubmodelElement currentSubmodelElement) {
-		return currentSubmodelElement instanceof SubmodelElementList;
-	}
-
-	private String getFirstIdShort(String[] splittedPath) {
-		return splittedPath[0];
-	}
-
-	private SubmodelElement getSubmodelElementFromSubmodelElementList(SubmodelElement submodelElement, int index) {
-		try {
-			SubmodelElementList sml = (SubmodelElementList) submodelElement;
 			return sml.getValue().get(index);
-		} catch (Exception e) {
-			throw new ElementDoesNotExistException(submodelElement.getIdShort() + "[" + index + "]");
 		}
+		SubmodelElementCollection smc = (SubmodelElementCollection) element;
+
+		return smc.getValue().stream().filter(sme -> sme.getIdShort().equals(token)).findAny()
+				.orElseThrow(() -> new ElementDoesNotExistException(token));
 	}
 
-	private SubmodelElement getSubmodelElementInSubmodelElement(SubmodelElement submodelElement, String nextIdShort) {
-		if (submodelElement.getIdShort().equals(nextIdShort)) {
-			return submodelElement;
-		}
-		if (isSubmodelElementList(submodelElement)) {
-			SubmodelElementList sml = (SubmodelElementList) submodelElement;
-			return sml.getValue().stream().filter(sme -> sme.getIdShort().equals(nextIdShort)).findAny()
-					.orElseThrow(() -> new ElementDoesNotExistException(nextIdShort));
-		} else if (submodelElement instanceof SubmodelElementCollection) {
-			SubmodelElementCollection smc = (SubmodelElementCollection) submodelElement;
-			return smc.getValue().stream().filter(sme -> sme.getIdShort().equals(nextIdShort)).findAny()
-					.orElseThrow(() -> new ElementDoesNotExistException(nextIdShort));
-		}
-		return null;
+	private int getIndexFromToken(String token) {
+		int start = token.indexOf('[');
+		int end = token.indexOf(']');
+		return Integer.valueOf(token.substring(start + 1, end));
 	}
 
-	private SubmodelElement getFirstSubmodelElement(String idShort) {
-		return submodel.getSubmodelElements().stream().filter(sme -> sme.getIdShort().equals(idShort)).findAny()
-				.orElseThrow(() -> new ElementDoesNotExistException(idShort));
+	private boolean isIndex(String token) {
+		return token.contains("[");
 	}
+
 }
