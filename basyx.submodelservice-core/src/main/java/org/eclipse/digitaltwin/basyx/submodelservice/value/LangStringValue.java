@@ -22,13 +22,12 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
+package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
 import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -39,12 +38,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @author danish
  *
  */
-public class LangStringMapper {
+public class LangStringValue {
 
 	@JsonValue
 	private Map<String, String> language;
 
-	public LangStringMapper(LangString langString) {
+	public LangStringValue(LangString langString) {
 		this.language = mapLangString(langString);
 	}
 

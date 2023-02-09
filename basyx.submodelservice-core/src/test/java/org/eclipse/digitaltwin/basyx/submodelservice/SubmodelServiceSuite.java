@@ -37,10 +37,10 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.LangStringValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.LangStringMapper;
 import org.junit.Test;
 
 /**
@@ -72,6 +72,7 @@ public abstract class SubmodelServiceSuite {
 	@Test
 	public void getSubmodelElement() {
 		Submodel technicalData = DummySubmodelFactory.createTechnicalDataSubmodel();
+		
 		SubmodelElement smElement = getSubmodelService(technicalData)
 				.getSubmodelElement(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT);
 
@@ -89,13 +90,14 @@ public abstract class SubmodelServiceSuite {
 	@Test
 	public void getPropertyValue() {
 		Submodel technicalData = DummySubmodelFactory.createTechnicalDataSubmodel();
+		
 		String expected = ((Property) SubmodelServiceUtil.getDummySubmodelElement(technicalData,
 				SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT)).getValue();
 
-		Object submodelElementValue = getSubmodelService(technicalData)
+		PropertyValue submodelElementValue = (PropertyValue) getSubmodelService(technicalData)
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT);
 
-		assertEquals(expected, ((PropertyValue) submodelElementValue).getValue());
+		assertEquals(expected, submodelElementValue.getValue());
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
@@ -112,10 +114,10 @@ public abstract class SubmodelServiceSuite {
 
 		String expected = "200";
 		smService.setSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT, expected);
-		Object submodelElementValue = smService
+		PropertyValue submodelElementValue = (PropertyValue) smService
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT);
 
-		assertEquals(expected, ((PropertyValue) submodelElementValue).getValue());
+		assertEquals(expected, submodelElementValue.getValue());
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
@@ -128,43 +130,41 @@ public abstract class SubmodelServiceSuite {
 	@Test
 	public void getRangeValue() {
 		Submodel technicalData = DummySubmodelFactory.createTechnicalDataSubmodel();
-		
-		String expectedMin = ((Range) SubmodelServiceUtil.getDummySubmodelElement(technicalData,
-				SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT)).getMin();
-		String expectedMax = ((Range) SubmodelServiceUtil.getDummySubmodelElement(technicalData,
-				SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT)).getMax();
 
-		Object submodelElementValue = getSubmodelService(technicalData)
+		Range expected = ((Range) SubmodelServiceUtil.getDummySubmodelElement(technicalData,
+				SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT));
+
+		RangeValue retrievedValue = (RangeValue) getSubmodelService(technicalData)
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT);
 
-		assertEquals(expectedMin, String.valueOf(((RangeValue) submodelElementValue).getMin()));
+		assertEquals(expected.getMin(), String.valueOf(retrievedValue.getMin()));
 
-		assertEquals(expectedMax, String.valueOf(((RangeValue) submodelElementValue).getMax()));
+		assertEquals(expected.getMax(), String.valueOf(retrievedValue.getMax()));
 	}
 
 	@Test
 	public void getMultiLanguagePropertyValue() {
 		Submodel technicalData = DummySubmodelFactory.createTechnicalDataSubmodel();
-		
-		List<LangStringMapper> expectedValue = Arrays.asList(new LangStringMapper(new DefaultLangString("Hello", "en")),
-				new LangStringMapper(new DefaultLangString("Hallo", "de")));
 
-		Object submodelElementValue = getSubmodelService(technicalData)
+		List<LangStringValue> expectedValue = Arrays.asList(new LangStringValue(new DefaultLangString("Hello", "en")),
+				new LangStringValue(new DefaultLangString("Hallo", "de")));
+
+		MultiLanguagePropertyValue submodelElementValue = (MultiLanguagePropertyValue) getSubmodelService(technicalData)
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_MULTI_LANG_PROP_ID_SHORT);
 
-		assertEquals(expectedValue.get(0).getLanguage(),
-				((MultiLanguagePropertyValue) submodelElementValue).getValue().get(0).getLanguage());
+		assertEquals(expectedValue.get(0).getLanguage(), submodelElementValue.getValue().get(0).getLanguage());
 	}
 
 	@Test
 	public void getFileValue() {
 		Submodel technicalData = DummySubmodelFactory.createTechnicalDataSubmodel();
+		
 		String expectedValue = ((File) SubmodelServiceUtil.getDummySubmodelElement(technicalData,
 				SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT)).getValue();
 
-		Object submodelElementValue = getSubmodelService(technicalData)
+		FileValue submodelElementValue = (FileValue) getSubmodelService(technicalData)
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT);
 
-		assertEquals(expectedValue, ((FileValue) submodelElementValue).getValue());
+		assertEquals(expectedValue, submodelElementValue.getValue());
 	}
 }

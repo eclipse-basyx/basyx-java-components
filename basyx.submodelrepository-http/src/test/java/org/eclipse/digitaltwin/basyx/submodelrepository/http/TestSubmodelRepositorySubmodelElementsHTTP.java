@@ -27,12 +27,8 @@ package org.eclipse.digitaltwin.basyx.submodelrepository.http;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ParseException;
 import org.eclipse.digitaltwin.basyx.http.serialization.BaSyxHttpTestUtils;
@@ -109,8 +105,8 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 
 		assertEquals(HttpStatus.OK.value(), response.getCode());
 
-		String expectedValue = FileUtils.readFileToString(new File(getClass().getClassLoader().getResource("value/expectedPropertyValue.json").getFile()), StandardCharsets.UTF_8);
-
+		String expectedValue = getValueJSON("value/expectedPropertyValue.json");
+		
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
 	}
 
@@ -131,7 +127,8 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 	@Test
 	public void setPropertyValue() throws IOException, ParseException {
 		String valueToWrite = "200";
-		String expectedValue = FileUtils.readFileToString(new File(getClass().getClassLoader().getResource("value/expectedPropertySetValue.json").getFile()), StandardCharsets.UTF_8);
+		
+		String expectedValue = getValueJSON("value/expectedPropertySetValue.json");
 
 		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT, valueToWrite);
 		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
@@ -159,8 +156,8 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT);
 
 		assertEquals(HttpStatus.OK.value(), response.getCode());
-
-		String expectedValue = FileUtils.readFileToString(new File(getClass().getClassLoader().getResource("value/expectedRangeValue.json").getFile()), StandardCharsets.UTF_8);
+		
+		String expectedValue = getValueJSON("value/expectedRangeValue.json");
 
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
 	}
@@ -170,8 +167,8 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_MULTI_LANG_PROP_ID_SHORT);
 
 		assertEquals(HttpStatus.OK.value(), response.getCode());
-
-		String expectedValue = FileUtils.readFileToString(new File(getClass().getClassLoader().getResource("value/expectedMultiLanguagePropertyValue.json").getFile()), StandardCharsets.UTF_8);
+		
+		String expectedValue = getValueJSON("value/expectedMultiLanguagePropertyValue.json");
 
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
 	}
@@ -181,8 +178,8 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT);
 
 		assertEquals(HttpStatus.OK.value(), response.getCode());
-
-		String expectedValue = FileUtils.readFileToString(new File(getClass().getClassLoader().getResource("value/expectedFileValue.json").getFile()), StandardCharsets.UTF_8);
+		
+		String expectedValue = getValueJSON("value/expectedFileValue.json");
 
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
 	}
@@ -237,5 +234,9 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 
 	private String getSubmodelElementJSON() throws FileNotFoundException, IOException {
 		return BaSyxHttpTestUtils.readJSONStringFromFile("classpath:SubmodelElement.json");
+	}
+	
+	private String getValueJSON(String fileName) throws FileNotFoundException, IOException {
+		return BaSyxHttpTestUtils.readJSONStringFromFile("classpath:" + fileName);
 	}
 }

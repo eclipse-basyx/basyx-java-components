@@ -26,7 +26,6 @@ package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
 import java.util.List;
 import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.LangStringMapper;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -38,13 +37,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public class MultiLanguagePropertyValue implements SubmodelElementValue {
 	@JsonValue
-	private List<LangStringMapper> value;
+	private List<LangStringValue> value;
 	
-	public MultiLanguagePropertyValue(List<LangStringMapper> list) {
+	public MultiLanguagePropertyValue(List<LangStringValue> list) {
 		this.value = list;
 	}
 
-	public List<LangStringMapper> getValue() {
+	public List<LangStringValue> getValue() {
 		return this.value;
 	}
 }

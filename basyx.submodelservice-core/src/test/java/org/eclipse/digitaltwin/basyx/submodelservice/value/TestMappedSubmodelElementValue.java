@@ -37,7 +37,6 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelServiceUtil;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.LangStringMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.PropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.RangeValueMapper;
@@ -54,15 +53,13 @@ public class TestMappedSubmodelElementValue {
 
 	@Test
 	public void mappedRangeValue() {
-		int expectedMin = 200, expectedMax = 300;
+		Range expected = SubmodelServiceUtil.createRangeSubmodelElement();
 
-		Range range = SubmodelServiceUtil.createRangeSubmodelElement();
+		RangeValue retrievedValue = (RangeValue) new RangeValueMapper(expected).getValue();
 
-		ValueMapper rangeValueMapper = new RangeValueMapper(range);
+		assertEquals(expected.getMin(), String.valueOf(retrievedValue.getMin()));
 
-		assertEquals(expectedMin, ((RangeValue) rangeValueMapper.getValue()).getMin());
-
-		assertEquals(expectedMax, ((RangeValue) rangeValueMapper.getValue()).getMax());
+		assertEquals(expected.getMax(), String.valueOf(retrievedValue.getMax()));
 	}
 
 	@Test
@@ -79,8 +76,8 @@ public class TestMappedSubmodelElementValue {
 
 	@Test
 	public void mappedMultiLanguagePropertyValue() {
-		List<LangStringMapper> expectedValue = Arrays.asList(new LangStringMapper(new DefaultLangString("Hello", "en")),
-				new LangStringMapper(new DefaultLangString("Hallo", "de")));
+		List<LangStringValue> expectedValue = Arrays.asList(new LangStringValue(new DefaultLangString("Hello", "en")),
+				new LangStringValue(new DefaultLangString("Hallo", "de")));
 
 		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
 
