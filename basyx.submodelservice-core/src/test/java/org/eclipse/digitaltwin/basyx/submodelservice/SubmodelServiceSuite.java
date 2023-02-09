@@ -152,7 +152,7 @@ public abstract class SubmodelServiceSuite {
 		MultiLanguagePropertyValue submodelElementValue = (MultiLanguagePropertyValue) getSubmodelService(technicalData)
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_MULTI_LANG_PROP_ID_SHORT);
 
-		assertEquals(expectedValue.get(0).getLanguage(), submodelElementValue.getValue().get(0).getLanguage());
+		assertEquals(expectedValue.get(0).toLanguageValue(), submodelElementValue.getValue().get(0).toLanguageValue());
 	}
 
 	@Test

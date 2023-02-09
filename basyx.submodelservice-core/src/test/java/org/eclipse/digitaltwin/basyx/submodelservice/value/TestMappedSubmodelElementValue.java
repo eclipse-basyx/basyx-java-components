@@ -33,7 +33,6 @@ import org.eclipse.digitaltwin.aas4j.v3.model.File;
 import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Range;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelServiceUtil;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
@@ -76,15 +75,16 @@ public class TestMappedSubmodelElementValue {
 
 	@Test
 	public void mappedMultiLanguagePropertyValue() {
-		List<LangStringValue> expectedValue = Arrays.asList(new LangStringValue(new DefaultLangString("Hello", "en")),
-				new LangStringValue(new DefaultLangString("Hallo", "de")));
+		List<LangStringValue> expectedValue = Arrays.asList(new LangStringValue("Hello", "en"),
+				new LangStringValue("Hallo", "de"));
 
 		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
 
 		ValueMapper multiLanguagePropertyValueMapper = new MultiLanguagePropertyValueMapper(multiLanguageProperty);
 
 		assertEquals(expectedValue.get(0).getLanguage(),
-				((MultiLanguagePropertyValue) multiLanguagePropertyValueMapper.getValue()).getValue().get(0).getLanguage());
+				((MultiLanguagePropertyValue) multiLanguagePropertyValueMapper.getValue()).getValue().get(0)
+						.getLanguage());
 	}
 
 	@Test

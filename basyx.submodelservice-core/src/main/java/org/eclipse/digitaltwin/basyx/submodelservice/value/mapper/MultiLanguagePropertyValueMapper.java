@@ -24,11 +24,13 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
+import java.security.interfaces.RSAMultiPrimePrivateCrtKey;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.LangStringValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
@@ -41,19 +43,28 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  *
  */
 public class MultiLanguagePropertyValueMapper implements ValueMapper {
-	private MultiLanguagePropertyValue multiLanguagePropertyValue;
+	private MultiLanguageProperty multiLanguageProperty;
 
 	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				mapLangString(multiLanguageProperty.getValue()));
+		this.multiLanguageProperty = multiLanguageProperty;
 	}
 
 	@Override
 	public SubmodelElementValue getValue() {
-		return this.multiLanguagePropertyValue;
+		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
+	}
+
+	@Override
+	public void setValue(SubmodelElementValue submodelElementValue) {
+		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
 	}
 
 	private List<LangStringValue> mapLangString(List<LangString> langStrings) {
-		return langStrings.stream().map(LangStringValue::new).collect(Collectors.toList());
+		return langStrings.stream().map(LanguageMapper::toLanguageValue).collect(Collectors.toList());
+	}
+
+	private List<LangString> mapToLangString(MultiLanguagePropertyValue multiLanguagePropertyValue) {
+		return multiLanguagePropertyValue.getValue().stream().map(LanguageMapper::toLangString)
+				.collect(Collectors.toList());
 	}
 }

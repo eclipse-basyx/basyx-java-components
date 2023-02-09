@@ -35,6 +35,7 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMappe
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.PropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.RangeValueMapper;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.ValueMapper;
 
 /**
  * Factory class to create {@link SubmodelElementValue} based on the provided
@@ -43,17 +44,17 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.RangeValueMapp
  * @author danish
  *
  */
-public class SubmodelElementValueFactory {
+public class SubmodelElementValueMapperFactory {
 
-	public SubmodelElementValue create(SubmodelElement submodelElement) {
+	public ValueMapper create(SubmodelElement submodelElement) {
 		if (submodelElement instanceof Property) {
-			return new PropertyValueMapper((Property) submodelElement).getValue();
+			return new PropertyValueMapper((Property) submodelElement);
 		} else if (submodelElement instanceof Range) {
-			return new RangeValueMapper((Range) submodelElement).getValue();
+			return new RangeValueMapper((Range) submodelElement);
 		} else if (submodelElement instanceof MultiLanguageProperty) {
-			return new MultiLanguagePropertyValueMapper((MultiLanguageProperty) submodelElement).getValue();
+			return new MultiLanguagePropertyValueMapper((MultiLanguageProperty) submodelElement);
 		} else if (submodelElement instanceof File) {
-			return new FileValueMapper((File) submodelElement).getValue();
+			return new FileValueMapper((File) submodelElement);
 		} else {
 			throw new ValueMapperNotFoundException(submodelElement.getIdShort());
 		}

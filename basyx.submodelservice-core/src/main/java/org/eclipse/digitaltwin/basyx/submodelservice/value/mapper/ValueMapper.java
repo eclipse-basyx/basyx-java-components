@@ -24,6 +24,8 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
+import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 /**
@@ -33,7 +35,9 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  *
  */
 public interface ValueMapper {
-	
+
+	public void setValue(SubmodelElementValue submodelElementValue);
+
 	public SubmodelElementValue getValue();
 
 }

@@ -24,9 +24,7 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
-import java.util.Collections;
-import java.util.Map;
-
+import java.util.AbstractMap.SimpleEntry;
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -39,19 +37,20 @@ import com.fasterxml.jackson.annotation.JsonValue;
  *
  */
 public class LangStringValue {
+//	private SimpleEntry<String, String> language;
+	private String text;
+	private String language;
+
+//	@JsonValue
+//	private Map<String, String> language;
+	
+	public LangStringValue(String text, String language) {
+		this.text = text;
+		this.language = language;
+	}
 
 	@JsonValue
-	private Map<String, String> language;
-
-	public LangStringValue(LangString langString) {
-		this.language = mapLangString(langString);
-	}
-
-	public Map<String, String> getLanguage() {
-		return language;
-	}
-
-	private Map<String, String> mapLangString(LangString langString) {
-		return Collections.singletonMap(langString.getLanguage(), langString.getText());
+	public SimpleEntry<String, String> getLanguage() {
+		return new SimpleEntry<>(this.language, this.text);
 	}
 }
