@@ -8,9 +8,15 @@ import org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
+import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
+import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.autoregistration.AutoRegisterAASAggregator;
 import org.eclipse.basyx.components.aas.autoregistration.AutoRegisterSubmodelAggregator;
+import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
+import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
+import org.eclipse.basyx.components.registry.RegistryComponent;
+import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -18,6 +24,8 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -41,11 +49,46 @@ public class TestAutoRegistration {
 	private static final Identifier DUMMY_SUBMODEL_IDENTIFIER = new Identifier(IdentifierType.CUSTOM,
 			"dummySubmodelIdentifier");
 
-	private IAASRegistry registry = new InMemoryRegistry();
+	private static final int REGISTRY_PORT = 4001;
+	private static final String REGISTRY_CONTEXT = "/testRegistry";
+	private static final String REGISTRY_URL = "http://localhost:" + REGISTRY_PORT + REGISTRY_CONTEXT;
+	private IAASRegistry registry = new AASRegistryProxy(REGISTRY_URL);
+
 	private AssetAdministrationShell dummyShell = createDummyShell();
 	private Submodel dummySubmodel = createDummySubmodel();
 	private IAASAggregator aasAggregator;
 	private ISubmodelAggregator smAggregator;
+	private AASServerComponent component;
+	private RegistryComponent registryComponent;
+
+	@Before
+	public void setUp() {
+		BaSyxContextConfiguration registryContextConfig = new BaSyxContextConfiguration();
+		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
+		registryContextConfig.setPort(REGISTRY_PORT);
+		registryContextConfig.setContextPath(REGISTRY_CONTEXT);
+
+		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration();
+		aasConfig.setAASBackend(AASServerBackend.INMEMORY);
+		aasConfig.setRegistry(REGISTRY_URL);
+
+		startRegistryComponent(registryContextConfig, registryConfig);
+		startAASServerComponent(contextConfig, aasConfig);
+	}
+
+	private void startRegistryComponent(BaSyxContextConfiguration registryContextConfig,
+			BaSyxRegistryConfiguration registryConfig) {
+		registryComponent = new RegistryComponent(registryContextConfig, registryConfig);
+		registryComponent.startComponent();
+	}
+
+	private void startAASServerComponent(BaSyxContextConfiguration contextConfig,
+			BaSyxAASServerConfiguration aasConfig) {
+		component = new AASServerComponent(contextConfig, aasConfig);
+		component.setRegistry(registry);
+		component.startComponent();
+	}
 
 	@Test
 	public void createdShellIsRegisteredAutomatically() {
@@ -100,6 +143,12 @@ public class TestAutoRegistration {
 
 	private Submodel createDummySubmodel() {
 		return new Submodel(DUMMY_SUBMODEL_ID_SHORT, DUMMY_SUBMODEL_IDENTIFIER);
+	}
+
+	@After
+	public void tearDown() {
+		component.stopComponent();
+		registryComponent.stopComponent();
 	}
 
 }
