@@ -56,7 +56,7 @@ public class AutoRegisterSubmodelAggregatorFactory implements ISubmodelAggregato
 
 	@Override
 	public ISubmodelAggregator create(IIdentifier aasIdentifier) {
-		return new AutoRegisterSubmodelAggregator(aggregatorFactory.create(), registry, aasIdentifier, endpoint);
+		return new AutoRegisterSubmodelAggregator(aggregatorFactory.create(aasIdentifier), registry, aasIdentifier, endpoint);
 	}
 
 }
