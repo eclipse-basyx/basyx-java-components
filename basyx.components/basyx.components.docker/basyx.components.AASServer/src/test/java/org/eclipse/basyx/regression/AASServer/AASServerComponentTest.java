@@ -71,50 +71,50 @@ public class AASServerComponentTest {
 	private static IAASRegistry registry;
 
 	private static final String XML_SOURCE = "xml/aas.xml";
-
+	
 	private static final String MULTIPLE_DIFFERENT_AAS_SERIALIZATION = "[\"json/aas.json\",\"aasx/01_Festo.aasx\",\"xml/aas.xml\"]";
 	private static final String SINGLE_JSON_AAS_SERIALIZATION = "[\"json/aas.json\"]";
 	private static final String EMPTY_JSON_ARRAY = "[]";
 	private static final String EMPTY_STRING = "";
-
+	
 	private static BaSyxMongoDBConfiguration mongoDBConfig;
 	private static BaSyxContextConfiguration contextConfig;
 	private static BaSyxAASServerConfiguration aasConfig;
-
+	
 	private static ConnectedAssetAdministrationShellManager manager;
-
+	
 	private static final String SM1_IDSHORT = "testSubmodel1IdShort";
 	private static final String SM2_IDSHORT = "testSubmodel2IdShort";
-	private static final String AAS_ID = "aasServerComponentTestId";
+	private static final String AAS_ID = "aasServerComponentTestId";	
 	private static final String AAS_IDSHORT = "aasServerComponentTestIdShort";
-
+	
 	private static IIdentifier aasIdentifier = new ModelUrn(AAS_ID);
 	private static IIdentifier submodel1Identifier = new CustomId("submodelId1");
 	private static IIdentifier submodel2Identifier = new CustomId("submodelId2");
-
+	
 	private static IAASAggregator aggregator;
 
 	private static void setUp(String source) {
 		initConfiguration(source);
 
 		createAASServerComponentAndRegistry();
-
+		
 		createAndResetAggregator();
-
+		
 		resetMongoDBTestData();
-
+		
 		createConnectedAASManager();
 	}
-
+	
 	private static void initConfiguration(String source) {
 		mongoDBConfig = new BaSyxMongoDBConfiguration();
 		mongoDBConfig.setAASCollection("basyxTestAASServerComponent");
 		mongoDBConfig.setSubmodelCollection("basyxTestSMServerComponent");
-
+		
 		contextConfig = createBaSyxContextConfiguration();
 		aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.MONGODB, source);
 	}
-
+	
 	private static BaSyxContextConfiguration createBaSyxContextConfiguration() {
 		BaSyxContextConfiguration config = new BaSyxContextConfiguration();
 		config.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
@@ -126,24 +126,22 @@ public class AASServerComponentTest {
 		registry = new AASRegistry(new MongoDBRegistryHandler(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH));
 		component.setRegistry(registry);
 	}
-
+	
 	private static void createAndResetAggregator() {
 		aggregator = createAASAggregator();
 		((MongoDBAASAggregator) aggregator).reset();
 	}
-
+	
 	private static IAASAggregator createAASAggregator() {
-		return new MongoDBAASServerComponentFactory(mongoDBConfig, new ArrayList<IAASServerDecorator>(), registry)
-				.create();
+		return new MongoDBAASServerComponentFactory(mongoDBConfig, new ArrayList<IAASServerDecorator>(), registry).create();
 	}
-
+	
 	private static void resetMongoDBTestData() {
-
 		((MongoDBAASAggregator) aggregator).reset();
 	}
-
+	
 	private static void createConnectedAASManager() {
-		manager = new ConnectedAssetAdministrationShellManager(registry, new IConnectorFactory() {
+		manager =  new ConnectedAssetAdministrationShellManager(registry, new IConnectorFactory() {
 
 			@Override
 			public IModelProvider getConnector(String addr) {
@@ -151,58 +149,58 @@ public class AASServerComponentTest {
 			}
 		});
 	}
-
+	
 	private static void doPresetting() {
 		createAssetAdministrationShell();
-
+		
 		createSubmodel(SM1_IDSHORT, submodel1Identifier);
 		createSubmodel(SM2_IDSHORT, submodel2Identifier);
-
+		
 		deregisterAASandSMsRegisteredInitiallyByManager();
 	}
-
+	
 	private static void deregisterAASandSMsRegisteredInitiallyByManager() {
 		deleteSubmodelsFromRegistry();
-
+		
 		deleteAASFromRegistry();
 	}
-
+	
 	private static void deleteSubmodelsFromRegistry() {
 		registry.delete(aasIdentifier, submodel1Identifier);
 		registry.delete(aasIdentifier, submodel2Identifier);
 	}
-
+	
 	private static void deleteAASFromRegistry() {
 		registry.delete(new ModelUrn(AAS_ID));
 	}
-
+	
 	private static void startAASServerComponent() {
 		component.startComponent();
 	}
-
+	
 	private static void createAssetAdministrationShell() {
 		AssetAdministrationShell assetAdministrationShell = new AssetAdministrationShell();
 
 		assetAdministrationShell.setIdentification(aasIdentifier);
 		assetAdministrationShell.setIdShort(AAS_IDSHORT);
-
+		
 		aggregator.createAAS(assetAdministrationShell);
-
+		
 		manager.createAAS(assetAdministrationShell, "");
 	}
-
+	
 	private static void createSubmodel(String idShort, IIdentifier submodelIdentifier) {
 		Submodel submodel = new Submodel();
 		submodel.setIdentification(submodelIdentifier);
 		submodel.setIdShort(idShort);
-
+		
 		manager.createSubmodel(aasIdentifier, submodel);
 	}
 
 	@Test
 	public void checkMultipleSerializedAasSourceOfDifferentTypes() {
 		setUp(MULTIPLE_DIFFERENT_AAS_SERIALIZATION);
-
+		
 		startAASServerComponent();
 
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
@@ -212,7 +210,7 @@ public class AASServerComponentTest {
 	@Test
 	public void checkSingleSerializedAasJsonSource() {
 		setUp(SINGLE_JSON_AAS_SERIALIZATION);
-
+		
 		startAASServerComponent();
 
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
@@ -222,7 +220,7 @@ public class AASServerComponentTest {
 	@Test
 	public void checkBehaviorWithEmptyJsonArray() {
 		setUp(EMPTY_JSON_ARRAY);
-
+		
 		startAASServerComponent();
 
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
@@ -237,7 +235,7 @@ public class AASServerComponentTest {
 	@Test
 	public void testServerCleanup() {
 		setUp(XML_SOURCE);
-
+		
 		startAASServerComponent();
 
 		List<AASDescriptor> aasDescriptors = registry.lookupAll();
@@ -263,37 +261,37 @@ public class AASServerComponentTest {
 			}
 		}
 	}
-
+	
 	@Test
 	public void aasPresentInDBIsRegisteredAfterStartingAASServerComponent() {
 		setUp(EMPTY_STRING);
-
+		
 		doPresetting();
-
+		
 		startAASServerComponent();
-
+		
 		AASDescriptor aasDescriptor = registry.lookupAAS(aasIdentifier);
 		assertEquals(aasIdentifier.getId(), aasDescriptor.getIdentifier().getId());
 	}
-
+	
 	@Test
 	public void submodelPresentInDBIsRegisteredAfterStartingAASServerComponent() {
 		setUp(EMPTY_STRING);
-
+		
 		doPresetting();
-
+		
 		startAASServerComponent();
-
+		
 		AASDescriptor aasDescriptor = registry.lookupAAS(aasIdentifier);
-
-		Collection<SubmodelDescriptor> smDescriptor = aasDescriptor.getSubmodelDescriptors();
+		
+		Collection<SubmodelDescriptor> smDescriptor = aasDescriptor.getSubmodelDescriptors(); 
 		assertEquals(2, smDescriptor.size());
 	}
 
 	public static void stopAASServerComponent() {
 		component.stopComponent();
 	}
-
+	
 	@After
 	public void stopServer() {
 		stopAASServerComponent();

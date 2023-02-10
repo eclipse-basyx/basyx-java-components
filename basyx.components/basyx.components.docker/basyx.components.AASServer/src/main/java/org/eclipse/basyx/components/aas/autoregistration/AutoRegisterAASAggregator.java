@@ -71,8 +71,8 @@ public class AutoRegisterAASAggregator implements IAASAggregator {
 
 	@Override
 	public void createAAS(AssetAdministrationShell aas) {
-		registry.register(new AASDescriptor(aas, endpoint));
 		aggregator.createAAS(aas);
+		registry.register(new AASDescriptor(aas, endpoint));
 
 	}
 
@@ -83,8 +83,8 @@ public class AutoRegisterAASAggregator implements IAASAggregator {
 
 	@Override
 	public void deleteAAS(IIdentifier aasId) {
-		registry.delete(aasId);
 		aggregator.deleteAAS(aasId);
+		registry.delete(aasId);
 	}
 
 }
