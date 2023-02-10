@@ -47,7 +47,7 @@ public class ReferableJsonSerializer extends JsonSerializer<Referable> {
 	public void serialize(Referable value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 		try {
 			String str = new org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer().write(value);
-			gen.writeRaw(str);
+			gen.writeRawValue(str);
 		} catch (SerializationException e) {
 			e.printStackTrace();
 		}
