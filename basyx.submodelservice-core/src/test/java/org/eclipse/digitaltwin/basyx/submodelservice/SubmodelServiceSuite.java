@@ -144,7 +144,7 @@ public abstract class SubmodelServiceSuite {
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
-	public void getNonExistentHierachicalSubmodelElementValueThrowsException() {
+	public void getNonExistentHierachicalSubmodelElementValue() {
 		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
 		String idShortPath = generateNonExistentIdShortPath();
 		getSubmodelService(operationalData).getSubmodelElementValue(idShortPath);
@@ -162,7 +162,7 @@ public abstract class SubmodelServiceSuite {
 	}
 
 	@Test(expected = ElementDoesNotExistException.class)
-	public void setNonExistentHierachicalSubmodelElementValueThrowsException() {
+	public void setNonExistentHierachicalSubmodelElementValue() {
 		String expected = "205";
 		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
 		String idShortPath = generateNonExistentIdShortPath();

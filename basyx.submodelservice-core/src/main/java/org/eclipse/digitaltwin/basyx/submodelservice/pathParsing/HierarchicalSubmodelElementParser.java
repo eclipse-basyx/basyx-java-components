@@ -39,6 +39,7 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
  */
 public class HierarchicalSubmodelElementParser {
 	private Submodel submodel;
+	private SubmodelElementIdShortPathParser pathParser;
 
 	/**
 	 * Creates a HierarchicalSubmodelElementParser
@@ -48,6 +49,7 @@ public class HierarchicalSubmodelElementParser {
 	 */
 	public HierarchicalSubmodelElementParser(Submodel submodel) {
 		this.submodel = submodel;
+		this.pathParser = new SubmodelElementIdShortPathParser();
 	}
 
 	/**
@@ -60,7 +62,6 @@ public class HierarchicalSubmodelElementParser {
 	 * 
 	 */
 	public SubmodelElement getSubmodelElementFromIdShortPath(String idShortPath) throws ElementDoesNotExistException {
-		SubmodelElementIdShortPathParser pathParser = new SubmodelElementIdShortPathParser();
 		Stack<PathToken> idShortPathTokenStack = pathParser.parsePathTokens(idShortPath);
 
 		return getLastElementOfStack(idShortPathTokenStack);

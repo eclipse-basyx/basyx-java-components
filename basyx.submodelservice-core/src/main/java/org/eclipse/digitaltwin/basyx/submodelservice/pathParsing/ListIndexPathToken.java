@@ -44,12 +44,11 @@ public class ListIndexPathToken implements PathToken {
 
 	@Override
 	public SubmodelElement getSubmodelElement(SubmodelElement rootElement) {
-		SubmodelElementList sml;
-		try {
-			sml = (SubmodelElementList) rootElement;
-		} catch (Exception e) {
-			throw new ElementDoesNotExistException();
-		}
+		if (!(rootElement instanceof SubmodelElementList))
+			throw new ElementDoesNotExistException(token);
+
+		SubmodelElementList sml = (SubmodelElementList) rootElement;
+
 		int index = getIndexFromToken(token);
 		if (index > sml.getValue().size() - 1) {
 			throw new ElementDoesNotExistException(rootElement.getIdShort() + token);

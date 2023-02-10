@@ -48,8 +48,7 @@ public class SubmodelElementIdShortPathParser {
 	public Stack<PathToken> parsePathTokens(String idShortPath) {
 		try {
 			String splitted[] = splitIdShortPathAtDots(idShortPath);
-			Stack<PathToken> tokenStack = generateTokenStackFromSplittedArray(splitted);
-			return tokenStack;
+			return generateTokenStackFromSplittedArray(splitted);
 		} catch (ElementDoesNotExistException e) {
 			throw new ElementDoesNotExistException(idShortPath);
 		}
@@ -133,14 +132,13 @@ public class SubmodelElementIdShortPathParser {
 
 	private static int extractIndex(String idShortToken, int occurance, int end) {
 		String currentIndice = idShortToken.substring(occurance + 1, end);
-		int index;
 		try {
-			index = Integer.valueOf(currentIndice);
-		} catch (NumberFormatException e) {
-			throw new ElementDoesNotExistException();
+			int index = Integer.valueOf(currentIndice);
+			throwExceptionIfIndexIsInvalid(index);
+			return index;
+		} catch (NumberFormatException doesNotMatter) {
 		}
-		throwExceptionIfIndexIsInvalid(index);
-		return index;
+		throw new ElementDoesNotExistException();
 	}
 
 	private static void throwExceptionIfIndexIsInvalid(int index) throws ElementDoesNotExistException {

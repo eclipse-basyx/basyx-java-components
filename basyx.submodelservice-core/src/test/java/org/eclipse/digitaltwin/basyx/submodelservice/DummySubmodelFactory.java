@@ -88,12 +88,10 @@ public class DummySubmodelFactory {
 	public static final String SUBMODEL_ELEMENT_SECOND_ID_SHORT = "MySecondSubmodelElement";
 	public static final String SUBMODEL_ELEMENT_FIRST_VALUE = "123";
 	public static final String SUBMODEL_ELEMENT_SECOND_VALUE = "456";
-	public static final String SUBMODEL_ELEMENT_FIRST_SEMANTIC_ID = "dd783c0a-3d1a-4691-95a3-f98fe22d4500";
-	public static final String SUBMODEL_ELEMENT_SECOND_SEMANTIC_ID = "421ebbe9-3e8e-4875-a226-bf6dd1d09dd0";
 	public static final String SUBMODEL_ELEMENT_COLLECTION_TOP = "TopLevelCollection";
 	public static final String SUBMODEL_ELEMENT_FIRST_LIST = "FirstList";
 	public static final String SUBMODEL_ELEMENT_SECOND_LIST = "SecondList";
-	public static final String SUBMODEL_ELEMENT_COLLECTION_DEPP = "DeepCollection";
+	public static final String SUBMODEL_ELEMENT_COLLECTION_DEEP = "DeepCollection";
 
 	public static Collection<Submodel> getSubmodels() {
 		return Arrays.asList(createTechnicalDataSubmodel(), createOperationalDataSubmodel());
@@ -179,16 +177,12 @@ public class DummySubmodelFactory {
 		topLevelElementCollection.setIdShort(SUBMODEL_ELEMENT_COLLECTION_TOP);
 		submodelElementListInElementCollection.setIdShort(SUBMODEL_ELEMENT_FIRST_LIST);
 		submodelElementListInElementList.setIdShort(SUBMODEL_ELEMENT_SECOND_LIST);
-		submodelElementCollectionInElementList.setIdShort(SUBMODEL_ELEMENT_COLLECTION_DEPP);
+		submodelElementCollectionInElementList.setIdShort(SUBMODEL_ELEMENT_COLLECTION_DEEP);
 		return topLevelElementCollection;
 	}
 
 	private static SubmodelElement createProperty(String propertyIdShort) {
 		SubmodelElement sme3 = new DefaultProperty.Builder().kind(ModelingKind.INSTANCE)
-				.semanticId(new DefaultReference.Builder()
-						.keys(new DefaultKey.Builder().type(KeyTypes.CONCEPT_DESCRIPTION)
-								.value(SUBMODEL_ELEMENT_SECOND_SEMANTIC_ID).build())
-						.type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.idShort(propertyIdShort).category(SUBMODEL_OPERATIONAL_DATA_PROPERTY_CATEGORY)
 				.value(SUBMODEL_OPERATIONAL_DATA_PROPERTY_VALUE).valueType(DataTypeDefXsd.INTEGER).build();
 		return sme3;

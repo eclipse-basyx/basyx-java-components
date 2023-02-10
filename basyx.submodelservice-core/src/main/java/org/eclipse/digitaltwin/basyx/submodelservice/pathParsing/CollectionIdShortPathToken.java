@@ -45,12 +45,11 @@ public class CollectionIdShortPathToken implements PathToken {
 
 	@Override
 	public SubmodelElement getSubmodelElement(SubmodelElement rootElement) {
-		SubmodelElementCollection smc;
-		try {
-			smc = (SubmodelElementCollection) rootElement;
-		} catch (Exception e) {
-			throw new ElementDoesNotExistException();
-		}
+		if (!(rootElement instanceof SubmodelElementCollection))
+			throw new ElementDoesNotExistException(token);
+
+		SubmodelElementCollection smc = (SubmodelElementCollection) rootElement;
+
 		return smc.getValue().stream().filter(sme -> sme.getIdShort().equals(token)).findAny()
 				.orElseThrow(() -> new ElementDoesNotExistException(token));
 	}
