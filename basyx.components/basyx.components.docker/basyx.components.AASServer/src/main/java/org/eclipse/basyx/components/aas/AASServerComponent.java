@@ -67,6 +67,7 @@ import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedAASServerFeatureFactory;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
+import org.eclipse.basyx.components.aas.autoregistration.AutoRegisterAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -353,6 +354,10 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
+		if (isRegistryConfigured()) {
+			addAASServerFeature(new AutoRegisterAASServerFeature(registry, getURL()));
+		}
+
 		if (isEventingEnabled()) {
 			configureMqttFeature();
 		}
@@ -375,6 +380,11 @@ public class AASServerComponent implements IComponent {
 		}
 
 		addAASServerFeature(new AuthorizedAASServerFeatureFactory(securityConfig).create());
+	}
+
+	private boolean isRegistryConfigured() {
+		String registryUrl = aasConfig.getRegistry();
+		return !(registryUrl == null || registryUrl.isEmpty());
 	}
 
 	private boolean isEventingEnabled() {
