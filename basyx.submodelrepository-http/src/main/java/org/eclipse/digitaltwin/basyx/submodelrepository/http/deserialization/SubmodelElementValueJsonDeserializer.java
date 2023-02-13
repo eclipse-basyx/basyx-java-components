@@ -26,7 +26,7 @@
 package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization;
 
 import java.io.IOException;
-import org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.factory.SubmodelElementValueFactory;
+import org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.factory.SubmodelElementValueDeserializationFactory;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValueType;
 
@@ -55,45 +55,9 @@ public class SubmodelElementValueJsonDeserializer extends JsonDeserializer<Submo
 
 			SubmodelElementValueType type = SubmodelElementValueType.fromString(node.get("valueType").asText());
 			
-			SubmodelElementValueFactory submodelElementValueFactory = new SubmodelElementValueFactory();
+			SubmodelElementValueDeserializationFactory submodelElementValueFactory = new SubmodelElementValueDeserializationFactory();
 			
 			return submodelElementValueFactory.create(type, node);
-
-//			switch (type) {
-//			case RANGE:
-//				int min = node.get("min").asInt();
-//				int max = node.get("max").asInt();
-//				return new RangeValue(min, max);
-//			case MULTI_LANGUAGE_PROPERTY_VALUE:
-//				return mapper.convertValue(node, MultiLanguagePropertyValue.class);
-//			case PROPERTY:
-//				String value = node.get("value").asText();
-//				return new PropertyValue(value);
-//			case FILE:
-//				String contentType = node.get("contentType").asText();
-//				String fileValue = node.get("value").asText();
-//				return new FileValue(contentType, fileValue);
-//			default:
-//				throw new IllegalArgumentException("Unsupported type: " + type);
-//			}
-
-//	        if (node.has("min") && node.has("max")) {
-//	            int min = node.get("min").asInt();
-//	            int max = node.get("max").asInt();
-//	            return new RangeValue(min, max);
-//	        } else if (node.isArray()) {
-//	            List<LangString> value = mapper.readValue(node.toString(), mapper.getTypeFactory().constructCollectionType(List.class, LangString.class));
-//	            return new MultiLanguagePropertyValue(value);
-//	        } else if (node.has("value") && node.has("contentType")) {
-//	        	String contentType = node.get("contentType").asText();
-//                String value = node.get("value").asText();
-//                return new FileValue(contentType, value);
-//	        } else if(node.has("value")) {
-//	        	String value = node.get("value").asText();
-//                return new PropertyValue(value);
-//	        }
-
-//			throw new IllegalArgumentException("Unable to determine concrete implementation based on JSON payload");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

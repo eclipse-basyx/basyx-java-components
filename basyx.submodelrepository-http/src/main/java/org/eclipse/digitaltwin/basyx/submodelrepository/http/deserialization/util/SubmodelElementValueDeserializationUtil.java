@@ -1,20 +1,27 @@
 package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.util;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class SubmodelElementValueUtil {
+public class SubmodelElementValueDeserializationUtil {
 	
 	private static final String CONTENT_TYPE = "contentType";
 	private static final String MAX = "max";
 	private static final String MIN = "min";
 	private static final String VALUE = "value";
 
-	private SubmodelElementValueUtil() {
+	private SubmodelElementValueDeserializationUtil() {
 	    throw new IllegalStateException("Utility class");
 	  }
 	
@@ -32,10 +39,16 @@ public class SubmodelElementValueUtil {
 	}
 	
 	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
-		String contentType1 = node.get(CONTENT_TYPE).asText();
-		String fileValue2 = node.get(VALUE).asText();
+		JsonNode nodeList = node.get(VALUE);
+		List<LangString> values = new ArrayList<>();
+        for (JsonNode arrayNode : nodeList) {
+            Iterator<String> fieldNames = arrayNode.fieldNames();
+            String language = fieldNames.next();
+            String text = arrayNode.get(language).asText();
+            values.add(new DefaultLangString(text, language));
+        }
 		
-		return new FileValue(contentType1, fileValue2);
+        return new MultiLanguagePropertyValue(values);
 	}
 	
 	public static SubmodelElementValue createFileValue(JsonNode node) {
