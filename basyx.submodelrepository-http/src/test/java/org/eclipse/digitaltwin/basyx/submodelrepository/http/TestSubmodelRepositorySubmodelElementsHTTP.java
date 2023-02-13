@@ -130,7 +130,7 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 		
 		String expectedValue = getValueJSON("value/expectedPropertySetValue.json");
 
-		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT, valueToWrite);
+		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT, expectedValue);
 		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
 
 		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT);
@@ -193,7 +193,8 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 	private String wrapStringValue(String value) {
 		// The value needs to be wrapped to ensure that it is correctly identified as
 		// string and not parsed to another primitive, e.g., int
-		return "\"" + value + "\"";
+//		return "\"" + value + "\"";
+		return value;
 	}
 
 

@@ -31,6 +31,7 @@ import java.util.Collection;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 /**
@@ -86,6 +87,6 @@ public interface SubmodelService {
 	 * @throws ElementDoesNotExistException
 	 *             if the SubmodelElement does not exist
 	 */
-	public void setSubmodelElementValue(String idShort, SubmodelElementValue value) throws ElementDoesNotExistException;
+	public void setSubmodelElementValue(String idShort, PropertyValue value) throws ElementDoesNotExistException;
 
 }

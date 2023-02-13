@@ -29,7 +29,6 @@ import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Range;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.exception.ValueMapperNotFoundException;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
@@ -38,7 +37,7 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.RangeValueMapp
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.ValueMapper;
 
 /**
- * Factory class to create {@link SubmodelElementValue} based on the provided
+ * Factory class to create {@link ValueMapper} based on the provided
  * {@link SubmodelElement}
  * 
  * @author danish

@@ -196,7 +196,7 @@ public abstract class SubmodelRepositorySuite {
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
 		String expected = "200";
 		
-		SubmodelElementValue valueToWrite = new PropertyValue(expected);
+		PropertyValue valueToWrite = new PropertyValue(expected);
 		
 		repo.setSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT, valueToWrite);
 		PropertyValue retrievedValue = (PropertyValue) repo.getSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_PROPERTY_ID_SHORT);
@@ -208,7 +208,7 @@ public abstract class SubmodelRepositorySuite {
 	public void setNonExistingSubmodelElementValue() {
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
 		
-		SubmodelElementValue valueToWrite = new PropertyValue("400");
+		PropertyValue valueToWrite = new PropertyValue("400");
 		
 		repo.setSubmodelElementValue(DummySubmodelFactory.SUBMODEL_OPERATIONAL_DATA_ID, "nonExisting", valueToWrite);
 	}
@@ -217,7 +217,7 @@ public abstract class SubmodelRepositorySuite {
 	public void setSubmodelElementValueOfNonExistingSubmodel() {
 		SubmodelRepository repo = getSubmodelRepositoryWithDummySubmodels();
 		
-		SubmodelElementValue valueToWrite = new PropertyValue("400");
+		PropertyValue valueToWrite = new PropertyValue("400");
 		
 		repo.setSubmodelElementValue("nonExisting", "doesNotMatter", valueToWrite);
 	}
