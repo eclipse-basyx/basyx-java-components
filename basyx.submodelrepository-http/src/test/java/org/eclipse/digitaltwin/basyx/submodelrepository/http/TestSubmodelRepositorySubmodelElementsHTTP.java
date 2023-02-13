@@ -180,13 +180,18 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 
 	@Test
 	public void setNonExistingSubmodelElementValue() throws IOException {
-		CloseableHttpResponse response = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, "nonExisting", "doesNotMatter");
+		String valueToWrite = getValueJSON("value/expectedFileValue2.json");
+		String expectedValue = getValueJSON("value/expectedFileValue.json");
+		
+		CloseableHttpResponse response = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, "nonExisting", valueToWrite);
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getCode());
 	}
 
 	@Test
 	public void setSubmodelElementValueOfNonExistingSubmodel() throws IOException {
-		CloseableHttpResponse response = writeSubmodelElementValue("nonExisting", "doesNotMatter", "doesNotMatter");
+		String valueToWrite = getValueJSON("value/expectedFileValue2.json");
+		
+		CloseableHttpResponse response = writeSubmodelElementValue("nonExisting", "doesNotMatter", valueToWrite);
 
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getCode());
 	}
