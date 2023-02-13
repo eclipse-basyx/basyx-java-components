@@ -22,34 +22,41 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
+package org.eclipse.digitaltwin.basyx.submodelservice.pathParsing;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 
 /**
- * Maps {@link MultiLanguageProperty} value to
- * {@link MultiLanguagePropertyValue}
+ * Implementation of {@link PathToken} for SubmodelElementCollection idShort
+ * tokens
  * 
- * @author danish
+ * @author fried
  *
  */
-public class MultiLanguagePropertyValueMapper implements ValueMapper {
-	private MultiLanguageProperty multiLanguageProperty;
+public class CollectionIdShortPathToken implements PathToken {
 
-	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				multiLanguageProperty.getValue());
+	private final String token;
+
+	public CollectionIdShortPathToken(String token) {
+		this.token = token;
 	}
 
 	@Override
-	public SubmodelElementValue getValue() {
-		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
+	public SubmodelElement getSubmodelElement(SubmodelElement rootElement) {
+		if (!(rootElement instanceof SubmodelElementCollection))
+			throw new ElementDoesNotExistException(token);
+
+		SubmodelElementCollection smc = (SubmodelElementCollection) rootElement;
+
+		return smc.getValue().stream().filter(sme -> sme.getIdShort().equals(token)).findAny()
+				.orElseThrow(() -> new ElementDoesNotExistException(token));
 	}
 
 	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
+	public String getToken() {
+		return token;
 	}
+
 }

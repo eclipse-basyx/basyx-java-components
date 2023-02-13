@@ -22,34 +22,43 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+
+package org.eclipse.digitaltwin.basyx.http;
+
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Maps {@link MultiLanguageProperty} value to
- * {@link MultiLanguagePropertyValue}
+ * Configuration class providing all relevant beans for HTTP payload
+ * (de-)serialization
  * 
- * @author danish
+ * @author schnicke
  *
  */
-public class MultiLanguagePropertyValueMapper implements ValueMapper {
-	private MultiLanguageProperty multiLanguageProperty;
+@Configuration
+public class BaSyxHTTPConfiguration {
 
-	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				multiLanguageProperty.getValue());
-	}
+	/**
+	 * Returns a Jackson2ObjectMapperBuilder that is configured using the passed
+	 * list of {@link SerializationExtension}
+	 * 
+	 * @param serializationExtensions
+	 * @return
+	 */
+	@Bean
+	public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(List<SerializationExtension> serializationExtensions) {
+		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder().serializationInclusion(JsonInclude.Include.NON_NULL);
 
-	@Override
-	public SubmodelElementValue getValue() {
-		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
-	}
-
-	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
+		for (SerializationExtension serializationExtension : serializationExtensions) {
+			serializationExtension.extend(builder);
+		}
+		
+		return builder;
 	}
 }

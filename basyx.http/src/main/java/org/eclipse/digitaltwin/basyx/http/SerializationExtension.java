@@ -22,34 +22,23 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+package org.eclipse.digitaltwin.basyx.http;
+
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
- * Maps {@link MultiLanguageProperty} value to
- * {@link MultiLanguagePropertyValue}
+ * Base interface for extending the default serialization with further
+ * (de-)serialization capabilities
  * 
- * @author danish
+ * @author schnicke
  *
  */
-public class MultiLanguagePropertyValueMapper implements ValueMapper {
-	private MultiLanguageProperty multiLanguageProperty;
-
-	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				multiLanguageProperty.getValue());
-	}
-
-	@Override
-	public SubmodelElementValue getValue() {
-		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
-	}
-
-	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
-	}
+public interface SerializationExtension {
+	/**
+	 * Extends the passed builder with further (de-)serialization capabilities
+	 * 
+	 * @param builder
+	 */
+	void extend(Jackson2ObjectMapperBuilder builder);
 }

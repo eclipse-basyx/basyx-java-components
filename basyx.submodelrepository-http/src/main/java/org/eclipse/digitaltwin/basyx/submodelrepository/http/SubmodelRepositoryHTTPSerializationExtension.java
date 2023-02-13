@@ -22,31 +22,29 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
-import java.util.AbstractMap.SimpleEntry;
-import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+package org.eclipse.digitaltwin.basyx.submodelrepository.http;
+
+import org.eclipse.digitaltwin.basyx.http.SerializationExtension;
+import org.eclipse.digitaltwin.basyx.submodelrepository.http.serialization.MultiLanguagePropertyValueSerializer;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.stereotype.Component;
 
 /**
- * Maps {@link LangString} value format to adhere to the ValueOnly serialization
- * of {@link MultiLanguagePropertyValue}
+ * SerializationExtension integrating the additional SubmodelRepository
+ * serialization
  * 
- * @author danish
+ * @author schnicke
  *
  */
-public class LangStringValue {
-	private String text;
-	private String language;
-	
-	public LangStringValue(String text, String language) {
-		this.text = text;
-		this.language = language;
+@Component
+public class SubmodelRepositoryHTTPSerializationExtension implements SerializationExtension {
+
+	@Override
+	public void extend(Jackson2ObjectMapperBuilder builder) {
+		builder.serializerByType(MultiLanguagePropertyValue.class, new MultiLanguagePropertyValueSerializer());
 	}
 
-	@JsonValue
-	public SimpleEntry<String, String> getLanguage() {
-		return new SimpleEntry<>(this.language, this.text);
-	}
 }

@@ -22,34 +22,34 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+
+package org.eclipse.digitaltwin.basyx.http;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
+import org.eclipse.digitaltwin.aas4j.v3.model.Referable;
+import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.http.serialization.AasJsonDeserializer;
+import org.eclipse.digitaltwin.basyx.http.serialization.ReferableJsonSerializer;
+import org.eclipse.digitaltwin.basyx.http.serialization.SubmodelJsonDeserializer;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.stereotype.Component;
 
 /**
- * Maps {@link MultiLanguageProperty} value to
- * {@link MultiLanguagePropertyValue}
+ * SerializationExtension integrating the AAS4J serialization in BaSyx
  * 
- * @author danish
+ * @author schnicke
  *
  */
-public class MultiLanguagePropertyValueMapper implements ValueMapper {
-	private MultiLanguageProperty multiLanguageProperty;
-
-	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				multiLanguageProperty.getValue());
-	}
+@Component
+public class Aas4JHTTPSerializationExtension implements SerializationExtension {
 
 	@Override
-	public SubmodelElementValue getValue() {
-		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
+	public void extend(Jackson2ObjectMapperBuilder builder) {
+		builder.deserializerByType(Submodel.class, new SubmodelJsonDeserializer());
+		builder.deserializerByType(AssetAdministrationShell.class, new AasJsonDeserializer());
+
+		builder.serializerByType(Referable.class, new ReferableJsonSerializer());
 	}
 
-	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
-	}
 }

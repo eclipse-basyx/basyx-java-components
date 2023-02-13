@@ -22,34 +22,30 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
+package org.eclipse.digitaltwin.basyx.submodelservice.pathParsing;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 
 /**
- * Maps {@link MultiLanguageProperty} value to
- * {@link MultiLanguagePropertyValue}
+ * Interface for idShortPath Tokens
  * 
- * @author danish
+ * @author fried
  *
  */
-public class MultiLanguagePropertyValueMapper implements ValueMapper {
-	private MultiLanguageProperty multiLanguageProperty;
+public interface PathToken {
 
-	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				multiLanguageProperty.getValue());
-	}
+	/**
+	 * Retrieve the Nested SubmodelElement from the rootElement
+	 * 
+	 * @param rootElement the SubmodelElement, the nested SubmodelElment is in
+	 * @return the nested SubmodelElement in the rootElement
+	 */
+	public SubmodelElement getSubmodelElement(SubmodelElement rootElement);
 
-	@Override
-	public SubmodelElementValue getValue() {
-		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
-	}
-
-	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
-	}
+	/**
+	 * Returns the token
+	 * 
+	 * @return the token
+	 */
+	public String getToken();
 }
