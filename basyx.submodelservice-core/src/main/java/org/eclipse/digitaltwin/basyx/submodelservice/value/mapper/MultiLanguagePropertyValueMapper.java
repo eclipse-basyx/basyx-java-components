@@ -39,17 +39,16 @@ public class MultiLanguagePropertyValueMapper implements ValueMapper {
 	private MultiLanguageProperty multiLanguageProperty;
 
 	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
-		this.multiLanguagePropertyValue = new MultiLanguagePropertyValue(
-				multiLanguageProperty.getValue());
+		this.multiLanguageProperty = multiLanguageProperty;
 	}
 
 	@Override
 	public SubmodelElementValue getValue() {
-		return new MultiLanguagePropertyValue(mapLangString(multiLanguageProperty.getValue()));
+		return new MultiLanguagePropertyValue(multiLanguageProperty.getValue());
 	}
 
 	@Override
 	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(mapToLangString((MultiLanguagePropertyValue) submodelElementValue));
+		multiLanguageProperty.setValue(((MultiLanguagePropertyValue) submodelElementValue).getValue());
 	}
 }

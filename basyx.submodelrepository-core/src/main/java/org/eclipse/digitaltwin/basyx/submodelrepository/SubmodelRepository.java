@@ -121,5 +121,5 @@ public interface SubmodelRepository {
 	 * @throws ElementDoesNotExistException
 	 *             if the SubmodelElement or the Submodel does not exist
 	 */
-	public void setSubmodelElementValue(String submodelId, String smeIdShort, PropertyValue value) throws ElementDoesNotExistException;
+	public void setSubmodelElementValue(String submodelId, String smeIdShort, SubmodelElementValue value) throws ElementDoesNotExistException;
 }

@@ -126,14 +126,54 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 
 	@Test
 	public void setPropertyValue() throws IOException, ParseException {
-		String valueToWrite = "200";
+//		String valueToWrite = "200";
 		
+		String valueToWrite = getValueJSON("value/expectedPropertySetValue2.json");
 		String expectedValue = getValueJSON("value/expectedPropertySetValue.json");
 
-		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT, expectedValue);
+		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT, valueToWrite);
 		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
 
 		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_PROPERTY_ID_SHORT);
+
+		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
+	}
+	
+	@Test
+	public void setMultiLanguagePropertyValue() throws IOException, ParseException {	
+		String valueToWrite = getValueJSON("value/expectedMultiLanguagePropertyValue2.json");
+		String expectedValue = getValueJSON("value/expectedMultiLanguagePropertyValue.json");
+
+		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_MULTI_LANG_PROP_ID_SHORT, valueToWrite);
+		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
+
+		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_MULTI_LANG_PROP_ID_SHORT);
+
+		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
+	}
+	
+	@Test
+	public void setRangeValue() throws IOException, ParseException {
+		String valueToWrite = getValueJSON("value/expectedRangeValue2.json");
+		String expectedValue = getValueJSON("value/expectedRangeValue.json");
+
+		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT, valueToWrite);
+		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
+
+		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_RANGE_ID_SHORT);
+
+		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
+	}
+	
+	@Test
+	public void setFileValue() throws IOException, ParseException {
+		String valueToWrite = getValueJSON("value/expectedFileValue2.json");
+		String expectedValue = getValueJSON("value/expectedFileValue.json");
+
+		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT, valueToWrite);
+		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
+
+		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT);
 
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
 	}

@@ -81,6 +81,6 @@ public interface SubmodelService {
 	 * @param value       the new value
 	 * @throws ElementDoesNotExistException if the SubmodelElement does not exist
 	 */
-	public void setSubmodelElementValue(String idShort, PropertyValue value) throws ElementDoesNotExistException;
+	public void setSubmodelElementValue(String idShort, SubmodelElementValue value) throws ElementDoesNotExistException;
 
 }
