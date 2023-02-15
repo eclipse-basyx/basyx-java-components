@@ -35,11 +35,8 @@ import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Range;
-import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
-import org.eclipse.digitaltwin.basyx.submodelservice.DummySubmodelFactory;
-import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelService;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelServiceUtil;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
@@ -66,6 +63,23 @@ public class TestMappedSubmodelElementValue {
 
 		assertEquals(expected.getMax(), String.valueOf(retrievedValue.getMax()));
 	}
+	
+	@Test
+	public void mappedRangeSetValue() {
+		int expectedMin = 50;
+		int expectedMax = 100;
+
+		Range range = SubmodelServiceUtil.createRangeSubmodelElement();
+
+		SubmodelElementValue submodelElementValue = new RangeValue(expectedMin, expectedMax);
+
+		ValueMapper rangeValueMapper = new RangeValueMapper(range);
+		rangeValueMapper.setValue(submodelElementValue);
+
+		assertEquals(Integer.valueOf(expectedMin), Integer.valueOf(range.getMin()));
+		
+		assertEquals(Integer.valueOf(expectedMax), Integer.valueOf(range.getMax()));
+	}
 
 	@Test
 	public void mappedPropertyValue() {
@@ -77,6 +91,20 @@ public class TestMappedSubmodelElementValue {
 		ValueMapper rangeValueMapper = new PropertyValueMapper(property);
 
 		assertEquals(expectedValue, ((PropertyValue) rangeValueMapper.getValue()).getValue());
+	}
+	
+	@Test
+	public void mappedPropertySetValue() {
+		String expectedValue = "5000";
+		
+		Property property = SubmodelServiceUtil.createPropertySubmodelElement();
+
+		SubmodelElementValue submodelElementValue = new PropertyValue(expectedValue);
+
+		ValueMapper propertyValueMapper = new PropertyValueMapper(property);
+		propertyValueMapper.setValue(submodelElementValue);
+
+		assertEquals(expectedValue, property.getValue());
 	}
 
 	@Test
@@ -94,19 +122,19 @@ public class TestMappedSubmodelElementValue {
 
 	@Test
 	public void mappedMultiLanguagePropertySetValue() {
-//		List<LangString> expectedValue = SubmodelServiceUtil.MULTI_LANGUAGE_VALUE;
-//		
-//		List<LangStringValue> valueToWrite = Arrays.asList(new LangStringValue("Hello", "en"),
-//				new LangStringValue("Hallo", "de"));
-//
-//		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
-//
-//		SubmodelElementValue submodelElementValue = new MultiLanguagePropertyValue(valueToWrite);
-//
-//		ValueMapper multiLanguagePropertyValueMapper = new MultiLanguagePropertyValueMapper(multiLanguageProperty);
-//		multiLanguagePropertyValueMapper.setValue(submodelElementValue);
-//
-//		assertEquals(expectedValue, multiLanguageProperty.getValue());
+		List<LangString> expectedValue = SubmodelServiceUtil.MULTI_LANGUAGE_VALUE;
+		
+		List<LangString> valueToWrite = Arrays.asList(new DefaultLangString("Hello", "en"),
+				new DefaultLangString("Hallo", "de"));
+
+		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
+
+		SubmodelElementValue submodelElementValue = new MultiLanguagePropertyValue(valueToWrite);
+
+		ValueMapper multiLanguagePropertyValueMapper = new MultiLanguagePropertyValueMapper(multiLanguageProperty);
+		multiLanguagePropertyValueMapper.setValue(submodelElementValue);
+
+		assertEquals(expectedValue, multiLanguageProperty.getValue());
 	}
 
 	@Test
@@ -118,5 +146,22 @@ public class TestMappedSubmodelElementValue {
 		ValueMapper fileValueMapper = new FileValueMapper(file);
 
 		assertEquals(expectedValue, ((FileValue) fileValueMapper.getValue()).getValue());
+	}
+	
+	@Test
+	public void mappedFileSetValue() {
+		String expectedContentType = "application/pdf";
+		String expectedValue = "someTestFile.pdf";
+		
+		File file = SubmodelServiceUtil.createFileSubmodelElement();
+
+		SubmodelElementValue submodelElementValue = new FileValue(expectedContentType, expectedValue);
+
+		ValueMapper fileValueMapper = new FileValueMapper(file);
+		fileValueMapper.setValue(submodelElementValue);
+
+		assertEquals(expectedContentType, file.getContentType());
+		
+		assertEquals(expectedValue, file.getValue());
 	}
 }

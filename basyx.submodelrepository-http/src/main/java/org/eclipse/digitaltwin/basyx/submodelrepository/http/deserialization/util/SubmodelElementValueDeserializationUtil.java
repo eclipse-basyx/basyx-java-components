@@ -24,38 +24,36 @@ public class SubmodelElementValueDeserializationUtil {
 	private SubmodelElementValueDeserializationUtil() {
 	    throw new IllegalStateException("Utility class");
 	  }
-	
-	public static SubmodelElementValue createPropertyValue(JsonNode node) {
-		String value = node.get(VALUE).asText();
-		
-		return new PropertyValue(value);
-	}
-	
-	public static SubmodelElementValue createRangeValue(JsonNode node) {
-		int min = node.get(MIN).asInt();
-		int max = node.get(MAX).asInt();
-		
-		return new RangeValue(min, max);
-	}
-	
+
 	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
-		JsonNode nodeList = node.get(VALUE);
-		List<LangString> values = new ArrayList<>();
-        for (JsonNode arrayNode : nodeList) {
-            Iterator<String> fieldNames = arrayNode.fieldNames();
-            String language = fieldNames.next();
-            String text = arrayNode.get(language).asText();
-            values.add(new DefaultLangString(text, language));
-        }
+		List<LangString> values = createLangStrings(node);
 		
         return new MultiLanguagePropertyValue(values);
 	}
 	
-	public static SubmodelElementValue createFileValue(JsonNode node) {
-		String contentType = node.get(CONTENT_TYPE).asText();
-		String fileValue = node.get(VALUE).asText();
+	public static boolean isTypeOfPropertyValue(JsonNode node) {
+		return node.size() == PropertyValue.class.getDeclaredFields().length && node.has(VALUE);
+	}
+
+	public static boolean isTypeOfFileValue(JsonNode node) {
+		return node.size() == FileValue.class.getDeclaredFields().length && node.has(VALUE) && node.has(CONTENT_TYPE);
+	}
+
+	public static boolean isTypeOfRangeValue(JsonNode node) {
+		return node.size() == RangeValue.class.getDeclaredFields().length && node.has(MIN) && node.has(MAX);
+	}
+	
+	private static List<LangString> createLangStrings(JsonNode node) {
+		List<LangString> langStrings = new ArrayList<>();
 		
-		return new FileValue(contentType, fileValue);
+        for (JsonNode arrayNode : node) {
+            Iterator<String> fieldNames = arrayNode.fieldNames();
+            String language = fieldNames.next();
+            String text = arrayNode.get(language).asText();
+            langStrings.add(new DefaultLangString(text, language));
+        }
+        
+		return langStrings;
 	}
 
 }

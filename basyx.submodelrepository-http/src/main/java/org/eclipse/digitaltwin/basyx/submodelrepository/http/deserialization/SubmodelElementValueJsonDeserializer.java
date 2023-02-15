@@ -28,8 +28,6 @@ package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization;
 import java.io.IOException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.factory.SubmodelElementValueDeserializationFactory;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValueType;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -37,9 +35,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Handles the mapping between a passed Submodel payload and AAS4J
+ * Deserializes a SubmodelElementValue as described in DotAAS Part 2
  * 
- * @author schnicke
+ * @author danish
  *
  */
 public class SubmodelElementValueJsonDeserializer extends JsonDeserializer<SubmodelElementValue> {
@@ -49,15 +47,10 @@ public class SubmodelElementValueJsonDeserializer extends JsonDeserializer<Submo
 		try {
 			ObjectMapper mapper = (ObjectMapper) p.getCodec();
 			JsonNode node = mapper.readTree(p);
-			if (!node.has("valueType")) {
-				throw new IllegalArgumentException("Unable to determine concrete implementation based on JSON payload");
-			}
-
-			SubmodelElementValueType type = SubmodelElementValueType.fromString(node.get("valueType").asText());
 			
 			SubmodelElementValueDeserializationFactory submodelElementValueFactory = new SubmodelElementValueDeserializationFactory();
 			
-			return submodelElementValueFactory.create(type, node);
+			return submodelElementValueFactory.create(mapper, node);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
