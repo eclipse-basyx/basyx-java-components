@@ -41,13 +41,12 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
 import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelservice.DummySubmodelFactory;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.junit.Test;
 
 /**
  * Testsuite for implementations of the SubmodelRepository interface
  * 
- * @author schnicke
+ * @author schnicke, danish
  *
  */
 public abstract class SubmodelRepositorySuite {

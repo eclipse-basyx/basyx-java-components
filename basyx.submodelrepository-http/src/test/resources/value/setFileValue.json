@@ -1,5 +1,4 @@
 {
-	"valueType": "FileValue",
-	"contentType": "application/octet-stream",
-	"value": "fileValue"
+	"contentType": "application/pdf",
+	"value": "TestInstructions.pdf"
 }

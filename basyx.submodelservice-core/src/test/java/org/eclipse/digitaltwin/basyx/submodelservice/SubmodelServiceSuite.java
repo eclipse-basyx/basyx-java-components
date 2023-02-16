@@ -51,7 +51,6 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.junit.Test;
 
 /**

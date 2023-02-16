@@ -1,59 +1,114 @@
+/*******************************************************************************
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * SPDX-License-Identifier: MIT
+ ******************************************************************************/
+
+
 package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.lang.reflect.Field;
 import java.util.List;
-
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * An utility class to check and validate the type for Deserialization
+ * 
+ * @author danish
+ *
+ */
 public class SubmodelElementValueDeserializationUtil {
-	
-	private static final String CONTENT_TYPE = "contentType";
-	private static final String MAX = "max";
-	private static final String MIN = "min";
-	private static final String VALUE = "value";
 
 	private SubmodelElementValueDeserializationUtil() {
-	    throw new IllegalStateException("Utility class");
-	  }
-
-	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
-		List<LangString> values = createLangStrings(node);
-		
-        return new MultiLanguagePropertyValue(values);
+		throw new IllegalStateException("Utility class");
 	}
-	
+
+	public static SubmodelElementValue createMultiLanguagePropertyValue(ObjectMapper mapper, JsonNode node)
+			throws JsonProcessingException {
+		List<LangString> langStrings = mapper.readValue(node.toString(), new TypeReference<List<LangString>>() {
+		});
+
+		return new MultiLanguagePropertyValue(langStrings);
+	}
+
 	public static boolean isTypeOfPropertyValue(JsonNode node) {
-		return node.size() == PropertyValue.class.getDeclaredFields().length && node.has(VALUE);
+		return isTypeOf(PropertyValue.class, node);
 	}
 
 	public static boolean isTypeOfFileValue(JsonNode node) {
-		return node.size() == FileValue.class.getDeclaredFields().length && node.has(VALUE) && node.has(CONTENT_TYPE);
+		return isTypeOf(FileValue.class, node);
 	}
 
 	public static boolean isTypeOfRangeValue(JsonNode node) {
-		return node.size() == RangeValue.class.getDeclaredFields().length && node.has(MIN) && node.has(MAX);
+		return isTypeOf(RangeValue.class, node);
 	}
-	
-	private static List<LangString> createLangStrings(JsonNode node) {
-		List<LangString> langStrings = new ArrayList<>();
+
+	public static boolean isTypeOfMultiLanguagePropertyValue(JsonNode node) {
+		return node.isArray() && hasStructureOfMultiLanguagePropertyValue(node);
+	}
+
+	private static boolean isTypeOf(Class<? extends SubmodelElementValue> clazz, JsonNode node) {
+		Field[] fields = clazz.getDeclaredFields();
+		int numOfAttributes = fields.length;
 		
-        for (JsonNode arrayNode : node) {
-            Iterator<String> fieldNames = arrayNode.fieldNames();
-            String language = fieldNames.next();
-            String text = arrayNode.get(language).asText();
-            langStrings.add(new DefaultLangString(text, language));
-        }
-        
-		return langStrings;
+		if (node.size() != numOfAttributes)
+			return false;
+
+		for (Field field : fields) {
+			if (!node.has(field.getName()))
+				return false;
+		}
+
+		return true;
+	}
+
+	private static boolean hasStructureOfMultiLanguagePropertyValue(JsonNode node) {
+		for (JsonNode element : node) {
+			if (!isValidLanguagePropertyValue(element))
+				return false;
+		}
+
+		return true;
+	}
+
+	private static boolean isValidLanguagePropertyValue(JsonNode element) {
+		return element.isObject() && ((ObjectNode) element).size() == 1 && isLanguageTextOfTypeText(element);
+	}
+
+	private static boolean isLanguageTextOfTypeText(JsonNode element) {
+		String language = element.fieldNames().next();
+
+		return element.get(language).isTextual();
 	}
 
 }

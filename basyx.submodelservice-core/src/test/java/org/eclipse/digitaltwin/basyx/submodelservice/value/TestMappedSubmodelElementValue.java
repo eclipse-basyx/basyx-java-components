@@ -54,7 +54,7 @@ import org.junit.Test;
 public class TestMappedSubmodelElementValue {
 
 	@Test
-	public void mappedRangeValue() {
+	public void mappedGetRangeValue() {
 		Range expected = SubmodelServiceUtil.createRangeSubmodelElement();
 
 		RangeValue retrievedValue = (RangeValue) new RangeValueMapper(expected).getValue();
@@ -65,16 +65,13 @@ public class TestMappedSubmodelElementValue {
 	}
 	
 	@Test
-	public void mappedRangeSetValue() {
+	public void mappedSetRangeValue() {
 		int expectedMin = 50;
 		int expectedMax = 100;
 
 		Range range = SubmodelServiceUtil.createRangeSubmodelElement();
 
-		SubmodelElementValue submodelElementValue = new RangeValue(expectedMin, expectedMax);
-
-		ValueMapper rangeValueMapper = new RangeValueMapper(range);
-		rangeValueMapper.setValue(submodelElementValue);
+		setRangeValue(expectedMin, expectedMax, range);
 
 		assertEquals(Integer.valueOf(expectedMin), Integer.valueOf(range.getMin()));
 		
@@ -82,7 +79,7 @@ public class TestMappedSubmodelElementValue {
 	}
 
 	@Test
-	public void mappedPropertyValue() {
+	public void mappedGetPropertyValue() {
 		String expectedValue = "200";
 
 		Property property = new DefaultProperty.Builder().value(expectedValue).valueType(DataTypeDefXsd.INTEGER)
@@ -94,21 +91,18 @@ public class TestMappedSubmodelElementValue {
 	}
 	
 	@Test
-	public void mappedPropertySetValue() {
+	public void mappedSetPropertyValue() {
 		String expectedValue = "5000";
 		
 		Property property = SubmodelServiceUtil.createPropertySubmodelElement();
 
-		SubmodelElementValue submodelElementValue = new PropertyValue(expectedValue);
-
-		ValueMapper propertyValueMapper = new PropertyValueMapper(property);
-		propertyValueMapper.setValue(submodelElementValue);
+		setPropertyValue(expectedValue, property);
 
 		assertEquals(expectedValue, property.getValue());
 	}
 
 	@Test
-	public void mappedMultiLanguagePropertyValue() {
+	public void mappedGetMultiLanguagePropertyValue() {
 		List<LangString> expectedValue = Arrays.asList(new DefaultLangString("Hello", "en"), new DefaultLangString("Hallo", "de"));
 
 		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
@@ -121,24 +115,18 @@ public class TestMappedSubmodelElementValue {
 	}
 
 	@Test
-	public void mappedMultiLanguagePropertySetValue() {
-		List<LangString> expectedValue = SubmodelServiceUtil.MULTI_LANGUAGE_VALUE;
-		
-		List<LangString> valueToWrite = Arrays.asList(new DefaultLangString("Hello", "en"),
-				new DefaultLangString("Hallo", "de"));
+	public void mappedSetMultiLanguagePropertyValue() {
+		List<LangString> expectedValue = Arrays.asList(new DefaultLangString("Bonjour", "fr"), new DefaultLangString("Hola", "es"));
 
 		MultiLanguageProperty multiLanguageProperty = SubmodelServiceUtil.createMultiLanguagePropertySubmodelElement();
 
-		SubmodelElementValue submodelElementValue = new MultiLanguagePropertyValue(valueToWrite);
-
-		ValueMapper multiLanguagePropertyValueMapper = new MultiLanguagePropertyValueMapper(multiLanguageProperty);
-		multiLanguagePropertyValueMapper.setValue(submodelElementValue);
+		setMultiLanguagePropertyValue(expectedValue, multiLanguageProperty);
 
 		assertEquals(expectedValue, multiLanguageProperty.getValue());
 	}
 
 	@Test
-	public void mappedFileValue() {
+	public void mappedGetFileValue() {
 		String expectedValue = SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_VALUE;
 
 		File file = SubmodelServiceUtil.createFileSubmodelElement();
@@ -149,19 +137,45 @@ public class TestMappedSubmodelElementValue {
 	}
 	
 	@Test
-	public void mappedFileSetValue() {
+	public void mappedSetFileValue() {
 		String expectedContentType = "application/pdf";
 		String expectedValue = "someTestFile.pdf";
 		
 		File file = SubmodelServiceUtil.createFileSubmodelElement();
 
-		SubmodelElementValue submodelElementValue = new FileValue(expectedContentType, expectedValue);
-
-		ValueMapper fileValueMapper = new FileValueMapper(file);
-		fileValueMapper.setValue(submodelElementValue);
+		setFileValue(expectedContentType, expectedValue, file);
 
 		assertEquals(expectedContentType, file.getContentType());
 		
 		assertEquals(expectedValue, file.getValue());
+	}
+	
+	private void setFileValue(String expectedContentType, String expectedValue, File file) {
+		SubmodelElementValue submodelElementValue = new FileValue(expectedContentType, expectedValue);
+
+		ValueMapper fileValueMapper = new FileValueMapper(file);
+		fileValueMapper.setValue(submodelElementValue);
+	}
+	
+	private void setRangeValue(int expectedMin, int expectedMax, Range range) {
+		SubmodelElementValue submodelElementValue = new RangeValue(expectedMin, expectedMax);
+
+		ValueMapper rangeValueMapper = new RangeValueMapper(range);
+		rangeValueMapper.setValue(submodelElementValue);
+	}
+	
+	private void setPropertyValue(String expectedValue, Property property) {
+		SubmodelElementValue submodelElementValue = new PropertyValue(expectedValue);
+
+		ValueMapper propertyValueMapper = new PropertyValueMapper(property);
+		propertyValueMapper.setValue(submodelElementValue);
+	}
+	
+	private void setMultiLanguagePropertyValue(List<LangString> valueToWrite,
+			MultiLanguageProperty multiLanguageProperty) {
+		SubmodelElementValue submodelElementValue = new MultiLanguagePropertyValue(valueToWrite);
+
+		ValueMapper multiLanguagePropertyValueMapper = new MultiLanguagePropertyValueMapper(multiLanguageProperty);
+		multiLanguagePropertyValueMapper.setValue(submodelElementValue);
 	}
 }

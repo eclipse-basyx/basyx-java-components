@@ -1,5 +1,4 @@
-{ 
-	"valueType": "RangeValue",
-	"min": 200,
-	"max": 300
+{
+	"min": 50,
+	"max": 400
 }

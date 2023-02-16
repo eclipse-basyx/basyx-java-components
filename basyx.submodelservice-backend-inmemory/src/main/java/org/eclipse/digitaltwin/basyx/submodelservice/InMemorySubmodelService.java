@@ -81,9 +81,6 @@ public class InMemorySubmodelService implements SubmodelService {
 
 	@Override
 	public void setSubmodelElementValue(String idShort, SubmodelElementValue value) throws ElementDoesNotExistException {
-//		Property property = (Property) getSubmodelElement(idShort);
-//		property.setValue((String) value);
-		
 		SubmodelElementValueMapperFactory submodelElementValueFactory = new SubmodelElementValueMapperFactory();
 		
 		ValueMapper valueMapper = submodelElementValueFactory.create(getSubmodelElement(idShort));

@@ -1,11 +1,8 @@
-{ 
-"valueType": "MultiLanguagePropertyValue",
-"value": [
+[
     {
-        "en": "Hello"
+        "fr": "Bonjour"
     },
     {
-        "de": "Hallo"
+        "es": "Hola"
     }
 ]
-}

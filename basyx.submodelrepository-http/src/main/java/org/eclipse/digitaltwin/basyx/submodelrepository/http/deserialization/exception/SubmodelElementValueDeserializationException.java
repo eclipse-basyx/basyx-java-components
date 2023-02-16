@@ -22,20 +22,22 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+
+package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.exception;
 
 /**
- * Mapper interface for the SubmodelElement Value
+ * Indicates that the provided content for SubmodelELementValue is invalid
  * 
  * @author danish
  *
  */
-public interface ValueMapper {
+public class SubmodelElementValueDeserializationException extends RuntimeException {
+	
+	private static final long serialVersionUID = 1L;
 
-	public void setValue(SubmodelElementValue submodelElementValue);
-
-	public SubmodelElementValue getValue();
+	public SubmodelElementValueDeserializationException() {
+		super("The provided SubmodelElementValue JSON is not as defined in the Dot AAS Part 2");
+	}
 
 }

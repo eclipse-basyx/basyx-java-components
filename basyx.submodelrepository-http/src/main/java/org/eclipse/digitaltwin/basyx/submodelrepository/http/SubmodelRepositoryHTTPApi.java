@@ -37,7 +37,6 @@ import javax.validation.Valid;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

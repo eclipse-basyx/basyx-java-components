@@ -26,7 +26,9 @@
 
 package org.eclipse.digitaltwin.basyx.submodelrepository.http;
 
+import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.basyx.http.SerializationExtension;
+import org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.LangStringJsonDeserializer;
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.SubmodelElementValueJsonDeserializer;
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.serialization.MultiLanguagePropertyValueSerializer;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
@@ -38,7 +40,7 @@ import org.springframework.stereotype.Component;
  * SerializationExtension integrating the additional SubmodelRepository
  * serialization
  * 
- * @author schnicke
+ * @author schnicke, danish
  *
  */
 @Component
@@ -47,8 +49,8 @@ public class SubmodelRepositoryHTTPSerializationExtension implements Serializati
 	@Override
 	public void extend(Jackson2ObjectMapperBuilder builder) {
 		builder.serializerByType(MultiLanguagePropertyValue.class, new MultiLanguagePropertyValueSerializer());
-		
 		builder.deserializerByType(SubmodelElementValue.class, new SubmodelElementValueJsonDeserializer());
+		builder.deserializerByType(LangString.class, new LangStringJsonDeserializer());
 	}
 
 }

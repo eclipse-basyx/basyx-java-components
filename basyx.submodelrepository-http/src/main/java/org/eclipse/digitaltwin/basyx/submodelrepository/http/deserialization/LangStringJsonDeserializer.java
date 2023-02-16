@@ -22,20 +22,34 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
+
+package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization;
+
+import java.io.IOException;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Mapper interface for the SubmodelElement Value
+ * Deserializes a LangString as described in DotAAS Part 2
  * 
  * @author danish
  *
  */
-public interface ValueMapper {
+public class LangStringJsonDeserializer extends JsonDeserializer<LangString> {
 
-	public void setValue(SubmodelElementValue submodelElementValue);
-
-	public SubmodelElementValue getValue();
+	@Override
+	public LangString deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+		ObjectNode objectNode = p.readValueAsTree();
+        String language = objectNode.fieldNames().next();
+        String text = objectNode.get(language).asText();
+        return new DefaultLangString(text, language);
+	}
 
 }
