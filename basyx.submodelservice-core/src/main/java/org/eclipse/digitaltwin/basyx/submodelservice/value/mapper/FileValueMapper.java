@@ -26,7 +26,6 @@ package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.File;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 /**
  * Maps {@link File} value to {@link FileValue} 
@@ -34,7 +33,7 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  * @author danish
  *
  */
-public class FileValueMapper implements ValueMapper {
+public class FileValueMapper implements ValueMapper<FileValue> {
 	private File file;
 	
 	public FileValueMapper(File file) {
@@ -42,13 +41,13 @@ public class FileValueMapper implements ValueMapper {
 	}
 
 	@Override
-	public SubmodelElementValue getValue() {
+	public FileValue getValue() {
 		return new FileValue(file.getContentType(), file.getValue());
 	}
 
 	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		file.setContentType(((FileValue) submodelElementValue).getContentType());
-		file.setValue(((FileValue) submodelElementValue).getValue());
+	public void setValue(FileValue fileValue) {
+		file.setContentType(fileValue.getContentType());
+		file.setValue(fileValue.getValue());
 	}
 }

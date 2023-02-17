@@ -43,14 +43,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 public class SubmodelElementValueJsonDeserializer extends JsonDeserializer<SubmodelElementValue> {
+	
+	private SubmodelElementValueDeserializationFactory submodelElementValueDeserializationFactory = new SubmodelElementValueDeserializationFactory();
 
 	@Override
 	public SubmodelElementValue deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 		try {
 			ObjectMapper mapper = (ObjectMapper) p.getCodec();
 			JsonNode node = mapper.readTree(p);
-
-			SubmodelElementValueDeserializationFactory submodelElementValueDeserializationFactory = new SubmodelElementValueDeserializationFactory();
 
 			return submodelElementValueDeserializationFactory.create(mapper, node);
 		} catch (IOException e) {

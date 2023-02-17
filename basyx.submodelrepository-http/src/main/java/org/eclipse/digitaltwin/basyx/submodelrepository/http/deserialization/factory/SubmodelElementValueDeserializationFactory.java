@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.factory;
 
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
@@ -38,24 +37,33 @@ import static org.eclipse.digitaltwin.basyx.submodelrepository.http.deserializat
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.exception.SubmodelElementValueDeserializationException;
 
 /**
- * Factory class to create deserialized {@link SubmodelElementValue} based on the content
+ * Factory class to create deserialized {@link SubmodelElementValue} based on
+ * the content
  * 
  * @author danish
  *
  */
 public class SubmodelElementValueDeserializationFactory {
 
+	/**
+	 * Deserializes the corresponding {@link SubmodelElementValue} based on the
+	 * JSON content
+	 * 
+	 * @return SubmodelELementValue
+	 * 
+	 * @throws SubmodelElementValueDeserializationException
+	 */
 	public SubmodelElementValue create(ObjectMapper mapper, JsonNode node) {
 		if (isTypeOfRangeValue(node)) {
 			return mapper.convertValue(node, RangeValue.class);
-        } else if (isTypeOfMultiLanguagePropertyValue(node)) {
-            return createMultiLanguagePropertyValue(node);
-        } else if (isTypeOfFileValue(node)) {
-        	return mapper.convertValue(node, FileValue.class);
-        } else if(isTypeOfPropertyValue(node)) {
-        	return mapper.convertValue(node, PropertyValue.class);
-        }
-		
+		} else if (isTypeOfMultiLanguagePropertyValue(node)) {
+			return createMultiLanguagePropertyValue(node);
+		} else if (isTypeOfFileValue(node)) {
+			return mapper.convertValue(node, FileValue.class);
+		} else if (isTypeOfPropertyValue(node)) {
+			return mapper.convertValue(node, PropertyValue.class);
+		}
+
 		throw new SubmodelElementValueDeserializationException();
 	}
 }

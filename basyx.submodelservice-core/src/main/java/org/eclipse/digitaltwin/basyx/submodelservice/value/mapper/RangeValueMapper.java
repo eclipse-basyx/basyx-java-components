@@ -26,7 +26,6 @@ package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Range;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 /**
  * Maps {@link Range} value to {@link RangeValue} 
@@ -34,7 +33,7 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  * @author danish
  *
  */
-public class RangeValueMapper implements ValueMapper {
+public class RangeValueMapper implements ValueMapper<RangeValue> {
 	private Range range;
 	
 	public RangeValueMapper(Range range) {
@@ -42,22 +41,22 @@ public class RangeValueMapper implements ValueMapper {
 	}
 
 	@Override
-	public SubmodelElementValue getValue() {
+	public RangeValue getValue() {
 		return new RangeValue(parseIntValue(range.getMin()), parseIntValue(range.getMax()));
 	}
 	
 	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		range.setMin(getMinValue((RangeValue) submodelElementValue));
-		range.setMax(getMaxValue((RangeValue) submodelElementValue));
+	public void setValue(RangeValue rangeValue) {
+		range.setMin(getMinValue(rangeValue));
+		range.setMax(getMaxValue(rangeValue));
 	}
 	
-	private String getMinValue(RangeValue submodelElementValue) {
-		return String.valueOf(submodelElementValue.getMin());
+	private String getMinValue(RangeValue rangeValue) {
+		return String.valueOf(rangeValue.getMin());
 	}
 	
-	private String getMaxValue(RangeValue submodelElementValue) {
-		return String.valueOf(submodelElementValue.getMax());
+	private String getMaxValue(RangeValue rangeValue) {
+		return String.valueOf(rangeValue.getMax());
 	}
 	
 	private int parseIntValue(String value) {

@@ -26,7 +26,6 @@ package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 /**
  * Maps {@link MultiLanguageProperty} value to
@@ -35,7 +34,7 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  * @author danish
  *
  */
-public class MultiLanguagePropertyValueMapper implements ValueMapper {
+public class MultiLanguagePropertyValueMapper implements ValueMapper<MultiLanguagePropertyValue> {
 	private MultiLanguageProperty multiLanguageProperty;
 
 	public MultiLanguagePropertyValueMapper(MultiLanguageProperty multiLanguageProperty) {
@@ -43,12 +42,12 @@ public class MultiLanguagePropertyValueMapper implements ValueMapper {
 	}
 
 	@Override
-	public SubmodelElementValue getValue() {
+	public MultiLanguagePropertyValue getValue() {
 		return new MultiLanguagePropertyValue(multiLanguageProperty.getValue());
 	}
 
 	@Override
-	public void setValue(SubmodelElementValue submodelElementValue) {
-		multiLanguageProperty.setValue(((MultiLanguagePropertyValue) submodelElementValue).getValue());
+	public void setValue(MultiLanguagePropertyValue multiLanguagePropertyValue) {
+		multiLanguageProperty.setValue(multiLanguagePropertyValue.getValue());
 	}
 }

@@ -32,10 +32,10 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
  * @author danish
  *
  */
-public interface ValueMapper {
+public interface ValueMapper<T extends SubmodelElementValue> {
 
-	public void setValue(SubmodelElementValue submodelElementValue);
+	public void setValue(T submodelElementValue);
 
-	public SubmodelElementValue getValue();
+	public T getValue();
 
 }
