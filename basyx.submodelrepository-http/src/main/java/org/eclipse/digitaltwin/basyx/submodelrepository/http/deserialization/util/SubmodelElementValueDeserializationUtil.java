@@ -27,18 +27,18 @@
 package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.util;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -53,10 +53,8 @@ public class SubmodelElementValueDeserializationUtil {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static SubmodelElementValue createMultiLanguagePropertyValue(ObjectMapper mapper, JsonNode node)
-			throws JsonProcessingException {
-		List<LangString> langStrings = mapper.readValue(node.toString(), new TypeReference<List<LangString>>() {
-		});
+	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
+		List<LangString> langStrings = createLangStrings(node);
 
 		return new MultiLanguagePropertyValue(langStrings);
 	}
@@ -75,6 +73,24 @@ public class SubmodelElementValueDeserializationUtil {
 
 	public static boolean isTypeOfMultiLanguagePropertyValue(JsonNode node) {
 		return node.isArray() && hasStructureOfMultiLanguagePropertyValue(node);
+	}
+	
+	private static List<LangString> createLangStrings(JsonNode node) {
+		List<LangString> langStrings = new ArrayList<>();
+		
+        for (JsonNode element : node) {
+        	langStrings.add(createLangString(element));
+        }
+        
+		return langStrings;
+	}
+
+	private static DefaultLangString createLangString(JsonNode arrayNode) {
+		Iterator<String> fieldNames = arrayNode.fieldNames();
+		String language = fieldNames.next();
+		String text = arrayNode.get(language).asText();
+		
+		return new DefaultLangString(text, language);
 	}
 
 	private static boolean isTypeOf(Class<? extends SubmodelElementValue> clazz, JsonNode node) {
