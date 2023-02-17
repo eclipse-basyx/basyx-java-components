@@ -35,8 +35,6 @@ import javax.validation.Valid;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
-import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
-import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,20 +74,16 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 	@Override
 	public ResponseEntity<Void> deleteAssetAdministrationShellById(
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier) {
-		try {
-			aasRepository.deleteAas(aasIdentifier.getIdentifier());
-			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-		} catch (ElementDoesNotExistException e) {
-			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-		}
+		aasRepository.deleteAas(aasIdentifier.getIdentifier());
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 
 	@Override
 	public ResponseEntity<Void> deleteSubmodelReferenceById(
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier,
-			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") String submodelIdentifier) {
-		String accept = request.getHeader("Accept");
-		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") Base64UrlEncodedIdentifier submodelIdentifier) {
+		aasRepository.removeSubmodelReference(aasIdentifier.getIdentifier(), submodelIdentifier.getIdentifier());
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	@Override
@@ -97,15 +91,10 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier) {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
-			try {
-				return new ResponseEntity<List<Reference>>(objectMapper.readValue("[ \"\", \"\" ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-			} catch (IOException e) {
-				log.error("Couldn't serialize response for content type application/json", e);
-				return new ResponseEntity<List<Reference>>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			List<Reference> submodelReferences = aasRepository.getSubmodelReferences(aasIdentifier.getIdentifier());
+			return new ResponseEntity<List<Reference>>(submodelReferences, HttpStatus.OK);
 		}
-
-		return new ResponseEntity<List<Reference>>(HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity<List<Reference>>(HttpStatus.BAD_REQUEST);
 	}
 
 	@Override
@@ -129,11 +118,7 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 	@Override
 	public ResponseEntity<AssetAdministrationShell> getAssetAdministrationShellById(
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier) {
-		try {
-			return new ResponseEntity<AssetAdministrationShell>(aasRepository.getAas(aasIdentifier.getIdentifier()), HttpStatus.OK);
-		} catch (ElementDoesNotExistException e) {
-			return new ResponseEntity<AssetAdministrationShell>(HttpStatus.NOT_FOUND);
-		}
+		return new ResponseEntity<AssetAdministrationShell>(aasRepository.getAas(aasIdentifier.getIdentifier()), HttpStatus.OK);
 	}
 
 	@Override
@@ -141,12 +126,8 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.DEFAULT, description = "Asset Administration Shell object", required = true, schema = @Schema()) @Valid @RequestBody AssetAdministrationShell body) {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
-			try {
-				aasRepository.createAas(body);
-				return new ResponseEntity<AssetAdministrationShell>(body, HttpStatus.CREATED);
-			} catch (CollidingIdentifierException e) {
-				return new ResponseEntity<AssetAdministrationShell>(HttpStatus.BAD_REQUEST);
-			}
+			aasRepository.createAas(body);
+			return new ResponseEntity<AssetAdministrationShell>(body, HttpStatus.CREATED);
 		}
 
 		return new ResponseEntity<AssetAdministrationShell>(HttpStatus.BAD_REQUEST);
@@ -158,15 +139,10 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.DEFAULT, description = "Reference to the Submodel", required = true, schema = @Schema()) @Valid @RequestBody Reference body) {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
-			try {
-				return new ResponseEntity<Reference>(objectMapper.readValue("\"\"", Reference.class), HttpStatus.NOT_IMPLEMENTED);
-			} catch (IOException e) {
-				log.error("Couldn't serialize response for content type application/json", e);
-				return new ResponseEntity<Reference>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			aasRepository.addSubmodelReference(aasIdentifier.getIdentifier(), body);
+			return new ResponseEntity<Reference>(body, HttpStatus.CREATED);
 		}
-
-		return new ResponseEntity<Reference>(HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity<Reference>(HttpStatus.BAD_REQUEST);
 	}
 
 	@Override

@@ -23,39 +23,34 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.digitaltwin.basyx.http.serialization;
 
-import java.io.IOException;
+package org.eclipse.digitaltwin.basyx.http;
 
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.DeserializationException;
-import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
- * Handles the mapping between a passed AAS payload and AAS4J
+ * Configures overall Exception to HTTP status code mapping
  * 
  * @author schnicke
  *
  */
-public class AasJsonDeserializer extends JsonDeserializer<AssetAdministrationShell> {
+@ControllerAdvice
+public class BaSyxExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@Override
-	public AssetAdministrationShell deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-		try {
-			ObjectMapper mapper = (ObjectMapper) p.getCodec();
-			JsonNode node = mapper.readTree(p);
-			String serialized = mapper.writeValueAsString(node);
-
-			return new org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer().readReferable(serialized, AssetAdministrationShell.class);
-		} catch (DeserializationException | IOException e) {
-			throw new RuntimeException(e);
-		}
+	@ExceptionHandler(ElementDoesNotExistException.class)
+	public <T> ResponseEntity<T> handleElementNotFoundException(ElementDoesNotExistException exception, WebRequest request) {
+		return new ResponseEntity<T>(HttpStatus.NOT_FOUND);
 	}
 
+	@ExceptionHandler(CollidingIdentifierException.class)
+	public <T> ResponseEntity<T> handleCollidingIdentifierException(CollidingIdentifierException exception, WebRequest request) {
+		return new ResponseEntity<T>(HttpStatus.CONFLICT);
+	}
 }
