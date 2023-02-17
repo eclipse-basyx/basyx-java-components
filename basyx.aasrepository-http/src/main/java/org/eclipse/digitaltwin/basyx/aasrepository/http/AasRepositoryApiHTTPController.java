@@ -87,9 +87,13 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 	@Override
 	public ResponseEntity<Void> deleteSubmodelReferenceById(
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier,
-			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") String submodelIdentifier) {
-		String accept = request.getHeader("Accept");
-		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") Base64UrlEncodedIdentifier submodelIdentifier) {
+		try {
+			aasRepository.removeSubmodelReference(aasIdentifier.getIdentifier(), submodelIdentifier.getIdentifier());
+		} catch (ElementDoesNotExistException e) {
+			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	@Override
@@ -98,14 +102,13 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				return new ResponseEntity<List<Reference>>(objectMapper.readValue("[ \"\", \"\" ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-			} catch (IOException e) {
-				log.error("Couldn't serialize response for content type application/json", e);
-				return new ResponseEntity<List<Reference>>(HttpStatus.INTERNAL_SERVER_ERROR);
+				List<Reference> submodelReferences = aasRepository.getSubmodelReferences(aasIdentifier.getIdentifier());
+				return new ResponseEntity<List<Reference>>(submodelReferences, HttpStatus.OK);
+			} catch (ElementDoesNotExistException e) {
+				return new ResponseEntity<List<Reference>>(HttpStatus.NOT_FOUND);
 			}
 		}
-
-		return new ResponseEntity<List<Reference>>(HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity<List<Reference>>(HttpStatus.BAD_REQUEST);
 	}
 
 	@Override
@@ -159,14 +162,13 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				return new ResponseEntity<Reference>(objectMapper.readValue("\"\"", Reference.class), HttpStatus.NOT_IMPLEMENTED);
-			} catch (IOException e) {
-				log.error("Couldn't serialize response for content type application/json", e);
-				return new ResponseEntity<Reference>(HttpStatus.INTERNAL_SERVER_ERROR);
+				aasRepository.addSubmodelReference(aasIdentifier.getIdentifier(), body);
+			} catch (ElementDoesNotExistException e) {
+				return new ResponseEntity<Reference>(HttpStatus.NOT_FOUND);
 			}
+			return new ResponseEntity<Reference>(body, HttpStatus.CREATED);
 		}
-
-		return new ResponseEntity<Reference>(HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity<Reference>(HttpStatus.BAD_REQUEST);
 	}
 
 	@Override
