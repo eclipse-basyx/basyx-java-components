@@ -85,7 +85,7 @@ public class TestAasRepositoryHTTP {
 
 		CloseableHttpResponse creationResponse = createAasOnServer(aasJsonContent);
 
-		assertEquals(400, creationResponse.getCode());
+		assertEquals(HttpStatus.CONFLICT.value(), creationResponse.getCode());
 	}
 
 	@Test
@@ -101,7 +101,7 @@ public class TestAasRepositoryHTTP {
 	public void getNonExistingAasByIdentifier() throws IOException {
 		CloseableHttpResponse response = getSpecificAas("nonExisting");
 
-		assertEquals(404, response.getCode());
+		assertEquals(HttpStatus.NOT_FOUND.value(), response.getCode());
 	}
 
 	@Test
