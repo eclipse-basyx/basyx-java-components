@@ -82,11 +82,7 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 	public ResponseEntity<Void> deleteSubmodelReferenceById(
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier,
 			@Parameter(in = ParameterIn.PATH, description = "The Submodel’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("submodelIdentifier") Base64UrlEncodedIdentifier submodelIdentifier) {
-		try {
-			aasRepository.removeSubmodelReference(aasIdentifier.getIdentifier(), submodelIdentifier.getIdentifier());
-		} catch (ElementDoesNotExistException e) {
-			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-		}
+		aasRepository.removeSubmodelReference(aasIdentifier.getIdentifier(), submodelIdentifier.getIdentifier());
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
@@ -95,12 +91,8 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier) {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
-			try {
-				List<Reference> submodelReferences = aasRepository.getSubmodelReferences(aasIdentifier.getIdentifier());
-				return new ResponseEntity<List<Reference>>(submodelReferences, HttpStatus.OK);
-			} catch (ElementDoesNotExistException e) {
-				return new ResponseEntity<List<Reference>>(HttpStatus.NOT_FOUND);
-			}
+			List<Reference> submodelReferences = aasRepository.getSubmodelReferences(aasIdentifier.getIdentifier());
+			return new ResponseEntity<List<Reference>>(submodelReferences, HttpStatus.OK);
 		}
 		return new ResponseEntity<List<Reference>>(HttpStatus.BAD_REQUEST);
 	}
@@ -147,11 +139,7 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.DEFAULT, description = "Reference to the Submodel", required = true, schema = @Schema()) @Valid @RequestBody Reference body) {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
-			try {
-				aasRepository.addSubmodelReference(aasIdentifier.getIdentifier(), body);
-			} catch (ElementDoesNotExistException e) {
-				return new ResponseEntity<Reference>(HttpStatus.NOT_FOUND);
-			}
+			aasRepository.addSubmodelReference(aasIdentifier.getIdentifier(), body);
 			return new ResponseEntity<Reference>(body, HttpStatus.CREATED);
 		}
 		return new ResponseEntity<Reference>(HttpStatus.BAD_REQUEST);
