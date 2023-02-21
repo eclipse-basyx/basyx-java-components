@@ -32,10 +32,14 @@ import java.util.Iterator;
 import java.util.List;
 import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.AnnotatedRelationshipElementValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.EntityValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.ReferenceValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.RelationshipElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,14 +57,8 @@ public class SubmodelElementValueDeserializationUtil {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
-		List<LangString> langStrings = createLangStrings(node);
-
-		return new MultiLanguagePropertyValue(langStrings);
-	}
-
 	public static boolean isTypeOfPropertyValue(JsonNode node) {
-		return isTypeOf(PropertyValue.class, node);
+		return node.isValueNode() && node.isTextual();
 	}
 
 	public static boolean isTypeOfFileValue(JsonNode node) {
@@ -73,6 +71,28 @@ public class SubmodelElementValueDeserializationUtil {
 
 	public static boolean isTypeOfMultiLanguagePropertyValue(JsonNode node) {
 		return node.isArray() && hasStructureOfMultiLanguagePropertyValue(node);
+	}
+	
+	public static boolean isTypeOfEntityValue(JsonNode node) {
+		return isTypeOf(EntityValue.class, node);
+	}
+	
+	public static boolean isTypeOfReferenceElementValue(JsonNode node) {
+		return isTypeOf(ReferenceValue.class, node);
+	}
+	
+	public static boolean isTypeOfRelationshipElementValue(JsonNode node) {
+		return isTypeOf(RelationshipElementValue.class, node);
+	}
+	
+	public static boolean isTypeOfAnnotatedRelationshipElementValue(JsonNode node) {
+		return isTypeOf(AnnotatedRelationshipElementValue.class, node);
+	}
+	
+	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
+		List<LangString> langStrings = createLangStrings(node);
+
+		return new MultiLanguagePropertyValue(langStrings);
 	}
 	
 	private static List<LangString> createLangStrings(JsonNode node) {
@@ -94,8 +114,9 @@ public class SubmodelElementValueDeserializationUtil {
 	}
 
 	private static boolean isTypeOf(Class<? extends SubmodelElementValue> clazz, JsonNode node) {
+		Field[] superClassFields = clazz.getSuperclass().getDeclaredFields();
 		Field[] fields = clazz.getDeclaredFields();
-		int numOfAttributes = fields.length;
+		int numOfAttributes = superClassFields.length + fields.length;
 		
 		if (node.size() != numOfAttributes)
 			return false;
