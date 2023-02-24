@@ -96,9 +96,9 @@ public class MongoDBAasRepository implements AasRepository {
 
 	@Override
 	public void updateAas(AssetAdministrationShell aas) {
-		Query query = new Query().addCriteria(Criteria.where("id").is(aas.getId()));
+		Query query = new Query().addCriteria(Criteria.where(IDJSONPATH).is(aas.getId()));
 		if (!mongoTemplate.exists(query, AssetAdministrationShell.class, collectionName)) {
-			throw new ElementDoesNotExistException();
+			throw new ElementDoesNotExistException(aas.getId());
 		} else {
 			mongoTemplate.remove(query, AssetAdministrationShell.class, collectionName);
 			mongoTemplate.save(aas, collectionName);
