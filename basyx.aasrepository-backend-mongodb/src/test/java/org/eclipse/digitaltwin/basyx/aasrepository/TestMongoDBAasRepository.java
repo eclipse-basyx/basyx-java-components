@@ -26,6 +26,11 @@
 
 package org.eclipse.digitaltwin.basyx.aasrepository;
 
+import static org.junit.Assert.assertEquals;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
+import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -54,6 +59,30 @@ public class TestMongoDBAasRepository extends AasRepositorySuite {
 
 	private void clearDatabase(MongoTemplate template) {
 		template.remove(new Query(), COLLECTION);
+	}
+
+	@Test
+	public void aasIsPersisted() {
+		AasRepositoryFactory repoFactory = getAasRepositoryFactory();
+		AssetAdministrationShell expectedShell = createDummyShellOnRepo(repoFactory);
+		AssetAdministrationShell retrievedShell = getAasFromNewBackendInstance(repoFactory, expectedShell.getId());
+
+		assertEquals(expectedShell, retrievedShell);
+
+	}
+
+	private AssetAdministrationShell getAasFromNewBackendInstance(AasRepositoryFactory repoFactory, String shellId) {
+		AssetAdministrationShell retrievedShell = repoFactory.create().getAas(shellId);
+		return retrievedShell;
+	}
+
+	private AssetAdministrationShell createDummyShellOnRepo(AasRepositoryFactory repoFactory) {
+		AasRepository repo = repoFactory.create();
+		
+		AssetAdministrationShell expectedShell = new DefaultAssetAdministrationShell.Builder().id("dummy").build();
+		
+		repo.createAas(expectedShell);
+		return expectedShell;
 	}
 
 }
