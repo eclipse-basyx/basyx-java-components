@@ -1,20 +1,3 @@
-package org.eclipse.digitaltwin.basyx.aasrepository;
-
-import java.util.Collection;
-import java.util.List;
-
-import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
-import org.eclipse.digitaltwin.basyx.aasservice.backend.InMemoryAasService;
-import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
-import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-
-import com.mongodb.client.result.DeleteResult;
-
 /*******************************************************************************
  * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
@@ -38,6 +21,22 @@ import com.mongodb.client.result.DeleteResult;
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
+package org.eclipse.digitaltwin.basyx.aasrepository;
+
+import java.util.Collection;
+import java.util.List;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
+import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
+import org.eclipse.digitaltwin.basyx.aasservice.backend.InMemoryAasService;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * 
