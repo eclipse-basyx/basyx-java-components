@@ -160,14 +160,14 @@ public class BaSyxHttpTestUtils {
 	/**
 	 * Performs a delete request on the passed URL
 	 * 
-	 * @param string
+	 * @param url
 	 * @return
 	 * @throws IOException
 	 */
-	public static CloseableHttpResponse executeDeleteOnServer(String string) throws IOException {
+	public static CloseableHttpResponse executeDeleteOnServer(String url) throws IOException {
 		CloseableHttpClient client = HttpClients.createDefault();
 
-		HttpDelete deleteRequest = new HttpDelete(string);
+		HttpDelete deleteRequest = new HttpDelete(url);
 
 		return client.execute(deleteRequest);
 	}
