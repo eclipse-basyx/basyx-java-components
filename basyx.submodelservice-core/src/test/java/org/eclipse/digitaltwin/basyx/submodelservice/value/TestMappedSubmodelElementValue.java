@@ -49,7 +49,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelServiceUtil;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.AnnotatedRelationshipElementValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.EntityValueMapper;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileBlobValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.PropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.RangeValueMapper;
@@ -161,9 +161,9 @@ public class TestMappedSubmodelElementValue {
 
 		File file = SubmodelServiceUtil.createFileSubmodelElement();
 
-		FileValueMapper fileValueMapper = new FileValueMapper(file);
+		FileBlobValueMapper fileValueMapper = new FileBlobValueMapper(file);
 
-		assertEquals(expectedValue, ((FileValue) fileValueMapper.getValue()).getValue());
+		assertEquals(expectedValue, ((FileBlobValue) fileValueMapper.getValue()).getValue());
 	}
 
 	@Test
@@ -372,9 +372,9 @@ public class TestMappedSubmodelElementValue {
 	}
 
 	private void setFileValue(String expectedContentType, String expectedValue, File file) {
-		FileValue fileValue = new FileValue(expectedContentType, expectedValue);
+		FileBlobValue fileValue = new FileBlobValue(expectedContentType, expectedValue);
 
-		FileValueMapper fileValueMapper = new FileValueMapper(file);
+		FileBlobValueMapper fileValueMapper = new FileBlobValueMapper(file);
 		fileValueMapper.setValue(fileValue);
 	}
 

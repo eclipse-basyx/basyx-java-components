@@ -34,7 +34,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.AnnotatedRelationshipElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.EntityValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.FileBlobValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
@@ -62,7 +62,7 @@ public class SubmodelElementValueDeserializationUtil {
 	}
 
 	public static boolean isTypeOfFileValue(JsonNode node) {
-		return isTypeOf(FileValue.class, node);
+		return isTypeOf(FileBlobValue.class, node);
 	}
 
 	public static boolean isTypeOfRangeValue(JsonNode node) {

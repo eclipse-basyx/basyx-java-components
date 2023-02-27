@@ -24,24 +24,25 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
+import org.eclipse.digitaltwin.aas4j.v3.model.Blob;
 import org.eclipse.digitaltwin.aas4j.v3.model.File;
 
 /**
- * Represents the submodel element {@link File} value
+ * Represents the submodel elements {@link File} and {@link Blob} value
  * 
  * @author danish
  *
  */
-public class FileValue implements SubmodelElementValue {
+public class FileBlobValue implements SubmodelElementValue {
 	private String contentType;
 	private String value;
 	
 	@SuppressWarnings("unused")
-	private FileValue() {
+	private FileBlobValue() {
 		super();
 	}
 	
-	public FileValue(String contentType, String value) {
+	public FileBlobValue(String contentType, String value) {
 		this.contentType = contentType;
 		this.value = value;
 	}

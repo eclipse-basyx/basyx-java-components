@@ -36,7 +36,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.exception.ValueMapperNotFoundException;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.AnnotatedRelationshipElementValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.EntityValueMapper;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileValueMapper;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.FileBlobValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.MultiLanguagePropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.PropertyValueMapper;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.mapper.RangeValueMapper;
@@ -61,7 +61,7 @@ public class SubmodelElementValueMapperFactory {
 		} else if (submodelElement instanceof MultiLanguageProperty) {
 			return new MultiLanguagePropertyValueMapper((MultiLanguageProperty) submodelElement);
 		} else if (submodelElement instanceof File) {
-			return new FileValueMapper((File) submodelElement);
+			return new FileBlobValueMapper((File) submodelElement);
 		} else if (submodelElement instanceof Entity) {
 			return new EntityValueMapper((Entity) submodelElement);
 		} else if (submodelElement instanceof ReferenceElement) {

@@ -27,7 +27,7 @@ package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.fa
 
 import org.eclipse.digitaltwin.basyx.submodelservice.value.AnnotatedRelationshipElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.EntityValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.FileBlobValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ReferenceElementValue;
@@ -64,7 +64,7 @@ public class SubmodelElementValueDeserializationFactory {
 		} else if (isTypeOfMultiLanguagePropertyValue(node)) {
 			return createMultiLanguagePropertyValue(node);
 		} else if (isTypeOfFileValue(node)) {
-			return mapper.convertValue(node, FileValue.class);
+			return mapper.convertValue(node, FileBlobValue.class);
 		} else if (isTypeOfPropertyValue(node)) {
 			return mapper.convertValue(node, PropertyValue.class);
 		} else if (isTypeOfEntityValue(node)) {

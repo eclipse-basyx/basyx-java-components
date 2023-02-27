@@ -47,7 +47,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelElementCollection;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelElementList;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.FileBlobValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
@@ -266,7 +266,7 @@ public abstract class SubmodelServiceSuite {
 		String expectedValue = ((File) SubmodelServiceUtil.getDummySubmodelElement(technicalData,
 				SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT)).getValue();
 
-		FileValue submodelElementValue = (FileValue) getSubmodelService(technicalData)
+		FileBlobValue submodelElementValue = (FileBlobValue) getSubmodelService(technicalData)
 				.getSubmodelElementValue(SubmodelServiceUtil.SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT);
 
 		assertEquals(expectedValue, submodelElementValue.getValue());

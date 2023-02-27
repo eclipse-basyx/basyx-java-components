@@ -24,29 +24,30 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
+import org.eclipse.digitaltwin.aas4j.v3.model.Blob;
 import org.eclipse.digitaltwin.aas4j.v3.model.File;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.FileValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.FileBlobValue;
 
 /**
- * Maps {@link File} value to {@link FileValue} 
+ * Maps {@link File} or {@link Blob} value to {@link FileBlobValue} 
  * 
  * @author danish
  *
  */
-public class FileValueMapper implements ValueMapper<FileValue> {
+public class FileBlobValueMapper implements ValueMapper<FileBlobValue> {
 	private File file;
 	
-	public FileValueMapper(File file) {
+	public FileBlobValueMapper(File file) {
 		this.file = file;
 	}
 
 	@Override
-	public FileValue getValue() {
-		return new FileValue(file.getContentType(), file.getValue());
+	public FileBlobValue getValue() {
+		return new FileBlobValue(file.getContentType(), file.getValue());
 	}
 
 	@Override
-	public void setValue(FileValue fileValue) {
+	public void setValue(FileBlobValue fileValue) {
 		file.setContentType(fileValue.getContentType());
 		file.setValue(fileValue.getValue());
 	}
