@@ -44,7 +44,7 @@ import com.google.common.base.Strings;
  */
 public class MqttAASServerFeature implements IAASServerFeature {
 	private BaSyxMqttConfiguration mqttConfig;
-	private MqttClient client;
+	protected MqttClient client;
 	private String clientId;
 
 	public MqttAASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId) {
@@ -76,6 +76,20 @@ public class MqttAASServerFeature implements IAASServerFeature {
 
 	@Override
 	public void cleanUp() {
+		disconnectAndClose(client);
+	}
+
+	private static void disconnectAndClose(MqttClient client) {
+		try {
+			client.disconnect();
+			client.close();
+		} catch (MqttException e) {
+			try {
+				client.close(true);
+			} catch (MqttException e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	@Override

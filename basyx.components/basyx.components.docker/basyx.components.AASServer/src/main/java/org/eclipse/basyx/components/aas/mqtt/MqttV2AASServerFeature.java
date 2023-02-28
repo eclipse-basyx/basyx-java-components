@@ -24,15 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mqtt;
 
-import java.security.ProviderException;
-
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 /**
  * 
@@ -41,10 +35,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  * @author fischer, fried, siebert
  *
  */
-public class MqttV2AASServerFeature implements IAASServerFeature {
-	private BaSyxMqttConfiguration mqttConfig;
-	private MqttClient client;
-	private String clientId;
+public class MqttV2AASServerFeature extends MqttAASServerFeature {
 	private String aasRepoId;
 	private IEncoder idEncoder;
 
@@ -52,33 +43,13 @@ public class MqttV2AASServerFeature implements IAASServerFeature {
 	 * Creates the aas server feature for integrating the MqttV2 feature in the AAS
 	 * Server
 	 * 
-	 * @param mqttConfig
-	 * @param clientId
 	 * @param aasRepoId
 	 * @param idEncoder
 	 */
 	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasRepoId, IEncoder idEncoder) {
-		this.mqttConfig = mqttConfig;
-		this.clientId = clientId;
+		super(mqttConfig, clientId);
 		this.aasRepoId = aasRepoId;
 		this.idEncoder = idEncoder;
-	}
-
-	@Override
-	public void initialize() {
-	  MqttAASServerFeature mqttAASServerFeature = new MqttAASServerFeature(mqttConfig, clientId);
-		try {
-			String serverEndpoint = mqttConfig.getServer();
-			MqttConnectOptions options = mqttAASServerFeature.createMqttConnectOptions();
-			client = new MqttClient(serverEndpoint, clientId);
-			client.connect(options);
-		} catch (MqttException e) {
-			throw new ProviderException("moquette.conf Error ", e);
-		}
-	}
-
-	@Override
-	public void cleanUp() {
 	}
 
 	@Override
