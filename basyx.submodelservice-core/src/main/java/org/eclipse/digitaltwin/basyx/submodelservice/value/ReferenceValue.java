@@ -36,7 +36,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.ReferenceTypes;
  * @author danish
  *
  */
-public class ReferenceValue implements SubmodelElementValue {
+public class ReferenceValue {
 	private ReferenceTypes type;
 	private List<Key> keys;
 	

@@ -29,14 +29,12 @@ package org.eclipse.digitaltwin.basyx.submodelrepository.http.serialization;
 import java.io.IOException;
 
 import org.eclipse.digitaltwin.basyx.submodelservice.value.PropertyValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SpecificAssetIdValue;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
- * Serializes a SpecificAssetIdValue as described in DotAAS Part 2
+ * Serializes a {@link PropertyValue} as described in DotAAS Part 2
  * 
  * @author danish
  *

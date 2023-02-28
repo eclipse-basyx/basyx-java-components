@@ -25,6 +25,7 @@
 package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Entity;
 import org.eclipse.digitaltwin.aas4j.v3.model.EntityType;
@@ -38,8 +39,8 @@ import org.eclipse.digitaltwin.aas4j.v3.model.EntityType;
 public class EntityValue implements SubmodelElementValue {
 	private List<ValueOnly> statements;
 	private EntityType entityType;
-	private ReferenceValue globalAssetId;
-	private List<SpecificAssetIdValue> specificAssetIds;
+	private Optional<ReferenceValue> globalAssetId;
+	private Optional<List<SpecificAssetIdValue>> specificAssetIds;
 	
 	@SuppressWarnings("unused")
 	private EntityValue() {
@@ -50,8 +51,8 @@ public class EntityValue implements SubmodelElementValue {
 			List<SpecificAssetIdValue> specificAssetIds) {
 		this.statements = statements;
 		this.entityType = entityType;
-		this.globalAssetId = globalAssetId;
-		this.specificAssetIds = specificAssetIds;
+		this.globalAssetId = Optional.ofNullable(globalAssetId);
+		this.specificAssetIds = Optional.ofNullable(specificAssetIds);
 	}
 
 	public List<ValueOnly> getStatements() {
@@ -63,11 +64,11 @@ public class EntityValue implements SubmodelElementValue {
 	}
 
 	public ReferenceValue getGlobalAssetId() {
-		return globalAssetId;
+		return globalAssetId.orElse(null);
 	}
 
 	public List<SpecificAssetIdValue> getSpecificAssetIds() {
-		return specificAssetIds;
+		return specificAssetIds.orElse(null);
 	}
 	
 }

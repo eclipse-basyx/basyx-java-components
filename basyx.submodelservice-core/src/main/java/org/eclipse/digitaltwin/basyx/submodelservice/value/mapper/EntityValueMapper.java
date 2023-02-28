@@ -35,6 +35,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.EntityValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ReferenceValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SpecificAssetIdValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ValueOnly;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.factory.SubmodelElementValueMapperFactory;
 
@@ -85,10 +86,8 @@ public class EntityValueMapper implements ValueMapper<EntityValue> {
 		submodelElements.stream().forEach(annotation -> setValue(annotation, valueOnlies));
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setValue(SubmodelElement submodelElement, List<ValueOnly> valueOnlies) {
-		@SuppressWarnings("rawtypes")
-		ValueMapper valueMapper = new SubmodelElementValueMapperFactory().create(submodelElement);
+		ValueMapper<SubmodelElementValue> valueMapper = new SubmodelElementValueMapperFactory().create(submodelElement);
 
 		valueMapper.setValue(ValueMapperUtil.getSubmodelElementValue(submodelElement, valueOnlies));
 	}

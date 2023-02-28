@@ -61,8 +61,8 @@
     },
     {
         "modelType": "File",
-        "contentType": "application/octet-stream",
-        "value": "fileValue",
+        "contentType": "application/json",
+        "value": "testFile.json",
         "kind": "Instance",
         "semanticId": {
             "keys": [
@@ -268,5 +268,22 @@
                 "idShort": "RotationSpeedRange"
             }
         ]
+    },
+    {
+        "modelType": "Blob",
+        "contentType": "application/xml",
+        "value": "VGVzdCBjb250ZW50IG9mIFhNTCBmaWxl",
+        "kind": "Instance",
+        "semanticId": {
+            "keys": [
+                {
+                    "type": "ConceptDescription",
+                    "value": "0173-1#02-BAA120#008"
+                }
+            ],
+            "type": "GlobalReference"
+        },
+        "category": "PARAMETER",
+        "idShort": "BlobData"
     }
 ]

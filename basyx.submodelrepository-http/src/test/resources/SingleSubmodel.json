@@ -75,8 +75,8 @@
         },
         {
             "modelType": "File",
-            "contentType": "application/octet-stream",
-            "value": "fileValue",
+            "contentType": "application/json",
+            "value": "testFile.json",
             "kind": "Instance",
             "semanticId": {
                 "keys": [
@@ -96,15 +96,15 @@
             "globalAssetId": {
                 "keys": [
                     {
-                        "type": "Blob",
-                        "value": "BlobType"
+                        "type": "DataElement",
+                        "value": "DataElement"
                     }
                 ],
-                "type": "GlobalReference"
+                "type": "ModelReference"
             },
             "specificAssetId": {
-                "name": "assetName",
-                "value": "assetValue"
+                "name": "specificAssetIdName",
+                "value": "specificValue"
             },
             "statements": [
                 {
@@ -173,11 +173,11 @@
             "value": {
                 "keys": [
                     {
-                        "type": "Blob",
-                        "value": "BlobType"
+                        "type": "DataElement",
+                        "value": "DataElement"
                     }
                 ],
-                "type": "GlobalReference"
+                "type": "ModelReference"
             }
         },
         {
@@ -197,20 +197,20 @@
             "first": {
                 "keys": [
                     {
-                        "type": "Blob",
-                        "value": "BlobType"
+                        "type": "DataElement",
+                        "value": "DataElement"
                     }
                 ],
-                "type": "GlobalReference"
+                "type": "ModelReference"
             },
             "second": {
                 "keys": [
                     {
-                        "type": "Entity",
-                        "value": "EntityType"
+                        "type": "BasicEventElement",
+                        "value": "BasicEventElement"
                     }
                 ],
-                "type": "ModelReference"
+                "type": "GlobalReference"
             }
         },
         {
@@ -230,20 +230,20 @@
             "first": {
                 "keys": [
                     {
-                        "type": "Blob",
-                        "value": "BlobType"
+                        "type": "DataElement",
+                        "value": "DataElement"
                     }
                 ],
-                "type": "GlobalReference"
+                "type": "ModelReference"
             },
             "second": {
                 "keys": [
                     {
-                        "type": "Entity",
-                        "value": "EntityType"
+                        "type": "BasicEventElement",
+                        "value": "BasicEventElement"
                     }
                 ],
-                "type": "ModelReference"
+                "type": "GlobalReference"
             },
             "annotations": [
                 {
@@ -282,6 +282,23 @@
                     "idShort": "RotationSpeedRange"
                 }
             ]
+        },
+        {
+            "modelType": "Blob",
+            "contentType": "application/xml",
+            "value": "VGVzdCBjb250ZW50IG9mIFhNTCBmaWxl",
+            "kind": "Instance",
+            "semanticId": {
+                "keys": [
+                    {
+                        "type": "ConceptDescription",
+                        "value": "0173-1#02-BAA120#008"
+                    }
+                ],
+                "type": "GlobalReference"
+            },
+            "category": "PARAMETER",
+            "idShort": "BlobData"
         }
     ]
 }

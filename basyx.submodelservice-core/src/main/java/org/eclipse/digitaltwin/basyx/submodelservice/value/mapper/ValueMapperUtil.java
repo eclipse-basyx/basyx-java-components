@@ -23,11 +23,12 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-
 package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ValueOnly;
@@ -41,25 +42,49 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.factory.SubmodelEleme
  *
  */
 public class ValueMapperUtil {
-	
+
 	private ValueMapperUtil() {
-	    throw new IllegalStateException("Utility class");
-	  }
-	
+		throw new IllegalStateException("Utility class");
+	}
+
+	/**
+	 * Transforms the {@link SubmodelElement} into a new instance of
+	 * {@link ValueOnly}
+	 * 
+	 * @param submodelElement
+	 * @return ValueOnly
+	 */
 	public static ValueOnly toValueOnly(SubmodelElement submodelElement) {
 		String idShort = submodelElement.getIdShort();
-		SubmodelElementValue submodelElementValue = new SubmodelElementValueMapperFactory().create(submodelElement).getValue();
-		
+		SubmodelElementValue submodelElementValue = new SubmodelElementValueMapperFactory().create(submodelElement)
+				.getValue();
+
 		return new ValueOnly(idShort, submodelElementValue);
 	}
-	
-	public static SubmodelElementValue getSubmodelElementValue(SubmodelElement submodelElement, List<ValueOnly> valueOnlies) {
-		Optional<ValueOnly> optionalValueOnly = valueOnlies.stream().parallel().filter(valueOnly -> submodelElement.getIdShort().equals(valueOnly.getIdShort())).findAny();
-		
-		if (!optionalValueOnly.isPresent()) 
+
+	/**
+	 * Filters a {@link SubmodelElementValue} from {@link ValueOnly} that matches
+	 * the corresponding {@link SubmodelElement}
+	 * 
+	 * @param submodelElement        
+	 * @param valueOnlies            list of ValueOnly
+	 * @return SubmodelElementValue  the matching submodel element value
+	 * 
+	 * @throws SubmodelElementValueNotFoundException
+	 */
+	public static SubmodelElementValue getSubmodelElementValue(SubmodelElement submodelElement,
+			List<ValueOnly> valueOnlies) {
+		Optional<ValueOnly> optionalValueOnly = valueOnlies.stream().parallel()
+				.filter(filterMatchingValueOnly(submodelElement)).findAny();
+
+		if (!optionalValueOnly.isPresent())
 			throw new SubmodelElementValueNotFoundException(submodelElement.getIdShort());
-		
+
 		return optionalValueOnly.get().getSubmodelElementValue();
+	}
+
+	private static Predicate<? super ValueOnly> filterMatchingValueOnly(SubmodelElement submodelElement) {
+		return valueOnly -> submodelElement.getIdShort().equals(valueOnly.getIdShort());
 	}
 
 }

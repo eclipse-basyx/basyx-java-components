@@ -24,12 +24,12 @@
  ******************************************************************************/
 package org.eclipse.digitaltwin.basyx.submodelservice;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AnnotatedRelationshipElement;
+import org.eclipse.digitaltwin.aas4j.v3.model.Blob;
 import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
 import org.eclipse.digitaltwin.aas4j.v3.model.Entity;
 import org.eclipse.digitaltwin.aas4j.v3.model.EntityType;
@@ -49,6 +49,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SpecificAssetId;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAnnotatedRelationshipElement;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultBlob;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultEntity;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultFile;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
@@ -67,20 +68,20 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSpecificAssetId;
  * @author danish
  *
  */
-public class SubmodelServiceUtil {
+public class SubmodelServiceHelper {
 
 	private static final String _0173_1_02_BAA120_008 = "0173-1#02-BAA120#008";
 	public static final String SUBMODEL_TECHNICAL_DATA_ID = "7A7104BDAB57E184";
 	private static final String MAX_ROTATION_SPEED = "MaxRotationSpeed";
 	public static final String SUBMODEL_TECHNICAL_DATA_ID_SHORT = "TechnicalData";
 	public static final String SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID = "0173-1#01-AFZ615#016";
-	public static final List<Key> FIRST_KEYS = Arrays
+	public final List<Key> FIRST_KEYS = Arrays
 			.asList(new DefaultKey.Builder().type(KeyTypes.DATA_ELEMENT).value("DataElement").build());
-	public static final List<Key> SECOND_KEYS = Arrays
+	public final List<Key> SECOND_KEYS = Arrays
 			.asList(new DefaultKey.Builder().type(KeyTypes.BASIC_EVENT_ELEMENT).value("BasicEventElement").build());
-	public static final Reference FIRST_REFERENCE = new DefaultReference.Builder().type(ReferenceTypes.MODEL_REFERENCE)
+	public final Reference FIRST_REFERENCE = new DefaultReference.Builder().type(ReferenceTypes.MODEL_REFERENCE)
 			.keys(FIRST_KEYS).build();
-	public static final Reference SECOND_REFERENCE = new DefaultReference.Builder()
+	public final Reference SECOND_REFERENCE = new DefaultReference.Builder()
 			.type(ReferenceTypes.GLOBAL_REFERENCE).keys(SECOND_KEYS).build();
 
 	// SUBMODEL_ELEMENT_PROPERTY_DATA
@@ -110,8 +111,15 @@ public class SubmodelServiceUtil {
 	public static final String SUBMODEL_TECHNICAL_DATA_FILE_ID_SHORT = "FileData";
 	public static final String SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_FILE = _0173_1_02_BAA120_008;
 	public static final String SUBMODEL_TECHNICAL_DATA_FILE_CATEGORY = "PARAMETER";
-	public static final String SUBMODEL_TECHNICAL_DATA_FILE_VALUE = "fileValue";
-	public static final String SUBMODEL_TECHNICAL_DATA_FILE_CONTENT_TYPE = "application/octet-stream";
+	public static final String SUBMODEL_TECHNICAL_DATA_FILE_VALUE = "testFile.json";
+	public static final String SUBMODEL_TECHNICAL_DATA_FILE_CONTENT_TYPE = "application/json";
+	
+	// SUBMODEL_ELEMENT_B_DATA
+	public static final String SUBMODEL_TECHNICAL_DATA_BLOB_ID_SHORT = "BlobData";
+	public static final String SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_BLOB = _0173_1_02_BAA120_008;
+	public static final String SUBMODEL_TECHNICAL_DATA_BLOB_CATEGORY = "PARAMETER";
+	public static final String SUBMODEL_TECHNICAL_DATA_BLOB_VALUE = "Test content of XML file";
+	public static final String SUBMODEL_TECHNICAL_DATA_BLOB_CONTENT_TYPE = "application/xml";
 
 	// SUBMODEL_ELEMENT_ENTITY_DATA
 	public static final String SUBMODEL_TECHNICAL_DATA_ENTITY_ID_SHORT = "EntityData";
@@ -119,7 +127,7 @@ public class SubmodelServiceUtil {
 	public static final String SUBMODEL_TECHNICAL_DATA_ENTITY_CATEGORY = "Entity";
 	public static final String SPECIFIC_ASSET_ID_VALUE = "specificValue";
 	public static final String SPECIFIC_ASSET_ID_NAME = "specificAssetIdName";
-	public static final SpecificAssetId ENTITY_SPECIFIC_ASSET_ID = new DefaultSpecificAssetId.Builder()
+	private final SpecificAssetId ENTITY_SPECIFIC_ASSET_ID = new DefaultSpecificAssetId.Builder()
 			.name(SPECIFIC_ASSET_ID_NAME).value(SPECIFIC_ASSET_ID_VALUE).build();
 
 	// SUBMODEL_ELEMENT_REFERENCE_ELEMENT_DATA
@@ -183,6 +191,17 @@ public class SubmodelServiceUtil {
 				.value(SUBMODEL_TECHNICAL_DATA_FILE_VALUE).contentType(SUBMODEL_TECHNICAL_DATA_FILE_CONTENT_TYPE)
 				.build();
 	}
+	
+	public static Blob createBlobSubmodelElement() {
+		return new DefaultBlob.Builder().kind(ModelingKind.INSTANCE)
+				.semanticId(new DefaultReference.Builder()
+						.keys(new DefaultKey.Builder().type(KeyTypes.CONCEPT_DESCRIPTION)
+								.value(SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_BLOB).build())
+						.type(ReferenceTypes.GLOBAL_REFERENCE).build())
+				.idShort(SUBMODEL_TECHNICAL_DATA_BLOB_ID_SHORT).category(SUBMODEL_TECHNICAL_DATA_BLOB_CATEGORY)
+				.value(SUBMODEL_TECHNICAL_DATA_BLOB_VALUE.getBytes()).contentType(SUBMODEL_TECHNICAL_DATA_BLOB_CONTENT_TYPE)
+				.build();
+	}
 
 	public static Entity createEntitySubmodelElement() {
 		return new DefaultEntity.Builder().kind(ModelingKind.INSTANCE)
@@ -192,8 +211,8 @@ public class SubmodelServiceUtil {
 						.type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.idShort(SUBMODEL_TECHNICAL_DATA_ENTITY_ID_SHORT).category(SUBMODEL_TECHNICAL_DATA_ENTITY_CATEGORY)
 				.statements(Arrays.asList(createPropertySubmodelElement(), createRangeSubmodelElement()))
-				.entityType(EntityType.CO_MANAGED_ENTITY).globalAssetId(FIRST_REFERENCE)
-				.specificAssetId(ENTITY_SPECIFIC_ASSET_ID).build();
+				.entityType(EntityType.CO_MANAGED_ENTITY).globalAssetId(new SubmodelServiceHelper().FIRST_REFERENCE)
+				.specificAssetId(new SubmodelServiceHelper().ENTITY_SPECIFIC_ASSET_ID).build();
 	}
 
 	public static ReferenceElement createReferenceElementSubmodelElement() {
@@ -203,7 +222,9 @@ public class SubmodelServiceUtil {
 								.value(SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_REFERENCE_ELEMENT).build())
 						.type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.idShort(SUBMODEL_TECHNICAL_DATA_REFERENCE_ELEMENT_ID_SHORT)
-				.category(SUBMODEL_TECHNICAL_DATA_REFERENCE_ELEMENT_CATEGORY).value(FIRST_REFERENCE).build();
+				.category(SUBMODEL_TECHNICAL_DATA_REFERENCE_ELEMENT_CATEGORY)
+				.value(new SubmodelServiceHelper().FIRST_REFERENCE)
+				.build();
 	}
 
 	public static RelationshipElement createRelationshipElementSubmodelElement() {
@@ -213,8 +234,8 @@ public class SubmodelServiceUtil {
 								.value(SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_RELATIONSHIP_ELEMENT).build())
 						.type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.idShort(SUBMODEL_TECHNICAL_DATA_RELATIONSHIP_ELEMENT_ID_SHORT)
-				.category(SUBMODEL_TECHNICAL_DATA_RELATIONSHIP_ELEMENT_CATEGORY).first(FIRST_REFERENCE)
-				.second(SECOND_REFERENCE).build();
+				.category(SUBMODEL_TECHNICAL_DATA_RELATIONSHIP_ELEMENT_CATEGORY).first(new SubmodelServiceHelper().FIRST_REFERENCE)
+				.second(new SubmodelServiceHelper().SECOND_REFERENCE).build();
 	}
 
 	public static AnnotatedRelationshipElement createAnnotatedRelationshipElementSubmodelElement() {
@@ -224,8 +245,8 @@ public class SubmodelServiceUtil {
 								.value(SUBMODEL_TECHNICAL_DATA_SEMANTIC_ID_ANNOTATED_RELATIONSHIP_ELEMENT).build())
 						.type(ReferenceTypes.GLOBAL_REFERENCE).build())
 				.idShort(SUBMODEL_TECHNICAL_DATA_ANNOTATED_RELATIONSHIP_ELEMENT_ID_SHORT)
-				.category(SUBMODEL_TECHNICAL_DATA_ANNOTATED_RELATIONSHIP_ELEMENT_CATEGORY).first(FIRST_REFERENCE)
-				.second(SECOND_REFERENCE)
+				.category(SUBMODEL_TECHNICAL_DATA_ANNOTATED_RELATIONSHIP_ELEMENT_CATEGORY).first(new SubmodelServiceHelper().FIRST_REFERENCE)
+				.second(new SubmodelServiceHelper().SECOND_REFERENCE)
 				.annotations(Arrays.asList(createPropertySubmodelElement(), createRangeSubmodelElement())).build();
 	}
 
@@ -233,6 +254,6 @@ public class SubmodelServiceUtil {
 		return Arrays.asList(createPropertySubmodelElement(), createRangeSubmodelElement(),
 				createMultiLanguagePropertySubmodelElement(), createFileSubmodelElement(),
 				createEntitySubmodelElement(), createReferenceElementSubmodelElement(),
-				createRelationshipElementSubmodelElement(), createAnnotatedRelationshipElementSubmodelElement());
+				createRelationshipElementSubmodelElement(), createAnnotatedRelationshipElementSubmodelElement(), createBlobSubmodelElement());
 	}
 }

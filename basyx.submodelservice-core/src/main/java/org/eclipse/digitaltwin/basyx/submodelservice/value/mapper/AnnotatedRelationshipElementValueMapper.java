@@ -32,6 +32,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.DataElement;
 import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.AnnotatedRelationshipElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ReferenceValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ValueOnly;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.factory.SubmodelElementValueMapperFactory;
 
@@ -66,10 +67,8 @@ public class AnnotatedRelationshipElementValueMapper implements ValueMapper<Anno
 		annotations.stream().forEach(annotation -> setValue(annotation, valueOnlies));
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void setValue(DataElement dataElement, List<ValueOnly> valueOnlies) {
-		@SuppressWarnings("rawtypes")
-		ValueMapper valueMapper = new SubmodelElementValueMapperFactory().create(dataElement);
+		ValueMapper<SubmodelElementValue> valueMapper = new SubmodelElementValueMapperFactory().create(dataElement);
 		
 		valueMapper.setValue(ValueMapperUtil.getSubmodelElementValue(dataElement, valueOnlies));
 	}

@@ -63,7 +63,7 @@ public class SubmodelElementValueDeserializationFactory {
 			return mapper.convertValue(node, RangeValue.class);
 		} else if (isTypeOfMultiLanguagePropertyValue(node)) {
 			return createMultiLanguagePropertyValue(node);
-		} else if (isTypeOfFileValue(node)) {
+		} else if (isTypeOfFileBlobValue(node)) {
 			return mapper.convertValue(node, FileBlobValue.class);
 		} else if (isTypeOfPropertyValue(node)) {
 			return mapper.convertValue(node, PropertyValue.class);
