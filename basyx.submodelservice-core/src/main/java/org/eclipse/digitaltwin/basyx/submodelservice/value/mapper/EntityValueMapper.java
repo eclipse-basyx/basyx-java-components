@@ -26,18 +26,12 @@ package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.eclipse.digitaltwin.aas4j.v3.model.Entity;
 import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
 import org.eclipse.digitaltwin.aas4j.v3.model.SpecificAssetId;
-import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.EntityValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ReferenceValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SpecificAssetIdValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.ValueOnly;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.factory.SubmodelElementValueMapperFactory;
 
 /**
  * Maps {@link Entity} value to {@link EntityValue}
@@ -54,13 +48,13 @@ public class EntityValueMapper implements ValueMapper<EntityValue> {
 
 	@Override
 	public EntityValue getValue() {
-		return new EntityValue(createValueOnly(entity.getStatements()), entity.getEntityType(),
+		return new EntityValue(ValueMapperUtil.createValueOnlyCollection(entity.getStatements()), entity.getEntityType(),
 				createReferenceValue(entity.getGlobalAssetId()), getSpecificAssetIdValue(entity.getSpecificAssetId()));
 	}
 
 	@Override
 	public void setValue(EntityValue entityValue) {
-		setStatements(entity.getStatements(), entityValue.getStatements());
+		ValueMapperUtil.setValueOfSubmodelElementWithValueOnly(entity.getStatements(), entityValue.getStatements());
 		entity.setEntityType(entityValue.getEntityType());
 		setGlobalAssetId(entityValue.getGlobalAssetId());
 		setSpecificAssetId(entityValue.getSpecificAssetIds());
@@ -80,20 +74,6 @@ public class EntityValueMapper implements ValueMapper<EntityValue> {
 
 		entity.getGlobalAssetId().setType(referenceValue.getType());
 		entity.getGlobalAssetId().setKeys(referenceValue.getKeys());
-	}
-
-	private void setStatements(List<SubmodelElement> submodelElements, List<ValueOnly> valueOnlies) {
-		submodelElements.stream().forEach(annotation -> setValue(annotation, valueOnlies));
-	}
-
-	private void setValue(SubmodelElement submodelElement, List<ValueOnly> valueOnlies) {
-		ValueMapper<SubmodelElementValue> valueMapper = new SubmodelElementValueMapperFactory().create(submodelElement);
-
-		valueMapper.setValue(ValueMapperUtil.getSubmodelElementValue(submodelElement, valueOnlies));
-	}
-
-	private List<ValueOnly> createValueOnly(List<SubmodelElement> statements) {
-		return statements.stream().map(ValueMapperUtil::toValueOnly).collect(Collectors.toList());
 	}
 
 	private ReferenceValue createReferenceValue(Reference globalAssetId) {
