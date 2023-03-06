@@ -70,6 +70,6 @@ public enum AASServerBackend {
 				return constant;
 			}
 		}
-		throw new IllegalArgumentException("The literal '" + literal + "' is not a valid RegistryBackend");
+		throw new IllegalArgumentException("The literal '" + literal + "' is not a valid AasBackend");
 	}
 }
