@@ -28,6 +28,7 @@ package org.eclipse.basyx.components.aas.mongodb;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
 
 import com.mongodb.client.MongoClient;
@@ -59,6 +60,11 @@ public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFact
 	@Override
 	public ISubmodelAggregator create() {
 		return new MongoDBSubmodelAggregator(submodelAPIFactory, config, client);
+	}
+
+	@Override
+	public ISubmodelAggregator create(IIdentifier ignored) {
+		return create();
 	}
 
 }
