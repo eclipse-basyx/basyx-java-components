@@ -352,7 +352,7 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
-		if (isRegistryConfigured()) {
+		if (isAutoRegisterEnabled()) {
 			addAASServerFeature(new AutoRegisterAASServerFeature(registry, getURL()));
 		}
 
@@ -365,6 +365,14 @@ public class AASServerComponent implements IComponent {
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
+	}
+
+	private boolean isAutoRegisterEnabled() {
+		return isRegistryConfigured() && !isSubmodelRegistrationWhiteListConfigured();
+	}
+
+	private boolean isSubmodelRegistrationWhiteListConfigured() {
+		return !aasConfig.getSubmodels().isEmpty();
 	}
 
 	private void configureSecurity() {
