@@ -449,6 +449,8 @@ public class AASServerComponent implements IComponent {
 		cleanUpAASServerFeatures();
 
 		server.shutdown();
+
+		logger.info("AAS Server stopped");
 	}
 	
 	private void deregisterAASAndSmAddedDuringRuntime() {

@@ -5,3 +5,4 @@ for row in $(echo "${waiting_for}" | jq -r '.[] | @base64'); do
     }
     /bin/bash -c "./wait-for-it.sh -h $(_jq '.host') -p $(_jq '.port') -t $(_jq '.timeout')"
 done
+exec java -jar "/usr/share/basyxExecutable.jar"
