@@ -409,6 +409,23 @@ public class AASServerComponent implements IComponent {
 	 * @return
 	 */
 	public String getURL() {
+		if (isExternalPathConfigured()) {
+			return getExternalURL();
+		} else {
+			return getInternalURL();
+		}
+	}
+
+	private boolean isExternalPathConfigured() {
+		String hostPath = aasConfig.getHostpath();
+		return hostPath != null && !hostPath.isEmpty();
+	}
+
+	private String getExternalURL() {
+		return aasConfig.getHostpath();
+	}
+
+	private String getInternalURL() {
 		String basePath = aasConfig.getHostpath();
 		if (basePath.isEmpty()) {
 			return contextConfig.getUrl();
