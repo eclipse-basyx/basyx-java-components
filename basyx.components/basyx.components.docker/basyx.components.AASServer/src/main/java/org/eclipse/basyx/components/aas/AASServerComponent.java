@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,7 +39,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
@@ -51,12 +49,10 @@ import org.eclipse.basyx.aas.factory.aasx.SubmodelFileEndpointLoader;
 import org.eclipse.basyx.aas.factory.json.JSONAASBundleFactory;
 import org.eclipse.basyx.aas.factory.xml.XMLAASBundleFactory;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
@@ -88,8 +84,6 @@ import org.eclipse.basyx.extensions.shared.encoding.Base64URLEncoder;
 import org.eclipse.basyx.extensions.shared.encoding.URLEncoder;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
@@ -129,8 +123,6 @@ public class AASServerComponent implements IComponent {
 	private IAASAggregator aggregator;
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
-	
-	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -264,8 +256,6 @@ public class AASServerComponent implements IComponent {
 		logger.info("Start the server");
 		server = new BaSyxHTTPServer(context);
 		server.start();
-		
-		registerPreexistingAASAndSMIfPossible();
 	}
 
 	private DefaultServlet createDefaultServlet() {
@@ -284,70 +274,6 @@ public class AASServerComponent implements IComponent {
 		return authorizedAASServerFeature.getFilesAuthorizerParams();
 	}
 
-	private void registerPreexistingAASAndSMIfPossible() {
-		if(!shouldRegisterPreexistingAASAndSM()) {
-			return;
-		}
-		
-		aggregator.getAASList().stream().forEach(this::registerAASAndSubmodels);
-	}
-
-	private boolean shouldRegisterPreexistingAASAndSM() {
-		return isMongoDBBackend() && registry != null;
-	}
-	
-	private void registerAASAndSubmodels(IAssetAdministrationShell aas) {
-		registerAAS(aas);
-		
-		registerSubmodels(aas);
-	}
-
-	private void registerAAS(IAssetAdministrationShell aas) {
-		try {
-			String combinedEndpoint = getAASAccessPath(aas);
-			registry.register(new AASDescriptor(aas, combinedEndpoint));
-			logger.info("The AAS " + aas.getIdShort() + " is Successfully Registered from DB");
-		} catch(Exception e) {
-			logger.info("The AAS " + aas.getIdShort() + " could not be Registered from DB" + e);
-		}
-	}
-
-	private String getAASAccessPath(IAssetAdministrationShell aas) {
-		return VABPathTools.concatenatePaths(getURL(), AASAggregatorAPIHelper.getAASAccessPath(aas.getIdentification()));
-	}
-
-	private void registerSubmodels(IAssetAdministrationShell aas) {
-		List<ISubmodel> submodels = getSubmodelFromAggregator(aggregator, aas.getIdentification());
-		try {
-			submodels.stream().forEach(submodel -> registerSubmodel(aas, submodel));
-			logger.info("The submodels from AAS " + aas.getIdShort() + " are Successfully Registered from DB");
-		} catch(Exception e) {
-			logger.info("The submodel from AAS " + aas.getIdShort() + " could not be Registered from DB " + e);
-		}
-	}
-	
-	private void registerSubmodel(IAssetAdministrationShell aas, ISubmodel submodel) {
-		String smEndpoint = VABPathTools.concatenatePaths(getAASAccessPath(aas), AssetAdministrationShell.SUBMODELS, submodel.getIdShort(), SubmodelProvider.SUBMODEL);
-		registry.register(aas.getIdentification(), new SubmodelDescriptor(submodel, smEndpoint));
-	}
-
-	private List<ISubmodel> getSubmodelFromAggregator(IAASAggregator aggregator, IIdentifier iIdentifier) {
-		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) aggregator.getAASProvider(iIdentifier);
-
-		@SuppressWarnings("unchecked")
-		List<Object> submodelObject = (List<Object>) aasProvider.getValue(PREFIX_SUBMODEL_PATH);
-		
-		List<ISubmodel> persistentSubmodelList = new ArrayList<>();
-		
-		submodelObject.stream().map(this::getSubmodel).forEach(persistentSubmodelList::add);		
-
-		return persistentSubmodelList;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private ISubmodel getSubmodel(Object submodelObject) {
-		return Submodel.createAsFacade((Map<String, Object>) submodelObject);	
-	}
 
 	private void loadAASServerFeaturesFromConfig() {
 		if(aasConfig.isPropertyDelegationEnabled()) {
