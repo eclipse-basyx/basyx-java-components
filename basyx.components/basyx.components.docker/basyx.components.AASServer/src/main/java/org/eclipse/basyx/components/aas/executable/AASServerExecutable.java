@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
  * @author schnicke, espen, danish
  */
 public class AASServerExecutable {
-	// Creates a Logger based on the current class
 	private static Logger logger = LoggerFactory.getLogger(AASServerExecutable.class);
 
 	public static void main(String[] args) throws URISyntaxException {
@@ -73,7 +72,8 @@ public class AASServerExecutable {
 
 	private static void addShutdownHook(AASServerComponent component) {
 		Thread shutdownListener = new Thread(){
-		    public void run(){
+		    @Override
+			public void run(){
 		    	component.stopComponent();
 		            }
 		        };
