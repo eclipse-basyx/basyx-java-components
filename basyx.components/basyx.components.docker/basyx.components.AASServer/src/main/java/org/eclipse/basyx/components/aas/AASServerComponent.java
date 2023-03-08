@@ -381,6 +381,9 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private boolean isRegistryConfigured() {
+		if (registry != null)
+			return true;
+
 		String registryUrl = aasConfig.getRegistry();
 		return !(registryUrl == null || registryUrl.isEmpty());
 	}
