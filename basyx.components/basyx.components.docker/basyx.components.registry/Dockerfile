@@ -38,4 +38,4 @@ ARG MQTT_CONFIG_KEY
 ENV ${MQTT_CONFIG_KEY} "/usr/share/config/mqtt.properties"
 
 # Start the jar
-CMD java -jar "/usr/share/basyxExecutable.jar"
+ENTRYPOINT ["java", "-jar", "/usr/share/basyxExecutable.jar"]
