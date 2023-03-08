@@ -71,12 +71,8 @@ public class AASServerExecutable {
 	}
 
 	private static void addShutdownHook(AASServerComponent component) {
-		Thread shutdownListener = new Thread(){
-		    @Override
-			public void run(){
-		    	component.stopComponent();
-		            }
-		        };
+		Thread shutdownListener = new Thread(() -> component.stopComponent());
+
 		Runtime.getRuntime().addShutdownHook(shutdownListener);
 	}
 }

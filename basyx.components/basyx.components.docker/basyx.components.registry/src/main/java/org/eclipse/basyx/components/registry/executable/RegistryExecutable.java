@@ -72,12 +72,8 @@ public class RegistryExecutable {
 	}
 
 	private static void addShutdownHook(IComponent component) {
-		Thread shutdownListener = new Thread() {
-			@Override
-			public void run() {
-				component.stopComponent();
-			}
-		};
+		Thread shutdownListener = new Thread(() -> component.stopComponent());
+
 		Runtime.getRuntime().addShutdownHook(shutdownListener);
 	}
 }
