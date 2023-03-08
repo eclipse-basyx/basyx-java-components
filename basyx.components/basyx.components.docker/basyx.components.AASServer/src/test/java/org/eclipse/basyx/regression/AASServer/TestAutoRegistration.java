@@ -1,11 +1,16 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import org.eclipse.basyx.aas.aggregator.AASAggregator;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
+import org.eclipse.basyx.aas.aggregator.proxy.AASAggregatorProxy;
+import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind;
+import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
@@ -17,8 +22,6 @@ import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguratio
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
 import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfiguration;
-import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
-import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -37,117 +40,122 @@ import org.junit.Test;
  *
  */
 public class TestAutoRegistration {
-
-	private static final String TEST_ENDPOINT = "testEndpoint";
-	private static final String DUMMY_SHELL_ID_SHORT = "dummyShellIdShort";
-	private static final Identifier DUMMY_SHELL_IDENTIFIER = new Identifier(IdentifierType.CUSTOM,
-			"dummyShellIdentifier");
-	private static final Asset DUMMY_SHELL_ASSET = new Asset("assetIdShort",
-			new Identifier(IdentifierType.CUSTOM, "assetIdentifier"), AssetKind.INSTANCE);
-
-	private static final String DUMMY_SUBMODEL_ID_SHORT = "dummySubmodelId";
-	private static final Identifier DUMMY_SUBMODEL_IDENTIFIER = new Identifier(IdentifierType.CUSTOM,
-			"dummySubmodelIdentifier");
-
-	private static final int REGISTRY_PORT = 4001;
-	private static final String REGISTRY_CONTEXT = "/testRegistry";
-	private static final String REGISTRY_URL = "http://localhost:" + REGISTRY_PORT + REGISTRY_CONTEXT;
-	private IAASRegistry registry = new AASRegistryProxy(REGISTRY_URL);
-
 	private AssetAdministrationShell dummyShell = createDummyShell();
 	private Submodel dummySubmodel = createDummySubmodel();
 	private IAASAggregator aasAggregator;
-	private ISubmodelAggregator smAggregator;
-	private AASServerComponent component;
+	private AASServerComponent aasServerComponent;
 	private RegistryComponent registryComponent;
+	private IAASRegistry registry;
 
 	@Before
 	public void setUp() {
-		BaSyxContextConfiguration registryContextConfig = new BaSyxContextConfiguration();
-		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
-		registryContextConfig.setPort(REGISTRY_PORT);
-		registryContextConfig.setContextPath(REGISTRY_CONTEXT);
+		String registryComponentUrl = createRegistryComponent();
 
+		String aggregatorComponentUrl = createAASServerComponent(registryComponentUrl);
+
+		aasAggregator = new AASAggregatorProxy(aggregatorComponentUrl);
+		registry = new AASRegistryProxy(registryComponentUrl);
+	}
+
+	private String createAASServerComponent(String registryUrl) {
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration();
 		aasConfig.setAASBackend(AASServerBackend.INMEMORY);
-		aasConfig.setRegistry(REGISTRY_URL);
+		aasConfig.setRegistry(registryUrl);
 
-		startRegistryComponent(registryContextConfig, registryConfig);
-		startAASServerComponent(contextConfig, aasConfig);
+		aasServerComponent = new AASServerComponent(contextConfig, aasConfig);
+		aasServerComponent.startComponent();
+
+		return contextConfig.getUrl();
 	}
 
-	private void startRegistryComponent(BaSyxContextConfiguration registryContextConfig,
-			BaSyxRegistryConfiguration registryConfig) {
+	private String createRegistryComponent() {
+		BaSyxContextConfiguration registryContextConfig = new BaSyxContextConfiguration();
+		registryContextConfig.setPort(4001);
+		registryContextConfig.setContextPath("/testRegistry");
+
+		BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration();
+
 		registryComponent = new RegistryComponent(registryContextConfig, registryConfig);
 		registryComponent.startComponent();
-	}
 
-	private void startAASServerComponent(BaSyxContextConfiguration contextConfig,
-			BaSyxAASServerConfiguration aasConfig) {
-		component = new AASServerComponent(contextConfig, aasConfig);
-		component.setRegistry(registry);
-		component.startComponent();
+		return registryContextConfig.getUrl();
 	}
 
 	@Test
-	public void createdShellIsRegisteredAutomatically() {
-		createShellAndAggregator();
-		assertEquals(dummyShell.getIdentification(), registry.lookupAAS(DUMMY_SHELL_IDENTIFIER).getIdentifier());
-	}
-
-	@Test(expected = ResourceNotFoundException.class)
-	public void deletedShellIsUnregisteredAutomatically() {
-		createShellAndAggregator();
-		aasAggregator.deleteAAS(DUMMY_SHELL_IDENTIFIER);
-		registry.lookupAAS(DUMMY_SHELL_IDENTIFIER);
-	}
-
-	@Test
-	public void createdSubmodelIsRegisteredAutomatically() {
-		createShellAndAggregator();
-		createSubmodelAndAggregator();
-
-		IIdentifier foundSubmodelIdentifier = lookupSubmodelInRegistry();
-
-		assertEquals(DUMMY_SUBMODEL_IDENTIFIER, foundSubmodelIdentifier);
-	}
-
-	@Test(expected = ResourceNotFoundException.class)
-	public void createdSubmodelIsUnregisteredAutomatically() {
-		createShellAndAggregator();
-		createSubmodelAndAggregator();
-
-		smAggregator.deleteSubmodelByIdShort(DUMMY_SUBMODEL_ID_SHORT);
-		lookupSubmodelInRegistry();
-	}
-
-	private void createShellAndAggregator() {
-		aasAggregator = new AutoRegisterAASAggregator(new AASAggregator(), registry, TEST_ENDPOINT);
+	public void createdShellIsRegistered() {
 		aasAggregator.createAAS(dummyShell);
+
+		AASDescriptor shellDescriptor = registry.lookupAAS(dummyShell.getIdentification());
+
+		assertEquals(dummyShell.getIdentification(), shellDescriptor.getIdentifier());
+		
+		assertShellIsAccessible(dummyShell.getIdentification());
 	}
 
-	private IIdentifier lookupSubmodelInRegistry() {
-		return registry.lookupSubmodel(DUMMY_SHELL_IDENTIFIER, DUMMY_SUBMODEL_IDENTIFIER).getIdentifier();
+	private void assertShellIsAccessible(IIdentifier identification) {
+		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry);
+		manager.retrieveAAS(identification);
 	}
 
-	private void createSubmodelAndAggregator() {
-		smAggregator = new AutoRegisterSubmodelAggregator(new SubmodelAggregator(), registry, DUMMY_SHELL_IDENTIFIER,
-				TEST_ENDPOINT);
-		smAggregator.createSubmodel(dummySubmodel);
+	@Test
+	public void deletedShellIsUnregistered() {
+		aasAggregator.createAAS(dummyShell);
+		aasAggregator.deleteAAS(dummyShell.getIdentification());
+		
+		try {
+			registry.lookupAAS(dummyShell.getIdentification());
+			fail();
+		} catch (ResourceNotFoundException expected) {
+		}
+	}
+
+	@Test
+	public void createdSubmodelIsRegistered() {
+		aasAggregator.createAAS(dummyShell);
+
+		ConnectedAssetAdministrationShell connectedShell = (ConnectedAssetAdministrationShell) aasAggregator.getAAS(dummyShell.getIdentification());
+		connectedShell.addSubmodel(dummySubmodel);
+
+		SubmodelDescriptor submodelDescriptor = registry.lookupSubmodel(dummyShell.getIdentification(), dummySubmodel.getIdentification());
+		assertEquals(dummySubmodel.getIdentification(), submodelDescriptor.getIdentifier());
+
+		assertSubmodelIsAccessible(dummyShell.getIdentification(), dummySubmodel.getIdentification());
+	}
+
+	private void assertSubmodelIsAccessible(IIdentifier shellIdentification, IIdentifier submodelIdentification) {
+		ConnectedAssetAdministrationShellManager manager = new ConnectedAssetAdministrationShellManager(registry);
+		manager.retrieveSubmodel(shellIdentification, submodelIdentification);
+	}
+
+	@Test
+	public void createdSubmodelIsUnregistered() {
+		aasAggregator.createAAS(dummyShell);
+		ConnectedAssetAdministrationShell connectedShell = (ConnectedAssetAdministrationShell) aasAggregator.getAAS(dummyShell.getIdentification());
+		connectedShell.addSubmodel(dummySubmodel);
+		connectedShell.removeSubmodel(dummySubmodel.getIdentification());
+
+		try {
+			registry.lookupSubmodel(dummyShell.getIdentification(), dummySubmodel.getIdentification());
+			fail();
+		} catch (ResourceNotFoundException expected) {
+		}
 	}
 
 	private AssetAdministrationShell createDummyShell() {
-		return new AssetAdministrationShell(DUMMY_SHELL_ID_SHORT, DUMMY_SHELL_IDENTIFIER, DUMMY_SHELL_ASSET);
+		Asset asset = new Asset("assetIdShort", new Identifier(IdentifierType.CUSTOM, "assetIdentifier"), AssetKind.INSTANCE);
+		IIdentifier identifier = new Identifier(IdentifierType.CUSTOM, "dummyShellIdentifier");
+		return new AssetAdministrationShell("dummyShellIdShort", identifier, asset);
 	}
 
 	private Submodel createDummySubmodel() {
-		return new Submodel(DUMMY_SUBMODEL_ID_SHORT, DUMMY_SUBMODEL_IDENTIFIER);
+		return new Submodel("dummySubmodelId", new Identifier(IdentifierType.CUSTOM,
+				"dummySubmodelIdentifier"));
 	}
 
 	@After
 	public void tearDown() {
-		component.stopComponent();
+		aasServerComponent.stopComponent();
 		registryComponent.stopComponent();
 	}
 
