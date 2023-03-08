@@ -42,7 +42,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
-import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
 import org.eclipse.basyx.aas.bundle.AASBundleHelper;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
@@ -257,8 +256,7 @@ public class AASServerComponent implements IComponent {
 			// 2. Fix the file paths according to the servlet configuration
 			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
 
-			// 3. Register the initial AAS
-			registerEnvironment();
+			registerWhitelistedSubmodels();
 		}
 
 		logger.info("Start the server");
@@ -663,10 +661,8 @@ public class AASServerComponent implements IComponent {
 		return aasConfig.isAuthorizationCredentialsForSecuredRegistryConfigured();
 	}
 
-	private void registerEnvironment() {
-		if (aasConfig.getSubmodels().isEmpty()) {
-			registerFullAAS();
-		} else {
+	private void registerWhitelistedSubmodels() {
+		if (!aasConfig.getSubmodels().isEmpty()) {
 			registerSubmodelsFromWhitelist();
 		}
 	}
@@ -678,20 +674,6 @@ public class AASServerComponent implements IComponent {
 		for (String s : smWhitelist) {
 			updateSMEndpoint(s, descriptors);
 		}
-	}
-
-	private void registerFullAAS() {
-		if (registry == null) {
-			logger.info("No registry specified, skipped registration");
-			return;
-		}
-
-		String aggregatorPath = getAggregatorPath();
-		AASBundleHelper.register(registry, aasBundles, aggregatorPath);
-	}
-
-	private String getAggregatorPath() {
-		return VABPathTools.concatenatePaths(getURL(), AASAggregatorProvider.PREFIX);
 	}
 
 	private void updateSMEndpoint(String smId, List<AASDescriptor> descriptors) {
