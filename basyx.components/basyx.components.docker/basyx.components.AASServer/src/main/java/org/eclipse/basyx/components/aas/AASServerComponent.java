@@ -669,9 +669,12 @@ public class AASServerComponent implements IComponent {
 			return;
 		}
 
-		String baseUrl = getURL();
-		String aggregatorPath = VABPathTools.concatenatePaths(baseUrl, AASAggregatorProvider.PREFIX);
+		String aggregatorPath = getAggregatorPath();
 		AASBundleHelper.register(registry, aasBundles, aggregatorPath);
+	}
+
+	private String getAggregatorPath() {
+		return VABPathTools.concatenatePaths(getURL(), AASAggregatorProvider.PREFIX);
 	}
 
 	private void updateSMEndpoint(String smId, List<AASDescriptor> descriptors) {
