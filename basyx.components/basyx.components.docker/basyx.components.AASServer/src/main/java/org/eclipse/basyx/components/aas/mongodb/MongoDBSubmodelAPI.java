@@ -342,9 +342,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private void updateSubmodelElementInDB(List<String> idShorts, Object newValue) {
 		Submodel sm = (Submodel) getSubmodel();
 		ISubmodelElement element = getNestedSubmodelElement(sm, idShorts);
-		if (isNewValueAFile(newValue)) {
-			newValue = updateFileInDB(newValue, element);
-		}
+
 		IModelProvider mapProvider = new VABLambdaProvider((Map<String, Object>) element);
 		SubmodelElementProvider smeProvider = new SubmodelElementProvider(mapProvider);
 
@@ -357,7 +355,18 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		writeSubmodelInDB(sm);
 	}
 
-	private Object updateFileInDB(Object newValue, ISubmodelElement element) {
+	@Override
+	public void uploadSubmodelElementFile(String idShortPath, FileInputStream fileStream) {
+		String[] splitted = VABPathTools.splitPath(idShortPath);
+		List<String> idShorts = Arrays.asList(splitted);
+		Submodel sm = (Submodel) getSubmodel();
+		ISubmodelElement element = getNestedSubmodelElement(sm, idShorts);
+		String fileName = updateFileInDB(fileStream, element);
+		updateSubmodelElementInDB(idShorts, fileName);
+	}
+
+	@SuppressWarnings("unchecked")
+	private String updateFileInDB(FileInputStream newValue, ISubmodelElement element) {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket();
 		String fileName = file.getValue();
@@ -365,9 +374,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			fileName = file.getIdShort()+"."+file.getMimeType();
 		}
 		deleteAllDuplicateFiles(bucket, fileName);
-		bucket.uploadFromStream(fileName, (FileInputStream) newValue);				
-		newValue = fileName;
-		return newValue;
+		bucket.uploadFromStream(fileName, newValue);
+		return fileName;
 	}
 
 	private boolean isNewValueAFile(Object newValue) {
