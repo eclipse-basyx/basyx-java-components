@@ -27,35 +27,20 @@ package org.eclipse.digitaltwin.basyx.submodelrepository.http.deserialization.ut
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.LangString;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangString;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.AnnotatedRelationshipElementValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.EntityValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.FileBlobValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.MultiLanguagePropertyValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RangeValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.ReferenceValue;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.RelationshipElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementCollectionValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementListValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.ValueOnly;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * An utility class to check, validate and for few submodel element value create
- * the type for Deserialization
+ * An utility class to check and validate the type for Deserialization
  * 
  * @author danish
  *
@@ -99,47 +84,11 @@ public class SubmodelElementValueDeserializationUtil {
 	}
 
 	public static boolean isTypeOfSubmodelElementCollectionValue(JsonNode node) {
-		return node.isArray() && hasStructureOfValueOnly(node);
+		return node.isArray() && hasStructureOfSubmodelElementCollectionValue(node);
 	}
 	
 	public static boolean isTypeOfSubmodelElementListValue(JsonNode node) {
-		return node.isArray() && hasStructureOfSubmodelElementValue(node);
-	}
-
-	public static SubmodelElementValue createMultiLanguagePropertyValue(JsonNode node) {
-		List<LangString> langStrings = createLangStrings(node);
-
-		return new MultiLanguagePropertyValue(langStrings);
-	}
-	
-	public static SubmodelElementValue createSubmodelElementCollectionValue(ObjectMapper mapper, JsonNode node) throws JsonProcessingException {
-		List<ValueOnly> valueOnlies = mapper.readValue(node.toString(), new TypeReference<List<ValueOnly>>() {});
-
-		return new SubmodelElementCollectionValue(valueOnlies);
-	}
-	
-	public static SubmodelElementValue createSubmodelElementListValue(ObjectMapper mapper, JsonNode node) throws JsonProcessingException {
-		List<SubmodelElementValue> submodelElementValues = mapper.readValue(node.toString(), new TypeReference<List<SubmodelElementValue>>() {});
-		
-		return new SubmodelElementListValue(submodelElementValues);
-	}
-
-	private static List<LangString> createLangStrings(JsonNode node) {
-		List<LangString> langStrings = new ArrayList<>();
-
-		for (JsonNode element : node) {
-			langStrings.add(createLangString(element));
-		}
-
-		return langStrings;
-	}
-
-	private static DefaultLangString createLangString(JsonNode arrayNode) {
-		Iterator<String> fieldNames = arrayNode.fieldNames();
-		String language = fieldNames.next();
-		String text = arrayNode.get(language).asText();
-
-		return new DefaultLangString(text, language);
+		return node.isArray() && hasStructureOfSubmodelElementListValue(node);
 	}
 
 	private static boolean isTypeOf(Class<?> clazz, JsonNode node) {
@@ -205,7 +154,7 @@ public class SubmodelElementValueDeserializationUtil {
 		return true;
 	}
 
-	private static boolean hasStructureOfValueOnly(JsonNode node) {
+	private static boolean hasStructureOfSubmodelElementCollectionValue(JsonNode node) {
 		for (JsonNode element : node) {
 			if (!isValidValueOnly(element))
 				return false;
@@ -214,7 +163,7 @@ public class SubmodelElementValueDeserializationUtil {
 		return true;
 	}
 	
-	private static boolean hasStructureOfSubmodelElementValue(JsonNode node) {
+	private static boolean hasStructureOfSubmodelElementListValue(JsonNode node) {
 		for (JsonNode element : node) {
 			if (!isInstanceOfSubmodelElementValue(element))
 				return false;

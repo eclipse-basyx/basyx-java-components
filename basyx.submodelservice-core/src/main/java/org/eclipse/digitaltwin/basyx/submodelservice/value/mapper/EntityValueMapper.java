@@ -61,7 +61,7 @@ public class EntityValueMapper implements ValueMapper<EntityValue> {
 	}
 
 	private void setSpecificAssetId(List<SpecificAssetIdValue> specificAssetIds) {
-		if (entity.getSpecificAssetId() == null)
+		if (specificAssetIds == null || entity.getSpecificAssetId() == null)
 			return;
 
 		entity.getSpecificAssetId().setName(specificAssetIds.get(0).getName());
@@ -69,7 +69,7 @@ public class EntityValueMapper implements ValueMapper<EntityValue> {
 	}
 
 	private void setGlobalAssetId(ReferenceValue referenceValue) {
-		if (entity.getGlobalAssetId() == null)
+		if (referenceValue == null || entity.getGlobalAssetId() == null)
 			return;
 
 		entity.getGlobalAssetId().setType(referenceValue.getType());

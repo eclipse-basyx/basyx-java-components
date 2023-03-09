@@ -250,6 +250,19 @@ public class TestSubmodelRepositorySubmodelElementsHTTP {
 
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
 	}
+	
+	@Test
+	public void setEntityValueMRP() throws IOException, ParseException {
+		String minimumRequestPayloadValue = getJSONValueAsString("value/setEntityValueMRP.json");
+		String expectedValue = getJSONValueAsString("value/expectedUpdatedMRPEntityValue.json");
+
+		CloseableHttpResponse writeResponse = writeSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceHelper.SUBMODEL_TECHNICAL_DATA_ENTITY_ID_SHORT, minimumRequestPayloadValue);
+		assertEquals(HttpStatus.OK.value(), writeResponse.getCode());
+
+		CloseableHttpResponse response = requestSubmodelElementValue(DummySubmodelFactory.SUBMODEL_TECHNICAL_DATA_ID, SubmodelServiceHelper.SUBMODEL_TECHNICAL_DATA_ENTITY_ID_SHORT);
+
+		BaSyxHttpTestUtils.assertSameJSONContent(expectedValue, BaSyxHttpTestUtils.getResponseAsString(response));
+	}
 
 	@Test
 	public void getReferenceElementValue() throws IOException, ParseException {

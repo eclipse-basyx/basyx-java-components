@@ -65,7 +65,7 @@ public class SubmodelElementValueDeserializationFactory {
 		if (isTypeOfRangeValue(node)) {
 			return mapper.convertValue(node, RangeValue.class);
 		} else if (isTypeOfMultiLanguagePropertyValue(node)) {
-			return createMultiLanguagePropertyValue(node);
+			return new MultiLanguagePropertyValueDeserializationFactory(node).create();
 		} else if (isTypeOfFileBlobValue(node)) {
 			return mapper.convertValue(node, FileBlobValue.class);
 		} else if (isTypeOfPropertyValue(node)) {
@@ -79,9 +79,9 @@ public class SubmodelElementValueDeserializationFactory {
 		} else if (isTypeOfAnnotatedRelationshipElementValue(node)) {
 			return mapper.convertValue(node, AnnotatedRelationshipElementValue.class);
 		} else if (isTypeOfSubmodelElementCollectionValue(node)) {
-			return createSubmodelElementCollectionValue(mapper, node);
+			return new SubmodelElementCollectionValueDeserializationFactory(mapper, node).create();
 		} else if (isTypeOfSubmodelElementListValue(node)) {
-			return createSubmodelElementListValue(mapper, node);
+			return new SubmodelElementListValueDeserializationFactory(mapper, node).create();
 		}
 
 		throw new SubmodelElementValueDeserializationException();
