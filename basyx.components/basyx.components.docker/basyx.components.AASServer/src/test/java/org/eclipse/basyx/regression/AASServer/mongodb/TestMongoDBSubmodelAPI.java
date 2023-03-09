@@ -27,16 +27,27 @@ package org.eclipse.basyx.regression.AASServer.mongodb;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Map;
+
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.MultiLanguageProperty;
 import org.junit.Test;
 
+import com.mongodb.MongoGridFSException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
 
 /**
  * Tests the ISubmodelAPI implementation of the MongoDB backend
@@ -44,6 +55,8 @@ import com.mongodb.client.MongoClients;
  * @author schnicke
  */
 public class TestMongoDBSubmodelAPI {
+
+	private MongoClient client;
 
 	@Test
 	public void writeAndReadMultiLanguageProperty() {
@@ -60,8 +73,57 @@ public class TestMongoDBSubmodelAPI {
 		assertEquals(expected, value);
 	}
 
+	@Test
+	public void fileSubmodelElementFileUpload() throws FileNotFoundException {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		File file = new File("xml");
+		file.setValue("");
+		file.setIdShort("fileSmeIdShort");
+		submodelAPI.addSubmodelElement(file);
+
+		java.io.File expected = new java.io.File("src/test/resources/testfile.xml");
+		submodelAPI.uploadSubmodelElementFile("fileSmeIdShort", new FileInputStream(expected));
+
+		java.io.File value = (java.io.File) submodelAPI.getSubmodelElementFile("fileSmeIdShort");
+
+		assertEquals("fileSmeIdShort.xml", value.getName());
+		assertEquals(expected.length(), value.length());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test(expected = MongoGridFSException.class)
+	public void fileSubmodelElementFileIsAutomaticallyDeleted() throws FileNotFoundException {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		uploadDummyFile(submodelAPI);
+
+		Map<String, Object> submodelElementMap = (Map<String, Object>) submodelAPI.getSubmodelElement("fileSmeIdShort");
+
+		File retrievedFileSubmodelElement = File.createAsFacade(submodelElementMap);
+
+		String filePath = retrievedFileSubmodelElement.getValue();
+
+		submodelAPI.deleteSubmodelElement("fileSmeIdShort");
+
+		BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
+		MongoDatabase database = client.getDatabase(config.getDatabase());
+		GridFSBucket bucket = GridFSBuckets.create(database, config.getFileCollection());
+
+		OutputStream os = new FileOutputStream("fileSmeIdShort.xml");
+		bucket.downloadToStream("fileSmeIdShort.xml", os);
+	}
+
+	private void uploadDummyFile(MongoDBSubmodelAPI submodelAPI) throws FileNotFoundException {
+		File file = new File("xml");
+		file.setValue("");
+		file.setIdShort("fileSmeIdShort");
+		submodelAPI.addSubmodelElement(file);
+
+		java.io.File expected = new java.io.File("src/test/resources/testfile.xml");
+		submodelAPI.uploadSubmodelElementFile("fileSmeIdShort", new FileInputStream(expected));
+	}
+
 	private MongoDBSubmodelAPI createAPIWithPreconfiguredSubmodel() {
-		MongoClient client = MongoClients.create(new BaSyxMongoDBConfiguration().getConnectionUrl());
+		client = MongoClients.create(new BaSyxMongoDBConfiguration().getConnectionUrl());
 		MongoDBSubmodelAPI submodelAPI = new MongoDBSubmodelAPI("", client);
 
 		Submodel mySM = new Submodel("mySubmodel", new CustomId("mySubmodelId"));

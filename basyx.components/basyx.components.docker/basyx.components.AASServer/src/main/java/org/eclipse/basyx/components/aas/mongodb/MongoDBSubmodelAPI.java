@@ -378,9 +378,6 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		return fileName;
 	}
 
-	private boolean isNewValueAFile(Object newValue) {
-		return newValue instanceof FileInputStream;
-	}
 
 	private void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
 		bucket.find(Filters.eq("filename", fileName))
