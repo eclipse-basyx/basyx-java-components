@@ -27,6 +27,9 @@ package org.eclipse.basyx.components.aas.mongodb;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,12 +47,14 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
 import org.eclipse.basyx.submodel.restapi.SubmodelElementProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 import org.eclipse.basyx.vab.exception.provider.MalformedRequestException;
+import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
@@ -62,6 +67,10 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.model.Filters;
 
 /**
  * Implements the ISubmodelAPI for a mongoDB backend.
@@ -101,11 +110,13 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	@Deprecated
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId,
+			DelegatedInvocationManager invocationHelper) {
 		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
 	}
 
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId,
+			DelegatedInvocationManager invocationHelper, MongoClient client) {
 		this.client = client;
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
@@ -139,7 +150,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		this.invocationHelper = invocationHelper;
 	}
 
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper,
+			MongoClient client) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.client = client;
@@ -231,7 +243,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		// Cast all SubmodelElement maps to ISubmodelElements before returning the
 		// submodel
 		Map<String, ISubmodelElement> elements = new HashMap<>();
-		Map<String, Map<String, Object>> elemMaps = (Map<String, Map<String, Object>>) result.get(Submodel.SUBMODELELEMENT);
+		Map<String, Map<String, Object>> elemMaps = (Map<String, Map<String, Object>>) result
+				.get(Submodel.SUBMODELELEMENT);
 		for (Entry<String, Map<String, Object>> entry : elemMaps.entrySet()) {
 			String shortId = entry.getKey();
 			Map<String, Object> elemMap = entry.getValue();
@@ -276,8 +289,23 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		// Get sm from db
 		Submodel sm = (Submodel) getSubmodel();
 		// Remove element
+		
+		deleteAllFilesFromGridFsIfIsFileSubmodelElement(idShort, sm);
+
 		sm.getSubmodelElements().remove(idShort);
 		writeSubmodelInDB(sm);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	private void deleteAllFilesFromGridFsIfIsFileSubmodelElement(String idShort, Submodel sm) {
+		Map<String,Object> submodelElement = (Map<String, Object>) sm.getSubmodelElement(idShort);
+		if(File.isFile(submodelElement)) {
+			File file = File.createAsFacade(submodelElement);
+			GridFSBucket bucket = getGridFSBucket();
+			bucket.find(Filters.eq("filename", file.getValue()))
+					.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+		}
 	}
 
 	@Override
@@ -314,16 +342,47 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private void updateSubmodelElementInDB(List<String> idShorts, Object newValue) {
 		Submodel sm = (Submodel) getSubmodel();
 		ISubmodelElement element = getNestedSubmodelElement(sm, idShorts);
-
+		if (isNewValueAFile(newValue)) {
+			newValue = updateFileInDB(newValue, element);
+		}
 		IModelProvider mapProvider = new VABLambdaProvider((Map<String, Object>) element);
 		SubmodelElementProvider smeProvider = new SubmodelElementProvider(mapProvider);
 
 		smeProvider.setValue(Property.VALUE, newValue);
-		ISubmodelElement updatedElement = SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) smeProvider.getValue(""));
+		ISubmodelElement updatedElement = SubmodelElementFacadeFactory
+				.createSubmodelElement((Map<String, Object>) smeProvider.getValue(""));
 
 		sm.addSubmodelElement(updatedElement);
 
 		writeSubmodelInDB(sm);
+	}
+
+	private Object updateFileInDB(Object newValue, ISubmodelElement element) {
+		File file = File.createAsFacade((Map<String, Object>) element);
+		GridFSBucket bucket = getGridFSBucket();
+		String fileName = file.getValue();
+		if(fileName.isEmpty()) {
+			fileName = file.getIdShort()+"."+file.getMimeType();
+		}
+		deleteAllDuplicateFiles(bucket, fileName);
+		bucket.uploadFromStream(fileName, (FileInputStream) newValue);				
+		newValue = fileName;
+		return newValue;
+	}
+
+	private boolean isNewValueAFile(Object newValue) {
+		return newValue instanceof FileInputStream;
+	}
+
+	private void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
+		bucket.find(Filters.eq("filename", fileName))
+				.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+	}
+
+	private GridFSBucket getGridFSBucket() {
+		MongoDatabase database = client.getDatabase(config.getDatabase());
+		GridFSBucket bucket = GridFSBuckets.create(database, config.getFileCollection());
+		return bucket;
 	}
 
 	private Object getTopLevelSubmodelElementValue(String idShort) {
@@ -368,12 +427,14 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			if (elem instanceof SubmodelElementCollection) {
 				elemMap = ((SubmodelElementCollection) elem).getSubmodelElements();
 			} else {
-				throw new ResourceNotFoundException(idShort + " in the nested submodel element path could not be resolved.");
+				throw new ResourceNotFoundException(
+						idShort + " in the nested submodel element path could not be resolved.");
 			}
 		}
 		String lastIdShort = idShorts.get(idShorts.size() - 1);
 		if (!elemMap.containsKey(lastIdShort)) {
-			throw new ResourceNotFoundException(lastIdShort + " in the nested submodel element path could not be resolved.");
+			throw new ResourceNotFoundException(
+					lastIdShort + " in the nested submodel element path could not be resolved.");
 		}
 		return elemMap.get(lastIdShort);
 	}
@@ -467,7 +528,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object invokeOperation(String idShortPath, Object... params) {
-		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(idShortPath));
+		Operation operation = (Operation) SubmodelElementFacadeFactory
+				.createSubmodelElement((Map<String, Object>) getSubmodelElement(idShortPath));
 		if (!DelegatedInvocationManager.isDelegatingOperation(operation)) {
 			throw new MalformedRequestException("This backend supports only delegating operations.");
 		}
@@ -486,5 +548,23 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		String[] splitted = VABPathTools.splitPath(idShortPath);
 		List<String> idShorts = Arrays.asList(splitted);
 		addNestedSubmodelElement(idShorts, elem);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object getSubmodelElementFile(String idShortPath) {
+		try {
+			Map<String, Object> submodelElement = (Map<String, Object>) getSubmodelElement(idShortPath);
+			File fileSubmodelElement = File.createAsFacade(submodelElement);
+			GridFSBucket bucket = getGridFSBucket();
+			String fileName = fileSubmodelElement.getIdShort() + "." + fileSubmodelElement.getMimeType();
+			java.io.File file = new java.io.File(fileName);
+			FileOutputStream fileOutputStream;
+			fileOutputStream = new FileOutputStream(file);
+			bucket.downloadToStream(fileName, fileOutputStream);
+			return file;
+		} catch (FileNotFoundException e) {
+			throw new ProviderException("The File Submodel Element does not contain a File");
+		}
 	}
 }

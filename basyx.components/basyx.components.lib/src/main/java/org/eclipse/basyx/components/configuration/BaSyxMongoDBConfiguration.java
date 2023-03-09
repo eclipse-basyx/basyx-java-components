@@ -43,12 +43,14 @@ public class BaSyxMongoDBConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_REGISTRY_COLLECTION = "basyxregistry";
 	public static final String DEFAULT_AAS_COLLECTION = "basyxaas";
 	public static final String DEFAULT_SUBMODEL_COLLECTION = "basyxsubmodel";
+	public static final String DEFAULT_FILE_COLLECTION = "basyxfiles";
 
 	public static final String DATABASE = "dbname";
 	public static final String CONNECTIONURL = "dbconnectionstring";
 	public static final String REGISTRY_COLLECTION = "dbcollectionRegistry";
 	public static final String AAS_COLLECTION = "dbcollectionAAS";
 	public static final String SUBMODEL_COLLECTION = "dbcollectionSubmodels";
+	public static final String FILE_COLLECTION = "dbcollectionFiles";
 
 	// The default path for the context properties file
 	public static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
@@ -63,6 +65,7 @@ public class BaSyxMongoDBConfiguration extends BaSyxConfiguration {
 		defaultProps.put(REGISTRY_COLLECTION, DEFAULT_REGISTRY_COLLECTION);
 		defaultProps.put(AAS_COLLECTION, DEFAULT_AAS_COLLECTION);
 		defaultProps.put(SUBMODEL_COLLECTION, DEFAULT_SUBMODEL_COLLECTION);
+		defaultProps.put(FILE_COLLECTION, DEFAULT_FILE_COLLECTION);
 
 		return defaultProps;
 	}
@@ -189,5 +192,13 @@ public class BaSyxMongoDBConfiguration extends BaSyxConfiguration {
 
 	public void setSubmodelCollection(String submodelCollection) {
 		setProperty(SUBMODEL_COLLECTION, submodelCollection);
+	}
+
+	public String getFileCollection() {
+		return getProperty(FILE_COLLECTION);
+	}
+
+	public void setFileCollection(String fileCollection) {
+		setProperty(FILE_COLLECTION, fileCollection);
 	}
 }
