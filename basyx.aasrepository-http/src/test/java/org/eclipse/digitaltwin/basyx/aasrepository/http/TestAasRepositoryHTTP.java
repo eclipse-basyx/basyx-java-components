@@ -187,6 +187,51 @@ public class TestAasRepositoryHTTP {
 		assertEquals(404, deleteResponse.getCode());
 	}
 
+	@Test
+	public void getAssetInformationByIdentifier() throws FileNotFoundException, IOException, ParseException {
+		createDummyAasOnServer();
+		String url = getSpecificAasAccessURL(dummyAasId) + "/asset-information";
+		CloseableHttpResponse response = BaSyxHttpTestUtils.executeGetOnURL(url);
+
+		String expected = BaSyxHttpTestUtils.readJSONStringFromFile("classpath:assetInfoSimple.json");
+
+		BaSyxHttpTestUtils.assertSameJSONContent(expected, BaSyxHttpTestUtils.getResponseAsString(response));
+	}
+
+	@Test
+	public void getNonExistingAssetInformationByIdentifier() throws FileNotFoundException, IOException, ParseException {
+		String url = getSpecificAasAccessURL("someAasThatSureWontExist") + "/asset-information";
+		CloseableHttpResponse response = BaSyxHttpTestUtils.executeGetOnURL(url);
+
+		assertEquals(404, response.getCode());
+	}
+
+	@Test
+	public void postAssetInformationByIdentifier() throws FileNotFoundException, IOException, ParseException {
+		createDummyAasOnServer();
+
+		String json = BaSyxHttpTestUtils.readJSONStringFromFile("classpath:exampleAssetInfo.json");
+
+		BaSyxHttpTestUtils.executePostOnServer(getSpecificAasAccessURL(dummyAasId) + "/asset-information", json);
+
+		CloseableHttpResponse response = BaSyxHttpTestUtils
+				.executeGetOnURL(getSpecificAasAccessURL(dummyAasId) + "/asset-information");
+
+		BaSyxHttpTestUtils.assertSameJSONContent(json, BaSyxHttpTestUtils.getResponseAsString(response));
+	}
+
+	@Test
+	public void postAssetInformationToNonExistingAasByIdentifier()
+			throws FileNotFoundException, IOException, ParseException {
+
+		String json = BaSyxHttpTestUtils.readJSONStringFromFile("classpath:exampleAssetInfo.json");
+
+		CloseableHttpResponse response = BaSyxHttpTestUtils
+				.executeGetOnURL(getSpecificAasAccessURL("someAasThatSureWontExist") + "/asset-information");
+
+		assertEquals(404, response.getCode());
+	}
+
 	private String createDummyAasOnServer() throws FileNotFoundException, IOException {
 		String aasJsonContent = getAasJSONString();
 		createAasOnServer(aasJsonContent);

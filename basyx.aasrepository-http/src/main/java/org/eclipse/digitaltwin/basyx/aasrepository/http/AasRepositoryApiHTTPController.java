@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
+import org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation;
 import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
@@ -168,4 +169,19 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.QUERY, description = "The Asset Administration Shell’s IdShort", schema = @Schema()) @Valid @RequestParam(value = "idShort", required = false) String idShort) {
 		return new ResponseEntity<List<AssetAdministrationShell>>(new ArrayList<>(aasRepository.getAllAas()), HttpStatus.OK);
 	}
+	
+	@Override
+	public ResponseEntity<Void> postAssetInformationByAasId(
+			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier,
+			@Parameter(in = ParameterIn.DEFAULT, description = "Asset Information object", required = true, schema = @Schema()) @Valid @RequestBody AssetInformation body) {
+		aasRepository.setAssetInformation(aasIdentifier.getIdentifier(), body);
+		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<AssetInformation> getAssetInformationByAasId(
+			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier) {
+		return new ResponseEntity<AssetInformation>(aasRepository.getAssetInformation(aasIdentifier.getIdentifier()), HttpStatus.OK);
+	}
+
 }
