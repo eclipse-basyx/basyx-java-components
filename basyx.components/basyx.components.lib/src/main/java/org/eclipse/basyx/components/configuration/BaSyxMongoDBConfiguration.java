@@ -145,7 +145,8 @@ public class BaSyxMongoDBConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { DATABASE, CONNECTIONURL, REGISTRY_COLLECTION, AAS_COLLECTION, SUBMODEL_COLLECTION };
+		String[] properties = { DATABASE, CONNECTIONURL, REGISTRY_COLLECTION, AAS_COLLECTION, SUBMODEL_COLLECTION,
+				FILE_COLLECTION };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 

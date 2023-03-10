@@ -82,11 +82,11 @@ public class TestMongoDBSubmodelAPI {
 		submodelAPI.addSubmodelElement(file);
 
 		java.io.File expected = new java.io.File("src/test/resources/testfile.xml");
-		submodelAPI.uploadSubmodelElementFile("fileSmeIdShort", new FileInputStream(expected));
+		submodelAPI.uploadSubmodelElementFile(file.getIdShort(), new FileInputStream(expected));
 
 		java.io.File value = (java.io.File) submodelAPI.getSubmodelElementFile("fileSmeIdShort");
 
-		assertEquals("fileSmeIdShort.xml", value.getName());
+		assertEquals("mySubmodelId-fileSmeIdShort.xml", value.getName());
 		assertEquals(expected.length(), value.length());
 	}
 
@@ -94,7 +94,7 @@ public class TestMongoDBSubmodelAPI {
 	@Test(expected = MongoGridFSException.class)
 	public void fileSubmodelElementFileIsAutomaticallyDeleted() throws FileNotFoundException {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
-		uploadDummyFile(submodelAPI);
+		uploadDummyFile(submodelAPI, "fileSmeIdShort");
 
 		Map<String, Object> submodelElementMap = (Map<String, Object>) submodelAPI.getSubmodelElement("fileSmeIdShort");
 
@@ -112,14 +112,14 @@ public class TestMongoDBSubmodelAPI {
 		bucket.downloadToStream("fileSmeIdShort.xml", os);
 	}
 
-	private void uploadDummyFile(MongoDBSubmodelAPI submodelAPI) throws FileNotFoundException {
+	private void uploadDummyFile(MongoDBSubmodelAPI submodelAPI, String idShort) throws FileNotFoundException {
 		File file = new File("xml");
 		file.setValue("");
-		file.setIdShort("fileSmeIdShort");
+		file.setIdShort(idShort);
 		submodelAPI.addSubmodelElement(file);
 
-		java.io.File expected = new java.io.File("src/test/resources/testfile.xml");
-		submodelAPI.uploadSubmodelElementFile("fileSmeIdShort", new FileInputStream(expected));
+		java.io.File dummyFile = new java.io.File("src/test/resources/testfile.xml");
+		submodelAPI.uploadSubmodelElementFile(idShort, new FileInputStream(dummyFile));
 	}
 
 	private MongoDBSubmodelAPI createAPIWithPreconfiguredSubmodel() {

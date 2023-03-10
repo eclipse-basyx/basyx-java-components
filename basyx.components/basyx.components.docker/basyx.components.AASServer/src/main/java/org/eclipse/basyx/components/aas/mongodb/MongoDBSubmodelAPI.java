@@ -27,9 +27,9 @@ package org.eclipse.basyx.components.aas.mongodb;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,7 +54,6 @@ import org.eclipse.basyx.submodel.restapi.SubmodelElementProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 import org.eclipse.basyx.vab.exception.provider.MalformedRequestException;
-import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
@@ -300,12 +299,12 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	@SuppressWarnings("unchecked")
 	private void deleteAllFilesFromGridFsIfIsFileSubmodelElement(String idShort, Submodel sm) {
 		Map<String,Object> submodelElement = (Map<String, Object>) sm.getSubmodelElement(idShort);
-		if(File.isFile(submodelElement)) {
+		if (!File.isFile(submodelElement))
+			return;
 			File file = File.createAsFacade(submodelElement);
 			GridFSBucket bucket = getGridFSBucket();
 			bucket.find(Filters.eq("filename", file.getValue()))
 					.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
-		}
 	}
 
 	@Override
@@ -356,7 +355,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	@Override
-	public void uploadSubmodelElementFile(String idShortPath, FileInputStream fileStream) {
+	public void uploadSubmodelElementFile(String idShortPath, InputStream fileStream) {
 		String[] splitted = VABPathTools.splitPath(idShortPath);
 		List<String> idShorts = Arrays.asList(splitted);
 		Submodel sm = (Submodel) getSubmodel();
@@ -366,18 +365,17 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String updateFileInDB(FileInputStream newValue, ISubmodelElement element) {
+	private String updateFileInDB(InputStream newValue, ISubmodelElement element) {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket();
 		String fileName = file.getValue();
 		if(fileName.isEmpty()) {
-			fileName = file.getIdShort()+"."+file.getMimeType();
+			fileName = constructFileName(file);
 		}
 		deleteAllDuplicateFiles(bucket, fileName);
 		bucket.uploadFromStream(fileName, newValue);
 		return fileName;
 	}
-
 
 	private void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
 		bucket.find(Filters.eq("filename", fileName))
@@ -557,19 +555,26 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object getSubmodelElementFile(String idShortPath) {
+	public java.io.File getSubmodelElementFile(String idShortPath) {
 		try {
 			Map<String, Object> submodelElement = (Map<String, Object>) getSubmodelElement(idShortPath);
 			File fileSubmodelElement = File.createAsFacade(submodelElement);
 			GridFSBucket bucket = getGridFSBucket();
-			String fileName = fileSubmodelElement.getIdShort() + "." + fileSubmodelElement.getMimeType();
+			String fileName = constructFileName(fileSubmodelElement);
 			java.io.File file = new java.io.File(fileName);
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream(file);
 			bucket.downloadToStream(fileName, fileOutputStream);
 			return file;
 		} catch (FileNotFoundException e) {
-			throw new ProviderException("The File Submodel Element does not contain a File");
+			throw new ResourceNotFoundException("The File Submodel Element does not contain a File");
 		}
+	}
+
+	private String constructFileName(File file) {
+		String fileName;
+		Submodel sm = (Submodel) getSubmodel();
+		fileName = sm.getIdentification().getId() + "-" + file.getIdShort() + "." + file.getMimeType();
+		return fileName;
 	}
 }
