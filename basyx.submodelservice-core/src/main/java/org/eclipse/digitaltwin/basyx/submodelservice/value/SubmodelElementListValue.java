@@ -1,5 +1,3 @@
-package org.eclipse.digitaltwin.basyx.aasservice.feature;
-
 /*******************************************************************************
  * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
@@ -25,41 +23,33 @@ package org.eclipse.digitaltwin.basyx.aasservice.feature;
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-import org.eclipse.digitaltwin.basyx.aasservice.AasServiceFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ConsolePrintingAasServiceFeature implements AasServiceFeature {
+package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
-	public final static String FEATURENAME = "basyx.aasservice.feature.consoleprinter";
+import java.util.List;
 
-	@Value("#{${" + FEATURENAME + ".enabled:false} or ${basyx.feature.consoleprinter.enabled:false}}")
-	private boolean enabled;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList;
 
-	@Override
-	public void initialize() {
-
+/**
+ * Represents the submodel element {@link SubmodelElementList} value
+ * 
+ * @author danish
+ *
+ */
+public class SubmodelElementListValue implements SubmodelElementValue {
+	private List<SubmodelElementValue> submodelElementValues;
+	
+	@SuppressWarnings("unused")
+	private SubmodelElementListValue() {
+		super();
 	}
 
-	@Override
-	public void cleanUp() {
-
+	public SubmodelElementListValue(List<SubmodelElementValue> submodelElementValues) {
+		this.submodelElementValues = submodelElementValues;
 	}
 
-	@Override
-	public AasServiceFactory decorate(AasServiceFactory aasServiceFactory) {
-		return new ConsolePrintingAasServiceFactory(aasServiceFactory);
-	}
-
-	@Override
-	public String getName() {
-		return "AasService ConsolePrinter";
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return enabled;
+	public List<SubmodelElementValue> getSubmodelElementValues() {
+		return submodelElementValues;
 	}
 
 }

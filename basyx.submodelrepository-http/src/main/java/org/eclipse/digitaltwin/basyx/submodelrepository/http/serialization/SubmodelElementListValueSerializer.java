@@ -24,43 +24,34 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.consoleprinter;
+package org.eclipse.digitaltwin.basyx.submodelrepository.http.serialization;
 
-import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositoryFactory;
-import org.eclipse.digitaltwin.basyx.aasrepository.feature.AasRepositoryFeature;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import java.io.IOException;
 
-@Component
-public class ConsolePrintingAasRepositoryFeature implements AasRepositoryFeature {
-	@Override
-	public AasRepositoryFactory decorate(AasRepositoryFactory aasServiceFactory) {
-		return new ConsolePrintingAasRepositoryFactory(aasServiceFactory);
-	}
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementListValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
 
-	public final static String FEATURENAME = "basyx.aasrepository.feature.consoleprinter";
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
-	@Value("#{${" + FEATURENAME + ".enabled:false} or ${basyx.feature.consoleprinter.enabled:false}}")
-	private boolean enabled;
-
-	@Override
-	public void initialize() {
-
-	}
+/**
+ * Serializes a {@link SubmodelElementListValue} as described in DotAAS Part 2
+ * 
+ * @author danish
+ *
+ */
+public class SubmodelElementListValueSerializer extends JsonSerializer<SubmodelElementListValue> {
 
 	@Override
-	public void cleanUp() {
-
-	}
-
-	@Override
-	public String getName() {
-		return "AasRepository ConsolePrinter";
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return enabled;
+	public void serialize(SubmodelElementListValue value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+		gen.writeStartArray();
+		
+        for (SubmodelElementValue element : value.getSubmodelElementValues()) {
+            gen.writeObject(element);
+        }
+        
+        gen.writeEndArray();
 	}
 
 }

@@ -24,22 +24,32 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.consoleprinter;
+package org.eclipse.digitaltwin.basyx.submodelservice.value.mapper;
 
-import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
-import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositoryFactory;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementListValue;
 
-public class ConsolePrintingAasRepositoryFactory implements AasRepositoryFactory {
-
-	private AasRepositoryFactory decorated;
-
-	public ConsolePrintingAasRepositoryFactory(AasRepositoryFactory decorated) {
-		this.decorated = decorated;
+/**
+ * Maps {@link SubmodelElementList} value to {@link SubmodelElementListValue} 
+ * 
+ * @author danish
+ *
+ */
+public class SubmodelElementListValueMapper implements ValueMapper<SubmodelElementListValue> {
+	private SubmodelElementList submodelElementList;
+	
+	public SubmodelElementListValueMapper(SubmodelElementList submodelElementList) {
+		this.submodelElementList = submodelElementList;
 	}
 
 	@Override
-	public AasRepository create() {
-		return new ConsolePrintingAasRepository(decorated.create());
+	public SubmodelElementListValue getValue() {
+		return new SubmodelElementListValue(ValueMapperUtil.createSubmodelElementValues(submodelElementList.getValue()));
 	}
 
+	@Override
+	public void setValue(SubmodelElementListValue submodelElementListValue) {
+		ValueMapperUtil.setValueOfSubmodelElementWithSubmodelElementValue(submodelElementList.getValue(), submodelElementListValue.getSubmodelElementValues());
+	}
+	
 }

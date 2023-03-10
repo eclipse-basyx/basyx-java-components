@@ -1,4 +1,3 @@
-package org.eclipse.digitaltwin.basyx.aasservice.feature;
 /*******************************************************************************
  * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
@@ -25,41 +24,34 @@ package org.eclipse.digitaltwin.basyx.aasservice.feature;
  ******************************************************************************/
 
 
-import java.util.List;
+package org.eclipse.digitaltwin.basyx.submodelrepository.http.serialization;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
-import org.eclipse.digitaltwin.basyx.aasservice.AasService;
+import java.io.IOException;
 
-public class ConsolePrintingAasService implements AasService {
-	private AasService decorated;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementCollectionValue;
+import org.eclipse.digitaltwin.basyx.submodelservice.value.ValueOnly;
 
-	public ConsolePrintingAasService(AasService decorated) {
-		this.decorated = decorated;
-	}
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
-	@Override
-	public AssetAdministrationShell getAAS() {
-		System.out.println("Getting AAS");
-		return decorated.getAAS();
-	}
-
-	@Override
-	public List<Reference> getSubmodelReferences() {
-		System.out.println("Getting Submodel References");
-		return decorated.getSubmodelReferences();
-	}
+/**
+ * Serializes a {@link SubmodelElementCollectionValue} as described in DotAAS Part 2
+ * 
+ * @author danish
+ *
+ */
+public class SubmodelElementCollectionValueSerializer extends JsonSerializer<SubmodelElementCollectionValue> {
 
 	@Override
-	public void addSubmodelReference(Reference submodelReference) {
-		System.out.println("Adding Submodel Reference");
-		decorated.addSubmodelReference(submodelReference);
-	}
+	public void serialize(SubmodelElementCollectionValue value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+		gen.writeStartArray();
 
-	@Override
-	public void removeSubmodelReference(String submodelId) {
-		System.out.println("Removing Submodel Reference");
-		decorated.removeSubmodelReference(submodelId);
+		for (ValueOnly valueOnly : value.getValue()) {
+			gen.writeObject(valueOnly);
+		}
+
+		gen.writeEndArray();
 	}
 
 }

@@ -1,4 +1,3 @@
-package org.eclipse.digitaltwin.basyx.aasservice.feature;
 /*******************************************************************************
  * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
@@ -23,23 +22,32 @@ package org.eclipse.digitaltwin.basyx.aasservice.feature;
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
+package org.eclipse.digitaltwin.basyx.submodelservice.value;
 
+import java.util.List;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-import org.eclipse.digitaltwin.basyx.aasservice.AasService;
-import org.eclipse.digitaltwin.basyx.aasservice.AasServiceFactory;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
 
-public class ConsolePrintingAasServiceFactory implements AasServiceFactory {
-
-	private AasServiceFactory decorated;
-
-	public ConsolePrintingAasServiceFactory(AasServiceFactory decorated) {
-		this.decorated = decorated;
+/**
+ * Represents the submodel element {@link SubmodelElementCollection} value
+ * 
+ * @author danish
+ *
+ */
+public class SubmodelElementCollectionValue implements SubmodelElementValue {
+	private List<ValueOnly> value;
+	
+	@SuppressWarnings("unused")
+	private SubmodelElementCollectionValue() {
+		super();
+	}
+	
+	public SubmodelElementCollectionValue(List<ValueOnly> value) {
+		this.value = value;
 	}
 
-	@Override
-	public AasService create(AssetAdministrationShell aas) {
-		return new ConsolePrintingAasService(decorated.create(aas));
+	public List<ValueOnly> getValue() {
+		return value;
 	}
 
 }
