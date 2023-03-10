@@ -26,6 +26,7 @@ package org.eclipse.basyx.components.aas.autoregistration;
 
 import java.util.Collection;
 
+import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
@@ -33,6 +34,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 
 /**
@@ -72,8 +74,14 @@ public class AutoRegisterAASAggregator implements IAASAggregator {
 	@Override
 	public void createAAS(AssetAdministrationShell aas) {
 		aggregator.createAAS(aas);
-		registry.register(new AASDescriptor(aas, endpoint));
+		registry.register(new AASDescriptor(aas, getEndpoint(aas)));
 
+	}
+
+	private String getEndpoint(AssetAdministrationShell aas) {
+		String harmonized = AASAggregatorAPIHelper.harmonizeURL(endpoint);		
+		String aasAccessPath = AASAggregatorAPIHelper.getAASAccessPath(aas.getIdentification());
+		return VABPathTools.concatenatePaths(harmonized, aasAccessPath);
 	}
 
 	@Override

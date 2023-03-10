@@ -6,14 +6,10 @@ RUN apt install -y wget
 
 # Copy built jar to image using the jar name specified in the pom.xml (JAR_FILE)
 ARG JAR_FILE
-COPY wait-for-it.sh /
+COPY wait-for-it-env-and-start-jar.sh /
 # change EOL of .sh file to LF, so the unix container can find it
-RUN ["sed", "-i", "s/\r$//", "/wait-for-it.sh"]
-RUN ["chmod", "+x", "/wait-for-it.sh"]
-COPY wait-for-it-env.sh /
-# change EOL of .sh file to LF, so the unix container can find it
-RUN ["sed", "-i", "s/\r$//", "/wait-for-it-env.sh"]
-RUN ["chmod", "+x", "/wait-for-it-env.sh"]
+RUN ["sed", "-i", "s/\r$//", "/wait-for-it-env-and-start-jar.sh"]
+RUN ["chmod", "+x", "/wait-for-it-env-and-start-jar.sh"]
 
 COPY target/${JAR_FILE} /usr/share/basyxExecutable.jar
 COPY target/lib /usr/share/lib
@@ -43,4 +39,4 @@ ARG MQTT_CONFIG_KEY
 ENV ${MQTT_CONFIG_KEY} "/usr/share/config/mqtt.properties"
 
 # Start the jar
-CMD ./wait-for-it-env.sh && java -jar "/usr/share/basyxExecutable.jar"
+ENTRYPOINT ["./wait-for-it-env-and-start-jar.sh"]

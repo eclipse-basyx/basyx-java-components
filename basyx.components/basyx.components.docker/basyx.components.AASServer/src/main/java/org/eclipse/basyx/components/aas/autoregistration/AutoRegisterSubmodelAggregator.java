@@ -2,14 +2,18 @@ package org.eclipse.basyx.components.aas.autoregistration;
 
 import java.util.Collection;
 
+import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
+import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 
 /*******************************************************************************
  * Copyright (C) 2023 the Eclipse BaSyx Authors
@@ -86,14 +90,21 @@ public class AutoRegisterSubmodelAggregator implements ISubmodelAggregator {
 	@Override
 	public void createSubmodel(Submodel submodel) {
 		aggregator.createSubmodel(submodel);
-		registry.register(aasIdentifier, new SubmodelDescriptor(submodel, endpoint));
+		registry.register(aasIdentifier, new SubmodelDescriptor(submodel, getEndpoint(submodel)));
 	}
 
 	@Override
 	public void createSubmodel(ISubmodelAPI submodelAPI) {
 		aggregator.createSubmodel(submodelAPI);
-		registry.register(aasIdentifier, new SubmodelDescriptor(submodelAPI.getSubmodel(), endpoint));
+		registry.register(aasIdentifier, new SubmodelDescriptor(submodelAPI.getSubmodel(), getEndpoint(submodelAPI.getSubmodel())));
 
+	}
+
+	private String getEndpoint(ISubmodel submodel) {
+		String harmonized = AASAggregatorAPIHelper.harmonizeURL(endpoint);
+		String shellEntryPath = AASAggregatorAPIHelper.getAASEntryPath(aasIdentifier);
+		String submodelEntryPath = VABPathTools.concatenatePaths(MultiSubmodelProvider.SUBMODELS_PREFIX, submodel.getIdShort(), SubmodelProvider.SUBMODEL);
+		return VABPathTools.concatenatePaths(harmonized, shellEntryPath, submodelEntryPath);
 	}
 
 	@Override
