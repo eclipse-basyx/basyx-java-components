@@ -288,7 +288,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		// Get sm from db
 		Submodel sm = (Submodel) getSubmodel();
 		// Remove element
-		
+
 		deleteAllFilesFromGridFsIfIsFileSubmodelElement(idShort, sm);
 
 		sm.getSubmodelElements().remove(idShort);
@@ -298,13 +298,12 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 
 	@SuppressWarnings("unchecked")
 	private void deleteAllFilesFromGridFsIfIsFileSubmodelElement(String idShort, Submodel sm) {
-		Map<String,Object> submodelElement = (Map<String, Object>) sm.getSubmodelElement(idShort);
+		Map<String, Object> submodelElement = (Map<String, Object>) sm.getSubmodelElement(idShort);
 		if (!File.isFile(submodelElement))
 			return;
-			File file = File.createAsFacade(submodelElement);
-			GridFSBucket bucket = getGridFSBucket();
-			bucket.find(Filters.eq("filename", file.getValue()))
-					.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+		File file = File.createAsFacade(submodelElement);
+		GridFSBucket bucket = getGridFSBucket();
+		bucket.find(Filters.eq("filename", file.getValue())).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
 	}
 
 	@Override
@@ -360,17 +359,17 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		List<String> idShorts = Arrays.asList(splitted);
 		Submodel sm = (Submodel) getSubmodel();
 		ISubmodelElement element = getNestedSubmodelElement(sm, idShorts);
-		String fileName = updateFileInDB(fileStream, element);
+		String fileName = updateFileInDB(fileStream, element, idShortPath);
 		updateSubmodelElementInDB(idShorts, fileName);
 	}
 
 	@SuppressWarnings("unchecked")
-	private String updateFileInDB(InputStream newValue, ISubmodelElement element) {
+	private String updateFileInDB(InputStream newValue, ISubmodelElement element, String idShortPath) {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket();
 		String fileName = file.getValue();
-		if(fileName.isEmpty()) {
-			fileName = constructFileName(file);
+		if (fileName.isEmpty()) {
+			fileName = constructFileName(file, idShortPath);
 		}
 		deleteAllDuplicateFiles(bucket, fileName);
 		bucket.uploadFromStream(fileName, newValue);
@@ -378,8 +377,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	private void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
-		bucket.find(Filters.eq("filename", fileName))
-				.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+		bucket.find(Filters.eq("filename", fileName)).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
 	}
 
 	private GridFSBucket getGridFSBucket() {
@@ -560,7 +558,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			Map<String, Object> submodelElement = (Map<String, Object>) getSubmodelElement(idShortPath);
 			File fileSubmodelElement = File.createAsFacade(submodelElement);
 			GridFSBucket bucket = getGridFSBucket();
-			String fileName = constructFileName(fileSubmodelElement);
+			String fileName = constructFileName(fileSubmodelElement, idShortPath);
 			java.io.File file = new java.io.File(fileName);
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream(file);
@@ -571,10 +569,10 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		}
 	}
 
-	private String constructFileName(File file) {
+	private String constructFileName(File file, String idShortPath) {
 		String fileName;
 		Submodel sm = (Submodel) getSubmodel();
-		fileName = sm.getIdentification().getId() + "-" + file.getIdShort() + "." + file.getMimeType();
+		fileName = sm.getIdentification().getId() + "-" + idShortPath + "." + file.getMimeType();
 		return fileName;
 	}
 }
