@@ -161,21 +161,7 @@ public abstract class SubmodelServiceSuite {
 	public void getHierarchicalSubmodelElementFromEntity() {
 		Submodel operationalData = DummySubmodelFactory.createOperationalDataSubmodelWithHierarchicalSubmodelElements();
 
-		List<SubmodelElement> submodelElementsCollection = new ArrayList<>();
-
-		SubmodelElementCollection submodelElementCollection = createDummySubmodelElementCollection("test");
-		
-		SubmodelElementList submodelElementList = createDummySubmodelElementList("testList");
-		
-		Property testProperty = createDummyProperty("testProperty");
-		
-		Entity entity = createDummyEntityWithStatement(testProperty, "entityIdShort");
-		
-		submodelElementList.setValue(Arrays.asList(entity));
-
-		submodelElementCollection.setValue(Arrays.asList(submodelElementList));
-		
-		submodelElementsCollection.add(submodelElementCollection);
+		List<SubmodelElement> submodelElementsCollection = createHierarchicalSubmodelElement();
 		
 		operationalData.setSubmodelElements(submodelElementsCollection);
 
@@ -315,6 +301,26 @@ public abstract class SubmodelServiceSuite {
 				+ DummySubmodelFactory.SUBMODEL_ELEMENT_FIRST_LIST + "[0][0]."
 				+ DummySubmodelFactory.SUBMODEL_ELEMENT_FIRST_ID_SHORT;
 		return idShortPath;
+	}
+	
+	private List<SubmodelElement> createHierarchicalSubmodelElement() {
+		List<SubmodelElement> submodelElementsCollection = new ArrayList<>();
+
+		SubmodelElementCollection submodelElementCollection = createDummySubmodelElementCollection("test");
+		
+		SubmodelElementList submodelElementList = createDummySubmodelElementList("testList");
+		
+		Property testProperty = createDummyProperty("testProperty");
+		
+		Entity entity = createDummyEntityWithStatement(testProperty, "entityIdShort");
+		
+		submodelElementList.setValue(Arrays.asList(entity));
+
+		submodelElementCollection.setValue(Arrays.asList(submodelElementList));
+		
+		submodelElementsCollection.add(submodelElementCollection);
+		
+		return submodelElementsCollection;
 	}
 	
 	private DefaultSubmodelElementList createDummySubmodelElementList(String idShort) {
