@@ -176,6 +176,11 @@ public abstract class AasRepositorySuite {
 
 		assertEquals(aas1, aasRepo.getAas(AAS_1_ID));
 	}
+	
+	@Test(expected = ElementDoesNotExistException.class)
+	public void updateNonExistingAas() {
+		aasRepo.updateAas("nonExisting", aas1);
+	}
 
 	public static Reference createDummyReference(String submodelId) {
 		return new DefaultReference.Builder()

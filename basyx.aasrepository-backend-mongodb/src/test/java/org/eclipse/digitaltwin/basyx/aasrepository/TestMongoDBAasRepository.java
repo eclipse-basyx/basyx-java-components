@@ -32,6 +32,7 @@ import java.util.Arrays;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
+import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -88,6 +89,17 @@ public class TestMongoDBAasRepository extends AasRepositorySuite {
 		AssetAdministrationShell retrievedShell = getAasFromNewBackendInstance(repoFactory, expectedShell.getId());
 
 		assertEquals(expectedShell, retrievedShell);
+	}
+	
+	@Test(expected = ElementDoesNotExistException.class)
+	public void updateNonExistingAas() {
+		AasRepositoryFactory repoFactory = getAasRepositoryFactory();
+		
+		AasRepository mongoDBAasRepository = repoFactory.create();
+		
+		AssetAdministrationShell expectedShell = createDummyShellOnRepo(mongoDBAasRepository);
+		
+		updateShellOnRepo(mongoDBAasRepository, "nonExistingAasId", expectedShell);
 	}
 
 	private void addSubmodelReferenceToAas(AssetAdministrationShell expectedShell) {

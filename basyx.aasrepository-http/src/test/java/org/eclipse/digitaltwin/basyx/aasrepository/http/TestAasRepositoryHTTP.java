@@ -201,6 +201,17 @@ public class TestAasRepositoryHTTP {
 		
 		BaSyxHttpTestUtils.assertSameJSONContent(expectedAasJSON, aasJson);
 	}
+	
+	@Test
+	public void updateNonExistingAas() throws IOException {
+		String url = getSpecificAasAccessURL("nonExisting");
+		
+		String expectedAasJSON = getAasJSONString();
+		
+		CloseableHttpResponse updateResponse = BaSyxHttpTestUtils.executePutOnURL(url, expectedAasJSON);
+		
+		assertEquals(HttpStatus.NOT_FOUND.value(), updateResponse.getCode());
+	}
 
 	private CloseableHttpResponse updateSpecificAas(String dummyaasid, String aasJsonContent) throws IOException {
 		return BaSyxHttpTestUtils.executePutOnURL(getSpecificAasAccessURL(dummyaasid), aasJsonContent);
