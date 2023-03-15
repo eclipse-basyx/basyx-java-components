@@ -114,12 +114,12 @@ public class MqttAasRepository implements AasRepository {
 
 	@Override
 	public void setAssetInformation(String aasId, AssetInformation aasInfo) throws ElementDoesNotExistException {
-		decorated.getAas(aasId).setAssetInformation(aasInfo);
+		decorated.setAssetInformation(aasId, aasInfo);
 	}
 	
 	@Override
 	public AssetInformation getAssetInformation(String aasId) throws ElementDoesNotExistException{
-		return decorated.getAas(aasId).getAssetInformation();
+		return decorated.getAssetInformation(aasId);
 	}
 
 	private void aasCreated(AssetAdministrationShell shell, String repoId) {

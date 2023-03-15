@@ -169,11 +169,6 @@ public abstract class AasRepositorySuite {
 		aasRepo.removeSubmodelReference("nonExisting", "doesNotMatter");
 	}
 
-	private Reference createDummyReference() {
-		return new DefaultReference.Builder()
-				.keys(new DefaultKey.Builder().type(KeyTypes.SUBMODEL).value(DUMMY_SUBMODEL_ID).build()).build();
-	}
-
 	@Test
 	public void getAssetInformation() {
 		assertEquals(aas2.getAssetInformation(), aasRepo.getAssetInformation(aas2.getId()));
@@ -191,15 +186,19 @@ public abstract class AasRepositorySuite {
 		assertEquals(assetInfo, aasRepo.getAssetInformation(aas2.getId()));
 	}
 
-	private AssetInformation createDummyAssetInformation() {
-		AssetInformation assetInfo = new DefaultAssetInformation.Builder().assetKind(AssetKind.INSTANCE).globalAssetId(
-				new DefaultReference.Builder().keys(new DefaultKey.Builder().value("assetIDTestKey").build()).build())
-				.build();
-		return assetInfo;
-	}
-
 	@Test(expected = ElementDoesNotExistException.class)
 	public void setAssetInformationOfNonExistingAas() {
 		aasRepo.setAssetInformation("nonExisting", createDummyAssetInformation());
+	}	
+
+	private Reference createDummyReference() {
+		return new DefaultReference.Builder()
+				.keys(new DefaultKey.Builder().type(KeyTypes.SUBMODEL).value(DUMMY_SUBMODEL_ID).build()).build();
+	}
+
+	private AssetInformation createDummyAssetInformation() {
+		return new DefaultAssetInformation.Builder().assetKind(AssetKind.INSTANCE).globalAssetId(
+				new DefaultReference.Builder().keys(new DefaultKey.Builder().value("assetIDTestKey").build()).build())
+				.build();
 	}
 }
