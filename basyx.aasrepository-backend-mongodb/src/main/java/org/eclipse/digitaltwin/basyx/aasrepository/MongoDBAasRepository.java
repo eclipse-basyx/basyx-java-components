@@ -132,7 +132,7 @@ public class MongoDBAasRepository implements AasRepository {
 		InMemoryAasService service = new InMemoryAasService(getAas(aasId));
 		service.setAssetInformation(aasInfo);
 
-		updateAas(service.getAAS());
+		updateAas(aasId, service.getAAS());
 	}
 	
 	@Override

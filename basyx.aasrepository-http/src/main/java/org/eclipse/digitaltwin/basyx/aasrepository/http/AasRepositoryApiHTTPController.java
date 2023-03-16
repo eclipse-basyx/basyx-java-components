@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
@@ -60,15 +59,12 @@ public class AasRepositoryApiHTTPController implements AasRepositoryHTTPApi {
 	private static final Logger log = LoggerFactory.getLogger(AasRepositoryApiHTTPController.class);
 
 	private final ObjectMapper objectMapper;
-	
-	private final HttpServletRequest request;
 
 	private final AasRepository aasRepository;
 
 	@Autowired
-	public AasRepositoryApiHTTPController(ObjectMapper objectMapper, HttpServletRequest request, AasRepository aasRepository) {
+	public AasRepositoryApiHTTPController(ObjectMapper objectMapper, AasRepository aasRepository) {
 		this.objectMapper = objectMapper;
-		this.request = request;
 		this.aasRepository = aasRepository;
 	}
 
