@@ -78,7 +78,7 @@ public interface AasRepository {
 	 * 
 	 * @param aas
 	 */
-	public void updateAas(AssetAdministrationShell aas);
+	public void updateAas(String aasId, AssetAdministrationShell aas);
 
 	/**
 	 * Returns a List of References to Submodels

@@ -116,7 +116,6 @@ public interface AasRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier,
 			@Parameter(in = ParameterIn.DEFAULT, description = "Reference to the Submodel", required = true, schema = @Schema()) @Valid @RequestBody Reference body);
 
-
 	@Operation(summary = "Updates the Asset Administration Shell", description = "", tags = { "Asset Administration Shell Repository" })
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Asset Administration Shell updated successfully") })
 	@RequestMapping(value = "/shells/{aasIdentifier}/aas", consumes = { "application/json" }, method = RequestMethod.PUT)
