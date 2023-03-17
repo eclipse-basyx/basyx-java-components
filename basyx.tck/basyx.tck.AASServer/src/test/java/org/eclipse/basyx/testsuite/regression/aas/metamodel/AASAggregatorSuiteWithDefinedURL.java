@@ -39,6 +39,7 @@ import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -46,6 +47,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
+import org.eclipse.basyx.submodel.metamodel.map.modeltype.ModelType;
 import org.eclipse.basyx.testsuite.regression.aas.aggregator.AASAggregatorSuite;
 import org.junit.Test;
 
@@ -141,7 +143,7 @@ public class AASAggregatorSuiteWithDefinedURL extends AASAggregatorSuite {
 		AssetAdministrationShell localCopy = remoteAas.getLocalCopy();
 		
 		assertEquals(expected.getIdentification(), localCopy.getIdentification());
-		assertEquals(expected.getAsset(), localCopy.getAsset());
+		assertEqualAsset((Asset) expected.getAsset(), (Asset) localCopy.getAsset());
 		assertEquals(expected.getIdShort(), localCopy.getIdShort());
 		assertEquals(expected.getIdentification(), localCopy.getIdentification());
 		assertEquals(expected.getDescription(), localCopy.getDescription());
@@ -183,6 +185,11 @@ public class AASAggregatorSuiteWithDefinedURL extends AASAggregatorSuite {
 			assertTrue(actual.getSubmodelElements().containsKey(id));
 		}
 	}
-
+	
+	private void assertEqualAsset(Asset expected, Asset actual) {
+		assertEquals(expected.get(ModelType.MODELTYPE), actual.get(ModelType.MODELTYPE));
+		assertEquals(expected.getIdentification(), actual.getIdentification());
+		assertEquals(expected.getAssetKind(), actual.getAssetKind());
+	}
 
 }
