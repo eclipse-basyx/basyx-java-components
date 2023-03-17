@@ -47,6 +47,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
+import org.eclipse.basyx.submodel.metamodel.map.modeltype.ModelType;
 import org.eclipse.basyx.testsuite.regression.aas.aggregator.AASAggregatorSuite;
 import org.junit.Test;
 
@@ -186,7 +187,7 @@ public class AASAggregatorSuiteWithDefinedURL extends AASAggregatorSuite {
 	}
 	
 	private void assertEqualAsset(Asset expected, Asset actual) {
-		assertEquals(expected.get("modelType"), actual.get("modelType"));
+		assertEquals(expected.get(ModelType.MODELTYPE), actual.get(ModelType.MODELTYPE));
 		assertEquals(expected.getIdentification(), actual.getIdentification());
 		assertEquals(expected.getAssetKind(), actual.getAssetKind());
 	}
