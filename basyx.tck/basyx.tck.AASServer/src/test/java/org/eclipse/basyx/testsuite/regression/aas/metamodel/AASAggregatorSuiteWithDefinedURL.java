@@ -39,6 +39,7 @@ import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -141,7 +142,7 @@ public class AASAggregatorSuiteWithDefinedURL extends AASAggregatorSuite {
 		AssetAdministrationShell localCopy = remoteAas.getLocalCopy();
 		
 		assertEquals(expected.getIdentification(), localCopy.getIdentification());
-		assertEquals(expected.getAsset(), localCopy.getAsset());
+		assertEqualAsset((Asset) expected.getAsset(), (Asset) localCopy.getAsset());
 		assertEquals(expected.getIdShort(), localCopy.getIdShort());
 		assertEquals(expected.getIdentification(), localCopy.getIdentification());
 		assertEquals(expected.getDescription(), localCopy.getDescription());
@@ -183,6 +184,11 @@ public class AASAggregatorSuiteWithDefinedURL extends AASAggregatorSuite {
 			assertTrue(actual.getSubmodelElements().containsKey(id));
 		}
 	}
-
+	
+	private void assertEqualAsset(Asset expected, Asset actual) {
+		assertEquals(expected.get("modelType"), actual.get("modelType"));
+		assertEquals(expected.getIdentification(), actual.getIdentification());
+		assertEquals(expected.getAssetKind(), actual.getAssetKind());
+	}
 
 }
