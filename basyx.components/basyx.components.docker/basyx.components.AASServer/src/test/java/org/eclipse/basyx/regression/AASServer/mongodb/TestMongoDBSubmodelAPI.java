@@ -31,7 +31,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
@@ -76,7 +75,7 @@ public class TestMongoDBSubmodelAPI {
 	@Test
 	public void fileSubmodelElementFileUpload() throws FileNotFoundException {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
-		File file = new File("xml");
+		File file = new File("application/xml");
 		file.setValue("");
 		file.setIdShort("fileSmeIdShort");
 		submodelAPI.addSubmodelElement(file);
@@ -84,23 +83,16 @@ public class TestMongoDBSubmodelAPI {
 		java.io.File expected = new java.io.File("src/test/resources/testfile.xml");
 		submodelAPI.uploadSubmodelElementFile(file.getIdShort(), new FileInputStream(expected));
 
-		java.io.File value = (java.io.File) submodelAPI.getSubmodelElementFile("fileSmeIdShort");
+		java.io.File value = submodelAPI.getSubmodelElementFile("fileSmeIdShort");
 
 		assertEquals("mySubmodelId-fileSmeIdShort.xml", value.getName());
 		assertEquals(expected.length(), value.length());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test(expected = MongoGridFSException.class)
 	public void fileSubmodelElementFileIsAutomaticallyDeleted() throws FileNotFoundException {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
 		uploadDummyFile(submodelAPI, "fileSmeIdShort");
-
-		Map<String, Object> submodelElementMap = (Map<String, Object>) submodelAPI.getSubmodelElement("fileSmeIdShort");
-
-		File retrievedFileSubmodelElement = File.createAsFacade(submodelElementMap);
-
-		String filePath = retrievedFileSubmodelElement.getValue();
 
 		submodelAPI.deleteSubmodelElement("fileSmeIdShort");
 
@@ -113,7 +105,7 @@ public class TestMongoDBSubmodelAPI {
 	}
 
 	private void uploadDummyFile(MongoDBSubmodelAPI submodelAPI, String idShort) throws FileNotFoundException {
-		File file = new File("xml");
+		File file = new File("application/xml");
 		file.setValue("");
 		file.setIdShort(idShort);
 		submodelAPI.addSubmodelElement(file);
