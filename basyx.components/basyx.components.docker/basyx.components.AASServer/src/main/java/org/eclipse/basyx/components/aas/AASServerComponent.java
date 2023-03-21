@@ -71,6 +71,7 @@ import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.delegation.DelegationAASServerFeature;
+import org.eclipse.basyx.components.aas.fileadaptation.FileValueAdaptingAASServerFeature;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.mqtt.MqttV2AASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
@@ -361,6 +362,8 @@ public class AASServerComponent implements IComponent {
 		}
 
 		configureSecurity();
+
+		addAASServerFeature(new FileValueAdaptingAASServerFeature(getURL()));
 
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
