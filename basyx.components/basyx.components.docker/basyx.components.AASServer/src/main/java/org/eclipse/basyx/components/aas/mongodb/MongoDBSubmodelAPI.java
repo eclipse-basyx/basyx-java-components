@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -367,10 +370,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private String updateFileInDB(InputStream newValue, ISubmodelElement element, String idShortPath) {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket();
-		String fileName = file.getValue();
-		if (fileName.isEmpty()) {
-			fileName = constructFileName(file, idShortPath);
-		}
+		String fileName = constructFileName(file, idShortPath);
 		deleteAllDuplicateFiles(bucket, fileName);
 		bucket.uploadFromStream(fileName, newValue);
 		return fileName;
@@ -570,9 +570,18 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	private String constructFileName(File file, String idShortPath) {
-		String fileName;
 		Submodel sm = (Submodel) getSubmodel();
-		fileName = sm.getIdentification().getId() + "-" + idShortPath + "." + file.getMimeType();
-		return fileName;
+		return sm.getIdentification().getId() + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
+	}
+
+	private String getFileExtension(File file) {
+		MimeTypes allTypes = MimeTypes.getDefaultMimeTypes();
+		try {
+			MimeType mimeType = allTypes.forName(file.getMimeType());
+			return mimeType.getExtension();
+		} catch (MimeTypeException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 }
