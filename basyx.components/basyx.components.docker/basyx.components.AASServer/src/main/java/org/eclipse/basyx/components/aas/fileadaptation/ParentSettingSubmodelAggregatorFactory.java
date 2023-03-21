@@ -26,44 +26,31 @@
 
 package org.eclipse.basyx.components.aas.fileadaptation;
 
-import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
-import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
-import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
+import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
-import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 
 /**
- * Decorator for File value adaptation feature
+ * Factory for creating a {@link ParentSettingSubmodelAggregator}
  * 
  * @author schnicke
  *
  */
-public class FileValueAdaptingAASServerDecorator implements IAASServerDecorator {
+public class ParentSettingSubmodelAggregatorFactory implements ISubmodelAggregatorFactory {
+	private ISubmodelAggregatorFactory aggregatorFactory;
 
-	private String serverUrl;
-
-	public FileValueAdaptingAASServerDecorator(String serverUrl) {
-		this.serverUrl = serverUrl;
+	public ParentSettingSubmodelAggregatorFactory(ISubmodelAggregatorFactory aggregatorFactory) {
+		this.aggregatorFactory = aggregatorFactory;
 	}
 
 	@Override
-	public ISubmodelAPIFactory decorateSubmodelAPIFactory(ISubmodelAPIFactory submodelAPIFactory) {
-		return new FileValueAdaptingSubmodelAPIFactory(submodelAPIFactory, serverUrl);
+	public ISubmodelAggregator create() {
+		return aggregatorFactory.create();
 	}
 
 	@Override
-	public ISubmodelAggregatorFactory decorateSubmodelAggregatorFactory(ISubmodelAggregatorFactory submodelAggregatorFactory) {
-		return new ParentSettingSubmodelAggregatorFactory(submodelAggregatorFactory);
-	}
-
-	@Override
-	public IAASAPIFactory decorateAASAPIFactory(IAASAPIFactory aasAPIFactory) {
-		return aasAPIFactory;
-	}
-
-	@Override
-	public IAASAggregatorFactory decorateAASAggregatorFactory(IAASAggregatorFactory aasAggregatorFactory) {
-		return aasAggregatorFactory;
+	public ISubmodelAggregator create(IIdentifier aasIdentifier) {
+		return new ParentSettingSubmodelAggregator(aggregatorFactory.create(aasIdentifier), aasIdentifier);
 	}
 
 }
