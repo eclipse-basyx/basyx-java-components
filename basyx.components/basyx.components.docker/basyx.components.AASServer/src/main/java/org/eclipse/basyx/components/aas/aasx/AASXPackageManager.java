@@ -24,12 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.aasx;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,11 +49,13 @@ public class AASXPackageManager extends AASXToMetamodelConverter {
 		super(path);
 	}
 
+	/**
+	 * @deprecated This method is deprecated. Please use the {@link AASXToMetamodelConverter#getTemporaryDirPath()}
+	 */
 	@Override
-	protected Path getRootFolder() throws IOException, URISyntaxException {
-		URI uri = AASXPackageManager.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-		URI parent = new File(uri).getParentFile().toURI();
-		return Paths.get(parent);
+	@Deprecated(since = "1.4.0", forRemoval = true)
+	protected Path getRootFolder() throws URISyntaxException {
+		return getTemporaryDirPath();
 	}
 
 	@SuppressWarnings("unchecked")
