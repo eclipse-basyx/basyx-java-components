@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.executable;
 
+import org.eclipse.basyx.components.IComponent;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
 import org.eclipse.basyx.components.registry.RegistryComponent;
@@ -53,6 +54,7 @@ public class RegistryExecutable {
 
 		setMqttConfiguration(registryConfig, component);
 
+		addShutdownHook(component);
 		component.startComponent();
 	}
 
@@ -67,5 +69,11 @@ public class RegistryExecutable {
 
 	private static boolean isMqttBackendSelected(BaSyxRegistryConfiguration registryConfig) {
 		return registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTT) || registryConfig.getRegistryEvents().equals(RegistryEventBackend.MQTTV2);
+	}
+
+	private static void addShutdownHook(IComponent component) {
+		Thread shutdownListener = new Thread(() -> component.stopComponent());
+
+		Runtime.getRuntime().addShutdownHook(shutdownListener);
 	}
 }

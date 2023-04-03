@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,49 +22,41 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
+package org.eclipse.basyx.components.aas.autoregistration;
 
-package org.eclipse.basyx.components.aas.mongodb;
-
-import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
-
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 
 /**
- * Factory for creating a {@link MongoDBSubmodelAggregator}
  * 
- * @author schnicke
+ * Factory for creating a {@link AutoRegisterSubmodelAggregator}
+ * 
+ * @author fried
  *
  */
-public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFactory {
+public class AutoRegisterSubmodelAggregatorFactory implements ISubmodelAggregatorFactory {
 
-	private BaSyxMongoDBConfiguration config;
-	private ISubmodelAPIFactory submodelAPIFactory;
-	private MongoClient client;
+	private ISubmodelAggregatorFactory aggregatorFactory;
+	private IAASRegistry registry;
+	private String endpoint;
 
-	@Deprecated
-	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
-		this(config, submodelAPIFactory, MongoClients.create(config.getConnectionUrl()));
-	}
-
-	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory, MongoClient client) {
-		this.config = config;
-		this.client = client;
-		this.submodelAPIFactory = submodelAPIFactory;
+	public AutoRegisterSubmodelAggregatorFactory(ISubmodelAggregatorFactory aggregatorFactory, IAASRegistry registry,
+			String endpoint) {
+		this.aggregatorFactory = aggregatorFactory;
+		this.registry = registry;
+		this.endpoint = endpoint;
 	}
 
 	@Override
 	public ISubmodelAggregator create() {
-		return new MongoDBSubmodelAggregator(submodelAPIFactory, config, client);
+		return aggregatorFactory.create();
 	}
 
 	@Override
-	public ISubmodelAggregator create(IIdentifier ignored) {
-		return create();
+	public ISubmodelAggregator create(IIdentifier aasIdentifier) {
+		return new AutoRegisterSubmodelAggregator(aggregatorFactory.create(aasIdentifier), registry, aasIdentifier, endpoint);
 	}
 
 }

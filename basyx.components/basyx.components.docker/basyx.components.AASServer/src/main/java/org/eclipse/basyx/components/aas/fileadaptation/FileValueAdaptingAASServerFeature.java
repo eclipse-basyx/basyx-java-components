@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,39 +22,38 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.mqtt;
+
+
+package org.eclipse.basyx.components.aas.fileadaptation;
 
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
-import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
+import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 
 /**
+ * Feature for File value adaptation feature
  * 
- * Feature for Mqtt eventing of the AASServer
- * 
- * @author fischer, fried, siebert
+ * @author schnicke
  *
  */
-public class MqttV2AASServerFeature extends MqttAASServerFeature {
-	private String aasRepoId;
-	private IEncoder idEncoder;
+public class FileValueAdaptingAASServerFeature implements IAASServerFeature {
 
-	/**
-	 * Creates the aas server feature for integrating the MqttV2 feature in the AAS
-	 * Server
-	 * 
-	 * @param aasRepoId
-	 * @param idEncoder
-	 */
-	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasRepoId, IEncoder idEncoder) {
-		super(mqttConfig, clientId);
-		this.aasRepoId = aasRepoId;
-		this.idEncoder = idEncoder;
+	private String serverUrl;
+
+	public FileValueAdaptingAASServerFeature(String serverUrl) {
+		this.serverUrl = serverUrl;
+	}
+
+	@Override
+	public void initialize() {
+	}
+
+	@Override
+	public void cleanUp() {
 	}
 
 	@Override
 	public IAASServerDecorator getDecorator() {
-		return new MqttV2AASServerDecorator(client, this.aasRepoId, idEncoder);
+		return new FileValueAdaptingAASServerDecorator(serverUrl);
 	}
 
 }

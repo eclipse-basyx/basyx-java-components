@@ -27,9 +27,7 @@ package org.eclipse.basyx.regression.AASServer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.AASServerComponent;
@@ -49,7 +47,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-
 import io.moquette.broker.Server;
 import io.moquette.broker.config.ClasspathResourceLoader;
 import io.moquette.broker.config.IConfig;
@@ -116,7 +113,7 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 	}
 
 	@Test
-	public void submodelLifeCycle() throws InterruptedException {
+	public void submodelLifeCycle() {
 		IIdentifier shellIdentifierForSubmodel = new CustomId("shellSubmodelId");
 		AssetAdministrationShell shell = createShell(shellIdentifierForSubmodel.getId(), shellIdentifierForSubmodel);
 		manager.createAAS(shell, getURL());
@@ -131,8 +128,6 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 
 		manager.deleteSubmodel(shellIdentifierForSubmodel, submodelIdentifier);
 
-		waitForPropagation();
-
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttAASAPIHelper.TOPIC_REMOVESUBMODEL)));
 		assertTrue(listener.getTopics().stream().anyMatch(t -> t.equals(MqttSubmodelAggregatorHelper.TOPIC_DELETESUBMODEL)));
 		try {
@@ -142,10 +137,6 @@ public abstract class MqttAASServerSuite extends AASServerSuite {
 			// ResourceNotFoundException expected
 		}
 		manager.deleteAAS(shellIdentifierForSubmodel);
-	}
-
-	private void waitForPropagation() throws InterruptedException {
-		Thread.sleep(1000);
 	}
 
 	protected static BaSyxContextConfiguration createBaSyxContextConfiguration() {

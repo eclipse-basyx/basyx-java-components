@@ -42,7 +42,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
 import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
-import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.bundle.AASBundle;
 import org.eclipse.basyx.aas.bundle.AASBundleHelper;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
@@ -67,10 +66,12 @@ import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedAASServerFeatureFactory;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServletParams;
+import org.eclipse.basyx.components.aas.autoregistration.AutoRegisterAASServerFeature;
 import org.eclipse.basyx.components.aas.configuration.AASEventBackend;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.components.aas.delegation.DelegationAASServerFeature;
+import org.eclipse.basyx.components.aas.fileadaptation.FileValueAdaptingAASServerFeature;
 import org.eclipse.basyx.components.aas.mqtt.MqttAASServerFeature;
 import org.eclipse.basyx.components.aas.mqtt.MqttV2AASServerFeature;
 import org.eclipse.basyx.components.aas.servlet.AASAggregatorAASXUploadServlet;
@@ -256,8 +257,7 @@ public class AASServerComponent implements IComponent {
 			// 2. Fix the file paths according to the servlet configuration
 			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
 
-			// 3. Register the initial AAS
-			registerEnvironment();
+			registerWhitelistedSubmodels();
 		}
 
 		logger.info("Start the server");
@@ -353,15 +353,29 @@ public class AASServerComponent implements IComponent {
 			addAASServerFeature(new DelegationAASServerFeature());
 		}
 
+		if (isAutoRegisterEnabled()) {
+			addAASServerFeature(new AutoRegisterAASServerFeature(registry, getURL()));
+		}
+
 		if (isEventingEnabled()) {
 			configureMqttFeature();
 		}
 
 		configureSecurity();
 
+		addAASServerFeature(new FileValueAdaptingAASServerFeature(getURL()));
+
 		if (aasConfig.isAASXUploadEnabled()) {
 			enableAASXUpload();
 		}
+	}
+
+	private boolean isAutoRegisterEnabled() {
+		return isRegistryConfigured() && !isSubmodelRegistrationWhiteListConfigured();
+	}
+
+	private boolean isSubmodelRegistrationWhiteListConfigured() {
+		return !aasConfig.getSubmodels().isEmpty();
 	}
 
 	private void configureSecurity() {
@@ -375,6 +389,14 @@ public class AASServerComponent implements IComponent {
 		}
 
 		addAASServerFeature(new AuthorizedAASServerFeatureFactory(securityConfig).create());
+	}
+
+	private boolean isRegistryConfigured() {
+		if (registry != null)
+			return true;
+
+		String registryUrl = aasConfig.getRegistry();
+		return !(registryUrl == null || registryUrl.isEmpty());
 	}
 
 	private boolean isEventingEnabled() {
@@ -399,6 +421,23 @@ public class AASServerComponent implements IComponent {
 	 * @return
 	 */
 	public String getURL() {
+		if (isExternalPathConfigured()) {
+			return getExternalURL();
+		} else {
+			return getInternalURL();
+		}
+	}
+
+	private boolean isExternalPathConfigured() {
+		String hostPath = aasConfig.getHostpath();
+		return hostPath != null && !hostPath.isEmpty();
+	}
+
+	private String getExternalURL() {
+		return aasConfig.getHostpath();
+	}
+
+	private String getInternalURL() {
 		String basePath = aasConfig.getHostpath();
 		if (basePath.isEmpty()) {
 			return contextConfig.getUrl();
@@ -413,6 +452,8 @@ public class AASServerComponent implements IComponent {
 		cleanUpAASServerFeatures();
 
 		server.shutdown();
+
+		logger.info("AAS Server stopped");
 	}
 	
 	private void deregisterAASAndSmAddedDuringRuntime() {
@@ -636,10 +677,8 @@ public class AASServerComponent implements IComponent {
 		return aasConfig.isAuthorizationCredentialsForSecuredRegistryConfigured();
 	}
 
-	private void registerEnvironment() {
-		if (aasConfig.getSubmodels().isEmpty()) {
-			registerFullAAS();
-		} else {
+	private void registerWhitelistedSubmodels() {
+		if (!aasConfig.getSubmodels().isEmpty()) {
 			registerSubmodelsFromWhitelist();
 		}
 	}
@@ -651,17 +690,6 @@ public class AASServerComponent implements IComponent {
 		for (String s : smWhitelist) {
 			updateSMEndpoint(s, descriptors);
 		}
-	}
-
-	private void registerFullAAS() {
-		if (registry == null) {
-			logger.info("No registry specified, skipped registration");
-			return;
-		}
-
-		String baseUrl = getURL();
-		String aggregatorPath = VABPathTools.concatenatePaths(baseUrl, AASAggregatorProvider.PREFIX);
-		AASBundleHelper.register(registry, aasBundles, aggregatorPath);
 	}
 
 	private void updateSMEndpoint(String smId, List<AASDescriptor> descriptors) {

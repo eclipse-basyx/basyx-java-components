@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,39 +22,34 @@
  * 
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
-package org.eclipse.basyx.components.aas.mqtt;
+package org.eclipse.basyx.components.aas.autoregistration;
 
-import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
-import org.eclipse.basyx.components.configuration.BaSyxMqttConfiguration;
-import org.eclipse.basyx.extensions.shared.encoding.IEncoder;
+import org.eclipse.basyx.aas.aggregator.api.IAASAggregator;
+import org.eclipse.basyx.aas.aggregator.api.IAASAggregatorFactory;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 
 /**
+ * Factory for creating a {@link AutoRegisterAASAggregator}
  * 
- * Feature for Mqtt eventing of the AASServer
- * 
- * @author fischer, fried, siebert
+ * @author fried
  *
  */
-public class MqttV2AASServerFeature extends MqttAASServerFeature {
-	private String aasRepoId;
-	private IEncoder idEncoder;
+public class AutoRegisterAASAggregatorFactory implements IAASAggregatorFactory {
 
-	/**
-	 * Creates the aas server feature for integrating the MqttV2 feature in the AAS
-	 * Server
-	 * 
-	 * @param aasRepoId
-	 * @param idEncoder
-	 */
-	public MqttV2AASServerFeature(BaSyxMqttConfiguration mqttConfig, String clientId, String aasRepoId, IEncoder idEncoder) {
-		super(mqttConfig, clientId);
-		this.aasRepoId = aasRepoId;
-		this.idEncoder = idEncoder;
+	private IAASAggregatorFactory aggregatorFactory;
+	private IAASRegistry registry;
+	private String endpoint;
+
+	public AutoRegisterAASAggregatorFactory(IAASAggregatorFactory aggregatorFactory, IAASRegistry registry,
+			String endpoint) {
+		this.aggregatorFactory = aggregatorFactory;
+		this.registry = registry;
+		this.endpoint = endpoint;
 	}
 
 	@Override
-	public IAASServerDecorator getDecorator() {
-		return new MqttV2AASServerDecorator(client, this.aasRepoId, idEncoder);
+	public IAASAggregator create() {
+		return new AutoRegisterAASAggregator(aggregatorFactory.create(), registry, endpoint);
 	}
 
 }
