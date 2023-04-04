@@ -450,7 +450,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		for (AssetAdministrationShell aas : data) {
 			String aasId = aas.getIdentification().getId();
 			logger.info("Adding AAS from DB: " + aasId);
-			MongoDBAASAPI aasApi = new MongoDBAASAPI(aasId, mongoClient);
+			MongoDBAASAPI aasApi = new MongoDBAASAPI(config, aasId, mongoClient);
 			MultiSubmodelProvider provider = createMultiSubmodelProvider(aasApi);
 			addSubmodelsFromDB(provider, aas);
 			aasProviderMap.put(aas.getIdentification().getId(), provider);
