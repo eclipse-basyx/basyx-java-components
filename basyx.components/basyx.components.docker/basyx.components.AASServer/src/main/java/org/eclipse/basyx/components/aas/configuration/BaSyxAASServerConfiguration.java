@@ -70,10 +70,10 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public static final String DEFAULT_CLIENT_SCOPES = "[]";
 	public static final String DEFAULT_PROPERTY_DELEGATION = FEATURE_ENABLED;
 
-
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
-	public static final String HOSTPATH = "registry.host";
+	public static final String HOSTPATH_DEPRECATED = "registry.host";
+	public static final String HOSTPATH = "aas.externalurl";
 	public static final String SUBMODELS = "registry.submodels";
 	public static final String ID = "aas.id";
 	public static final String BACKEND = "aas.backend";
@@ -175,10 +175,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = {
-				REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT,
-				CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION, ID
-		};
+		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION, ID };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -186,17 +183,17 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		loadFileOrDefaultResource(DEFAULT_FILE_KEY, DEFAULT_CONFIG_PATH);
 		loadFromEnvironmentVariables();
 	}
-	
+
 	public IAuthorizationSupplier configureAndGetAuthorizationSupplier() {
-		if(!isAuthorizationCredentialsForSecuredRegistryConfigured()) {
+		if (!isAuthorizationCredentialsForSecuredRegistryConfigured()) {
 			throw new AuthorizationConfigurationException("Authorization credentials for the secured registry is not configured");
 		}
-		
+
 		return new OAuth2ClientCredentialsBasedAuthorizationSupplier(getTokenEndpoint(), getClientId(), getClientSecret(), getClientScopes());
 	}
-	
+
 	public String getAASId() {
-	  return getProperty(ID);
+		return getProperty(ID);
 	}
 
 	public AASServerBackend getAASBackend() {
@@ -282,7 +279,11 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public String getHostpath() {
-		return getProperty(HOSTPATH);
+		if (getProperty(HOSTPATH).equals("") && getProperty(HOSTPATH_DEPRECATED) != null) {
+			return getProperty(HOSTPATH_DEPRECATED);
+		} else {
+			return getProperty(HOSTPATH);
+		}
 	}
 
 	public void setHostpath(String hostPath) {
@@ -298,7 +299,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 			return fromJson;
 		}
 	}
-	
+
 	private <T> T parseFromJson(String property, Class<T> classTypeT) {
 		T fromJson = new Gson().fromJson(property, (Type) classTypeT);
 		if (fromJson == null) {
@@ -327,7 +328,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public String getTokenEndpoint() {
 		return getProperty(TOKEN_ENDPOINT);
 	}
-	
+
 	public void setTokenEndpoint(String tokenEndpoint) {
 		setProperty(TOKEN_ENDPOINT, tokenEndpoint);
 	}
@@ -335,7 +336,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public String getClientId() {
 		return getProperty(CLIENT_ID);
 	}
-	
+
 	public void setClientId(String clientId) {
 		setProperty(CLIENT_ID, clientId);
 	}
@@ -343,7 +344,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public String getClientSecret() {
 		return getProperty(CLIENT_SECRET);
 	}
-	
+
 	public void setClientSecret(String clientSecret) {
 		setProperty(CLIENT_SECRET, clientSecret);
 	}
@@ -352,11 +353,11 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public Set<String> getClientScopes() {
 		return parseFromJson(getProperty(CLIENT_SCOPES), Set.class);
 	}
-	
+
 	public void setClientScopes(String clientScopes) {
 		setProperty(CLIENT_SCOPES, clientScopes);
 	}
-	
+
 	public void enablePropertyDelegation() {
 		setProperty(PROPERTY_DELEGATION, FEATURE_ENABLED);
 	}
@@ -364,11 +365,11 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	public void disablePropertyDelegation() {
 		setProperty(PROPERTY_DELEGATION, FEATURE_DISABLED);
 	}
-	
+
 	public boolean isPropertyDelegationEnabled() {
 		return getProperty(PROPERTY_DELEGATION).equals(FEATURE_ENABLED);
 	}
-	
+
 	public boolean isAuthorizationCredentialsForSecuredRegistryConfigured() {
 		return isTokenEndpointConfigured() && isClientIdConfigured() && isClientSecretConfigured() && isScopeConfigured();
 	}
@@ -376,7 +377,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	private boolean isTokenEndpointConfigured() {
 		return getProperty(TOKEN_ENDPOINT) != null && !getProperty(TOKEN_ENDPOINT).isEmpty();
 	}
-	
+
 	private boolean isClientIdConfigured() {
 		return getProperty(CLIENT_ID) != null && !getProperty(CLIENT_ID).isEmpty();
 	}
@@ -384,7 +385,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	private boolean isClientSecretConfigured() {
 		return getProperty(CLIENT_SECRET) != null && !getProperty(CLIENT_SECRET).isEmpty();
 	}
-	
+
 	private boolean isScopeConfigured() {
 		return getProperty(CLIENT_SCOPES) != null && !getProperty(CLIENT_SCOPES).isEmpty();
 	}
