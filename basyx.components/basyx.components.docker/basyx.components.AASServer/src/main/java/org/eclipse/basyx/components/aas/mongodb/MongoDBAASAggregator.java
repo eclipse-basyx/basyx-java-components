@@ -519,9 +519,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void addSubmodelProvidersById(String smId, MultiSubmodelProvider provider) {
-		ISubmodelAPI smApi = new MongoDBSubmodelAPI(config, smId);
+		ISubmodelAPI smApi = new MongoDBSubmodelAPI(config, smId, mongoClient);
 		SubmodelProvider smProvider = new SubmodelProvider(smApi);
 		provider.addSubmodel(smProvider);
 	}
