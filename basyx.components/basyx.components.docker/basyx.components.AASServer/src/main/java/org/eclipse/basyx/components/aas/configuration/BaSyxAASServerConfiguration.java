@@ -72,8 +72,9 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 
 	// Configuration keys
 	public static final String REGISTRY = "registry.path";
-	public static final String HOSTPATH_DEPRECATED = "registry.host";
-	public static final String HOSTPATH = "aas.externalurl";
+	@Deprecated
+	public static final String HOSTPATH = "registry.host";
+	public static final String HOSTPATH_NEW = "aas.externalurl";
 	public static final String SUBMODELS = "registry.submodels";
 	public static final String ID = "aas.id";
 	public static final String BACKEND = "aas.backend";
@@ -100,7 +101,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 		defaultProps.put(BACKEND, DEFAULT_BACKEND);
 		defaultProps.put(SOURCE, DEFAULT_SOURCE);
 		defaultProps.put(REGISTRY, DEFAULT_REGISTRY);
-		defaultProps.put(HOSTPATH, DEFAULT_HOSTPATH);
+		defaultProps.put(HOSTPATH_NEW, DEFAULT_HOSTPATH);
 		defaultProps.put(SUBMODELS, DEFAULT_SUBMODELS);
 		defaultProps.put(EVENTS, DEFAULT_EVENTS);
 		defaultProps.put(AASX_UPLOAD, DEFAULT_AASX_UPLOAD);
@@ -175,7 +176,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public void loadFromEnvironmentVariables() {
-		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION, ID };
+		String[] properties = { REGISTRY, BACKEND, SOURCE, EVENTS, HOSTPATH, HOSTPATH_NEW, AASX_UPLOAD, AUTHORIZATION, TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET, CLIENT_SCOPES, PROPERTY_DELEGATION, ID };
 		loadFromEnvironmentVariables(ENV_PREFIX, properties);
 	}
 
@@ -279,15 +280,15 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	}
 
 	public String getHostpath() {
-		if (getProperty(HOSTPATH).equals("") && getProperty(HOSTPATH_DEPRECATED) != null) {
-			return getProperty(HOSTPATH_DEPRECATED);
-		} else {
+		if (getProperty(HOSTPATH_NEW).equals("") && getProperty(HOSTPATH) != null) {
 			return getProperty(HOSTPATH);
+		} else {
+			return getProperty(HOSTPATH_NEW);
 		}
 	}
 
 	public void setHostpath(String hostPath) {
-		setProperty(HOSTPATH, hostPath);
+		setProperty(HOSTPATH_NEW, hostPath);
 	}
 
 	@SuppressWarnings("unchecked")
