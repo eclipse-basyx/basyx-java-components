@@ -43,6 +43,7 @@ import org.apache.tika.mime.MimeTypes;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.facade.submodelelement.SubmodelElementFacadeFactory;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -112,13 +113,11 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	}
 
 	@Deprecated
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId,
-			DelegatedInvocationManager invocationHelper) {
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
 		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
 	}
 
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId,
-			DelegatedInvocationManager invocationHelper, MongoClient client) {
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
 		this.client = client;
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
@@ -152,8 +151,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		this.invocationHelper = invocationHelper;
 	}
 
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper,
-			MongoClient client) {
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.client = client;
@@ -245,8 +243,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		// Cast all SubmodelElement maps to ISubmodelElements before returning the
 		// submodel
 		Map<String, ISubmodelElement> elements = new HashMap<>();
-		Map<String, Map<String, Object>> elemMaps = (Map<String, Map<String, Object>>) result
-				.get(Submodel.SUBMODELELEMENT);
+		Map<String, Map<String, Object>> elemMaps = (Map<String, Map<String, Object>>) result.get(Submodel.SUBMODELELEMENT);
 		for (Entry<String, Map<String, Object>> entry : elemMaps.entrySet()) {
 			String shortId = entry.getKey();
 			Map<String, Object> elemMap = entry.getValue();
@@ -348,12 +345,24 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		SubmodelElementProvider smeProvider = new SubmodelElementProvider(mapProvider);
 
 		smeProvider.setValue(Property.VALUE, newValue);
-		ISubmodelElement updatedElement = SubmodelElementFacadeFactory
-				.createSubmodelElement((Map<String, Object>) smeProvider.getValue(""));
+		ISubmodelElement updatedLastLevelElement = SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) smeProvider.getValue(""));
+		ISubmodelElement updatedNestedElement = createNestedSubmodelElement(sm, updatedLastLevelElement, idShorts);
 
-		sm.addSubmodelElement(updatedElement);
+		sm.addSubmodelElement(updatedNestedElement);
 
 		writeSubmodelInDB(sm);
+	}
+
+	private ISubmodelElement createNestedSubmodelElement(Submodel sm, ISubmodelElement updatedLastLevelElement, List<String> idShorts) {
+		ISubmodelElement updatedNestedElement = updatedLastLevelElement;
+		for (int i = idShorts.size() - 1; i > 0; i--) {
+			idShorts = idShorts.subList(0, i);
+			ISubmodelElementCollection nextLevelElementCollection = (ISubmodelElementCollection) getNestedSubmodelElement(sm, idShorts);
+			nextLevelElementCollection.addSubmodelElement(updatedNestedElement);
+			updatedNestedElement = nextLevelElementCollection;
+		}
+
+		return updatedNestedElement;
 	}
 
 	@Override
@@ -428,14 +437,12 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			if (elem instanceof SubmodelElementCollection) {
 				elemMap = ((SubmodelElementCollection) elem).getSubmodelElements();
 			} else {
-				throw new ResourceNotFoundException(
-						idShort + " in the nested submodel element path could not be resolved.");
+				throw new ResourceNotFoundException(idShort + " in the nested submodel element path could not be resolved.");
 			}
 		}
 		String lastIdShort = idShorts.get(idShorts.size() - 1);
 		if (!elemMap.containsKey(lastIdShort)) {
-			throw new ResourceNotFoundException(
-					lastIdShort + " in the nested submodel element path could not be resolved.");
+			throw new ResourceNotFoundException(lastIdShort + " in the nested submodel element path could not be resolved.");
 		}
 		return elemMap.get(lastIdShort);
 	}
@@ -529,8 +536,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object invokeOperation(String idShortPath, Object... params) {
-		Operation operation = (Operation) SubmodelElementFacadeFactory
-				.createSubmodelElement((Map<String, Object>) getSubmodelElement(idShortPath));
+		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(idShortPath));
 		if (!DelegatedInvocationManager.isDelegatingOperation(operation)) {
 			throw new MalformedRequestException("This backend supports only delegating operations.");
 		}
