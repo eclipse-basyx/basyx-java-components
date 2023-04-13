@@ -37,8 +37,10 @@ import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.MultiLanguageProperty;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.Test;
 
 import com.mongodb.MongoGridFSException;
@@ -102,6 +104,36 @@ public class TestMongoDBSubmodelAPI {
 
 		OutputStream os = new FileOutputStream("fileSmeIdShort.xml");
 		bucket.downloadToStream("fileSmeIdShort.xml", os);
+	}
+
+	@Test
+	public void submodelElementInCollection() {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		SubmodelElementCollection collection = new SubmodelElementCollection("collection");
+		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
+		collection.addSubmodelElement(mlprop);
+		submodelAPI.addSubmodelElement(collection);
+
+		LangStrings expected = new LangStrings("de", "Hallo!");
+		submodelAPI.updateSubmodelElement(collection.getIdShort() + "/" + mlprop.getIdShort(), expected);
+
+		Object value = submodelAPI.getSubmodelElementValue(collection.getIdShort() + "/" + mlprop.getIdShort());
+
+		assertEquals(expected, value);
+	}
+
+	@Test(expected = ResourceNotFoundException.class)
+	public void submodelElementInCollectionNotExistingAsHighLevelElement() {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		SubmodelElementCollection collection = new SubmodelElementCollection("collection");
+		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
+		collection.addSubmodelElement(mlprop);
+		submodelAPI.addSubmodelElement(collection);
+
+		LangStrings expected = new LangStrings("de", "Hallo!");
+		submodelAPI.updateSubmodelElement(collection.getIdShort() + "/" + mlprop.getIdShort(), expected);
+
+		submodelAPI.getSubmodelElementValue(mlprop.getIdShort());
 	}
 
 	private void uploadDummyFile(MongoDBSubmodelAPI submodelAPI, String idShort) throws FileNotFoundException {
