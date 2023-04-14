@@ -122,6 +122,24 @@ public class TestMongoDBSubmodelAPI {
 		assertEquals(expected, value);
 	}
 
+	@Test
+	public void submodelElementInNestedCollection() {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		SubmodelElementCollection collectionFirstLevel = new SubmodelElementCollection("collectionFirstLevel");
+		SubmodelElementCollection collectionSecondLevel = new SubmodelElementCollection("collectionSecondLevel");
+		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
+		collectionSecondLevel.addSubmodelElement(mlprop);
+		collectionFirstLevel.addSubmodelElement(collectionSecondLevel);
+		submodelAPI.addSubmodelElement(collectionFirstLevel);
+
+		LangStrings expected = new LangStrings("de", "Hallo!");
+		submodelAPI.updateSubmodelElement(collectionFirstLevel.getIdShort() + "/" + collectionSecondLevel.getIdShort() + "/" + mlprop.getIdShort(), expected);
+
+		Object value = submodelAPI.getSubmodelElementValue(collectionFirstLevel.getIdShort() + "/" + collectionSecondLevel.getIdShort() + "/" + mlprop.getIdShort());
+
+		assertEquals(expected, value);
+	}
+
 	@Test(expected = ResourceNotFoundException.class)
 	public void submodelElementInCollectionNotExistingAsHighLevelElement() {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
