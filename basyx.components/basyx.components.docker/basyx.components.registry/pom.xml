@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.4.10</version>
+			<version>3.4.11</version>
 		</dependency>
 
 		<!-- Moquette MQTT broker for testing MQTT events -->
