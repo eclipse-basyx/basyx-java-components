@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.4.10</version>
+			<version>3.4.11</version>
 		</dependency>
 
 		<!-- Moquette MQTT broker for testing MQTT events -->
@@ -112,14 +112,14 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.14.2</version>
+			<version>2.15.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.14.2</version>
+			<version>2.15.0</version>
 		</dependency>
 	</dependencies>
 
