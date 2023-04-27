@@ -24,32 +24,22 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt;
+package org.eclipse.digitaltwin.basyx.common.encoding;
 
-import org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt.encoding.Encoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
- * Abstrac base class for all MqttV2Topic factories
+ * Encoder supporting Base64URL encoding
  * 
  * @author schnicke
  *
  */
-public abstract class AbstractMqttTopicFactory {
-	private Encoder encoder;
+public class Base64URLEncoder implements Encoder {
 
-	/**
-	 * @param encoder
-	 *            Used for encoding the aasId/submodelId
-	 */
-	public AbstractMqttTopicFactory(Encoder encoder) {
-		this.encoder = encoder;
+	@Override
+	public String encode(String toEncode) {
+		return Base64.getUrlEncoder().withoutPadding().encodeToString(toEncode.getBytes(StandardCharsets.UTF_8));
 	}
 
-	protected String encodeId(String id) {
-		if (id == null) {
-			return "<empty>";
-		}
-
-		return encoder.encode(id);
-	}
 }

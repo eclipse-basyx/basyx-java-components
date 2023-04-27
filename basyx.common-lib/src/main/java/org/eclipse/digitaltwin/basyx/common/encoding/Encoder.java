@@ -24,7 +24,7 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt.encoding;
+package org.eclipse.digitaltwin.basyx.common.encoding;
 
 /**
  * Simple encoder interface used for encoding strings

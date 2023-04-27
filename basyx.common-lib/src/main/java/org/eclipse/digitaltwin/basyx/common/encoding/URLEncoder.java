@@ -24,22 +24,28 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt.encoding;
+package org.eclipse.digitaltwin.basyx.common.encoding;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.io.UnsupportedEncodingException;
 
 /**
- * Encoder supporting Base64URL encoding
+ * Encoder supporting URL encoding
  * 
  * @author schnicke
  *
  */
-public class Base64URLEncoder implements Encoder {
+public class URLEncoder implements Encoder {
 
 	@Override
 	public String encode(String toEncode) {
-		return Base64.getUrlEncoder().withoutPadding().encodeToString(toEncode.getBytes(StandardCharsets.UTF_8));
+		return encodePathElement(toEncode);
 	}
 
+	private static String encodePathElement(String elem) {
+		try {
+			return java.net.URLEncoder.encode(elem, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

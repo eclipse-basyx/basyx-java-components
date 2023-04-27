@@ -24,28 +24,32 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt.encoding;
+package org.eclipse.digitaltwin.basyx.common.mqtt;
 
-import java.io.UnsupportedEncodingException;
+import org.eclipse.digitaltwin.basyx.common.encoding.Encoder;
 
 /**
- * Encoder supporting URL encoding
+ * Abstrac base class for all MqttV2Topic factories
  * 
  * @author schnicke
  *
  */
-public class URLEncoder implements Encoder {
+public abstract class AbstractMqttTopicFactory {
+	private Encoder encoder;
 
-	@Override
-	public String encode(String toEncode) {
-		return encodePathElement(toEncode);
+	/**
+	 * @param encoder
+	 *            Used for encoding the aasId/submodelId
+	 */
+	public AbstractMqttTopicFactory(Encoder encoder) {
+		this.encoder = encoder;
 	}
 
-	private static String encodePathElement(String elem) {
-		try {
-			return java.net.URLEncoder.encode(elem, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+	protected String encodeId(String id) {
+		if (id == null) {
+			return "<empty>";
 		}
+
+		return encoder.encode(id);
 	}
 }
