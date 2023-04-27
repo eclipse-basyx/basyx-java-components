@@ -24,10 +24,11 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt;
+package org.eclipse.digitaltwin.basyx.aasservice.feature.mqtt;
 
-import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositoryFactory;
-import org.eclipse.digitaltwin.basyx.aasrepository.feature.AasRepositoryFeature;
+import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
+import org.eclipse.digitaltwin.basyx.aasservice.AasServiceFactory;
+import org.eclipse.digitaltwin.basyx.aasservice.feature.AasServiceFeature;
 import org.eclipse.digitaltwin.basyx.common.encoding.URLEncoder;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,24 +36,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
-@ConditionalOnExpression("#{${" + MqttAasRepositoryFeature.FEATURENAME + ".enabled:false} or ${basyx.feature.mqtt.enabled:false}}")
+@ConditionalOnExpression("#{${" + MqttAasServiceFeature.FEATURENAME + ".enabled:false} or ${basyx.feature.mqtt.enabled:false}}")
 @Component
-public class MqttAasRepositoryFeature implements AasRepositoryFeature {
-	public final static String FEATURENAME = "basyx.aasrepository.feature.mqtt";
+public class MqttAasServiceFeature implements AasServiceFeature {
+	public final static String FEATURENAME = "basyx.aasservice.feature.mqtt";
 
 	@Value("#{${" + FEATURENAME + ".enabled:false} or ${basyx.feature.mqtt.enabled:false}}")
-	private boolean enabled;
-
+	private boolean enabled;	
+	
 	private IMqttClient mqttClient;
 
-	@Autowired
-	public MqttAasRepositoryFeature(IMqttClient mqttClient, AasRepositoryFactory repo) {
-		this.mqttClient = mqttClient;
-	}
+	private String repoId;
 
+	@Autowired
+	public MqttAasServiceFeature(IMqttClient mqttClient, AasRepository repo) {
+		this.mqttClient = mqttClient;
+		this.repoId = repo.getName();
+	}
+	
 	@Override
-	public AasRepositoryFactory decorate(AasRepositoryFactory aasServiceFactory) {
-		return new MqttAasRepositoryFactory(aasServiceFactory, mqttClient, new MqttAasRepositoryTopicFactory(new URLEncoder()));
+	public AasServiceFactory decorate(AasServiceFactory aasServiceFactory) {
+		return new MqttAasServiceFactory(aasServiceFactory, mqttClient, new MqttAasServiceTopicFactory(new URLEncoder()), repoId);
 	}
 
 	@Override
@@ -61,16 +65,16 @@ public class MqttAasRepositoryFeature implements AasRepositoryFeature {
 
 	@Override
 	public void cleanUp() {
-
 	}
 
 	@Override
 	public String getName() {
-		return "AasRepository MQTT";
+		return "AasService MQTT";
 	}
 
 	@Override
 	public boolean isEnabled() {
 		return enabled;
-	}
+	}	
+
 }

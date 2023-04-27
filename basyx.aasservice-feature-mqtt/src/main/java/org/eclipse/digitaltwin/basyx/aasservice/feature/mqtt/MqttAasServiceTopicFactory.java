@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,45 +24,40 @@
  ******************************************************************************/
 
 
-package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt;
+package org.eclipse.digitaltwin.basyx.aasservice.feature.mqtt;
 
 import java.util.StringJoiner;
-import org.eclipse.digitaltwin.basyx.common.mqtt.AbstractMqttTopicFactory;
+
 import org.eclipse.digitaltwin.basyx.common.encoding.Encoder;
+import org.eclipse.digitaltwin.basyx.common.mqtt.AbstractMqttTopicFactory;
 
-
-/**
- * A helper class containing methods that create topics used by the
- * AASAggregator.
- * 
- */
-public class MqttAasRepositoryTopicFactory extends AbstractMqttTopicFactory {
+public class MqttAasServiceTopicFactory extends AbstractMqttTopicFactory {
 	private static final String AASREPOSITORY = "aas-repository";
 	private static final String SHELLS = "shells";
+	private static final String ASSET_INFORMATION = "assetInformation";
+	private static final String SUBMODEL_REFERENCES = "submodelReferences";
 	private static final String CREATED = "created";
 	private static final String UPDATED = "updated";
 	private static final String DELETED = "deleted";
 
-	/**
-	 * @param encoder
-	 *            Used for encoding the aasId/submodelId
-	 */
-	public MqttAasRepositoryTopicFactory(Encoder encoder) {
+	public MqttAasServiceTopicFactory(Encoder encoder) {
 		super(encoder);
 	}
 
 	/**
-	 * Creates the hierarchical topic for the create event
+	 * Creates the hierarchical topic for a AssetInformation change eventimport org.eclipse.digitaltwin.basyx.common.encoding.Encoder;
 	 * 
 	 * @param repoId
 	 * @return
 	 */
-	public String createCreateAASTopic(String repoId) {
+	public String createSetAssetInformationTopic(String repoId, String shellId) {
 		return new StringJoiner("/", "", "")
 				.add(AASREPOSITORY)
 				.add(repoId)
 				.add(SHELLS)
-				.add(CREATED)
+				.add(shellId)
+				.add(ASSET_INFORMATION)
+				.add(UPDATED)
 				.toString();
 	}
 	
@@ -72,27 +67,32 @@ public class MqttAasRepositoryTopicFactory extends AbstractMqttTopicFactory {
 	 * @param repoId
 	 * @return
 	 */
-	public String createUpdateAASTopic(String repoId) {
+	public String createAddSubmodelReferenceTopic(String repoId, String shellId) {
 		return new StringJoiner("/", "", "")
 				.add(AASREPOSITORY)
 				.add(repoId)
 				.add(SHELLS)
-				.add(UPDATED)
+				.add(shellId)
+				.add(SUBMODEL_REFERENCES)
+				.add(CREATED)
 				.toString();
 	}
 	
 	/**
-	 * Creates the hierarchical topic for the delete event
+	 * Creates the hierarchical topic for the remove submodelReference event
 	 * 
 	 * @param repoId
 	 * @return
 	 */
-	public String createDeleteAASTopic(String repoId) {
+	public String createRemoveSubmodelReferenceTopic(String repoId, String shellId) {
 		return new StringJoiner("/", "", "")
 				.add(AASREPOSITORY)
 				.add(repoId)
 				.add(SHELLS)
+				.add(shellId)
+				.add(SUBMODEL_REFERENCES)
 				.add(DELETED)
 				.toString();
 	}
+
 }

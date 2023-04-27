@@ -25,6 +25,7 @@ package org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt;
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -40,8 +41,9 @@ import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositoryFactory;
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositorySuite;
 import org.eclipse.digitaltwin.basyx.aasrepository.InMemoryAasRepositoryFactory;
-import org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt.encoding.Base64URLEncoder;
-import org.eclipse.digitaltwin.basyx.aasrepository.feature.mqtt.encoding.URLEncoder;
+import org.eclipse.digitaltwin.basyx.common.encoding.Base64URLEncoder;
+import org.eclipse.digitaltwin.basyx.common.encoding.URLEncoder;
+import org.eclipse.digitaltwin.basyx.common.mqtt.MqttTestListener;
 import org.eclipse.digitaltwin.basyx.aasservice.backend.InMemoryAasServiceFactory;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
