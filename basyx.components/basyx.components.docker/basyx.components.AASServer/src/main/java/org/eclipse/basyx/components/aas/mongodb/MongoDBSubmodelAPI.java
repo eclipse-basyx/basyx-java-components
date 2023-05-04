@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.io.Files;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -90,6 +91,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	protected String collection;
 	protected String smId;
 	private MongoClient client;
+
+	private String tmpDirectory = Files.createTempDir().getAbsolutePath();
 
 	/**
 	 * Receives the path of the configuration.properties file in its constructor.
@@ -559,7 +562,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			File fileSubmodelElement = File.createAsFacade(submodelElement);
 			GridFSBucket bucket = getGridFSBucket();
 			String fileName = constructFileName(fileSubmodelElement, idShortPath);
-			java.io.File file = new java.io.File(fileName);
+			java.io.File file = new java.io.File(tmpDirectory, fileName.replaceAll("[^a-zA-Z0-9-_\\.]", "_"));
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream(file);
 			bucket.downloadToStream(fileName, fileOutputStream);
