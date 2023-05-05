@@ -29,7 +29,6 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.util.List;
 
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.memory.IRegistryHandler;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
@@ -81,7 +80,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 
 	private void configureIndexForAasId(MongoOperations mongoOps) {
 		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASID).build();
-		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
+		mongoOps.indexOps(AASDescriptor.class).ensureIndex(idIndex);
 	}
 
 	/**

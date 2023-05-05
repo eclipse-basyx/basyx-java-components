@@ -40,7 +40,6 @@ import java.util.Map.Entry;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -129,7 +128,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 
 	private void configureIndexForSubmodelId(MongoOperations mongoOps) {
 		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(SMIDPATH).build();
-		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
+		mongoOps.indexOps(Submodel.class).ensureIndex(idIndex);
 	}
 
 	/**
