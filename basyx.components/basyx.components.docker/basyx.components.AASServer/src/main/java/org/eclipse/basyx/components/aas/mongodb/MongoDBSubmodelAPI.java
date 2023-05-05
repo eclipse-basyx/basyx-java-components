@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
+import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -66,6 +67,7 @@ import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -83,6 +85,7 @@ import com.mongodb.client.model.Filters;
 public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	public static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private static String IDJSONPATH = "id";
 
 	protected DelegatedInvocationManager invocationHelper;
 
@@ -122,6 +125,12 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
 		this.invocationHelper = invocationHelper;
+		configureIndexForAasId(mongoOps);
+	}
+
+	private void configureIndexForAasId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(IDJSONPATH).build();
+		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 
 	/**

@@ -42,6 +42,7 @@ import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -55,6 +56,7 @@ import com.mongodb.client.MongoClients;
 public class MongoDBAASAPI implements IAASAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private static String IDJSONPATH = "id";
 
 	protected BaSyxMongoDBConfiguration config;
 	protected MongoOperations mongoOps;
@@ -80,6 +82,12 @@ public class MongoDBAASAPI implements IAASAPI {
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId, MongoClient client) {
 		this.setConfiguration(config, client);
 		this.setAASId(aasId);
+		configureIndexForAasId(mongoOps);
+	}
+
+	private void configureIndexForAasId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(IDJSONPATH).build();
+		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 
 	/**

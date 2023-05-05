@@ -29,6 +29,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.util.List;
 
+import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.memory.IRegistryHandler;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
@@ -37,6 +38,7 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import com.mongodb.client.MongoClient;
@@ -56,6 +58,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 
 	private static final String AASID = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 	private static final String ASSETID = AASDescriptor.ASSET + "." + Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private static String IDJSONPATH = "id";
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
@@ -74,6 +77,12 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
+		configureIndexForAasId(mongoOps);
+	}
+
+	private void configureIndexForAasId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(IDJSONPATH).build();
+		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 
 	/**
