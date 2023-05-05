@@ -42,6 +42,7 @@ import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -80,6 +81,12 @@ public class MongoDBAASAPI implements IAASAPI {
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId, MongoClient client) {
 		this.setConfiguration(config, client);
 		this.setAASId(aasId);
+		configureIndexForAasId(mongoOps);
+	}
+
+	private void configureIndexForAasId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASIDPATH).build();
+		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 
 	/**

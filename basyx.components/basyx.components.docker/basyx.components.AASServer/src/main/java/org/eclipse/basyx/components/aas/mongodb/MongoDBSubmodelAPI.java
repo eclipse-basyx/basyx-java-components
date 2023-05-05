@@ -66,6 +66,7 @@ import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -122,6 +123,12 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
 		this.invocationHelper = invocationHelper;
+		configureIndexForSubmodelId(mongoOps);
+	}
+
+	private void configureIndexForSubmodelId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(SMIDPATH).build();
+		mongoOps.indexOps(Submodel.class).ensureIndex(idIndex);
 	}
 
 	/**
