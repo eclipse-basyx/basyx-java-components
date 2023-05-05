@@ -58,7 +58,6 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 
 	private static final String AASID = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 	private static final String ASSETID = AASDescriptor.ASSET + "." + Identifiable.IDENTIFICATION + "." + Identifier.ID;
-	private static String IDJSONPATH = "id";
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
@@ -81,7 +80,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	}
 
 	private void configureIndexForAasId(MongoOperations mongoOps) {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(IDJSONPATH).build();
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASID).build();
 		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 

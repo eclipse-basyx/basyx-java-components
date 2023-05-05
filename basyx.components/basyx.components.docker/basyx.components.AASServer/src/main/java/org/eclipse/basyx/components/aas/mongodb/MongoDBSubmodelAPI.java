@@ -85,7 +85,6 @@ import com.mongodb.client.model.Filters;
 public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	public static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
-	private static String IDJSONPATH = "id";
 
 	protected DelegatedInvocationManager invocationHelper;
 
@@ -125,11 +124,11 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
 		this.invocationHelper = invocationHelper;
-		configureIndexForAasId(mongoOps);
+		configureIndexForSubmodelId(mongoOps);
 	}
 
-	private void configureIndexForAasId(MongoOperations mongoOps) {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(IDJSONPATH).build();
+	private void configureIndexForSubmodelId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(SMIDPATH).build();
 		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 

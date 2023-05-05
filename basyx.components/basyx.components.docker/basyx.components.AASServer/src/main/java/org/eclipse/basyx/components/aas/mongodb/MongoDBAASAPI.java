@@ -56,7 +56,6 @@ import com.mongodb.client.MongoClients;
 public class MongoDBAASAPI implements IAASAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
-	private static String IDJSONPATH = "id";
 
 	protected BaSyxMongoDBConfiguration config;
 	protected MongoOperations mongoOps;
@@ -86,7 +85,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	private void configureIndexForAasId(MongoOperations mongoOps) {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(IDJSONPATH).build();
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASIDPATH).build();
 		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
 	}
 
