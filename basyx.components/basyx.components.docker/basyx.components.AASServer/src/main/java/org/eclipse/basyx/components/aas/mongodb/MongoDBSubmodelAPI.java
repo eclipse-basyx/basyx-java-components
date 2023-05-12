@@ -562,7 +562,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			File fileSubmodelElement = File.createAsFacade(submodelElement);
 			GridFSBucket bucket = getGridFSBucket();
 			String fileName = constructFileName(fileSubmodelElement, idShortPath);
-			java.io.File file = new java.io.File(tmpDirectory, fileName.replaceAll("[^a-zA-Z0-9-_\\.]", "_"));
+			java.io.File file = new java.io.File(tmpDirectory, fileName);
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream(file);
 			bucket.downloadToStream(fileName, fileOutputStream);
@@ -574,7 +574,8 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 
 	private String constructFileName(File file, String idShortPath) {
 		Submodel sm = (Submodel) getSubmodel();
-		return sm.getIdentification().getId() + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
+		String fileName = sm.getIdentification().getId() + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
+		return fileName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
 	}
 
 	private String getFileExtension(File file) {
