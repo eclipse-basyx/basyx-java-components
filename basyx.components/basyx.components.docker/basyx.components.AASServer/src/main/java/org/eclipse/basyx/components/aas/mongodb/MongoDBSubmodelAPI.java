@@ -33,10 +33,6 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
-import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -126,6 +122,7 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 		this(DEFAULT_CONFIG_PATH, smId, invocationHelper, client);
 	}
 
+	// NEUER KONSTRUKTOR?
 	public MongoDBSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId, BaSyxMongoDBConfiguration config) {
 		super(storageAPI, identificationId);
 		this.setConfiguration(config);

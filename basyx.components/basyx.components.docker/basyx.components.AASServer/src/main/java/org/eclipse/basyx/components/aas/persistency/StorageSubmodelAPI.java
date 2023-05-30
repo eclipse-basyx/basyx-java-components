@@ -69,10 +69,23 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 		return identificationId;
 	}
 
+	/**
+	 * Sets the submodel id, so that this API points to the submodel with smId. Can
+	 * be changed to point to a different submodel in the database.
+	 * 
+	 * @param identificationId
+	 */
 	public void setSubmodelId(String identificationId) {
 		this.identificationId = identificationId;
 	}
 
+	/**
+	 * Depending on whether the model is already in the db, this method inserts or
+	 * replaces the existing data. The new submodel id for this API is taken from
+	 * the given submodel.
+	 * 
+	 * @param submodel
+	 */
 	public void setSubmodel(Submodel submodel) {
 		String submodelId = submodel.getIdentification().getId();
 		setSubmodelId(submodelId);

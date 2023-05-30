@@ -58,6 +58,7 @@ public class MongoDBSubmodelAPIFactory implements ISubmodelAPIFactory {
 	@Override
 	public ISubmodelAPI getSubmodelAPI(Submodel submodel) {
 		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId(), client);
+		api.setSubmodel(submodel);
 		return api;
 	}
 
