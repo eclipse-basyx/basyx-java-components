@@ -37,6 +37,7 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import com.mongodb.client.MongoClient;
@@ -74,6 +75,12 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 		config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
 		this.setConfiguration(config);
+		configureIndexForAasId(mongoOps);
+	}
+
+	private void configureIndexForAasId(MongoOperations mongoOps) {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASID).build();
+		mongoOps.indexOps(AASDescriptor.class).ensureIndex(idIndex);
 	}
 
 	/**

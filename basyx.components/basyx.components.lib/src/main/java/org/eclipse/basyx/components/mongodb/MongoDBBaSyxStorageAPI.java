@@ -44,6 +44,7 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -66,6 +67,12 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		this.config = config;
 		this.client = client;
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
+		this.configureIndexForSubmodelId();
+	}
+
+	private void configureIndexForSubmodelId() {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(SMIDPATH).build();
+		this.mongoOps.indexOps(Submodel.class).ensureIndex(idIndex);
 	}
 
 	@Override

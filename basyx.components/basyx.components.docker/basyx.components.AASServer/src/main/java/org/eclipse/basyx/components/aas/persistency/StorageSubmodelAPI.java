@@ -70,7 +70,6 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	}
 
 	public void setSubmodelId(String identificationId) {
-		System.err.println(">>>>>>>>>> SET SUBMODEL ID");
 		this.identificationId = identificationId;
 	}
 
