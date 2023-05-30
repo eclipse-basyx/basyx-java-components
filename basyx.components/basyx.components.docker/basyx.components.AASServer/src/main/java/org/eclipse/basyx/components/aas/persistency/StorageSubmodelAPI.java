@@ -39,6 +39,7 @@ import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
 import org.eclipse.basyx.submodel.metamodel.facade.submodelelement.SubmodelElementFacadeFactory;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
@@ -53,12 +54,12 @@ import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 
-public abstract class PersistencySubmodelAPI implements ISubmodelAPI {
+public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	protected BaSyxStorageAPI<Submodel> storageApi;
 	private String identificationId;
 	private DelegatedInvocationManager invocationHelper;
 
-	protected PersistencySubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId) {
+	protected StorageSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId) {
 		this.storageApi = storageAPI;
 		this.identificationId = identificationId;
 		this.invocationHelper = new DelegatedInvocationManager(new HTTPConnectorFactory());
@@ -69,13 +70,14 @@ public abstract class PersistencySubmodelAPI implements ISubmodelAPI {
 	}
 
 	public void setSubmodelId(String identificationId) {
+		System.err.println(">>>>>>>>>> SET SUBMODEL ID");
 		this.identificationId = identificationId;
 	}
 
 	public void setSubmodel(Submodel submodel) {
-		String smId = submodel.getIdentification().getId();
-		setSubmodelId(smId);
-		storageApi.update(submodel, smId);
+		String submodelId = submodel.getIdentification().getId();
+		setSubmodelId(submodelId);
+		storageApi.update(submodel, submodelId);
 	}
 
 	@Override
@@ -116,27 +118,41 @@ public abstract class PersistencySubmodelAPI implements ISubmodelAPI {
 
 	private void addToSubmodelElementCollection(ISubmodelElement element, Submodel submodel, ISubmodelElement parentElement) {
 		((SubmodelElementCollection) parentElement).addSubmodelElement(element);
-		submodel.addSubmodelElement(parentElement);// TODO:?????
+		submodel.addSubmodelElement(parentElement);
 		storageApi.update(submodel, identificationId);
 	}
 
 	private ISubmodelElement getNestedSubmodelElement(Submodel submodel, List<String> idShorts) {
-		Map<String, ISubmodelElement> elemMap = submodel.getSubmodelElements();
-		// Get last nested submodel element
-		for (int i = 0; i < idShorts.size() - 1; i++) {
-			String idShort = idShorts.get(i);
-			ISubmodelElement elem = elemMap.get(idShort);
-			if (elem instanceof SubmodelElementCollection) {
-				elemMap = ((SubmodelElementCollection) elem).getSubmodelElements();
-			} else {
-				throw new ResourceNotFoundException(idShort + " in the nested submodel element path could not be resolved.");
-			}
-		}
+		Map<String, ISubmodelElement> elementMap = submodel.getSubmodelElements();
+		Map<String, ISubmodelElement> resolvedElementMap = resolveElementPath(idShorts, elementMap);
+
 		String lastIdShort = idShorts.get(idShorts.size() - 1);
-		if (!elemMap.containsKey(lastIdShort)) {
-			throw new ResourceNotFoundException(lastIdShort + " in the nested submodel element path could not be resolved.");
+		if (!resolvedElementMap.containsKey(lastIdShort)) {
+			throwPathCouldNotBeResolvedException(lastIdShort);
 		}
-		return elemMap.get(lastIdShort);
+
+		return resolvedElementMap.get(lastIdShort);
+	}
+
+	private Map<String, ISubmodelElement> resolveElementPath(List<String> idShorts, Map<String, ISubmodelElement> elementMap) {
+		var elementMapWrapper = new Object() {
+			Map<String, ISubmodelElement> wrappedElementMap = elementMap;
+		};
+
+		String lastIdShort = idShorts.get(idShorts.size() - 1);
+		idShorts.stream().takeWhile(idShort -> !lastIdShort.equals(idShort)).forEachOrdered(idShort -> {
+			ISubmodelElement element = elementMapWrapper.wrappedElementMap.get(idShort);
+			if (element instanceof SubmodelElementCollection) {
+				elementMapWrapper.wrappedElementMap = ((SubmodelElementCollection) element).getSubmodelElements();
+			} else {
+				throwPathCouldNotBeResolvedException(idShort);
+			}
+		});
+		return elementMapWrapper.wrappedElementMap;
+	}
+
+	private void throwPathCouldNotBeResolvedException(String idShort) {
+		throw new ResourceNotFoundException(idShort + " in the nested submodel element path could not be resolved.");
 	}
 
 	@Override
@@ -145,13 +161,32 @@ public abstract class PersistencySubmodelAPI implements ISubmodelAPI {
 			List<String> idShorts = idShortsPathAsList(idShortPath);
 			return getNestedSubmodelElement(idShorts);
 		} else {
-			return storageApi.getTopLevelSubmodelElement((Submodel) getSubmodel(), idShortPath);
+			return getTopLevelSubmodelElement(idShortPath);
 		}
 	}
 
 	private ISubmodelElement getNestedSubmodelElement(List<String> idShorts) {
 		Submodel submodel = (Submodel) getSubmodel();
-		return MongoDBHelper.convertSubmodelElement(getNestedSubmodelElement(submodel, idShorts));
+		return convertSubmodelElement(getNestedSubmodelElement(submodel, idShorts));
+	}
+
+	private ISubmodelElement getTopLevelSubmodelElement(String idShort) {
+		Submodel submodel = (Submodel) getSubmodel();
+		Map<String, ISubmodelElement> submodelElements = submodel.getSubmodelElements();
+		ISubmodelElement element = submodelElements.get(idShort);
+		if (element == null) {
+			throw new ResourceNotFoundException("The element \"" + idShort + "\" could not be found");
+		}
+		return convertSubmodelElement(element);
+	}
+
+	@SuppressWarnings("unchecked")
+	private ISubmodelElement convertSubmodelElement(ISubmodelElement element) {
+		// FIXME: Convert internal data structure of ISubmodelElement
+		Map<String, Object> elementMap = (Map<String, Object>) element;
+		IModelProvider elementProvider = new SubmodelElementProvider(new VABMapProvider(elementMap));
+		Object elementVABObj = elementProvider.getValue("");
+		return SubmodelElement.createAsFacade((Map<String, Object>) elementVABObj);
 	}
 
 	@Override
@@ -225,8 +260,20 @@ public abstract class PersistencySubmodelAPI implements ISubmodelAPI {
 			List<String> idShorts = idShortsPathAsList(idShortPath);
 			return getNestedSubmodelElementValue(idShorts);
 		} else {
-			return storageApi.getTopLevelSubmodelElementValue((Submodel) getSubmodel(), idShortPath);
+			return getTopLevelSubmodelElementValue(idShortPath);
 		}
+	}
+
+	private Object getTopLevelSubmodelElementValue(String idShort) {
+		Submodel submodel = (Submodel) getSubmodel();
+		return getElementProvider(submodel, idShort).getValue("/value");
+	}
+
+	@SuppressWarnings("unchecked")
+	private IModelProvider getElementProvider(Submodel submodel, String idShortPath) {
+		ISubmodelElement elem = submodel.getSubmodelElement(idShortPath);
+		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) elem);
+		return SubmodelElementProvider.getElementProvider(mapProvider);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -255,7 +302,7 @@ public abstract class PersistencySubmodelAPI implements ISubmodelAPI {
 	public Object invokeOperation(String idShortPath, Object... params) {
 		String elementPath = VABPathTools.getParentPath(idShortPath);
 
-		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map) getSubmodelElement(elementPath));
+		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(elementPath));
 		if (!DelegatedInvocationManager.isDelegatingOperation(operation)) {
 			throw new MalformedRequestException("This backend supports only delegating operations.");
 		}

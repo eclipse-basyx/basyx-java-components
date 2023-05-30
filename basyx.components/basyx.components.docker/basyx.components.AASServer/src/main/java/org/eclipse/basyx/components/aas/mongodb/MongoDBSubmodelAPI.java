@@ -24,7 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
 
-import org.eclipse.basyx.components.aas.persistency.PersistencySubmodelAPI;
+import org.eclipse.basyx.components.aas.persistency.StorageSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
@@ -42,7 +42,7 @@ import com.mongodb.client.MongoClients;
  * 
  * @author fischer
  */
-public class MongoDBSubmodelAPI extends PersistencySubmodelAPI {
+public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	private static final String COLLECTION_NAME = "submodels";
 	public static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
@@ -122,7 +122,6 @@ public class MongoDBSubmodelAPI extends PersistencySubmodelAPI {
 		this(DEFAULT_CONFIG_PATH, smId, invocationHelper, client);
 	}
 
-	// NEUER KONSTRUKTOR?
 	public MongoDBSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId, BaSyxMongoDBConfiguration config) {
 		super(storageAPI, identificationId);
 		this.setConfiguration(config);

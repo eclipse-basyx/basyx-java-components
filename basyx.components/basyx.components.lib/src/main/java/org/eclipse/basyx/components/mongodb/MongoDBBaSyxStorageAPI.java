@@ -149,15 +149,4 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	public void deleteFile(Submodel submodel, String idShort) {
 		MongoDBFileHelper.deleteAllFilesFromGridFsIfIsFileSubmodelElement(client, config, submodel, idShort);
 	}
-
-	@Override
-	public ISubmodelElement getTopLevelSubmodelElement(Submodel submodel, String idShortPath) {
-		return MongoDBHelper.getTopLevelSubmodelElement(submodel, idShortPath);
-	}
-
-	@Override
-	public Object getTopLevelSubmodelElementValue(Submodel submodel, String idShortPath) {
-		return MongoDBHelper.getTopLevelSubmodelElementValue(submodel, idShortPath);
-	}
-
 }

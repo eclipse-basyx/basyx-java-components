@@ -25,19 +25,11 @@
 
 package org.eclipse.basyx.components.mongodb;
 
-import java.util.Map;
 
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
-import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
-import org.eclipse.basyx.submodel.restapi.SubmodelElementProvider;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
-import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
-import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 
 public class MongoDBHelper {
 	private MongoDBHelper() {
@@ -64,34 +56,4 @@ public class MongoDBHelper {
 			return "";
 		}
 	}
-
-	public static ISubmodelElement getTopLevelSubmodelElement(Submodel sm, String idShort) {
-		Map<String, ISubmodelElement> submodelElements = sm.getSubmodelElements();
-		ISubmodelElement element = submodelElements.get(idShort);
-		if (element == null) {
-			throw new ResourceNotFoundException("The element \"" + idShort + "\" could not be found");
-		}
-		return convertSubmodelElement(element);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static ISubmodelElement convertSubmodelElement(ISubmodelElement element) {
-		// FIXME: Convert internal data structure of ISubmodelElement
-		Map<String, Object> elementMap = (Map<String, Object>) element;
-		IModelProvider elementProvider = new SubmodelElementProvider(new VABMapProvider(elementMap));
-		Object elementVABObj = elementProvider.getValue("");
-		return SubmodelElement.createAsFacade((Map<String, Object>) elementVABObj);
-	}
-
-	public static Object getTopLevelSubmodelElementValue(Submodel sm, String idShort) {
-		return getElementProvider(sm, idShort).getValue("/value");
-	}
-
-	@SuppressWarnings("unchecked")
-	private static SubmodelElementProvider getElementProvider(Submodel sm, String idShort) {
-		ISubmodelElement elem = sm.getSubmodelElement(idShort);
-		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) elem);
-		return new SubmodelElementProvider(mapProvider);
-	}
-
 }
