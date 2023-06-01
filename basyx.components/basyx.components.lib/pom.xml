@@ -80,6 +80,20 @@
 			<version>42.6.0</version>
 		</dependency>
 
+		<!-- Use MongoDB Java Drivers for db connections -->
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-sync</artifactId>
+			<version>4.9.1</version>
+		</dependency>
+
+		<!-- Use Spring Data MongoDB for db data management -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+			<version>3.4.10</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.camunda.bpm</groupId>
 			<artifactId>camunda-engine</artifactId>
