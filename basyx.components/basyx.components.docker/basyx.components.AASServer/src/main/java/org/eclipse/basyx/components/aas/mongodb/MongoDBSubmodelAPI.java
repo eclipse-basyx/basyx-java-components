@@ -24,7 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
 
-import org.eclipse.basyx.components.aas.persistency.StorageSubmodelAPI;
+import org.eclipse.basyx.components.aas.internal.StorageSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
@@ -44,7 +44,6 @@ import com.mongodb.client.MongoClients;
  */
 public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
-	private static final String COLLECTION_NAME = "submodels";
 	public static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected DelegatedInvocationManager invocationHelper;
@@ -95,7 +94,7 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 
 	@Deprecated
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper) {
-		super(createSubmodelStorageAPI(createConfig(resourceConfigPath)), smId);
+		super(createSubmodelStorageAPI(createConfig(resourceConfigPath)), smId, invocationHelper);
 		this.config = createConfig(resourceConfigPath);
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
@@ -124,12 +123,12 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 
 	// NEUER KONSTRUKTOR?
 	public MongoDBSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId, BaSyxMongoDBConfiguration config) {
-		super(storageAPI, identificationId);
+		super(storageAPI, identificationId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 		this.setConfiguration(config);
 	}
 
 	public MongoDBSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId) {
-		super(storageAPI, identificationId);
+		super(storageAPI, identificationId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
 	/**
@@ -140,14 +139,14 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	}
 
 	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
-		super(createSubmodelStorageAPI(config, client), smId);
+		super(createSubmodelStorageAPI(config, client), smId, invocationHelper);
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
 		this.invocationHelper = invocationHelper;
 	}
 
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
-		super(createSubmodelStorageAPI(createConfig(resourceConfigPath), client), smId);
+		super(createSubmodelStorageAPI(createConfig(resourceConfigPath), client), smId, invocationHelper);
 		this.config = createConfig(resourceConfigPath);
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);
@@ -155,12 +154,12 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	}
 
 	private static BaSyxStorageAPI<Submodel> createSubmodelStorageAPI(BaSyxMongoDBConfiguration config) {
-		MongoDBBaSyxStorageAPIFactory<Submodel> storageAPIFactory = new MongoDBBaSyxStorageAPIFactory<>(config, Submodel.class, COLLECTION_NAME);
+		MongoDBBaSyxStorageAPIFactory<Submodel> storageAPIFactory = new MongoDBBaSyxStorageAPIFactory<>(config, Submodel.class, config.getSubmodelCollection());
 		return storageAPIFactory.create();
 	}
 
 	private static BaSyxStorageAPI<Submodel> createSubmodelStorageAPI(BaSyxMongoDBConfiguration config, MongoClient client) {
-		MongoDBBaSyxStorageAPIFactory<Submodel> storageAPIFactory = new MongoDBBaSyxStorageAPIFactory<>(config, Submodel.class, COLLECTION_NAME, client);
+		MongoDBBaSyxStorageAPIFactory<Submodel> storageAPIFactory = new MongoDBBaSyxStorageAPIFactory<>(config, Submodel.class, config.getSubmodelCollection(), client);
 		return storageAPIFactory.create();
 	}
 

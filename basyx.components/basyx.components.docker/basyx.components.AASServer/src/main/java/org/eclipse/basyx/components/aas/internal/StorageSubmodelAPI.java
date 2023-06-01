@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.basyx.components.aas.persistency;
+package org.eclipse.basyx.components.aas.internal;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.basyx.components.mongodb.MongoDBHelper;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -52,17 +51,16 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 
 public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	protected BaSyxStorageAPI<Submodel> storageApi;
 	private String identificationId;
-	private DelegatedInvocationManager invocationHelper;
+	private DelegatedInvocationManager invocationManager;
 
-	protected StorageSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId) {
+	protected StorageSubmodelAPI(BaSyxStorageAPI<Submodel> storageAPI, String identificationId, DelegatedInvocationManager invocatonManager) {
 		this.storageApi = storageAPI;
 		this.identificationId = identificationId;
-		this.invocationHelper = new DelegatedInvocationManager(new HTTPConnectorFactory());
+		this.invocationManager = invocatonManager;
 	}
 
 	public String getSubmodelId() {
@@ -312,13 +310,11 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object invokeOperation(String idShortPath, Object... params) {
-		String elementPath = VABPathTools.getParentPath(idShortPath);
-
-		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(elementPath));
+		Operation operation = (Operation) SubmodelElementFacadeFactory.createSubmodelElement((Map<String, Object>) getSubmodelElement(idShortPath));
 		if (!DelegatedInvocationManager.isDelegatingOperation(operation)) {
 			throw new MalformedRequestException("This backend supports only delegating operations.");
 		}
-		return invocationHelper.invokeDelegatedOperation(operation, params);
+		return invocationManager.invokeDelegatedOperation(operation, params);
 	}
 
 	@Override

@@ -40,6 +40,7 @@ import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.MultiLanguageProperty;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.Test;
 
@@ -63,13 +64,13 @@ public class TestMongoDBSubmodelAPI {
 	public void writeAndReadMultiLanguageProperty() {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
 
-		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
-		submodelAPI.addSubmodelElement(mlprop);
+		Property myProp = new Property("myProp", 0);
+		submodelAPI.addSubmodelElement(myProp);
 
-		LangStrings expected = new LangStrings("de", "Hallo!");
-		submodelAPI.updateSubmodelElement(mlprop.getIdShort(), expected);
+		int expected = 1;
+		submodelAPI.updateSubmodelElement(myProp.getIdShort(), expected);
 
-		Object value = submodelAPI.getSubmodelElementValue(mlprop.getIdShort());
+		Object value = submodelAPI.getSubmodelElementValue(myProp.getIdShort());
 
 		assertEquals(expected, value);
 	}
