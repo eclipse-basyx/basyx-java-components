@@ -116,8 +116,8 @@ public abstract class AASXSuite {
 
 	@Test
 	public void testGetSingleModule() throws Exception {
-		final String FILE_ENDING = "files/aasx/Nameplate/marking_rcm.jpg";
-		final String FILE_PATH = rootEndpoint + "files/aasx/Nameplate/marking_rcm.jpg";
+		final String FILE_ENDING = "basyx-temp/files/aasx/Nameplate/marking_rcm.jpg";
+		final String FILE_PATH = rootEndpoint + "basyx-temp/files/aasx/Nameplate/marking_rcm.jpg";
 		checkFile(FILE_PATH);
 
 		// Get the submdoel nameplate
