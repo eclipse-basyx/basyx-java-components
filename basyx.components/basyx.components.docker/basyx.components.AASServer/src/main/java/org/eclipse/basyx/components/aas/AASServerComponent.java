@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -259,6 +260,8 @@ public class AASServerComponent implements IComponent {
 
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
+			createBasyxResourceDirectoryIfNotExists();
+			
 			addAasxFilesResourceServlet(context);
 
 			// 2. Fix the file paths according to the servlet configuration
@@ -800,6 +803,15 @@ public class AASServerComponent implements IComponent {
 		childContext.addLifecycleListener(new Tomcat.FixContextListener());
 		
 		return childContext;
+	}
+	
+	private void createBasyxResourceDirectoryIfNotExists() {
+		File directory = new File(AASX_RES_FILE_DOCBASE_PATH);
+		
+		if (directory.exists())
+			return;
+		
+        directory.mkdir();
 	}
 	
 }
