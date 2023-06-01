@@ -54,11 +54,16 @@ public class MongoDBSubmodelAPIFactory implements ISubmodelAPIFactory {
 		this.client = client;
 	}
 
+	@Deprecated
 	@Override
 	public ISubmodelAPI getSubmodelAPI(Submodel submodel) {
 		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId(), client);
 		api.setSubmodel(submodel);
 		return api;
+	}
+
+	public ISubmodelAPI create(Submodel submodel) {
+		return getSubmodelAPI(submodel);
 	}
 
 }
