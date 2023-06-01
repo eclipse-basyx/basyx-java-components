@@ -23,11 +23,14 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.basyx.components.mongodb;
+package org.eclipse.basyx.components.internal.mongodb;
 
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
@@ -39,6 +42,12 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.model.Filters;
 
+/**
+ * Supports MongoDB file handling
+ * 
+ * @author fischer
+ *
+ */
 public class MongoDBFileHelper {
 	private MongoDBFileHelper() {
 	}
@@ -47,7 +56,7 @@ public class MongoDBFileHelper {
 	public static String updateFileInDB(MongoClient client, BaSyxMongoDBConfiguration config, String submodelId, InputStream newValue, ISubmodelElement element, String idShortPath) {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket(client, config);
-		String fileName = MongoDBHelper.constructFileName(submodelId, file, idShortPath);
+		String fileName = constructFileName(submodelId, file, idShortPath);
 		deleteAllDuplicateFiles(bucket, fileName);
 		bucket.uploadFromStream(fileName, newValue);
 		return fileName;
@@ -70,6 +79,21 @@ public class MongoDBFileHelper {
 
 	private static void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
 		bucket.find(Filters.eq("filename", fileName)).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+	}
+
+	public static String constructFileName(String submodelId, File file, String idShortPath) {
+		return submodelId + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
+	}
+
+	private static String getFileExtension(File file) {
+		MimeTypes allTypes = MimeTypes.getDefaultMimeTypes();
+		try {
+			MimeType mimeType = allTypes.forName(file.getMimeType());
+			return mimeType.getExtension();
+		} catch (MimeTypeException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 
 }

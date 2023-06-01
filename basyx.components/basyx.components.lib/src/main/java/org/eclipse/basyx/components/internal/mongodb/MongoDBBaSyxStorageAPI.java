@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.basyx.components.mongodb;
+package org.eclipse.basyx.components.internal.mongodb;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -51,6 +52,13 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.gridfs.GridFSBucket;
 
+/**
+ * Provides BaSyxStorageAPI implementation for MongoDB
+ * 
+ * @author fischer
+ *
+ * @param <T>
+ */
 public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	private static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
@@ -77,8 +85,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public T createOrUpdate(T obj) {
-		// not necessary as of now
-		return null;
+		throw new NotImplementedException();
 	}
 
 	@Override
@@ -96,26 +103,25 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public Collection<T> retrieveAll() {
-		// not necessary as of now
-		return null;
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public boolean delete(String key) {
-		// not necessary as of now
-		return false;
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void createCollectionIfNotExists(String collectionName) {
-		// not necessary as of now
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void deleteCollection() {
-		// not necessary as of now
+		throw new NotImplementedException();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T rawRetrieve(String key) {
 		// Query Submodel from MongoDB
@@ -136,7 +142,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		try {
 			File fileSubmodelElement = File.createAsFacade(objMap);
 			GridFSBucket bucket = MongoDBFileHelper.getGridFSBucket(client, config);
-			String fileName = MongoDBHelper.constructFileName(parentKey, fileSubmodelElement, idShortPath);
+			String fileName = MongoDBFileHelper.constructFileName(parentKey, fileSubmodelElement, idShortPath);
 			java.io.File file = new java.io.File(fileName);
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream(file);

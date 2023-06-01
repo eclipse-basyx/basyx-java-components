@@ -52,6 +52,12 @@ import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.lambda.VABLambdaProvider;
 import org.eclipse.basyx.vab.modelprovider.map.VABMapProvider;
 
+/**
+ * Abstract submodel api for storage backends.
+ * 
+ * @author fischer
+ *
+ */
 public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	protected BaSyxStorageAPI<Submodel> storageApi;
 	private String identificationId;
@@ -192,7 +198,6 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 
 	@SuppressWarnings("unchecked")
 	private ISubmodelElement convertSubmodelElement(ISubmodelElement element) {
-		// FIXME: Convert internal data structure of ISubmodelElement
 		Map<String, Object> elementMap = (Map<String, Object>) element;
 		IModelProvider elementProvider = new SubmodelElementProvider(new VABMapProvider(elementMap));
 		Object elementVABObj = elementProvider.getValue("");
@@ -248,6 +253,7 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 		updateSubmodelElement(idShorts, newValue);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void updateSubmodelElement(List<String> idShorts, Object newValue) {
 		Submodel submodel = (Submodel) getSubmodel();
 		ISubmodelElement element = getNestedSubmodelElement(submodel, idShorts);
@@ -283,7 +289,7 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	private IModelProvider getElementProvider(Submodel submodel, String idShortPath) {
 		ISubmodelElement elem = submodel.getSubmodelElement(idShortPath);
 		IModelProvider mapProvider = new VABMapProvider((Map<String, Object>) elem);
-		return SubmodelElementProvider.getElementProvider(mapProvider);
+		return new SubmodelElementProvider(mapProvider);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -329,13 +335,11 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	}
 
 	private Object invokeNestedOperationAsync(List<String> idShorts, Object... params) {
-		// not possible to invoke operations on a submodel that is stored in a db
 		throw new MalformedRequestException("Invoke not supported by this backend");
 	}
 
 	@Override
 	public Object getOperationResult(String idShort, String requestId) {
-		// not possible to invoke operations on a submodel that is stored in a db
 		throw new MalformedRequestException("Invoke not supported by this backend");
 	}
 
@@ -351,6 +355,7 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 		return updatedNestedElement;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public java.io.File getSubmodelElementFile(String idShortPath) {
 		Map<String, Object> submodelElement = (Map<String, Object>) getSubmodelElement(idShortPath);

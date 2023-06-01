@@ -26,7 +26,7 @@ package org.eclipse.basyx.components.aas.mongodb;
 
 import org.eclipse.basyx.components.aas.internal.StorageSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.eclipse.basyx.components.mongodb.MongoDBBaSyxStorageAPIFactory;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;

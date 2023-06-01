@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: MIT
  ******************************************************************************/
 
-package org.eclipse.basyx.components.mongodb;
+package org.eclipse.basyx.components.internal.mongodb;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.slf4j.Logger;
@@ -41,16 +41,16 @@ import com.mongodb.client.MongoClient;
 public class MongoDBBaSyxStorageAPIFactory<T> {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private final BaSyxMongoDBConfiguration CONFIG;
-	private final Class<T> TYPE;
-	private final String COLLECTION_NAME;
-	private final MongoClient CLIENT;
+	private final BaSyxMongoDBConfiguration config;
+	private final Class<T> type;
+	private final String collectionName;
+	private final MongoClient client;
 
 	/**
-	 * Constructor for a generic BaSyxS3APIFactory
+	 * Constructor for a generic BaSyxMongoDBAPIFactory
 	 * 
 	 * @param config
-	 *            BaSyx S3 Configuration
+	 *            BaSyx MongoDB Configuration
 	 * @param type
 	 *            Must be the exact same type as the type of the generic parameter
 	 *            {@code <T>}
@@ -58,17 +58,17 @@ public class MongoDBBaSyxStorageAPIFactory<T> {
 	 *            The name of the collection, managed by the produced API
 	 */
 	public MongoDBBaSyxStorageAPIFactory(BaSyxMongoDBConfiguration config, Class<T> type, String collectionName) {
-		CONFIG = config;
-		TYPE = type;
-		COLLECTION_NAME = collectionName;
-		CLIENT = null;
+		this.config = config;
+		this.type = type;
+		this.collectionName = collectionName;
+		this.client = null;
 	}
 
 	/**
-	 * Constructor for a generic BaSyxS3APIFactory
+	 * Constructor for a generic BaSyxMongoDBAPIFactory
 	 * 
 	 * @param config
-	 *            BaSyx S3 Configuration
+	 *            BaSyx MongoDB Configuration
 	 * @param type
 	 *            Must be the exact same type as the type of the generic parameter
 	 *            {@code <T>}
@@ -78,18 +78,18 @@ public class MongoDBBaSyxStorageAPIFactory<T> {
 	 *            The client of the MongoDB connection
 	 */
 	public MongoDBBaSyxStorageAPIFactory(BaSyxMongoDBConfiguration config, Class<T> type, String collectionName, MongoClient client) {
-		CONFIG = config;
-		TYPE = type;
-		COLLECTION_NAME = collectionName;
-		CLIENT = client;
+		this.config = config;
+		this.type = type;
+		this.collectionName = collectionName;
+		this.client = client;
 	}
 
 	public MongoDBBaSyxStorageAPI<T> create() {
 		logger.info("Create MongoDB client...");
-		if (CLIENT == null) {
-			return new MongoDBBaSyxStorageAPI<T>(COLLECTION_NAME, TYPE, CONFIG);
+		if (client == null) {
+			return new MongoDBBaSyxStorageAPI<T>(collectionName, type, config);
 		} else {
-			return new MongoDBBaSyxStorageAPI<T>(COLLECTION_NAME, TYPE, CONFIG, CLIENT);
+			return new MongoDBBaSyxStorageAPI<T>(collectionName, type, config, client);
 		}
 	}
 }

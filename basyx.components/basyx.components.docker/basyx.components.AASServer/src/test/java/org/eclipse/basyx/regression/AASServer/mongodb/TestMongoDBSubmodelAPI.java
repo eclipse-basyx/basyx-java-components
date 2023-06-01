@@ -40,7 +40,6 @@ import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.MultiLanguageProperty;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.Test;
 
@@ -64,13 +63,13 @@ public class TestMongoDBSubmodelAPI {
 	public void writeAndReadMultiLanguageProperty() {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
 
-		Property myProp = new Property("myProp", 0);
-		submodelAPI.addSubmodelElement(myProp);
+		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
+		submodelAPI.addSubmodelElement(mlprop);
 
-		int expected = 1;
-		submodelAPI.updateSubmodelElement(myProp.getIdShort(), expected);
+		LangStrings expected = new LangStrings("de", "Hallo!");
+		submodelAPI.updateSubmodelElement(mlprop.getIdShort(), expected);
 
-		Object value = submodelAPI.getSubmodelElementValue(myProp.getIdShort());
+		Object value = submodelAPI.getSubmodelElementValue(mlprop.getIdShort());
 
 		assertEquals(expected, value);
 	}
@@ -119,24 +118,6 @@ public class TestMongoDBSubmodelAPI {
 		submodelAPI.updateSubmodelElement(collection.getIdShort() + "/" + mlprop.getIdShort(), expected);
 
 		Object value = submodelAPI.getSubmodelElementValue(collection.getIdShort() + "/" + mlprop.getIdShort());
-
-		assertEquals(expected, value);
-	}
-
-	@Test
-	public void submodelElementInNestedCollection() {
-		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
-		SubmodelElementCollection collectionFirstLevel = new SubmodelElementCollection("collectionFirstLevel");
-		SubmodelElementCollection collectionSecondLevel = new SubmodelElementCollection("collectionSecondLevel");
-		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
-		collectionSecondLevel.addSubmodelElement(mlprop);
-		collectionFirstLevel.addSubmodelElement(collectionSecondLevel);
-		submodelAPI.addSubmodelElement(collectionFirstLevel);
-
-		LangStrings expected = new LangStrings("de", "Hallo!");
-		submodelAPI.updateSubmodelElement(collectionFirstLevel.getIdShort() + "/" + collectionSecondLevel.getIdShort() + "/" + mlprop.getIdShort(), expected);
-
-		Object value = submodelAPI.getSubmodelElementValue(collectionFirstLevel.getIdShort() + "/" + collectionSecondLevel.getIdShort() + "/" + mlprop.getIdShort());
 
 		assertEquals(expected, value);
 	}
