@@ -51,6 +51,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * Provides BaSyxStorageAPI implementation for MongoDB
@@ -103,12 +104,15 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public Collection<T> retrieveAll() {
-		throw new NotImplementedException();
+		Collection<T> data = mongoOps.findAll(TYPE, COLLECTION_NAME);
+		return data;
 	}
 
 	@Override
 	public boolean delete(String key) {
-		throw new NotImplementedException();
+		Query hasId = query(where(SMIDPATH).is(key));
+		DeleteResult result = mongoOps.remove(hasId, COLLECTION_NAME);
+		return result.getDeletedCount() == 1L;
 	}
 
 	@Override
