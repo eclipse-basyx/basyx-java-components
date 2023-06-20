@@ -31,15 +31,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Map;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.MultiLanguageProperty;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.Test;
 
@@ -106,6 +110,7 @@ public class TestMongoDBSubmodelAPI {
 		bucket.downloadToStream("fileSmeIdShort.xml", os);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void submodelElementInCollection() {
 		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
@@ -119,6 +124,12 @@ public class TestMongoDBSubmodelAPI {
 
 		Object value = submodelAPI.getSubmodelElementValue(collection.getIdShort() + "/" + mlprop.getIdShort());
 
+		Collection<ISubmodelElement> updatedSubmodelElements = submodelAPI.getSubmodelElements();
+		Map<String, Object> updatedCollectionMap = (Map<String, Object>) submodelAPI.getSubmodelElement("collection");
+		Collection<?> collectionValue = (Collection<?>) updatedCollectionMap.get(Property.VALUE);
+
+		assertEquals(1, updatedSubmodelElements.size());
+		assertEquals(1, collectionValue.size());
 		assertEquals(expected, value);
 	}
 
