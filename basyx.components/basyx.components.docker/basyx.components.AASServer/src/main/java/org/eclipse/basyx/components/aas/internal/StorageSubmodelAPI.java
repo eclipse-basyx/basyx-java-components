@@ -36,6 +36,7 @@ import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
+import org.eclipse.basyx.submodel.metamodel.facade.SubmodelElementMapCollectionConverter;
 import org.eclipse.basyx.submodel.metamodel.facade.submodelelement.SubmodelElementFacadeFactory;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement;
@@ -173,35 +174,20 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 
 	@Override
 	public ISubmodelElement getSubmodelElement(String idShortPath) {
-		if (idShortPath.contains("/")) {
-			List<String> idShorts = idShortsPathAsList(idShortPath);
-			return getNestedSubmodelElement(idShorts);
-		} else {
-			return getTopLevelSubmodelElement(idShortPath);
-		}
+		List<String> idShorts = idShortsPathAsList(idShortPath);
+		ISubmodelElement submodelElement = getNestedSubmodelElement(idShorts);
+		return convertSubmodelElement(submodelElement);
 	}
 
 	private ISubmodelElement getNestedSubmodelElement(List<String> idShorts) {
 		Submodel submodel = (Submodel) getSubmodel();
-		return convertSubmodelElement(getNestedSubmodelElement(submodel, idShorts));
-	}
-
-	private ISubmodelElement getTopLevelSubmodelElement(String idShort) {
-		Submodel submodel = (Submodel) getSubmodel();
-		Map<String, ISubmodelElement> submodelElements = submodel.getSubmodelElements();
-		ISubmodelElement element = submodelElements.get(idShort);
-		if (element == null) {
-			throw new ResourceNotFoundException("The element \"" + idShort + "\" could not be found");
-		}
-		return convertSubmodelElement(element);
+		return getNestedSubmodelElement(submodel, idShorts);
 	}
 
 	@SuppressWarnings("unchecked")
 	private ISubmodelElement convertSubmodelElement(ISubmodelElement element) {
-		Map<String, Object> elementMap = (Map<String, Object>) element;
-		IModelProvider elementProvider = new SubmodelElementProvider(new VABMapProvider(elementMap));
-		Object elementVABObj = elementProvider.getValue("");
-		return SubmodelElement.createAsFacade((Map<String, Object>) elementVABObj);
+		Map<String, Object> convertedCollectionMap = SubmodelElementMapCollectionConverter.smElementToMap((Map<String, Object>) element);
+		return SubmodelElement.createAsFacade(convertedCollectionMap);
 	}
 
 	@Override
