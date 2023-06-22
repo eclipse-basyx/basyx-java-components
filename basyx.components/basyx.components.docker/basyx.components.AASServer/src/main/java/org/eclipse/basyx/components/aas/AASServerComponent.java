@@ -557,13 +557,14 @@ public class AASServerComponent implements IComponent {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
-		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
+		try (AASXToMetamodelConverter packageManager = new AASXToMetamodelConverter(aasxPath)) {
+			// Unpack the files referenced by the aas
+			packageManager.unzipRelatedFiles();
 
-		// Unpack the files referenced by the aas
-		packageManager.unzipRelatedFiles();
-
-		// Retrieve the aas from the package
-		return packageManager.retrieveAASBundles();
+			// Retrieve the aas from the package
+			return packageManager.retrieveAASBundles();
+		}
+		
 	}
 
 	private void addAASServerFeaturesToContext(BaSyxContext context) {
