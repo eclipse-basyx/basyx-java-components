@@ -87,7 +87,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>3.4.12</version>
+			<version>3.4.13</version>
 		</dependency>
 
 		<!-- Adds additional classes of the BaSys SDK for tests -->
@@ -128,7 +128,7 @@
 			<groupId>com.tngtech.keycloakmock</groupId>
 			<artifactId>mock</artifactId>
 			<scope>test</scope>
-			<version>0.14.0</version>
+			<version>0.15.0</version>
 		</dependency>
 
 		<dependency>
