@@ -32,9 +32,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -56,12 +56,12 @@ import com.mongodb.client.result.DeleteResult;
 /**
  * Provides BaSyxStorageAPI implementation for MongoDB
  * 
- * @author fischer
+ * @author fischer, jung
  *
  * @param <T>
  */
 public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
-	private static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private static final String INDEX_KEY = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected BaSyxMongoDBConfiguration config;
 	protected MongoClient client;
@@ -76,66 +76,76 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		this.config = config;
 		this.client = client;
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
-		this.configureIndexForSubmodelId();
+		this.configureIndexKey();
 	}
 
-	private void configureIndexForSubmodelId() {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(SMIDPATH).build();
-		this.mongoOps.indexOps(Submodel.class).ensureIndex(idIndex);
+	private void configureIndexKey() {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(INDEX_KEY).build();
+		this.mongoOps.indexOps(TYPE).ensureIndex(idIndex);
 	}
 
 	@Override
 	public T createOrUpdate(T obj) {
-		throw new NotImplementedException();
+		String key = getKey(obj);
+		if (alreadyExists(obj, key)) {
+			return update(obj, key);
+		}
+
+		T created = mongoOps.insert(obj, COLLECTION_NAME);
+		created = removeMongoDBSpecificMapAttribute(created);
+
+		return created;
+	}
+
+	private boolean alreadyExists(T obj, String key) {
+		Query hasId = query(where(INDEX_KEY).is(key));
+		boolean exists = mongoOps.exists(hasId, this.TYPE);
+		return exists;
 	}
 
 	@Override
 	public T update(T obj, String key) {
-		Query hasId = query(where(SMIDPATH).is(key));
+		Query hasId = query(where(INDEX_KEY).is(key));
 		T replaced = mongoOps.findAndReplace(hasId, obj, COLLECTION_NAME);
 		if (replaced == null) {
-			mongoOps.insert(obj, COLLECTION_NAME);
+			return createOrUpdate(obj);
 		}
-		// Remove mongoDB-specific map attribute from SM
-		// mongoOps modify sm on save - thus _id has to be removed here...
-		((Submodel) obj).remove("_id");
-		return obj;
+		return replaced;
 	}
 
-	@Override
-	public Collection<T> retrieveAll() {
-		Collection<T> data = mongoOps.findAll(TYPE, COLLECTION_NAME);
-		return data;
+	@SuppressWarnings("unchecked")
+	private T removeMongoDBSpecificMapAttribute(T created) {
+		if (created instanceof Map)
+			((HashMap<String, Object>) created).remove("_id");
+		return created;
 	}
 
 	@Override
 	public boolean delete(String key) {
-		Query hasId = query(where(SMIDPATH).is(key));
+		Query hasId = query(where(INDEX_KEY).is(key));
 		DeleteResult result = mongoOps.remove(hasId, COLLECTION_NAME);
 		return result.getDeletedCount() == 1L;
 	}
 
 	@Override
 	public void createCollectionIfNotExists(String collectionName) {
-		throw new NotImplementedException();
+		// With MongoOperations Collections are created implicitly
 	}
 
 	@Override
 	public void deleteCollection() {
-		throw new NotImplementedException();
+		mongoOps.dropCollection(COLLECTION_NAME);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public T rawRetrieve(String key) {
-		// Query Submodel from MongoDB
-		Query hasId = query(where(SMIDPATH).is(key));
+		Query hasId = query(where(INDEX_KEY).is(key));
 		Submodel result = mongoOps.findOne(hasId, Submodel.class, COLLECTION_NAME);
 		if (result == null) {
 			throw new ResourceNotFoundException("The submodel " + key + " could not be found in the database.");
 		}
 
-		// Remove mongoDB-specific map attribute from AASDescriptor
 		result.remove("_id");
 
 		return (T) result;
@@ -165,5 +175,11 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public void deleteFile(Submodel submodel, String idShort) {
 		MongoDBFileHelper.deleteAllFilesFromGridFsIfIsFileSubmodelElement(client, config, submodel, idShort);
+	}
+
+	@Override
+	public Collection<T> rawRetrieveAll() {
+		Collection<T> data = mongoOps.findAll(TYPE, COLLECTION_NAME);
+		return data;
 	}
 }
