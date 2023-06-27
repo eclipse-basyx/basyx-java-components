@@ -46,11 +46,11 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 
 	@Deprecated
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
-		this(smApiFactory, new MongoDBBaSyxStorageAPI<>(config.getSubmodelCollection(), Submodel.class, config));
+		this(smApiFactory, new MongoDBBaSyxStorageAPI<Submodel>(config.getSubmodelCollection(), Submodel.class, config));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
-		this(smApiFactory, new MongoDBBaSyxStorageAPI<>(config.getSubmodelCollection(), Submodel.class, config, client));
+		this(smApiFactory, new MongoDBBaSyxStorageAPI<Submodel>(config.getSubmodelCollection(), Submodel.class, config, client));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, MongoDBBaSyxStorageAPI<Submodel> storageApi) {
