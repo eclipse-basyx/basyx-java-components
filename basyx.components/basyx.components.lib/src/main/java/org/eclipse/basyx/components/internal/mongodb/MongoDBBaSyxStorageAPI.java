@@ -32,7 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
@@ -116,7 +115,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@SuppressWarnings("unchecked")
 	private T removeMongoDBSpecificMapAttribute(T created) {
 		if (created instanceof Map)
-			((HashMap<String, Object>) created).remove("_id");
+			((Map<String, Object>) created).remove("_id");
 		return created;
 	}
 
@@ -141,13 +140,13 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public T rawRetrieve(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		Submodel result = mongoOps.findOne(hasId, Submodel.class, COLLECTION_NAME);
+		var result = mongoOps.findOne(hasId, TYPE, COLLECTION_NAME);
 		if (result == null) {
 			throw new ResourceNotFoundException("The submodel " + key + " could not be found in the database.");
 		}
-
-		result.remove("_id");
-
+		if (isBaSyxType(TYPE)) {
+			((Map<String, Object>) result).remove("_id");
+		}
 		return (T) result;
 	}
 

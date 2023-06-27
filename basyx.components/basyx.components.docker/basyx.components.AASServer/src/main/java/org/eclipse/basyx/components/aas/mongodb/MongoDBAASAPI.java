@@ -24,12 +24,8 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
@@ -40,9 +36,9 @@ import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
 
@@ -52,12 +48,12 @@ import com.mongodb.client.MongoClient;
  * @author espen, jungjan
  */
 public class MongoDBAASAPI implements IAASAPI {
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected MongoOperations mongoOps;
 	protected String collection;
-	protected String aasId;
 	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageApi;
 	private String identificationId;
 
@@ -81,9 +77,9 @@ public class MongoDBAASAPI implements IAASAPI {
 		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getSubmodelCollection(), AssetAdministrationShell.class, config, client), identificationId);
 	}
 
-	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> s3StorageAPI, String identificationId) {
+	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI, String identificationId) {
 		super();
-		this.storageApi = s3StorageAPI;
+		this.storageApi = mongoDBStorageAPI;
 		this.identificationId = identificationId;
 	}
 
@@ -142,6 +138,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * 
 	 * @param config
 	 */
+	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
 		// Do nothing
 	}
@@ -153,7 +150,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @param aasId
 	 */
 	public void setAASId(String aasId) {
-		this.aasId = aasId;
+		this.identificationId = aasId;
 	}
 
 	/**
@@ -161,75 +158,45 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * replaces the existing data. The new aas id for this API is taken from the
 	 * given aas.
 	 * 
-	 * @param aas
+	 * @param shell
 	 */
-	public void setAAS(AssetAdministrationShell aas) {
-		String id = aas.getIdentification().getId();
+	public void setAAS(AssetAdministrationShell shell) {
+		String id = shell.getIdentification().getId();
 		this.setAASId(id);
-
-		Query hasId = query(where(AASIDPATH).is(aasId));
-		// Try to replace if already present - otherwise: insert it
-		Object replaced = mongoOps.findAndReplace(hasId, aas, collection);
-		if (replaced == null) {
-			mongoOps.insert(aas, collection);
-		}
-		// Remove mongoDB-specific map attribute from AAS.
-		// mongoOps modify aas on save - thus _id has to be removed here...
-		aas.remove("_id");
+		storageApi.createOrUpdate(shell);
 	}
 
 	@Override
 	public IAssetAdministrationShell getAAS() {
-		Query hasId = query(where(AASIDPATH).is(aasId));
-		AssetAdministrationShell aas = mongoOps.findOne(hasId, AssetAdministrationShell.class, collection);
-		if (aas == null) {
-			throw new ResourceNotFoundException("The AAS " + aasId + " could not be found in the database.");
-		}
-		// Remove mongoDB-specific map attribute from AAS
-		aas.remove("_id");
-		return aas;
+		return storageApi.retrieve(identificationId);
 	}
 
 	@Override
 	public void addSubmodel(IReference submodel) {
-		// Get AAS from db
-		Query hasId = query(where(AASIDPATH).is(aasId));
-		AssetAdministrationShell aas = mongoOps.findOne(hasId, AssetAdministrationShell.class, collection);
-		if (aas == null) {
-			throw new ResourceNotFoundException("The AAS " + aasId + " could not be found in the database.");
-		}
-		// Add reference
-		aas.addSubmodelReference(submodel);
-		// Update db entry
-		mongoOps.findAndReplace(hasId, aas, collection);
+		AssetAdministrationShell shell = (AssetAdministrationShell) getAAS();
+		shell.addSubmodelReference(submodel);
+		storageApi.update(shell, identificationId);
 	}
 
 	@Override
-	public void removeSubmodel(String id) {
-		// Get AAS from db
-		Query hasId = query(where(AASIDPATH).is(aasId));
-		AssetAdministrationShell aas = mongoOps.findOne(hasId, AssetAdministrationShell.class, collection);
-		if (aas == null) {
-			throw new ResourceNotFoundException("The AAS " + aasId + " could not be found in the database.");
+	public void removeSubmodel(String idShort) {
+		AssetAdministrationShell shell = (AssetAdministrationShell) this.getAAS();
+		Collection<IReference> submodelReferences = shell.getSubmodelReferences();
+		Optional<IReference> toBeRemoved = submodelReferences.stream().filter(submodelReference -> getLastSubmodelReferenceKey(submodelReference).getValue().equals(idShort)).findFirst();
+		if (toBeRemoved.isEmpty()) {
+			logger.warn("Submodel reference could not be removed. Shell with identification id '{}' does not contain submodel with idShort '{}'.", shell.getIdentification().getId(), idShort);
 		}
-		// Remove reference
-		Collection<IReference> smReferences = aas.getSubmodelReferences();
-		// Reference to submodel could be either by idShort (=> local) or directly via
-		// its identifier
-		for (Iterator<IReference> iterator = smReferences.iterator(); iterator.hasNext();) {
-			IReference ref = iterator.next();
-			List<IKey> keys = ref.getKeys();
-			IKey lastKey = keys.get(keys.size() - 1);
-			String idValue = lastKey.getValue();
-			// remove this reference, if the last key points to the submodel
-			if (idValue.equals(id)) {
-				iterator.remove();
-				break;
-			}
-		}
-		aas.setSubmodelReferences(smReferences);
-		// Update db entry
-		mongoOps.findAndReplace(hasId, aas, collection);
+		submodelReferences.remove(toBeRemoved.get());
+		logger.info("Removed submodel reference with idShort '{}' from shell with identification id '{}'.", idShort, shell.getIdentification().getId());
+		shell.setSubmodelReferences(submodelReferences);
+		storageApi.update(shell, identificationId);
 	}
 
+	private IKey getLastSubmodelReferenceKey(IReference submodelReference) {
+		return submodelReference.getKeys().get(getLastSubmodelReferenceReferenceIndex(submodelReference));
+	}
+
+	private int getLastSubmodelReferenceReferenceIndex(IReference submodelReference) {
+		return submodelReference.getKeys().size() - 1;
+	}
 }
