@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2021, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -35,32 +35,31 @@ import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 
 /**
  * Implements the IAASAPI for a mongoDB backend.
  * 
- * @author espen
+ * @author espen, jungjan
  */
 public class MongoDBAASAPI implements IAASAPI {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 	private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
-	protected BaSyxMongoDBConfiguration config;
 	protected MongoOperations mongoOps;
 	protected String collection;
 	protected String aasId;
+	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageApi;
+	private String identificationId;
 
 	/**
 	 * Receives the path of the configuration.properties file in its constructor.
@@ -69,8 +68,8 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId) {
-		this(config, aasId, MongoClients.create(config.getConnectionUrl()));
+	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId) {
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getSubmodelCollection(), AssetAdministrationShell.class, config), identificationId);
 	}
 
 	/**
@@ -78,15 +77,14 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * 
 	 * @param config
 	 */
-	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String aasId, MongoClient client) {
-		this.setConfiguration(config, client);
-		this.setAASId(aasId);
-		configureIndexForAasId(mongoOps);
+	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId, MongoClient client) {
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getSubmodelCollection(), AssetAdministrationShell.class, config, client), identificationId);
 	}
 
-	private void configureIndexForAasId(MongoOperations mongoOps) {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASIDPATH).build();
-		mongoOps.indexOps(AssetAdministrationShell.class).ensureIndex(idIndex);
+	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> s3StorageAPI, String identificationId) {
+		super();
+		this.storageApi = s3StorageAPI;
+		this.identificationId = identificationId;
 	}
 
 	/**
@@ -95,21 +93,21 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBAASAPI(String resourceConfigPath, String aasId) {
-		config = new BaSyxMongoDBConfiguration();
-		config.loadFromResource(resourceConfigPath);
-		this.setConfiguration(config);
-		this.setAASId(aasId);
+	public MongoDBAASAPI(String resourceConfigPath, String identificationId) {
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath)), identificationId);
 	}
 
 	/**
 	 * Receives the path of the .properties file in its constructor from a resource.
 	 */
-	public MongoDBAASAPI(String resourceConfigPath, String aasId, MongoClient client) {
-		config = new BaSyxMongoDBConfiguration();
+	public MongoDBAASAPI(String resourceConfigPath, String identificationId, MongoClient client) {
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), identificationId);
+	}
+
+	private static BaSyxMongoDBConfiguration configFromResource(String resourceConfigPath) {
+		BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
 		config.loadFromResource(resourceConfigPath);
-		this.setConfiguration(config, client);
-		this.setAASId(aasId);
+		return config;
 	}
 
 	/**
@@ -129,16 +127,23 @@ public class MongoDBAASAPI implements IAASAPI {
 		this(DEFAULT_CONFIG_PATH, aasId, client);
 	}
 
+	/**
+	 * This Method is just here to avoid breaking changes. It has no effect at all.
+	 * 
+	 * @param config
+	 */
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
-		setConfiguration(config, client);
+		// Do nothing
 	}
 
+	/**
+	 * This Method is just here to avoid breaking changes. It has no effect at all.
+	 * 
+	 * @param config
+	 */
 	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.mongoOps = new MongoTemplate(client, config.getDatabase());
-		this.collection = config.getAASCollection();
+		// Do nothing
 	}
 
 	/**

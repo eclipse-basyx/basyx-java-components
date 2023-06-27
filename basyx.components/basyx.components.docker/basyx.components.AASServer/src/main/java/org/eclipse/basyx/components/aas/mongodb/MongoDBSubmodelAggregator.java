@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2022, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -25,64 +25,51 @@
 
 package org.eclipse.basyx.components.aas.mongodb;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 
 /**
  * Extends the {@link SubmodelAggregator} for the needs of MongoDB
  * 
- * @author schnicke
+ * @author schnicke, jungjan
  *
  */
 public class MongoDBSubmodelAggregator extends SubmodelAggregator {
-
-	private String smCollection;
-	private MongoTemplate mongoOps;
+	private MongoDBBaSyxStorageAPI<Submodel> storageApi;
 
 	@Deprecated
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
-		this(smApiFactory, config, MongoClients.create(config.getConnectionUrl()));
+		this(smApiFactory, new MongoDBBaSyxStorageAPI<>(config.getSubmodelCollection(), Submodel.class, config));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
-		super(smApiFactory);
-
-		smCollection = config.getSubmodelCollection();
-
-		mongoOps = new MongoTemplate(client, config.getDatabase());
+		this(smApiFactory, new MongoDBBaSyxStorageAPI<>(config.getSubmodelCollection(), Submodel.class, config, client));
 	}
+
+	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, MongoDBBaSyxStorageAPI<Submodel> storageApi) {
+		super(submodelApiFactory);
+		this.storageApi = storageApi;
+	}
+
 
 	@Override
 	public void deleteSubmodelByIdentifier(IIdentifier identifier) {
 		super.deleteSubmodelByIdentifier(identifier);
-		deleteSubmodelFromDB(identifier);
+		storageApi.delete(identifier.getId());
 	}
 
 	@Override
 	public void deleteSubmodelByIdShort(String idShort) {
-		try {
-			ISubmodel sm = getSubmodelbyIdShort(idShort);
-			super.deleteSubmodelByIdShort(idShort);
-			deleteSubmodelFromDB(sm.getIdentification());
-		} catch (ResourceNotFoundException e) {
-			// Nothing to do
-		}
+		ISubmodel submodel = getSubmodelbyIdShort(idShort);
+		super.deleteSubmodelByIdShort(idShort);
+		storageApi.delete(submodel.getIdentification().getId());
 	}
 
-	private void deleteSubmodelFromDB(IIdentifier identifier) {
-		Query hasId = query(where(MongoDBSubmodelAPI.SMIDPATH).is(identifier.getId()));
-		mongoOps.remove(hasId, smCollection);
-	}
 }
