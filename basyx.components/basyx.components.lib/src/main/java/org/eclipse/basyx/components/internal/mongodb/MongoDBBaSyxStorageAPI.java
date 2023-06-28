@@ -142,7 +142,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		Query hasId = query(where(INDEX_KEY).is(key));
 		var result = mongoOps.findOne(hasId, TYPE, COLLECTION_NAME);
 		if (result == null) {
-			throw new ResourceNotFoundException("The submodel " + key + " could not be found in the database.");
+			throw new ResourceNotFoundException("No Object for key '" + key + "' found in the database.");
 		}
 		if (isBaSyxType(TYPE)) {
 			((Map<String, Object>) result).remove("_id");

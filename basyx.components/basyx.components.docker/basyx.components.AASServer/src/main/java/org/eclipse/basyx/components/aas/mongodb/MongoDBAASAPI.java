@@ -147,10 +147,10 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * Sets the aas id, so that this API points to the aas with aasId. Can be
 	 * changed to point to a different aas in the database.
 	 * 
-	 * @param aasId
+	 * @param identificationId
 	 */
-	public void setAASId(String aasId) {
-		this.identificationId = aasId;
+	public void setAASId(String identificationId) {
+		this.identificationId = identificationId;
 	}
 
 	/**
