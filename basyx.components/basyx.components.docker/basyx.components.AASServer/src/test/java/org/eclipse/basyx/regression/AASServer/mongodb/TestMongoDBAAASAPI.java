@@ -95,14 +95,12 @@ public class TestMongoDBAAASAPI {
 		IIdentifier identification = Identifier.createAsFacade(identificationMap);
 
 		AssetAdministrationShell expectedShell = new AssetAdministrationShell(idShortShell, identification, null);
-
-		Submodel expectedSubmodel = new Submodel(idShortSubmodel, identification);
 		shellAPI.setAAS(expectedShell);
 
+		Submodel expectedSubmodel = new Submodel(idShortSubmodel, identification);
 		IReference testReference = expectedSubmodel.getReference();
 
 		expectedShell.addSubmodelReference(testReference);
-
 		shellAPI.addSubmodel(testReference);
 
 		Object resultShell = shellAPI.getAAS();
@@ -113,6 +111,29 @@ public class TestMongoDBAAASAPI {
 
 	@Test
 	public void removeSubmodel() {
+		String idShortShell = "testIdShortShell";
+		String idShortSubmodel = "testIdShortSubmodel";
 
+		Map<String, Object> identificationMap = new HashMap<>();
+		identificationMap.put(Identifier.IDTYPE, IdentifierType.CUSTOM.toString());
+		identificationMap.put(Identifier.ID, IDENTIFICATION_ID);
+		IIdentifier identification = Identifier.createAsFacade(identificationMap);
+
+		AssetAdministrationShell expectedShell = new AssetAdministrationShell(idShortShell, identification, null);
+
+		Submodel expectedSubmodel = new Submodel(idShortSubmodel, identification);
+		IReference testReference = expectedSubmodel.getReference();
+
+		// expectedShell.addSubmodelReference(testReference);
+		shellAPI.setAAS(expectedShell);
+		shellAPI.addSubmodel(testReference);
+
+		// expectedShell.removeSubmodel(identification);
+
+		shellAPI.removeSubmodel(idShortSubmodel);
+
+		Object resultShell = shellAPI.getAAS();
+
+		assertEquals(expectedShell, resultShell);
 	}
 }
