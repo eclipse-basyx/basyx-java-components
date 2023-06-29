@@ -30,6 +30,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -144,11 +145,17 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 			GridFSBucket bucket = MongoDBFileHelper.getGridFSBucket(client, config);
 			String fileName = MongoDBFileHelper.constructFileName(parentKey, fileSubmodelElement, idShortPath);
 			java.io.File file = new java.io.File(fileName);
-			FileOutputStream fileOutputStream;
-			fileOutputStream = new FileOutputStream(file);
-			bucket.downloadToStream(fileName, fileOutputStream);
+			// check if file with this filename exist in MongoDB
+			// there might be older files constructed with old (=legacy) filenames, use this one instead
+			// the real file in file system still uses the new filename pattern!
+			if (!MongoDBFileHelper.fileExists(bucket, fileName)) {
+				fileName = MongoDBFileHelper.legacyFileName(parentKey, fileSubmodelElement, idShortPath);
+			}
+			try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+				bucket.downloadToStream(fileName, fileOutputStream);
+			}
 			return file;
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			throw new ResourceNotFoundException("The File Submodel Element does not contain a File");
 		}
 	}
