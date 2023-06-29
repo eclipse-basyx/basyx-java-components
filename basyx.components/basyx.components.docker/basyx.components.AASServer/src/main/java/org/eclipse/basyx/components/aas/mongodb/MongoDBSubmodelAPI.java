@@ -29,6 +29,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.common.io.Files;
 import org.apache.tika.mime.MimeType;
@@ -309,7 +312,7 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			return;
 		File file = File.createAsFacade(submodelElement);
 		GridFSBucket bucket = getGridFSBucket();
-		bucket.find(Filters.eq("filename", file.getValue())).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+		deleteAllDuplicateFiles(bucket, constructFileName(file, idShort), legacyFileName(file, idShort));
 	}
 
 	@Override
@@ -373,16 +376,24 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private String updateFileInDB(InputStream newValue, ISubmodelElement element, String idShortPath) {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket();
+		String legacyFilename = legacyFileName(file, idShortPath);
 		String fileName = constructFileName(file, idShortPath);
-		deleteAllDuplicateFiles(bucket, fileName);
+		deleteAllDuplicateFiles(bucket, fileName, legacyFilename);
 		bucket.uploadFromStream(fileName, newValue);
 		return fileName;
 	}
 
-	private void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
-		bucket.find(Filters.eq("filename", fileName)).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+	private void deleteAllDuplicateFiles(GridFSBucket bucket, String... fileNames) {
+		bucket.find(Filters.or(
+				Arrays.stream(fileNames)
+						.map(fileName -> Filters.eq("filename", fileName))
+						.collect(Collectors.toList())))
+				.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
 	}
 
+	private boolean fileExists(GridFSBucket bucket, String fileName) {
+		return bucket.find(Filters.eq("filename", fileName)).first() != null;
+	}
 	private GridFSBucket getGridFSBucket() {
 		MongoDatabase database = client.getDatabase(config.getDatabase());
 		GridFSBucket bucket = GridFSBuckets.create(database, config.getFileCollection());
@@ -563,11 +574,17 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 			GridFSBucket bucket = getGridFSBucket();
 			String fileName = constructFileName(fileSubmodelElement, idShortPath);
 			java.io.File file = new java.io.File(tmpDirectory, fileName);
-			FileOutputStream fileOutputStream;
-			fileOutputStream = new FileOutputStream(file);
-			bucket.downloadToStream(fileName, fileOutputStream);
+			// check if file with this filename exist in MongoDB
+			// there might be older files constructed with old (=legacy) filenames, use this one instead
+			// the real file in file system still uses the new filename pattern!
+			if (!fileExists(bucket, fileName)) {
+				fileName = legacyFileName(fileSubmodelElement, idShortPath);
+			}
+			try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+				bucket.downloadToStream(fileName, fileOutputStream);
+			}
 			return file;
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			throw new ResourceNotFoundException("The File Submodel Element does not contain a File");
 		}
 	}
@@ -575,7 +592,21 @@ public class MongoDBSubmodelAPI implements ISubmodelAPI {
 	private String constructFileName(File file, String idShortPath) {
 		Submodel sm = (Submodel) getSubmodel();
 		String fileName = sm.getIdentification().getId() + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
-		return fileName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+		// replace those chars that are not permitted on filesystems
+		fileName = fileName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+		// ensure the filename is still unique to be used as key in MongoDB storage layer
+		return String.format("#%s#", Objects.hashCode(sm.getIdentification().getId())).concat(fileName);
+	}
+
+	/**
+	 * This method is kept for backwards compatibility to still find files from DB which where stored with old scheme.
+	 * @param file the filename of this file is requested.
+	 * @param idShortPath the shortId of the given file.
+	 * @return the filename as it was constructed in older versions.
+	 */
+	private String legacyFileName(File file, String idShortPath) {
+		Submodel sm = (Submodel) getSubmodel();
+		return sm.getIdentification().getId() + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
 	}
 
 	private String getFileExtension(File file) {
