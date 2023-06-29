@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -35,9 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServlet;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.basyx.aas.aggregator.AASAggregatorAPIHelper;
@@ -93,6 +98,7 @@ import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
+import org.eclipse.basyx.vab.protocol.http.server.BaSyxChildContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
@@ -131,6 +137,9 @@ public class AASServerComponent implements IComponent {
 	private boolean isAASXUploadEnabled = false;
 	
 	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
+	private static final String AASX_RES_FILE_CONTEXT_PATH = "/basyx-temp";
+	private static final String AASX_RES_FILE_DOCBASE_PATH = System.getProperty("java.io.tmpdir") + AASX_RES_FILE_CONTEXT_PATH;	
+	private static final String AASX_RES_FILE_SERVLET_MAPPING_PATTERN = "/files/*";
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -251,11 +260,12 @@ public class AASServerComponent implements IComponent {
 
 		// An initial AAS has been loaded from the drive?
 		if (aasBundles != null) {
-			// 1. Also provide the files
-			context.addServletMapping("/files/*", createDefaultServlet());
+			createBasyxResourceDirectoryIfNotExists();
+			
+			addAasxFilesResourceServlet(context);
 
 			// 2. Fix the file paths according to the servlet configuration
-			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath());
+			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath() + AASX_RES_FILE_CONTEXT_PATH);
 
 			registerWhitelistedSubmodels();
 		}
@@ -547,13 +557,14 @@ public class AASServerComponent implements IComponent {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
-		AASXToMetamodelConverter packageManager = new AASXPackageManager(aasxPath);
+		try (AASXToMetamodelConverter packageManager = new AASXToMetamodelConverter(aasxPath)) {
+			// Unpack the files referenced by the aas
+			packageManager.unzipRelatedFiles();
 
-		// Unpack the files referenced by the aas
-		packageManager.unzipRelatedFiles();
-
-		// Retrieve the aas from the package
-		return packageManager.retrieveAASBundles();
+			// Retrieve the aas from the package
+			return packageManager.retrieveAASBundles();
+		}
+		
 	}
 
 	private void addAASServerFeaturesToContext(BaSyxContext context) {
@@ -775,4 +786,33 @@ public class AASServerComponent implements IComponent {
 	private String getMqttSubmodelClientId() {
 		return getMqttAASClientId() + "/submodelAggregator";
 	}
+	
+	private void addAasxFilesResourceServlet(BaSyxContext context) {
+		HttpServlet httpServlet = createDefaultServlet();
+		
+		String childContextPath = contextConfig.getContextPath() + AASX_RES_FILE_CONTEXT_PATH;
+		
+		Context childContext = createChildContextForAasxResourceFiles(childContextPath, AASX_RES_FILE_DOCBASE_PATH);
+		
+		context.addChildContext(new BaSyxChildContext(childContext, httpServlet, AASX_RES_FILE_SERVLET_MAPPING_PATTERN));
+	}
+
+	private Context createChildContextForAasxResourceFiles(String childContextPath, String childDocbasePath) {
+		Context childContext = new StandardContext();
+		childContext.setPath(childContextPath);
+		childContext.setDocBase(childDocbasePath);
+		childContext.addLifecycleListener(new Tomcat.FixContextListener());
+		
+		return childContext;
+	}
+	
+	private void createBasyxResourceDirectoryIfNotExists() {
+		File directory = new File(AASX_RES_FILE_DOCBASE_PATH);
+		
+		if (directory.exists())
+			return;
+		
+        directory.mkdir();
+	}
+	
 }

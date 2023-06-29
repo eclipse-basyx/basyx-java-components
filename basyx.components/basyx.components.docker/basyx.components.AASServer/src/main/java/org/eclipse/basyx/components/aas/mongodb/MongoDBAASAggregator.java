@@ -115,6 +115,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	protected ISubmodelAggregator submodelAggregator;
 	protected ISubmodelAggregatorFactory submodelAggregatorFactory;
 
+	private MongoClient mongoClient;
+
 	/**
 	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
 	 * MongoDB backend.
@@ -417,31 +419,18 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * @deprecated This method is used with the old, deprecated Constructors. Use
 	 *             {@link MongoDBAASServerComponentFactory} instead
 	 */
-	@SuppressWarnings("deprecation")
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
-		// set mongoDB configuration
-		this.config = config;
 		MongoClient client = MongoClients.create(config.getConnectionUrl());
-		this.mongoOps = new MongoTemplate(client, config.getDatabase());
-		this.aasCollection = config.getAASCollection();
-		this.smCollection = config.getSubmodelCollection();
+		setMongoDBConfiguration(config, client);
 
-		// Create API factories with the given configuration
-		this.aasApiProvider = aas -> {
-			MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId());
-			api.setAAS(aas);
-			return api;
-		};
-		this.smApiProvider = sm -> {
-			MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, sm.getIdentification().getId());
-			api.setSubmodel(sm);
-			return api;
-		};
+		this.aasApiProvider = new MongoDBAASAPIFactory(config, client);
+		this.smApiProvider = new MongoDBSubmodelAPIFactory(config, client);
 	}
 
 	private void setMongoDBConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
 		this.config = config;
+		this.mongoClient = client;
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
 		this.aasCollection = config.getAASCollection();
 		this.smCollection = config.getSubmodelCollection();
@@ -456,13 +445,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		aasProviderMap.clear();
 	}
 
-	@SuppressWarnings("deprecation")
 	private void init() {
 		List<AssetAdministrationShell> data = mongoOps.findAll(AssetAdministrationShell.class, aasCollection);
 		for (AssetAdministrationShell aas : data) {
 			String aasId = aas.getIdentification().getId();
 			logger.info("Adding AAS from DB: " + aasId);
-			MongoDBAASAPI aasApi = new MongoDBAASAPI(config, aasId);
+			MongoDBAASAPI aasApi = new MongoDBAASAPI(config, aasId, mongoClient);
 			MultiSubmodelProvider provider = createMultiSubmodelProvider(aasApi);
 			addSubmodelsFromDB(provider, aas);
 			aasProviderMap.put(aas.getIdentification().getId(), provider);
@@ -531,9 +519,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void addSubmodelProvidersById(String smId, MultiSubmodelProvider provider) {
-		ISubmodelAPI smApi = new MongoDBSubmodelAPI(config, smId);
+		ISubmodelAPI smApi = new MongoDBSubmodelAPI(config, smId, mongoClient);
 		SubmodelProvider smProvider = new SubmodelProvider(smApi);
 		provider.addSubmodel(smProvider);
 	}

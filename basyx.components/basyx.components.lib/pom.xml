@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.eclipse.basyx</groupId>
 		<artifactId>basyx.components</artifactId>
-		<version>1.4.0</version>
+		<version>1.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>basyx.components.lib</artifactId>
@@ -80,16 +80,30 @@
 			<version>42.6.0</version>
 		</dependency>
 
+		<!-- Use MongoDB Java Drivers for db connections -->
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-sync</artifactId>
+			<version>4.10.1</version>
+		</dependency>
+
+		<!-- Use Spring Data MongoDB for db data management -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+			<version>3.4.13</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.camunda.bpm</groupId>
 			<artifactId>camunda-engine</artifactId>
-			<version>7.18.0</version>
+			<version>7.19.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.camunda.bpm.model</groupId>
 			<artifactId>camunda-bpmn-model</artifactId>
-			<version>7.18.0</version>
+			<version>7.19.0</version>
 		</dependency>
 
 		<dependency>
