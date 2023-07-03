@@ -43,14 +43,31 @@ public class BaSyxConfiguration {
 
 	// Properties in this configuration
 	private Map<String, String> values;
+	private List<String> propertiesExcludedFromLogging;
 
+
+	@Deprecated
 	/**
 	 * Constructor that takes the configuration's default values. All the keys in
 	 * the map are the name of the properties that are stored and loaded in this
 	 * configuration.
+	 * 
+	 * @param defaultValues
+	 * @deprecated Use {@link #BaSyxConfiguration(Map, List)} to ensure proper
+	 *             exclusion is configured
 	 */
 	public BaSyxConfiguration(Map<String, String> defaultValues) {
 		this.values = defaultValues;
+	}
+
+	/**
+	 * 
+	 * @param defaultValues
+	 * @param propertiesExcludedFromLogging
+	 */
+	public BaSyxConfiguration(Map<String, String> defaultValues, List<String> propertiesExcludedFromLogging) {
+		this(defaultValues);
+		this.propertiesExcludedFromLogging = propertiesExcludedFromLogging;
 	}
 
 	public static InputStream getResourceStream(String relativeResourcePath) {
@@ -150,14 +167,13 @@ public class BaSyxConfiguration {
 		for (Object property : properties.keySet()) {
 			String propertyName = (String) property;
 			String loaded = properties.getProperty(propertyName);
-			if (values.containsKey(propertyName)) {
-				logger.info(propertyName + ": '" + loaded + "'");
-			} else {
-				logger.debug(propertyName + ": '" + loaded + "'");
-			}
+
+			logPropertyVariable(propertyName, loaded);
+
 			values.put(propertyName, loaded);
 		}
 	}
+
 
 	/**
 	 * Method for subclasses to read specific environment variables
@@ -182,13 +198,33 @@ public class BaSyxConfiguration {
 			for (String propName : properties) {
 				String result = getEnvironmentVariable(prefix, propName, usesDeprecatedNamingConvention);
 				if (result != null) {
-					logger.info("Environment - " + propName + ": " + result);
+					logEnvironmentVariable(propName, result);
 					setProperty(propName, result);
 				}
 			}
 		} catch (SecurityException e) {
 			logger.info("Reading configs from environment is not permitted: " + e);
 		}
+	}
+
+	private void logPropertyVariable(String propertyName, String result) {
+		if (isPropertyExcludedFromLogging(propertyName)) {
+			result = "*****";
+		}
+
+		logger.info("Property File - " + propertyName + ": '" + result + "'");
+	}
+
+	private void logEnvironmentVariable(String propertyName, String result) {
+		if (isPropertyExcludedFromLogging(propertyName)) {
+			result = "*****";
+		}
+
+		logger.info("Environment - " + propertyName + ": " + result);
+	}
+
+	private boolean isPropertyExcludedFromLogging(String propertyName) {
+		return propertiesExcludedFromLogging.contains(propertyName);
 	}
 
 	private String getEnvironmentVariable(String prefix, String propName, boolean usesDeprecatedNamingConvention) {

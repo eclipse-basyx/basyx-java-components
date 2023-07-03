@@ -27,6 +27,7 @@ package org.eclipse.basyx.components.aas.configuration;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxAASServerConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), getPropertiesExcludedFromLogging());
 	}
 
 	/**
@@ -130,7 +131,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	 *            The file source for the AASServer (e.g. an .aasx file)
 	 */
 	public BaSyxAASServerConfiguration(AASServerBackend backend, String source) {
-		super(getDefaultProperties());
+		this();
 		setAASBackend(backend);
 		setAASSourceAsList(source);
 	}
@@ -172,7 +173,7 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	 * Constructor with predefined value map
 	 */
 	public BaSyxAASServerConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, getPropertiesExcludedFromLogging());
 	}
 
 	public void loadFromEnvironmentVariables() {
@@ -390,4 +391,9 @@ public class BaSyxAASServerConfiguration extends BaSyxConfiguration {
 	private boolean isScopeConfigured() {
 		return getProperty(CLIENT_SCOPES) != null && !getProperty(CLIENT_SCOPES).isEmpty();
 	}
+
+	private static List<String> getPropertiesExcludedFromLogging() {
+		return Collections.singletonList(CLIENT_SECRET);
+	}
+
 }

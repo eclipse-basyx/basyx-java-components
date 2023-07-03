@@ -24,7 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,14 +76,14 @@ public class BaSyxMongoDBConfiguration extends BaSyxConfiguration {
 	 * Constructor with predefined value map
 	 */
 	public BaSyxMongoDBConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, getPropertiesExcludedFromLogging());
 	}
 
 	/**
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxMongoDBConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), getPropertiesExcludedFromLogging());
 	}
 
 	/**
@@ -201,5 +203,9 @@ public class BaSyxMongoDBConfiguration extends BaSyxConfiguration {
 
 	public void setFileCollection(String fileCollection) {
 		setProperty(FILE_COLLECTION, fileCollection);
+	}
+
+	private static List<String> getPropertiesExcludedFromLogging() {
+		return Collections.singletonList(CONNECTIONURL);
 	}
 }
