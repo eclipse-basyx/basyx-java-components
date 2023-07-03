@@ -25,11 +25,13 @@
 package org.eclipse.basyx.regression.AASServer.mongodb;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
@@ -119,21 +121,17 @@ public class TestMongoDBAAASAPI {
 		identificationMap.put(Identifier.ID, IDENTIFICATION_ID);
 		IIdentifier identification = Identifier.createAsFacade(identificationMap);
 
-		AssetAdministrationShell expectedShell = new AssetAdministrationShell(idShortShell, identification, null);
+		AssetAdministrationShell testShell = new AssetAdministrationShell(idShortShell, identification, null);
 
 		Submodel expectedSubmodel = new Submodel(idShortSubmodel, identification);
 		IReference testReference = expectedSubmodel.getReference();
 
-		// expectedShell.addSubmodelReference(testReference);
-		shellAPI.setAAS(expectedShell);
+		shellAPI.setAAS(testShell);
 		shellAPI.addSubmodel(testReference);
+		shellAPI.removeSubmodel(expectedSubmodel.getIdentification().getId());
 
-		// expectedShell.removeSubmodel(identification);
-
-		shellAPI.removeSubmodel(idShortSubmodel);
-
-		Object resultShell = shellAPI.getAAS();
-
-		assertEquals(expectedShell, resultShell);
+		IAssetAdministrationShell resultShell = shellAPI.getAAS();
+		Collection<IReference> submodelReferences = resultShell.getSubmodelReferences();
+		assertTrue(submodelReferences.isEmpty());
 	}
 }

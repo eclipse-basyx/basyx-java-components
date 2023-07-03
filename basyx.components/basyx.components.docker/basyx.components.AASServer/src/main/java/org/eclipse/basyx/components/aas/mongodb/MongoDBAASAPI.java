@@ -34,11 +34,8 @@ import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
-import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
-import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoOperations;
 
 import com.mongodb.client.MongoClient;
 
@@ -50,9 +47,10 @@ import com.mongodb.client.MongoClient;
 public class MongoDBAASAPI implements IAASAPI {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
-	private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	// private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." +
+	// Identifier.ID;
 
-	protected MongoOperations mongoOps;
+	// protected MongoOperations mongoOps;
 	protected String collection;
 	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageApi;
 	private String identificationId;
@@ -65,7 +63,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	@Deprecated
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getSubmodelCollection(), AssetAdministrationShell.class, config), identificationId);
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config), identificationId);
 	}
 
 	/**
@@ -74,7 +72,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @param config
 	 */
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId, MongoClient client) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getSubmodelCollection(), AssetAdministrationShell.class, config, client), identificationId);
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config, client), identificationId);
 	}
 
 	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI, String identificationId) {
@@ -172,22 +170,23 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	@Override
-	public void addSubmodel(IReference submodel) {
+	public void addSubmodel(IReference submodelReference) {
 		AssetAdministrationShell shell = (AssetAdministrationShell) getAAS();
-		shell.addSubmodelReference(submodel);
+		shell.addSubmodelReference(submodelReference);
 		storageApi.update(shell, identificationId);
 	}
 
 	@Override
-	public void removeSubmodel(String idShort) {
+	public void removeSubmodel(String identificationId) {
 		AssetAdministrationShell shell = (AssetAdministrationShell) this.getAAS();
 		Collection<IReference> submodelReferences = shell.getSubmodelReferences();
-		Optional<IReference> toBeRemoved = submodelReferences.stream().filter(submodelReference -> getLastSubmodelReferenceKey(submodelReference).getValue().equals(idShort)).findFirst();
-		if (toBeRemoved.isEmpty()) {
-			logger.warn("Submodel reference could not be removed. Shell with identification id '{}' does not contain submodel with idShort '{}'.", shell.getIdentification().getId(), idShort);
+
+		Optional<IReference> toBeRemoved = submodelReferences.stream().filter(submodelReference -> getLastSubmodelReferenceKey(submodelReference).getValue().equals(identificationId)).findFirst();
+		if (!toBeRemoved.isPresent()) {
+			logger.warn("Submodel reference could not be removed. Shell with identification id '{}' does not contain submodel with idShort '{}'.", shell.getIdentification().getId(), identificationId);
 		}
 		submodelReferences.remove(toBeRemoved.get());
-		logger.info("Removed submodel reference with idShort '{}' from shell with identification id '{}'.", idShort, shell.getIdentification().getId());
+		logger.info("Removed submodel reference with idShort '{}' from shell with identification id '{}'.", identificationId, shell.getIdentification().getId());
 		shell.setSubmodelReferences(submodelReferences);
 		storageApi.update(shell, identificationId);
 	}

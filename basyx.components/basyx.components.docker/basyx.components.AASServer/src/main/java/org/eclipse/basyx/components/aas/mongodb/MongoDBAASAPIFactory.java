@@ -28,35 +28,38 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 
 /**
  * 
  * Factory for creating a MongoDBAASAPI
  * 
- * @author fried
+ * @author fried, jung
  *
  */
 public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
-	private BaSyxMongoDBConfiguration config;
-	private MongoClient client;
+	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageAPI;
 
 	@Deprecated
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config));
 	}
 
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.client = client;
+		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config, client));
+	}
+
+	public MongoDBAASAPIFactory(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI) {
+		this.storageAPI = mongoDBStorageAPI;
 	}
 
 	@Override
 	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
+		new MongoDBAASAPI(storageAPI, aas.getIdentification().getId());
+		MongoDBAASAPI api = new MongoDBAASAPI(storageAPI, aas.getIdentification().getId());
 		api.setAAS(aas);
 		return api;
 	}
