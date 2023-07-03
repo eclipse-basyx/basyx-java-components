@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,14 +69,14 @@ public class BaSyxDockerConfiguration extends BaSyxConfiguration {
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxDockerConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), Collections.emptyList());
 	}
 
 	/**
 	 * Constructor with predefined value map
 	 */
 	public BaSyxDockerConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, Collections.emptyList());
 	}
 
 	/**

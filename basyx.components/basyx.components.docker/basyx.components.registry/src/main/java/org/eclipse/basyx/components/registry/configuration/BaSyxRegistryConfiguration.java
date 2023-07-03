@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.registry.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,16 +74,16 @@ public class BaSyxRegistryConfiguration extends BaSyxConfiguration {
 	}
 
 	public BaSyxRegistryConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), Collections.emptyList());
 	}
 
 	public BaSyxRegistryConfiguration(RegistryBackend backend) {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), Collections.emptyList());
 		setRegistryBackend(backend);
 	}
 
 	public BaSyxRegistryConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, Collections.emptyList());
 	}
 
 	public void loadFromEnvironmentVariables() {
