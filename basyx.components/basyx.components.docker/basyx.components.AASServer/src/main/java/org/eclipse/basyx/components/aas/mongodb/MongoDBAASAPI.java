@@ -51,7 +51,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	// Identifier.ID;
 
 	// protected MongoOperations mongoOps;
-	protected String collection;
+	protected String collectionName;
 	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageApi;
 	private String identificationId;
 
