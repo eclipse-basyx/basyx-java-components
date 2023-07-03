@@ -375,14 +375,16 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	private static MongoDBBaSyxStorageAPI<Submodel> submodelStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
 		String submodelCollectionName = config.getSubmodelCollection();
-		MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi = client == null ? new MongoDBBaSyxStorageAPI<>(submodelCollectionName, Submodel.class, config)
+		MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi = client == null
+				? new MongoDBBaSyxStorageAPI<>(submodelCollectionName, Submodel.class, config)
 				: new MongoDBBaSyxStorageAPI<>(submodelCollectionName, Submodel.class, config, client);
 		return submodelStorageApi;
 	}
 
 	private static MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
 		String shellCollectionName = config.getAASCollection();
-		MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi = client == null ? new MongoDBBaSyxStorageAPI<>(shellCollectionName, AssetAdministrationShell.class, config)
+		MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi = client == null
+				? new MongoDBBaSyxStorageAPI<>(shellCollectionName, AssetAdministrationShell.class, config)
 				: new MongoDBBaSyxStorageAPI<>(shellCollectionName, AssetAdministrationShell.class, config, client);
 		return shellStorageApi;
 	}

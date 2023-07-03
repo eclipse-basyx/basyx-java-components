@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
@@ -86,19 +87,19 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public T createOrUpdate(T obj) {
 		String key = getKey(obj);
-		if (alreadyExists(obj, key)) {
+		if (alreadyExists(key)) {
 			return update(obj, key);
 		}
 
 		T created = mongoOps.insert(obj, COLLECTION_NAME);
-		created = removeMongoDBSpecificMapAttribute(created);
+		created = handleMongoDbIdAttribute(created);
 
 		return created;
 	}
 
-	private boolean alreadyExists(T obj, String key) {
+	private boolean alreadyExists(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		boolean exists = mongoOps.exists(hasId, this.TYPE);
+		boolean exists = mongoOps.exists(hasId, null, COLLECTION_NAME);
 		return exists;
 	}
 
@@ -109,14 +110,15 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		if (replaced == null) {
 			return createOrUpdate(obj);
 		}
+		replaced = handleMongoDbIdAttribute(replaced);
 		return replaced;
 	}
 
 	@SuppressWarnings("unchecked")
-	private T removeMongoDBSpecificMapAttribute(T created) {
-		if (created instanceof Map)
-			((Map<String, Object>) created).remove("_id");
-		return created;
+	private T handleMongoDbIdAttribute(T data) {
+		if (data instanceof Map)
+			((Map<String, Object>) data).remove("_id");
+		return data;
 	}
 
 	@Override
@@ -128,7 +130,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public void createCollectionIfNotExists(String collectionName) {
-		// With MongoOperations Collections are created implicitly
+		// MongoOperations implicitly creates Collections.
 	}
 
 	@Override
@@ -136,7 +138,6 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		mongoOps.dropCollection(COLLECTION_NAME);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public T rawRetrieve(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
@@ -144,9 +145,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		if (result == null) {
 			throw new ResourceNotFoundException("No Object for key '" + key + "' found in the database.");
 		}
-		if (isBaSyxType(TYPE)) {
-			((Map<String, Object>) result).remove("_id");
-		}
+		result = handleMongoDbIdAttribute(result);
 		return (T) result;
 	}
 
@@ -179,6 +178,9 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public Collection<T> rawRetrieveAll() {
 		Collection<T> data = mongoOps.findAll(TYPE, COLLECTION_NAME);
+		data = data.stream()
+				.map(this::handleMongoDbIdAttribute)
+				.collect(Collectors.toList());
 		return data;
 	}
 }

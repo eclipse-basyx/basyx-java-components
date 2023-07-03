@@ -42,7 +42,7 @@ import com.mongodb.client.MongoClient;
 /**
  * Implements the IAASAPI for a mongoDB backend.
  * 
- * @author espen, jungjan
+ * @author espen, jungjan, witt
  */
 public class MongoDBAASAPI implements IAASAPI {
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -182,8 +182,9 @@ public class MongoDBAASAPI implements IAASAPI {
 		Collection<IReference> submodelReferences = shell.getSubmodelReferences();
 
 		Optional<IReference> toBeRemoved = submodelReferences.stream().filter(submodelReference -> getLastSubmodelReferenceKey(submodelReference).getValue().equals(identificationId)).findFirst();
-		if (!toBeRemoved.isPresent()) {
+		if (!toBeRemoved.isPresent() || toBeRemoved.isEmpty()) {
 			logger.warn("Submodel reference could not be removed. Shell with identification id '{}' does not contain submodel with idShort '{}'.", shell.getIdentification().getId(), identificationId);
+			return;
 		}
 		submodelReferences.remove(toBeRemoved.get());
 		logger.info("Removed submodel reference with idShort '{}' from shell with identification id '{}'.", identificationId, shell.getIdentification().getId());

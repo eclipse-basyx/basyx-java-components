@@ -111,7 +111,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		component.startComponent();
 
 		createAssetAdministrationShell(AAS_ID);
-		// createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
+		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
 	}
 
 	private static void initConfiguration() {
