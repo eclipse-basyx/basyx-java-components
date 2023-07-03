@@ -145,6 +145,7 @@ public class TestAASXPackageManager {
 	/**
 	 * Creates a new .aasx using the AASXFactory and tries to parse it
 	 */
+	@SuppressWarnings("resource")
 	@Test
 	public void testLoadGeneratedAASX() throws InvalidFormatException, IOException, ParserConfigurationException, SAXException, TransformerException, URISyntaxException {
 

@@ -66,7 +66,6 @@ import org.eclipse.basyx.components.aas.aascomponent.IAASServerDecorator;
 import org.eclipse.basyx.components.aas.aascomponent.IAASServerFeature;
 import org.eclipse.basyx.components.aas.aascomponent.InMemoryAASServerComponentFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
-import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.components.aas.authorization.AuthorizedAASServerFeature;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedAASServerFeatureFactory;
 import org.eclipse.basyx.components.aas.authorization.internal.AuthorizedDefaultServlet;
@@ -113,7 +112,6 @@ import org.xml.sax.SAXException;
  *
  * @author schnicke, espen, fried, fischer, danish, wege
  */
-@SuppressWarnings("deprecation")
 public class AASServerComponent implements IComponent {
 	private static Logger logger = LoggerFactory.getLogger(AASServerComponent.class);
 
