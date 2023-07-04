@@ -61,7 +61,7 @@ import com.mongodb.client.result.DeleteResult;
  * @param <T>
  */
 public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
-	private static final String INDEX_KEY = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private final String INDEX_KEY = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected BaSyxMongoDBConfiguration config;
 	protected MongoClient client;
@@ -91,7 +91,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 			return update(obj, key);
 		}
 
-		T created = mongoOps.insert(obj, COLLECTION_NAME);
+		T created = mongoOps.insert(obj, getCollectionName());
 		created = handleMongoDbIdAttribute(created);
 
 		return created;
@@ -99,14 +99,14 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	private boolean alreadyExists(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		boolean exists = mongoOps.exists(hasId, null, COLLECTION_NAME);
+		boolean exists = mongoOps.exists(hasId, getCollectionName());
 		return exists;
 	}
 
 	@Override
 	public T update(T obj, String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		T replaced = mongoOps.findAndReplace(hasId, obj, COLLECTION_NAME);
+		T replaced = mongoOps.findAndReplace(hasId, obj, getCollectionName());
 		if (replaced == null) {
 			return createOrUpdate(obj);
 		}
@@ -115,7 +115,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private T handleMongoDbIdAttribute(T data) {
+	public T handleMongoDbIdAttribute(T data) {
 		if (data instanceof Map)
 			((Map<String, Object>) data).remove("_id");
 		return data;
@@ -124,7 +124,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public boolean delete(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		DeleteResult result = mongoOps.remove(hasId, COLLECTION_NAME);
+		DeleteResult result = mongoOps.remove(hasId, getCollectionName());
 		return result.getDeletedCount() == 1L;
 	}
 
@@ -135,13 +135,13 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public void deleteCollection() {
-		mongoOps.dropCollection(COLLECTION_NAME);
+		mongoOps.dropCollection(getCollectionName());
 	}
 
 	@Override
 	public T rawRetrieve(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		var result = mongoOps.findOne(hasId, TYPE, COLLECTION_NAME);
+		var result = mongoOps.findOne(hasId, TYPE, getCollectionName());
 		if (result == null) {
 			throw new ResourceNotFoundException("No Object for key '" + key + "' found in the database.");
 		}
@@ -177,10 +177,15 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public Collection<T> rawRetrieveAll() {
-		Collection<T> data = mongoOps.findAll(TYPE, COLLECTION_NAME);
+		Collection<T> data = mongoOps.findAll(TYPE, getCollectionName());
 		data = data.stream()
 				.map(this::handleMongoDbIdAttribute)
 				.collect(Collectors.toList());
 		return data;
+	}
+
+	@Override
+	public Object getStorageConnection() {
+		return mongoOps;
 	}
 }

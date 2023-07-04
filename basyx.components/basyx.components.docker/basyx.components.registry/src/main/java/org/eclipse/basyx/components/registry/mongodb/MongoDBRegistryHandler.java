@@ -32,16 +32,12 @@ import java.util.List;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.memory.IRegistryHandler;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Criteria;
-
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 
 /**
  * A registry handler based on MongoDB
@@ -51,9 +47,7 @@ import com.mongodb.client.MongoClients;
 public class MongoDBRegistryHandler implements IRegistryHandler {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
 
-	protected BaSyxMongoDBConfiguration config;
-	protected MongoOperations mongoOps;
-	protected String collection;
+	private MongoDBBaSyxStorageAPI<AASDescriptor> storageApi;
 
 	private static final String AASID = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 	private static final String ASSETID = AASDescriptor.ASSET + "." + Identifiable.IDENTIFICATION + "." + Identifier.ID;
@@ -64,7 +58,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	 * @param config
 	 */
 	public MongoDBRegistryHandler(BaSyxMongoDBConfiguration config) {
-		this.setConfiguration(config);
+		this.initStorageApi(config);
 	}
 
 	/**
@@ -72,15 +66,13 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	 * resource.
 	 */
 	public MongoDBRegistryHandler(String resourceConfigPath) {
-		config = new BaSyxMongoDBConfiguration();
-		config.loadFromResource(resourceConfigPath);
-		this.setConfiguration(config);
-		configureIndexForAasId(mongoOps);
+		this(configFromResource(resourceConfigPath));
 	}
 
-	private void configureIndexForAasId(MongoOperations mongoOps) {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(AASID).build();
-		mongoOps.indexOps(AASDescriptor.class).ensureIndex(idIndex);
+	private static BaSyxMongoDBConfiguration configFromResource(String resourceConfigPath) {
+		BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		return config;
 	}
 
 	/**
@@ -91,67 +83,57 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	}
 
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
-		this.config = config;
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
-		this.mongoOps = new MongoTemplate(client, config.getDatabase());
-		this.collection = config.getRegistryCollection();
+		this.initStorageApi(config);
+	}
+
+	private void initStorageApi(BaSyxMongoDBConfiguration config) {
+		String collectionName = config.getRegistryCollection();
+		this.storageApi = new MongoDBBaSyxStorageAPI<>(collectionName, AASDescriptor.class, config);
 	}
 
 	@Override
 	public boolean contains(IIdentifier identifier) {
-		String id = identifier.getId();
+		String identificationId = identifier.getId();
 		Criteria hasId = new Criteria();
-		hasId.orOperator(where(AASID).is(id), where(ASSETID).is(id));
-		return mongoOps.exists(query(hasId), collection);
+		hasId.orOperator(where(AASID).is(identificationId), where(ASSETID).is(identificationId));
+
+		return getStorageConnection().exists(query(hasId), this.storageApi.getCollectionName());
+	}
+
+	private MongoOperations getStorageConnection() {
+		return (MongoOperations) this.storageApi.getStorageConnection();
 	}
 
 	@Override
 	public void remove(IIdentifier identifier) {
-		String id = identifier.getId();
+		String indentificationId = identifier.getId();
 		Criteria hasId = new Criteria();
-		hasId.orOperator(where(AASID).is(id), where(ASSETID).is(id));
-		mongoOps.remove(query(hasId), collection);
+		hasId.orOperator(where(AASID).is(indentificationId), where(ASSETID).is(indentificationId));
+		getStorageConnection().remove(query(hasId), this.storageApi.getCollectionName());
 	}
 
 	@Override
 	public void insert(AASDescriptor descriptor) {
-		mongoOps.insert(descriptor, collection);
-		// mongoOps added "_id" to descriptor after insert
-		removeMongoDBSpecificId(descriptor);
+		this.update(descriptor);
 	}
 
 	@Override
 	public void update(AASDescriptor descriptor) {
-		String aasId = descriptor.getIdentifier().getId();
-		Object result = mongoOps.findAndReplace(query(where(AASID).is(aasId)), descriptor, collection);
-		if (result == null) {
-			insert(descriptor);
-		}
+		this.storageApi.createOrUpdate(descriptor);
 	}
 
 	@Override
 	public AASDescriptor get(IIdentifier identifier) {
-		String id = identifier.getId();
+		String indentificationId = identifier.getId();
 		Criteria hasId = new Criteria();
-		hasId.orOperator(where(AASID).is(id), where(ASSETID).is(id));
-		AASDescriptor result = mongoOps.findOne(query(hasId), AASDescriptor.class, collection);
-		removeMongoDBSpecificId(result);
-		
-		return result;
-	}
+		hasId.orOperator(where(AASID).is(indentificationId), where(ASSETID).is(indentificationId));
 
-	private void removeMongoDBSpecificId(AASDescriptor result) {
-		if (result != null) {
-			// Remove mongoDB-specific map attribute from AASDescriptor
-			result.remove("_id");
-		}
+		AASDescriptor result = getStorageConnection().findOne(query(hasId), AASDescriptor.class, this.storageApi.getCollectionName());
+		return this.storageApi.handleMongoDbIdAttribute(result);
 	}
 
 	@Override
 	public List<AASDescriptor> getAll() {
-		List<AASDescriptor> result = mongoOps.findAll(AASDescriptor.class, collection);
-		// Remove mongoDB-specific map attribute from AASDescriptor
-		result.forEach(desc -> desc.remove("_id"));
-		return result;
+		return (List<AASDescriptor>) this.storageApi.retrieveAll();
 	}
 }
