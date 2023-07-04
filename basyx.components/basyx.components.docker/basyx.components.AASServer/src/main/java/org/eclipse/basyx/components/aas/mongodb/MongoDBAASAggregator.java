@@ -548,18 +548,13 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		IIdentifier identification = shell.getIdentification();
 		String identificationId = identification.getId();
 
+		MultiSubmodelProvider oldProvider = (MultiSubmodelProvider) getAASProvider(identification);
 
-		// MultiSubmodelProvider oldProvider = (MultiSubmodelProvider)
-		// getAASProvider(identification);
-		//
 		IAASAPI shellApi = this.shellApiFactory.create(shell);
+		MultiSubmodelProvider updatedProvider = updateAASProvider(shellApi, oldProvider);
 
-		// MultiSubmodelProvider updatedProvider = updateAASProvider(shellApi,
-		// oldProvider);
-		//
-		// shellProviderMap.put(identificationId, updatedProvider);
-		// logger.info("update shell with id {}", identificationId);
-
+		shellProviderMap.put(identificationId, updatedProvider);
+		logger.info("update shell with id {}", identificationId);
 	}
 
 	private MultiSubmodelProvider updateAASProvider(IAASAPI shellApi, MultiSubmodelProvider oldProvider) {
