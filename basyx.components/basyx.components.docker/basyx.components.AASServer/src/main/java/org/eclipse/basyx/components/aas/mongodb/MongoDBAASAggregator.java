@@ -24,7 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -124,7 +123,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *            The MongoDB Configuration
 	 * @param registry
 	 *            The registry
-	 * @throws IOException
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link MongoDBAASServerComponentFactory}.
@@ -159,7 +157,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *
 	 * @param config
 	 *            The MongoDB Configuration
-	 * @throws IOException
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link MongoDBAASServerComponentFactory}.
@@ -175,7 +172,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 *
 	 * @param resourceConfigPath
 	 *            Path of the configuration file
-	 * @throws IOException
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
 	 *             {@link MongoDBAASServerComponentFactory}
@@ -247,7 +243,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * 
 	 * @param config
 	 * @param registry
-	 * @param aasAPIFactory
+	 * @param shellAPIFactory
 	 * @param submodelAggregatorFactory
 	 * 
 	 */
