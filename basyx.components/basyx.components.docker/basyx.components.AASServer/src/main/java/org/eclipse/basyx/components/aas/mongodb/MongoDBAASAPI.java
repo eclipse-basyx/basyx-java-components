@@ -60,17 +60,6 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
-	 * @deprecated Use the new constructor using a MongoClient
-	 */
-	@Deprecated
-	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId) {
-		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config), identificationId);
-	}
-
-	/**
-	 * Receives the path of the configuration.properties file in its constructor.
-	 * 
-	 * @param config
 	 */
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId, MongoClient client) {
 		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config, client), identificationId);
@@ -84,25 +73,37 @@ public class MongoDBAASAPI implements IAASAPI {
 
 	/**
 	 * Receives the path of the .properties file in its constructor from a resource.
+	 */
+	public MongoDBAASAPI(String resourceConfigPath, String identificationId, MongoClient client) {
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), identificationId);
+	}
+
+	/**
+	 * Constructor using default MongoDB connections
+	 */
+	public MongoDBAASAPI(String aasId, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, aasId, client);
+	}
+
+	/**
+	 * Receives the path of the configuration.properties file in its constructor.
+	 * 
+	 * @param config
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId) {
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config), identificationId);
+	}
+
+	/**
+	 * Receives the path of the .properties file in its constructor from a resource.
 	 * 
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
 	public MongoDBAASAPI(String resourceConfigPath, String identificationId) {
 		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath)), identificationId);
-	}
-
-	/**
-	 * Receives the path of the .properties file in its constructor from a resource.
-	 */
-	public MongoDBAASAPI(String resourceConfigPath, String identificationId, MongoClient client) {
-		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), identificationId);
-	}
-
-	private static BaSyxMongoDBConfiguration configFromResource(String resourceConfigPath) {
-		BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
-		config.loadFromResource(resourceConfigPath);
-		return config;
 	}
 
 	/**
@@ -115,11 +116,10 @@ public class MongoDBAASAPI implements IAASAPI {
 		this(DEFAULT_CONFIG_PATH, aasId);
 	}
 
-	/**
-	 * Constructor using default MongoDB connections
-	 */
-	public MongoDBAASAPI(String aasId, MongoClient client) {
-		this(DEFAULT_CONFIG_PATH, aasId, client);
+	private static BaSyxMongoDBConfiguration configFromResource(String resourceConfigPath) {
+		BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
+		config.loadFromResource(resourceConfigPath);
+		return config;
 	}
 
 	/**

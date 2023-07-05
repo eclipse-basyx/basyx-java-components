@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2021, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -51,55 +51,6 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	protected BaSyxMongoDBConfiguration config;
 	protected String collection;
 
-	/**
-	 * Receives the path of the configuration.properties file in its constructor.
-	 * 
-	 * @param config
-	 * @deprecated Use the new constructor using a MongoClient
-	 */
-	@Deprecated
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId) {
-		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
-	}
-
-	@Deprecated
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
-		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
-	}
-
-	/**
-	 * Receives the path of the .properties file in its constructor from a resource.
-	 * 
-	 * @deprecated Use the new constructor using a MongoClient
-	 */
-	@Deprecated
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId) {
-		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
-	}
-
-	/**
-	 * Constructor using default MongoDB connections
-	 * 
-	 * @deprecated Use the new constructor using a MongoClient
-	 */
-	@Deprecated
-	public MongoDBSubmodelAPI(String smId) {
-		this(DEFAULT_CONFIG_PATH, smId);
-	}
-
-	@Deprecated
-	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper) {
-		this(DEFAULT_CONFIG_PATH, smId, invocationHelper);
-	}
-
-	@Deprecated
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper) {
-		super(createSubmodelStorageAPI(createConfig(resourceConfigPath)), smId, invocationHelper);
-		this.config = createConfig(resourceConfigPath);
-		this.setConfiguration(config);
-		this.setSubmodelId(smId);
-		this.invocationHelper = invocationHelper;
-	}
 
 	/**
 	 * Receives the path of the configuration.properties file in its constructor.
@@ -147,6 +98,56 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 
 	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
 		super(createSubmodelStorageAPI(createConfig(resourceConfigPath), client), smId, invocationHelper);
+		this.config = createConfig(resourceConfigPath);
+		this.setConfiguration(config);
+		this.setSubmodelId(smId);
+		this.invocationHelper = invocationHelper;
+	}
+
+	/**
+	 * Receives the path of the configuration.properties file in its constructor.
+	 * 
+	 * @param config
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId) {
+		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	}
+
+	@Deprecated
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
+		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
+	}
+
+	/**
+	 * Receives the path of the .properties file in its constructor from a resource.
+	 * 
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId) {
+		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	}
+
+	/**
+	 * Constructor using default MongoDB connections
+	 * 
+	 * @deprecated Use the new constructor using a MongoClient
+	 */
+	@Deprecated
+	public MongoDBSubmodelAPI(String smId) {
+		this(DEFAULT_CONFIG_PATH, smId);
+	}
+
+	@Deprecated
+	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper) {
+		this(DEFAULT_CONFIG_PATH, smId, invocationHelper);
+	}
+
+	@Deprecated
+	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper) {
+		super(createSubmodelStorageAPI(createConfig(resourceConfigPath)), smId, invocationHelper);
 		this.config = createConfig(resourceConfigPath);
 		this.setConfiguration(config);
 		this.setSubmodelId(smId);

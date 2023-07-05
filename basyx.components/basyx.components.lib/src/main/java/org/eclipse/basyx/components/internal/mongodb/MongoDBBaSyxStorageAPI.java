@@ -56,7 +56,7 @@ import com.mongodb.client.result.DeleteResult;
 /**
  * Provides BaSyxStorageAPI implementation for MongoDB
  * 
- * @author fischer, jung
+ * @author fischer, jungjan, witt
  *
  * @param <T>
  */

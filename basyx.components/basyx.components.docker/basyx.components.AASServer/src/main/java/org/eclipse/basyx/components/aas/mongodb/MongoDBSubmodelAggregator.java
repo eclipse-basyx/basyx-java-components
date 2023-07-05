@@ -39,16 +39,11 @@ import com.mongodb.client.MongoClient;
 /**
  * Extends the {@link SubmodelAggregator} for the needs of MongoDB
  * 
- * @author schnicke, jungjan
+ * @author schnicke, jungjan, witt
  *
  */
 public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	private MongoDBBaSyxStorageAPI<Submodel> storageApi;
-
-	@Deprecated
-	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
-		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config));
-	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
 		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config, client));
@@ -57,6 +52,11 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, MongoDBBaSyxStorageAPI<Submodel> storageApi) {
 		super(submodelApiFactory);
 		this.storageApi = storageApi;
+	}
+
+	@Deprecated
+	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
+		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config));
 	}
 
 

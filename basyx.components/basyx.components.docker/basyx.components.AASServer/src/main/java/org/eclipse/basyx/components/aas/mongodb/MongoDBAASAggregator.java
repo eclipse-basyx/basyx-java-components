@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2021, 2023 the Eclipse BaSyx Authors
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,7 +24,6 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.aas.mongodb;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -116,39 +115,76 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
-	 * MongoDB backend.
-	 *
-	 * @param config
-	 *            The MongoDB Configuration
-	 * @param registry
-	 *            The registry
+	 * Receives a BaSyxMongoDBConfiguration, IAASRegistry, IAASAPIFactory,
+	 * ISubmodelAggregatorFactory and a MongoClient to create a persistent MongoDB
+	 * backend.
 	 * 
-	 * @deprecated Use new MongoDBAASAggregator with the
-	 *             {@link MongoDBAASServerComponentFactory}.
+	 * @param config
+	 * @param registry
+	 * @param shellAPIFactory
+	 * @param submodelAggregatorFactory
+	 * 
 	 */
-	@Deprecated
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
-		this(registry, initShellApiFactory(config), initSubmodelAggregatorFactory(config), submodelStorageApiFromConfig(config, null), shellStorageApiFromConfig(config, null));
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		this(registry, shellAPIFactory, submodelAggregatorFactory, submodelStorageApiFromConfig(config, client), shellStorageApiFromConfig(config, client));
 	}
 
-	private static ISubmodelAggregatorFactory initSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config) {
-		ISubmodelAPIFactory submodelApiFactory = initSubmodelApiFactory(config);
-		return new SubmodelAggregatorFactory(submodelApiFactory);
+	/**
+	 * Receives a BaSyxMongoDBConfiguration,
+	 * IAASAPIFactory,ISubmodelAggregatorFactory and a MongoClient to create a
+	 * persistent MongoDB backend.
+	 * 
+	 * @param config
+	 * @param shellAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 * 
+	 */
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		this(config, null, shellAPIFactory, submodelAggregatorFactory, client);
 	}
 
-	private static ISubmodelAPIFactory initSubmodelApiFactory(BaSyxMongoDBConfiguration config) {
-		return new MongoDBSubmodelAPIFactory(config);
+	/**
+	 * Receives a resourceConfigPath, IAASRegistry, IAASAPIFactory,
+	 * ISubmodelAggregatorFactory and a MongoClient to create a persistent MongoDB
+	 * backend.
+	 * 
+	 * @param resourceConfigPath
+	 * @param registry
+	 * @param shellAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 *            Use the new constructor using a MongoClient
+	 * 
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		this(loadConfigFromPath(resourceConfigPath), registry, shellAPIFactory, submodelAggregatorFactory, client);
 	}
 
-	private MongoDBSubmodelAPI createAPI(Submodel submodel, BaSyxMongoDBConfiguration config) {
-		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId());
-		api.setSubmodel(submodel);
-		return api;
+	/**
+	 * Receives a resourceConfigPath, IAASAPIFactory, ISubmodelAggregatorFactory and
+	 * a MongoClient to create a persistent MongoDB backend.
+	 * 
+	 * @param resourceConfigPath
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 * 
+	 */
+	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		this(loadConfigFromPath(resourceConfigPath), aasAPIFactory, submodelAggregatorFactory, client);
 	}
 
-	private static IAASAPIFactory initShellApiFactory(BaSyxMongoDBConfiguration config) {
-		return new MongoDBAASAPIFactory(config);
+	/**
+	 * Constructor using the default configuration, with the given
+	 * IAASAPIFactory,ISubmodelAggregatorFactory and MongoClient.
+	 * 
+	 * @param aasAPIFactory
+	 * @param submodelAggregatorFactory
+	 * @param client
+	 */
+	public MongoDBAASAggregator(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
+		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory, client);
 	}
 
 	/**
@@ -198,6 +234,23 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
+	 * Receives a BaSyxMongoDBConfiguration and a registry to create a persistent
+	 * MongoDB backend.
+	 *
+	 * @param config
+	 *            The MongoDB Configuration
+	 * @param registry
+	 *            The registry
+	 * 
+	 * @deprecated Use new MongoDBAASAggregator with the
+	 *             {@link MongoDBAASServerComponentFactory}.
+	 */
+	@Deprecated
+	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry) {
+		this(registry, initShellApiFactory(config), initSubmodelAggregatorFactory(config), submodelStorageApiFromConfig(config, null), shellStorageApiFromConfig(config, null));
+	}
+
+	/**
 	 * Constructor using default connections
 	 * 
 	 * @deprecated Use new MongoDBAASAggregator with the
@@ -237,36 +290,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives a BaSyxMongoDBConfiguration, IAASRegistry, IAASAPIFactory,
-	 * ISubmodelAggregatorFactory and a MongoClient to create a persistent MongoDB
-	 * backend.
-	 * 
-	 * @param config
-	 * @param registry
-	 * @param shellAPIFactory
-	 * @param submodelAggregatorFactory
-	 * 
-	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASRegistry registry, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
-		this(registry, shellAPIFactory, submodelAggregatorFactory, submodelStorageApiFromConfig(config, client), shellStorageApiFromConfig(config, client));
-	}
-
-	/**
-	 * Receives a BaSyxMongoDBConfiguration,
-	 * IAASAPIFactory,ISubmodelAggregatorFactory and a MongoClient to create a
-	 * persistent MongoDB backend.
-	 * 
-	 * @param config
-	 * @param shellAPIFactory
-	 * @param submodelAggregatorFactory
-	 * @param client
-	 * 
-	 */
-	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
-		this(config, null, shellAPIFactory, submodelAggregatorFactory, client);
-	}
-
-	/**
 	 * Receives a BaSyxMongoDBConfiguration, IAASAPIFactory and a
 	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
 	 * 
@@ -296,23 +319,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	/**
-	 * Receives a resourceConfigPath, IAASRegistry, IAASAPIFactory,
-	 * ISubmodelAggregatorFactory and a MongoClient to create a persistent MongoDB
-	 * backend.
-	 * 
-	 * @param resourceConfigPath
-	 * @param registry
-	 * @param shellAPIFactory
-	 * @param submodelAggregatorFactory
-	 * @param client
-	 *            Use the new constructor using a MongoClient
-	 * 
-	 */
-	public MongoDBAASAggregator(String resourceConfigPath, IAASRegistry registry, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
-		this(loadConfigFromPath(resourceConfigPath), registry, shellAPIFactory, submodelAggregatorFactory, client);
-	}
-
-	/**
 	 * Receives a resourceConfigPath, IAASAPIFactory and a
 	 * ISubmodelAggregatorFactory to create a persistent MongoDB backend.
 	 * 
@@ -324,20 +330,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	@Deprecated
 	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory) {
 		this(loadConfigFromPath(resourceConfigPath), shellAPIFactory, submodelAggregatorFactory);
-	}
-
-	/**
-	 * Receives a resourceConfigPath, IAASAPIFactory, ISubmodelAggregatorFactory and
-	 * a MongoClient to create a persistent MongoDB backend.
-	 * 
-	 * @param resourceConfigPath
-	 * @param aasAPIFactory
-	 * @param submodelAggregatorFactory
-	 * @param client
-	 * 
-	 */
-	public MongoDBAASAggregator(String resourceConfigPath, IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
-		this(loadConfigFromPath(resourceConfigPath), aasAPIFactory, submodelAggregatorFactory, client);
 	}
 
 	/**
@@ -353,16 +345,23 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory);
 	}
 
-	/**
-	 * Constructor using the default configuration, with the given
-	 * IAASAPIFactory,ISubmodelAggregatorFactory and MongoClient.
-	 * 
-	 * @param aasAPIFactory
-	 * @param submodelAggregatorFactory
-	 * @param client
-	 */
-	public MongoDBAASAggregator(IAASAPIFactory aasAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
-		this(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH, aasAPIFactory, submodelAggregatorFactory, client);
+	private static ISubmodelAggregatorFactory initSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config) {
+		ISubmodelAPIFactory submodelApiFactory = initSubmodelApiFactory(config);
+		return new SubmodelAggregatorFactory(submodelApiFactory);
+	}
+
+	private static ISubmodelAPIFactory initSubmodelApiFactory(BaSyxMongoDBConfiguration config) {
+		return new MongoDBSubmodelAPIFactory(config);
+	}
+
+	private MongoDBSubmodelAPI createAPI(Submodel submodel, BaSyxMongoDBConfiguration config) {
+		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId());
+		api.setSubmodel(submodel);
+		return api;
+	}
+
+	private static IAASAPIFactory initShellApiFactory(BaSyxMongoDBConfiguration config) {
+		return new MongoDBAASAPIFactory(config);
 	}
 
 	private static MongoDBBaSyxStorageAPI<Submodel> submodelStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
@@ -420,7 +419,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		data.forEach(shell -> {
 			String shellIdentificationId = shell.getIdentification().getId();
 			logger.info("Adding AAS from DB: " + shellIdentificationId);
-			shellApiFactory.create(shell);
 			IAASAPI shellApi = shellApiFactory.create(shell);
 			MultiSubmodelProvider provider = createMultiSubmodelProvider(shellApi);
 			addSubmodelsFromDB(provider, shell);
@@ -456,76 +454,94 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	/**
 	 * Adds submodel providers for submodels in the MongoDB
 	 */
-	private void addSubmodelsFromDB(MultiSubmodelProvider provider, AssetAdministrationShell aas) {
-		// Get ids and idShorts from aas
-		Collection<IReference> submodelRefs = aas.getSubmodelReferences();
-		List<String> smIds = new ArrayList<>();
-		List<String> smIdShorts = new ArrayList<>();
-		for (IReference ref : submodelRefs) {
-			List<IKey> keys = ref.getKeys();
-			IKey lastKey = keys.get(keys.size() - 1);
-			if (lastKey.getIdType() == KeyType.IDSHORT) {
-				smIdShorts.add(lastKey.getValue());
-			} else {
-				smIds.add(lastKey.getValue());
-			}
-		}
+	private void addSubmodelsFromDB(MultiSubmodelProvider provider, AssetAdministrationShell shell) {
+		Collection<IReference> submodelRefs = shell.getSubmodelReferences();
+		List<String> submodelIdentificationIds = getSubmodelIdentificationIdsFromSubmodelReferences(submodelRefs);
+		List<String> submodelIdShorts = getSubmodelIdShortsFromSubmodelReferences(submodelRefs);
+		submodelIdentificationIds = completeSubmodelIdentificationsIdsByIdShorts(submodelIdentificationIds, submodelIdShorts);
 
-		// Add submodel ids by id shorts
-		for (String idShort : smIdShorts) {
-			String id = getSubmodelId(idShort);
-			if (id != null) {
-				smIds.add(id);
-			}
-		}
-
-		// Create a provider for each submodel
-		for (String id : smIds) {
-			logger.info("Adding Submodel from DB: " + id);
-			addSubmodelProvidersById(id, provider);
-		}
+		createProviderForSubmodels(provider, submodelIdentificationIds);
 	}
 
-	private String getSubmodelId(String idShort) {
-		Submodel sm = submodelStorageApi.retrieve(idShort);
-		if (sm != null) {
-			return sm.getIdentification().getId();
+	private void createProviderForSubmodels(MultiSubmodelProvider provider, List<String> submodelIdentificationIds) {
+		submodelIdentificationIds.forEach(identificationId -> {
+			logger.info("Adding Submodel from DB: " + identificationId);
+			addSubmodelProvidersById(identificationId, provider);
+		});
+	}
+
+	private List<String> completeSubmodelIdentificationsIdsByIdShorts(List<String> submodelIdentificationIds, List<String> submodelIdShorts) {
+		submodelIdShorts.forEach(idShort -> {
+			String id = getSubmodelIdByIdShort(idShort);
+			if (id != null) {
+				submodelIdentificationIds.add(id);
+			}
+		});
+		return submodelIdentificationIds;
+	}
+
+	private List<String> getSubmodelIdentificationIdsFromSubmodelReferences(Collection<IReference> submodelRefs) {
+		List<String> submodelIdentificationIds = submodelRefs.stream()
+				.map(this::getLastKeyFromReference)
+				.filter(lastKey -> lastKey.getIdType() != KeyType.IDSHORT)
+				.map(lastKey -> lastKey.getValue()).collect(Collectors.toList());
+		return submodelIdentificationIds;
+	}
+
+	private List<String> getSubmodelIdShortsFromSubmodelReferences(Collection<IReference> submodelRefs) {
+		List<String> submodelIdShorts = submodelRefs.stream()
+				.map(this::getLastKeyFromReference)
+				.filter(lastKey -> lastKey.getIdType() == KeyType.IDSHORT)
+				.map(lastKey -> lastKey.getValue()).collect(Collectors.toList());
+		return submodelIdShorts;
+	}
+	
+	private IKey getLastKeyFromReference(IReference reference) {
+		List<IKey> keys = reference.getKeys();
+		IKey lastKey = keys.get(keys.size() - 1);
+		return lastKey;
+	}
+
+	private String getSubmodelIdByIdShort(String idShort) {
+		Submodel submodel = submodelStorageApi.retrieve(idShort);
+		if (submodel != null) {
+			return submodel.getIdentification().getId();
 		}
 		return null;
 	}
 
 	private void addSubmodelProvidersById(String submodelIdentificationId, MultiSubmodelProvider provider) {
-		ISubmodelAPI smApi = new MongoDBSubmodelAPI(this.submodelStorageApi, submodelIdentificationId);
-		SubmodelProvider smProvider = new SubmodelProvider(smApi);
-		provider.addSubmodel(smProvider);
+		ISubmodelAPI submodelApi = new MongoDBSubmodelAPI(this.submodelStorageApi, submodelIdentificationId);
+		SubmodelProvider submodelProvider = new SubmodelProvider(submodelApi);
+		provider.addSubmodel(submodelProvider);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<IAssetAdministrationShell> getAASList() {
-		return shellProviderMap.values().stream().map(p -> {
+		return shellProviderMap.values().stream().map(provider -> {
 			try {
-				return p.getValue("/aas");
+				return provider.getValue("/aas");
 			} catch (NotAuthorizedException e) {
 				return null;
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				throw new RuntimeException();
 			}
-		}).filter(Objects::nonNull).map(m -> {
-			AssetAdministrationShell aas = new AssetAdministrationShell();
-			aas.putAll((Map<? extends String, ? extends Object>) m);
-			return aas;
+		}).filter(Objects::nonNull).map(shellMap -> {
+			AssetAdministrationShell shell = new AssetAdministrationShell();
+			shell.putAll((Map<? extends String, ? extends Object>) shellMap);
+			return shell;
 		}).collect(Collectors.toList());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public IAssetAdministrationShell getAAS(IIdentifier shellIdentification) {
-		IModelProvider aasProvider = getAASProvider(shellIdentification);
+		IModelProvider shellProvider = getAASProvider(shellIdentification);
 
-		Map<String, Object> aasMap = (Map<String, Object>) aasProvider.getValue("/aas");
-		return AssetAdministrationShell.createAsFacade(aasMap);
+		Map<String, Object> shellMap = (Map<String, Object>) shellProvider.getValue("/aas");
+		return AssetAdministrationShell.createAsFacade(shellMap);
 	}
 
 	@Override
@@ -565,16 +581,16 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		shellProviderMap.remove(identificationId);
 	}
 
-	public MultiSubmodelProvider getProviderForAASId(String aasId) {
-		return shellProviderMap.get(aasId);
+	public MultiSubmodelProvider getProviderForAASId(String shellIdentificationId) {
+		return shellProviderMap.get(shellIdentificationId);
 	}
 
 	@Override
-	public IModelProvider getAASProvider(IIdentifier aasId) {
-		MultiSubmodelProvider provider = shellProviderMap.get(aasId.getId());
+	public IModelProvider getAASProvider(IIdentifier shellIdentificationId) {
+		MultiSubmodelProvider provider = shellProviderMap.get(shellIdentificationId.getId());
 
 		if (provider == null) {
-			throw new ResourceNotFoundException("AAS with Id " + aasId.getId() + " does not exist");
+			throw new ResourceNotFoundException("AAS with Id " + shellIdentificationId.getId() + " does not exist");
 		}
 
 		return provider;

@@ -43,7 +43,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 /**
  * A registry handler based on MongoDB
  * 
- * @author espen, jung
+ * @author espen, jungjan, witt
  */
 public class MongoDBRegistryHandler implements IRegistryHandler {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";

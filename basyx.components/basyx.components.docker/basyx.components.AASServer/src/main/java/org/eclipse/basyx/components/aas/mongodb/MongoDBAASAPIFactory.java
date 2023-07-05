@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2022, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -37,7 +37,7 @@ import com.mongodb.client.MongoClient;
  * 
  * Factory for creating a MongoDBAASAPI
  * 
- * @author fried, jung
+ * @author fried, jungjan, witt
  *
  */
 public class MongoDBAASAPIFactory implements IAASAPIFactory {
