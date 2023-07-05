@@ -45,6 +45,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorizedException;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
@@ -57,7 +58,6 @@ import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
-import org.eclipse.basyx.submodel.restapi.operation.DelegatedInvocationManager;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
@@ -106,8 +106,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	private MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi;
 	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi;
 
-	private DelegatedInvocationManager mongoClient;
-
 	public MongoDBAASAggregator(IAASRegistry registry, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi,
 			MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi) {
 		this.submodelStorageApi = submodelStorageApi;
@@ -142,7 +140,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	private static ISubmodelAPIFactory initSubmodelApiFactory(BaSyxMongoDBConfiguration config) {
-		// TODO: ensure that StoragePAI is used here!
 		return new MongoDBSubmodelAPIFactory(config);
 	}
 
@@ -153,7 +150,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	private static IAASAPIFactory initShellApiFactory(BaSyxMongoDBConfiguration config) {
-		// TODO: check how to ensure that Storage API is used here!
 		return new MongoDBAASAPIFactory(config);
 	}
 
@@ -271,7 +267,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	 * 
 	 */
 	public MongoDBAASAggregator(BaSyxMongoDBConfiguration config, IAASAPIFactory shellAPIFactory, ISubmodelAggregatorFactory submodelAggregatorFactory, MongoClient client) {
-		this(config, null/* TODO: may registry stay null? */, shellAPIFactory, submodelAggregatorFactory, client);
+		this(config, null, shellAPIFactory, submodelAggregatorFactory, client);
 	}
 
 	/**
@@ -376,16 +372,16 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	private static MongoDBBaSyxStorageAPI<Submodel> submodelStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
 		String submodelCollectionName = config.getSubmodelCollection();
 		MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi = client == null
-				? new MongoDBBaSyxStorageAPI<>(submodelCollectionName, Submodel.class, config)
-				: new MongoDBBaSyxStorageAPI<>(submodelCollectionName, Submodel.class, config, client);
+				? MongoDBBaSyxStorageAPIFactory.<Submodel>create(submodelCollectionName, Submodel.class, config)
+				: MongoDBBaSyxStorageAPIFactory.<Submodel>create(submodelCollectionName, Submodel.class, config, client);
 		return submodelStorageApi;
 	}
 
 	private static MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
 		String shellCollectionName = config.getAASCollection();
 		MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi = client == null
-				? new MongoDBBaSyxStorageAPI<>(shellCollectionName, AssetAdministrationShell.class, config)
-				: new MongoDBBaSyxStorageAPI<>(shellCollectionName, AssetAdministrationShell.class, config, client);
+				? MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(shellCollectionName, AssetAdministrationShell.class, config)
+				: MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(shellCollectionName, AssetAdministrationShell.class, config, client);
 		return shellStorageApi;
 	}
 

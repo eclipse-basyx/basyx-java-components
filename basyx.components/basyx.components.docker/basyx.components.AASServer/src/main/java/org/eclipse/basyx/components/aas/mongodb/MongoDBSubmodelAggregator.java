@@ -27,6 +27,7 @@ package org.eclipse.basyx.components.aas.mongodb;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -46,11 +47,11 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 
 	@Deprecated
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
-		this(smApiFactory, new MongoDBBaSyxStorageAPI<Submodel>(config.getSubmodelCollection(), Submodel.class, config));
+		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
-		this(smApiFactory, new MongoDBBaSyxStorageAPI<Submodel>(config.getSubmodelCollection(), Submodel.class, config, client));
+		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config, client));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, MongoDBBaSyxStorageAPI<Submodel> storageApi) {

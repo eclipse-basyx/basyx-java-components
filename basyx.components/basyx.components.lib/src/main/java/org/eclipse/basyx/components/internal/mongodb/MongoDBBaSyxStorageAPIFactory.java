@@ -25,21 +25,27 @@
 
 package org.eclipse.basyx.components.internal.mongodb;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 /**
  * 
- * @author fischer
+ * @author fischer, jung
  * 
  * @param <T>
  *            Generic type of the objects to be managed by the produced API
  */
 public class MongoDBBaSyxStorageAPIFactory<T> {
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private static Map<String, MongoClient> knownClients = new HashMap<>();
+
+	private static Logger logger = LoggerFactory.getLogger(MongoDBBaSyxStorageAPIFactory.class);
 
 	private final BaSyxMongoDBConfiguration config;
 	private final Class<T> type;
@@ -84,12 +90,67 @@ public class MongoDBBaSyxStorageAPIFactory<T> {
 		this.client = client;
 	}
 
-	public MongoDBBaSyxStorageAPI<T> create() {
-		logger.info("Create MongoDB client...");
-		if (client == null) {
-			return new MongoDBBaSyxStorageAPI<T>(collectionName, type, config);
-		} else {
-			return new MongoDBBaSyxStorageAPI<T>(collectionName, type, config, client);
+	/**
+	 * Creates a generic MongoDBBaSyxStorageAPI. This method has been designed to
+	 * ensure efficient resource utilization by reusing existing storage clients if
+	 * they already exist.
+	 * 
+	 * @param <T>
+	 * @param config
+	 *            BaSyx MongoDB Configuration
+	 * @param type
+	 *            Must be the exact same type as the type of the generic parameter
+	 *            {@code <T>}
+	 * @param collectionName
+	 *            The name of the collection, managed by the produced API
+	 * @param client
+	 *            The client of the MongoDB connection
+	 * @return
+	 */
+	public static synchronized <T> MongoDBBaSyxStorageAPI<T> create(String collectionName, Class<T> type, BaSyxMongoDBConfiguration config, MongoClient client) {
+		String connectionUrl = config.getConnectionUrl();
+		if (!knownClients.containsKey(connectionUrl)) {
+			knownClients.put(connectionUrl, client);
 		}
+		logger.info("Create MongoDBBaSyxStorageAPI...");
+		return new MongoDBBaSyxStorageAPI<T>(collectionName, type, config, knownClients.get(connectionUrl));
+	}
+
+	/**
+	 * Creates a generic MongoDBBaSyxStorageAPI. If an appropriate MongoClient
+	 * already exists, it will be reused.
+	 * 
+	 * @param <T>
+	 * @param config
+	 *            BaSyx MongoDB Configuration
+	 * @param type
+	 *            Must be the exact same type as the type of the generic parameter
+	 *            {@code <T>}
+	 * @param collectionName
+	 *            The name of the collection, managed by the produced API
+	 * @return
+	 */
+	public static synchronized <T> MongoDBBaSyxStorageAPI<T> create(String collectionName, Class<T> type, BaSyxMongoDBConfiguration config) {
+		String connectionUrl = config.getConnectionUrl();
+		return knownClients.containsKey(connectionUrl)
+				? create(collectionName, type, config, knownClients.get(connectionUrl))
+				: create(collectionName, type, config, createNewClient(config));
+	}
+
+	private static MongoClient createNewClient(BaSyxMongoDBConfiguration config) {
+		MongoClient client = MongoClients.create(config.getConnectionUrl());
+		return client;
+	}
+
+	/**
+	 * Creates a generic MongoDBBaSyxStorageAPI. If an appropriate MongoClient
+	 * already exists, it will be reused
+	 * 
+	 * @return
+	 */
+	public MongoDBBaSyxStorageAPI<T> create() {
+		return this.client == null 
+				? MongoDBBaSyxStorageAPIFactory.<T>create(collectionName, type, config)
+				: MongoDBBaSyxStorageAPIFactory.<T>create(collectionName, type, config, client);
 	}
 }

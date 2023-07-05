@@ -29,6 +29,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 
 import com.mongodb.client.MongoClient;
 
@@ -45,11 +46,11 @@ public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
 	@Deprecated
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config));
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config));
 	}
 
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config, client));
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config, client));
 	}
 
 	public MongoDBAASAPIFactory(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI) {

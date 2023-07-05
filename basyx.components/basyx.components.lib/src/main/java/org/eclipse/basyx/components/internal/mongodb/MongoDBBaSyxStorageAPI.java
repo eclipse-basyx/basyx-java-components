@@ -67,6 +67,11 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	protected MongoClient client;
 	protected MongoOperations mongoOps;
 
+	/**
+	 * @deprecated Please use the other constructor with MongoClient client. 
+	 *             Using this constructor may lead to inefficient resource utilization.
+	 */
+	@Deprecated
 	public MongoDBBaSyxStorageAPI(String collectionName, Class<T> type, BaSyxMongoDBConfiguration config) {
 		this(collectionName, type, config, MongoClients.create(config.getConnectionUrl()));
 	}
@@ -187,5 +192,9 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public Object getStorageConnection() {
 		return mongoOps;
+	}
+
+	public MongoClient getClient() {
+		return client;
 	}
 }

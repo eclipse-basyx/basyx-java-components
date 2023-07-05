@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2021, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -33,6 +33,7 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.memory.IRegistryHandler;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
@@ -42,7 +43,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 /**
  * A registry handler based on MongoDB
  * 
- * @author espen
+ * @author espen, jung
  */
 public class MongoDBRegistryHandler implements IRegistryHandler {
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
@@ -88,7 +89,8 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 
 	private void initStorageApi(BaSyxMongoDBConfiguration config) {
 		String collectionName = config.getRegistryCollection();
-		this.storageApi = new MongoDBBaSyxStorageAPI<>(collectionName, AASDescriptor.class, config);
+		MongoDBBaSyxStorageAPIFactory<AASDescriptor> storageApiFactory = new MongoDBBaSyxStorageAPIFactory<>(config, AASDescriptor.class, collectionName);
+		this.storageApi = storageApiFactory.create();
 	}
 
 	@Override

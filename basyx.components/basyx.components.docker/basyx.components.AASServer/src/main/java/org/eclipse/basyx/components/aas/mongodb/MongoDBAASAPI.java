@@ -32,6 +32,7 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	@Deprecated
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config), identificationId);
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config), identificationId);
 	}
 
 	/**
@@ -72,7 +73,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @param config
 	 */
 	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId, MongoClient client) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(config.getAASCollection(), AssetAdministrationShell.class, config, client), identificationId);
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config, client), identificationId);
 	}
 
 	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI, String identificationId) {
@@ -88,14 +89,14 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	@Deprecated
 	public MongoDBAASAPI(String resourceConfigPath, String identificationId) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath)), identificationId);
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath)), identificationId);
 	}
 
 	/**
 	 * Receives the path of the .properties file in its constructor from a resource.
 	 */
 	public MongoDBAASAPI(String resourceConfigPath, String identificationId, MongoClient client) {
-		this(new MongoDBBaSyxStorageAPI<AssetAdministrationShell>(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), identificationId);
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), identificationId);
 	}
 
 	private static BaSyxMongoDBConfiguration configFromResource(String resourceConfigPath) {
