@@ -50,8 +50,8 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 
 	private MongoDBBaSyxStorageAPI<AASDescriptor> storageApi;
 
-	private static final String AASID = Identifiable.IDENTIFICATION + "." + Identifier.ID;
-	private static final String ASSETID = AASDescriptor.ASSET + "." + Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private static final String SHELL_IDENTIFICATION_ID = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private static final String ASSET_IDENTIFICATION_ID = AASDescriptor.ASSET + "." + Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	/**
 	 * Receives the path of the configuration.properties file in it's constructor.
@@ -97,7 +97,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	public boolean contains(IIdentifier identifier) {
 		String identificationId = identifier.getId();
 		Criteria hasId = new Criteria();
-		hasId.orOperator(where(AASID).is(identificationId), where(ASSETID).is(identificationId));
+		hasId.orOperator(where(SHELL_IDENTIFICATION_ID).is(identificationId), where(ASSET_IDENTIFICATION_ID).is(identificationId));
 
 		return getStorageConnection().exists(query(hasId), this.storageApi.getCollectionName());
 	}
@@ -110,7 +110,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	public void remove(IIdentifier identifier) {
 		String indentificationId = identifier.getId();
 		Criteria hasId = new Criteria();
-		hasId.orOperator(where(AASID).is(indentificationId), where(ASSETID).is(indentificationId));
+		hasId.orOperator(where(SHELL_IDENTIFICATION_ID).is(indentificationId), where(ASSET_IDENTIFICATION_ID).is(indentificationId));
 		getStorageConnection().remove(query(hasId), this.storageApi.getCollectionName());
 	}
 
@@ -128,7 +128,7 @@ public class MongoDBRegistryHandler implements IRegistryHandler {
 	public AASDescriptor get(IIdentifier identifier) {
 		String indentificationId = identifier.getId();
 		Criteria hasId = new Criteria();
-		hasId.orOperator(where(AASID).is(indentificationId), where(ASSETID).is(indentificationId));
+		hasId.orOperator(where(SHELL_IDENTIFICATION_ID).is(indentificationId), where(ASSET_IDENTIFICATION_ID).is(indentificationId));
 
 		AASDescriptor result = getStorageConnection().findOne(query(hasId), AASDescriptor.class, this.storageApi.getCollectionName());
 		return this.storageApi.handleMongoDbIdAttribute(result);

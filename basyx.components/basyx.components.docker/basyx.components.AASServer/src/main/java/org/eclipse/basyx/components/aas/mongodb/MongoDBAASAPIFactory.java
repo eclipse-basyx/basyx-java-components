@@ -58,10 +58,10 @@ public class MongoDBAASAPIFactory implements IAASAPIFactory {
 	}
 
 	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell sehll) {
-		new MongoDBAASAPI(storageAPI, sehll.getIdentification().getId());
-		MongoDBAASAPI api = new MongoDBAASAPI(storageAPI, sehll.getIdentification().getId());
-		api.setAAS(sehll);
+	public IAASAPI getAASApi(AssetAdministrationShell shell) {
+		new MongoDBAASAPI(storageAPI, shell.getIdentification().getId());
+		MongoDBAASAPI api = new MongoDBAASAPI(storageAPI, shell.getIdentification().getId());
+		api.setAAS(shell);
 		return api;
 	}
 

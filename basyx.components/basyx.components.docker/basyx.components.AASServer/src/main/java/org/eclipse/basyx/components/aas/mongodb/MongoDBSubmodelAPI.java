@@ -57,19 +57,19 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	 * 
 	 * @param config
 	 */
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, MongoClient client) {
-		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String submdoelIdentificationId, MongoClient client) {
+		this(config, submdoelIdentificationId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
 	}
 
 	/**
 	 * Constructor using default MongoDB connections
 	 */
-	public MongoDBSubmodelAPI(String smId, MongoClient client) {
-		this(DEFAULT_CONFIG_PATH, smId, client);
+	public MongoDBSubmodelAPI(String submodelIdentificationId, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, submodelIdentificationId, client);
 	}
 
-	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
-		this(DEFAULT_CONFIG_PATH, smId, invocationHelper, client);
+	public MongoDBSubmodelAPI(String submodelIdentificationId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, submodelIdentificationId, invocationHelper, client);
 	}
 
 	// NEUER KONSTRUKTOR?
@@ -85,22 +85,22 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	/**
 	 * Receives the path of the .properties file in its constructor from a resource.
 	 */
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, MongoClient client) {
-		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
+	public MongoDBSubmodelAPI(String resourceConfigPath, String submodelIdentificationId, MongoClient client) {
+		this(resourceConfigPath, submodelIdentificationId, new DelegatedInvocationManager(new HTTPConnectorFactory()), client);
 	}
 
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
-		super(createSubmodelStorageAPI(config, client), smId, invocationHelper);
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String submodelIdentificationId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+		super(createSubmodelStorageAPI(config, client), submodelIdentificationId, invocationHelper);
 		this.setConfiguration(config);
-		this.setSubmodelId(smId);
+		this.setSubmodelId(submodelIdentificationId);
 		this.invocationHelper = invocationHelper;
 	}
 
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper, MongoClient client) {
-		super(createSubmodelStorageAPI(createConfig(resourceConfigPath), client), smId, invocationHelper);
+	public MongoDBSubmodelAPI(String resourceConfigPath, String submodelIdentificationId, DelegatedInvocationManager invocationHelper, MongoClient client) {
+		super(createSubmodelStorageAPI(createConfig(resourceConfigPath), client), submodelIdentificationId, invocationHelper);
 		this.config = createConfig(resourceConfigPath);
 		this.setConfiguration(config);
-		this.setSubmodelId(smId);
+		this.setSubmodelId(submodelIdentificationId);
 		this.invocationHelper = invocationHelper;
 	}
 
@@ -111,13 +111,13 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId) {
-		this(config, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String submodelIdentificationId) {
+		this(config, submodelIdentificationId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
 	@Deprecated
-	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String smId, DelegatedInvocationManager invocationHelper) {
-		this(config, smId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
+	public MongoDBSubmodelAPI(BaSyxMongoDBConfiguration config, String submodelIdentificationId, DelegatedInvocationManager invocationHelper) {
+		this(config, submodelIdentificationId, invocationHelper, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	/**
@@ -126,8 +126,8 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId) {
-		this(resourceConfigPath, smId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
+	public MongoDBSubmodelAPI(String resourceConfigPath, String submodelIdentificationId) {
+		this(resourceConfigPath, submodelIdentificationId, new DelegatedInvocationManager(new HTTPConnectorFactory()));
 	}
 
 	/**
@@ -136,21 +136,21 @@ public class MongoDBSubmodelAPI extends StorageSubmodelAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBSubmodelAPI(String smId) {
-		this(DEFAULT_CONFIG_PATH, smId);
+	public MongoDBSubmodelAPI(String submodelIdentificationId) {
+		this(DEFAULT_CONFIG_PATH, submodelIdentificationId);
 	}
 
 	@Deprecated
-	public MongoDBSubmodelAPI(String smId, DelegatedInvocationManager invocationHelper) {
-		this(DEFAULT_CONFIG_PATH, smId, invocationHelper);
+	public MongoDBSubmodelAPI(String submodelIdentificationId, DelegatedInvocationManager invocationHelper) {
+		this(DEFAULT_CONFIG_PATH, submodelIdentificationId, invocationHelper);
 	}
 
 	@Deprecated
-	public MongoDBSubmodelAPI(String resourceConfigPath, String smId, DelegatedInvocationManager invocationHelper) {
-		super(createSubmodelStorageAPI(createConfig(resourceConfigPath)), smId, invocationHelper);
+	public MongoDBSubmodelAPI(String resourceConfigPath, String submodelIdentificationId, DelegatedInvocationManager invocationHelper) {
+		super(createSubmodelStorageAPI(createConfig(resourceConfigPath)), submodelIdentificationId, invocationHelper);
 		this.config = createConfig(resourceConfigPath);
 		this.setConfiguration(config);
-		this.setSubmodelId(smId);
+		this.setSubmodelId(submodelIdentificationId);
 		this.invocationHelper = invocationHelper;
 	}
 

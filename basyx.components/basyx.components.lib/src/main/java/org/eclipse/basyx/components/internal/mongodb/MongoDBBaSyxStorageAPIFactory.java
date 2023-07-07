@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -44,8 +42,6 @@ import com.mongodb.client.MongoClients;
  */
 public class MongoDBBaSyxStorageAPIFactory<T> {
 	private static Map<String, MongoClient> knownClients = new HashMap<>();
-
-	private static Logger logger = LoggerFactory.getLogger(MongoDBBaSyxStorageAPIFactory.class);
 
 	private final BaSyxMongoDBConfiguration config;
 	private final Class<T> type;
@@ -112,7 +108,6 @@ public class MongoDBBaSyxStorageAPIFactory<T> {
 		if (!knownClients.containsKey(connectionUrl)) {
 			knownClients.put(connectionUrl, client);
 		}
-		logger.info("Create MongoDBBaSyxStorageAPI...");
 		return new MongoDBBaSyxStorageAPI<T>(collectionName, type, config, knownClients.get(connectionUrl));
 	}
 
@@ -138,8 +133,7 @@ public class MongoDBBaSyxStorageAPIFactory<T> {
 	}
 
 	private static MongoClient createNewClient(BaSyxMongoDBConfiguration config) {
-		MongoClient client = MongoClients.create(config.getConnectionUrl());
-		return client;
+		return MongoClients.create(config.getConnectionUrl());
 	}
 
 	/**

@@ -28,19 +28,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.basyx.aas.metamodel.api.IAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,12 +52,12 @@ public class TestMongoDBAAASAPI {
 	private final static String COLLECTION_NAME = "testCollection";
 	private final static BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
 	private static MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI;
-	private final static String IDENTIFICATION_ID = "testIdentificationId";
+	private final static String SHELL_IDENTIFICATION_ID = "testIdentificationId";
 
 	@BeforeClass
 	public static void setUpClass() {
 		mongoDBStorageAPI = new MongoDBBaSyxStorageAPI<>(COLLECTION_NAME, AssetAdministrationShell.class, config);
-		shellAPI = new MongoDBAASAPI(mongoDBStorageAPI, IDENTIFICATION_ID);
+		shellAPI = new MongoDBAASAPI(mongoDBStorageAPI, SHELL_IDENTIFICATION_ID);
 	}
 
 	@Before
@@ -73,11 +70,7 @@ public class TestMongoDBAAASAPI {
 	public void setAndGetAAS() {
 		String idShort = "testIdShort";
 
-		Map<String, Object> identificationMap = new HashMap<>();
-		identificationMap.put(Identifier.IDTYPE, IdentifierType.CUSTOM.toString());
-		identificationMap.put(Identifier.ID, IDENTIFICATION_ID);
-
-		IIdentifier identification = Identifier.createAsFacade(identificationMap);
+		IIdentifier identification = new CustomId(SHELL_IDENTIFICATION_ID);
 		AssetAdministrationShell expectedShell = new AssetAdministrationShell(idShort, identification, null);
 
 		shellAPI.setAAS(expectedShell);
@@ -91,10 +84,7 @@ public class TestMongoDBAAASAPI {
 		String idShortShell = "testIdShortShell";
 		String idShortSubmodel = "testIdShortSubmodel";
 
-		Map<String, Object> identificationMap = new HashMap<>();
-		identificationMap.put(Identifier.IDTYPE, IdentifierType.CUSTOM.toString());
-		identificationMap.put(Identifier.ID, IDENTIFICATION_ID);
-		IIdentifier identification = Identifier.createAsFacade(identificationMap);
+		IIdentifier identification = new CustomId(SHELL_IDENTIFICATION_ID);
 
 		AssetAdministrationShell expectedShell = new AssetAdministrationShell(idShortShell, identification, null);
 		shellAPI.setAAS(expectedShell);
@@ -116,10 +106,7 @@ public class TestMongoDBAAASAPI {
 		String idShortShell = "testIdShortShell";
 		String idShortSubmodel = "testIdShortSubmodel";
 
-		Map<String, Object> identificationMap = new HashMap<>();
-		identificationMap.put(Identifier.IDTYPE, IdentifierType.CUSTOM.toString());
-		identificationMap.put(Identifier.ID, IDENTIFICATION_ID);
-		IIdentifier identification = Identifier.createAsFacade(identificationMap);
+		IIdentifier identification = new CustomId(SHELL_IDENTIFICATION_ID);
 
 		AssetAdministrationShell testShell = new AssetAdministrationShell(idShortShell, identification, null);
 

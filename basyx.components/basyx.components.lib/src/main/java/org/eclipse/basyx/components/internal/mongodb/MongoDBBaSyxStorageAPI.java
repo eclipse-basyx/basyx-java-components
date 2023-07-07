@@ -43,6 +43,7 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
@@ -97,26 +98,36 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		}
 
 		T created = mongoOps.insert(obj, getCollectionName());
-		created = handleMongoDbIdAttribute(created);
-
-		return created;
+		return handleMongoDbIdAttribute(created);
 	}
 
 	private boolean alreadyExists(String key) {
 		Query hasId = query(where(INDEX_KEY).is(key));
-		boolean exists = mongoOps.exists(hasId, getCollectionName());
-		return exists;
+		return mongoOps.exists(hasId, getCollectionName());
 	}
 
 	@Override
 	public T update(T obj, String key) {
-		Query hasId = query(where(INDEX_KEY).is(key));
-		T replaced = mongoOps.findAndReplace(hasId, obj, getCollectionName());
+		T replaced = findAndReplaceIfExists(obj, key);
 		if (replaced == null) {
+			logger.warn("Could not execute update for key {} as it does not exist in the database; Creating new entry...", key);
 			return createOrUpdate(obj);
 		}
 		replaced = handleMongoDbIdAttribute(replaced);
 		return replaced;
+	}
+
+	private T findAndReplaceIfExists(T obj, String key) {
+		Query hasId = query(where(INDEX_KEY).is(key));
+		FindAndReplaceOptions replacementOptions = setupReplacemantOptionsToReturnNew();
+		T replaced = mongoOps.findAndReplace(hasId, obj, replacementOptions.returnNew(), getCollectionName());
+		return replaced;
+	}
+
+	private FindAndReplaceOptions setupReplacemantOptionsToReturnNew() {
+		FindAndReplaceOptions replacementOptions = FindAndReplaceOptions.empty();
+		replacementOptions.returnNew();
+		return replacementOptions;
 	}
 
 	@SuppressWarnings("unchecked")

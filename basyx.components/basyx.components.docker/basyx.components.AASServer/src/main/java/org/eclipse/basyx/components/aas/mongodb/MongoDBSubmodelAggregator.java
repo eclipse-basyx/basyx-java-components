@@ -45,8 +45,8 @@ import com.mongodb.client.MongoClient;
 public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	private MongoDBBaSyxStorageAPI<Submodel> storageApi;
 
-	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
-		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config, client));
+	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
+		this(submodelApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config, client));
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, MongoDBBaSyxStorageAPI<Submodel> storageApi) {
@@ -55,15 +55,15 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	}
 
 	@Deprecated
-	public MongoDBSubmodelAggregator(ISubmodelAPIFactory smApiFactory, BaSyxMongoDBConfiguration config) {
-		this(smApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config));
+	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, BaSyxMongoDBConfiguration config) {
+		this(submodelApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config));
 	}
 
 
 	@Override
-	public void deleteSubmodelByIdentifier(IIdentifier identifier) {
-		super.deleteSubmodelByIdentifier(identifier);
-		storageApi.delete(identifier.getId());
+	public void deleteSubmodelByIdentifier(IIdentifier submodelIdentifier) {
+		super.deleteSubmodelByIdentifier(submodelIdentifier);
+		storageApi.delete(submodelIdentifier.getId());
 	}
 
 	@Override

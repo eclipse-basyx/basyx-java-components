@@ -35,6 +35,7 @@ import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.vab.exception.FeatureNotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,41 +49,38 @@ import com.mongodb.client.MongoClient;
 public class MongoDBAASAPI implements IAASAPI {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String DEFAULT_CONFIG_PATH = "mongodb.properties";
-	// private static final String AASIDPATH = Identifiable.IDENTIFICATION + "." +
-	// Identifier.ID;
 
-	// protected MongoOperations mongoOps;
 	protected String collectionName;
 	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageApi;
-	private String identificationId;
+	private String shellIdentificationId;
 
 	/**
 	 * Receives the path of the configuration.properties file in its constructor.
 	 * 
 	 * @param config
 	 */
-	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId, MongoClient client) {
-		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config, client), identificationId);
+	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String shellIdentificationId, MongoClient client) {
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config, client), shellIdentificationId);
 	}
 
-	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI, String identificationId) {
+	public MongoDBAASAPI(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI, String shellIdentificationId) {
 		super();
 		this.storageApi = mongoDBStorageAPI;
-		this.identificationId = identificationId;
+		this.shellIdentificationId = shellIdentificationId;
 	}
 
 	/**
 	 * Receives the path of the .properties file in its constructor from a resource.
 	 */
-	public MongoDBAASAPI(String resourceConfigPath, String identificationId, MongoClient client) {
-		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), identificationId);
+	public MongoDBAASAPI(String resourceConfigPath, String shellIdentificationId, MongoClient client) {
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath), client), shellIdentificationId);
 	}
 
 	/**
 	 * Constructor using default MongoDB connections
 	 */
-	public MongoDBAASAPI(String aasId, MongoClient client) {
-		this(DEFAULT_CONFIG_PATH, aasId, client);
+	public MongoDBAASAPI(String shellIdentificationId, MongoClient client) {
+		this(DEFAULT_CONFIG_PATH, shellIdentificationId, client);
 	}
 
 	/**
@@ -92,8 +90,8 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String identificationId) {
-		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config), identificationId);
+	public MongoDBAASAPI(BaSyxMongoDBConfiguration config, String shellIdentificationId) {
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config), shellIdentificationId);
 	}
 
 	/**
@@ -102,8 +100,8 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBAASAPI(String resourceConfigPath, String identificationId) {
-		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath)), identificationId);
+	public MongoDBAASAPI(String resourceConfigPath, String shellIdentificationId) {
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(configFromResource(resourceConfigPath).getSubmodelCollection(), AssetAdministrationShell.class, configFromResource(resourceConfigPath)), shellIdentificationId);
 	}
 
 	/**
@@ -112,8 +110,8 @@ public class MongoDBAASAPI implements IAASAPI {
 	 * @deprecated Use the new constructor using a MongoClient
 	 */
 	@Deprecated
-	public MongoDBAASAPI(String aasId) {
-		this(DEFAULT_CONFIG_PATH, aasId);
+	public MongoDBAASAPI(String shellIdentificationId) {
+		this(DEFAULT_CONFIG_PATH, shellIdentificationId);
 	}
 
 	private static BaSyxMongoDBConfiguration configFromResource(String resourceConfigPath) {
@@ -129,7 +127,7 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
-		// Do nothing
+		throw new FeatureNotImplementedException("The Configuration shall be set set during instantiation using one of the constructors.");
 	}
 
 	/**
@@ -139,23 +137,24 @@ public class MongoDBAASAPI implements IAASAPI {
 	 */
 	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
-		// Do nothing
+		throw new FeatureNotImplementedException("The Configuration and the MongoClient shall be set set during instantiation using one of the constructors.");
 	}
 
 	/**
-	 * Sets the aas id, so that this API points to the aas with aasId. Can be
-	 * changed to point to a different aas in the database.
+	 * Sets the shellIdentificationId, so that this API points to the shell with
+	 * shellIdentificationId. Can be changed to point to a different shell in the
+	 * database.
 	 * 
-	 * @param identificationId
+	 * @param shellIdentificationId
 	 */
-	public void setAASId(String identificationId) {
-		this.identificationId = identificationId;
+	public void setAASId(String shellIdentificationId) {
+		this.shellIdentificationId = shellIdentificationId;
 	}
 
 	/**
 	 * Depending on whether the model is already in the db, this method inserts or
-	 * replaces the existing data. The new aas id for this API is taken from the
-	 * given aas.
+	 * replaces the existing data. The new shell id for this API is taken from the
+	 * given shell.
 	 * 
 	 * @param shell
 	 */
@@ -167,30 +166,29 @@ public class MongoDBAASAPI implements IAASAPI {
 
 	@Override
 	public IAssetAdministrationShell getAAS() {
-		return storageApi.retrieve(identificationId);
+		return storageApi.retrieve(shellIdentificationId);
 	}
 
 	@Override
 	public void addSubmodel(IReference submodelReference) {
 		AssetAdministrationShell shell = (AssetAdministrationShell) getAAS();
 		shell.addSubmodelReference(submodelReference);
-		storageApi.update(shell, identificationId);
+		storageApi.update(shell, shellIdentificationId);
 	}
 
 	@Override
-	public void removeSubmodel(String identificationId) {
+	public void removeSubmodel(String submodelIdShort) {
 		AssetAdministrationShell shell = (AssetAdministrationShell) this.getAAS();
 		Collection<IReference> submodelReferences = shell.getSubmodelReferences();
 
-		Optional<IReference> toBeRemoved = submodelReferences.stream().filter(submodelReference -> getLastSubmodelReferenceKey(submodelReference).getValue().equals(identificationId)).findFirst();
+		Optional<IReference> toBeRemoved = submodelReferences.stream().filter(submodelReference -> getLastSubmodelReferenceKey(submodelReference).getValue().equals(submodelIdShort)).findFirst();
 		if (!toBeRemoved.isPresent() || toBeRemoved.isEmpty()) {
-			logger.warn("Submodel reference could not be removed. Shell with identification id '{}' does not contain submodel with idShort '{}'.", shell.getIdentification().getId(), identificationId);
+			logger.warn("Submodel reference could not be removed. Shell with identification id '{}' does not contain submodel with idShort '{}'.", shell.getIdentification().getId(), submodelIdShort);
 			return;
 		}
 		submodelReferences.remove(toBeRemoved.get());
-		logger.info("Removed submodel reference with idShort '{}' from shell with identification id '{}'.", identificationId, shell.getIdentification().getId());
 		shell.setSubmodelReferences(submodelReferences);
-		storageApi.update(shell, identificationId);
+		storageApi.update(shell, submodelIdShort);
 	}
 
 	private IKey getLastSubmodelReferenceKey(IReference submodelReference) {
