@@ -31,7 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -125,19 +124,17 @@ public class AASServerComponent implements IComponent {
 	private BaSyxMongoDBConfiguration mongoDBConfig;
 	private BaSyxSecurityConfiguration securityConfig;
 
-	private List<IAASServerFeature> aasServerFeatureList = new ArrayList<IAASServerFeature>();
-
-	// Initial AASBundle
-	protected Collection<AASBundle> aasBundles;
+	private List<IAASServerFeature> aasServerFeatureList = new ArrayList<>();
+	protected List<Collection<AASBundle>> aasBundles = new ArrayList<>();
 
 	private IAASAggregator aggregator;
 	// Watcher for AAS Aggregator functionality
 	private boolean isAASXUploadEnabled = false;
 	
 	private static final String PREFIX_SUBMODEL_PATH = "/aas/submodels/";
-	private static final String AASX_RES_FILE_CONTEXT_PATH = "/basyx-temp";
-	private static final String AASX_RES_FILE_DOCBASE_PATH = System.getProperty("java.io.tmpdir") + AASX_RES_FILE_CONTEXT_PATH;	
-	private static final String AASX_RES_FILE_SERVLET_MAPPING_PATTERN = "/files/*";
+	private static final String AASX_RES_FILE_CONTEXT_PATH = AASXToMetamodelConverter.TEMP_DIRECTORY;
+	private static final String AASX_RES_FILE_DOCBASE_PATH = VABPathTools.append(System.getProperty("java.io.tmpdir"), AASX_RES_FILE_CONTEXT_PATH);
+	private static final String AASX_RES_FILE_SERVLET_MAPPING_PATTERN = "/*";
 
 	/**
 	 * Constructs an empty AAS server using the passed context
@@ -217,7 +214,8 @@ public class AASServerComponent implements IComponent {
 	 *            The bundles that will be loaded during startup
 	 */
 	public void setAASBundles(Collection<AASBundle> aasBundles) {
-		this.aasBundles = aasBundles;
+		this.aasBundles = new ArrayList<>();
+		this.aasBundles.add(aasBundles);
 	}
 
 	/**
@@ -227,7 +225,9 @@ public class AASServerComponent implements IComponent {
 	 *            The bundle that will be loaded during startup
 	 */
 	public void setAASBundle(AASBundle aasBundle) {
-		this.aasBundles = Collections.singleton(aasBundle);
+		this.aasBundles = new ArrayList<Collection<AASBundle>>();
+		Collection<AASBundle> firstBundleSet = Collections.singleton(aasBundle);
+		this.aasBundles.add(firstBundleSet);
 	}
 
 	/**
@@ -263,7 +263,7 @@ public class AASServerComponent implements IComponent {
 			addAasxFilesResourceServlet(context);
 
 			// 2. Fix the file paths according to the servlet configuration
-			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), contextConfig.getContextPath() + AASX_RES_FILE_CONTEXT_PATH);
+			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), getRootFilePathWithContext(contextConfig.getContextPath()));
 
 			registerWhitelistedSubmodels();
 		}
@@ -273,6 +273,10 @@ public class AASServerComponent implements IComponent {
 		server.start();
 		
 		registerPreexistingAASAndSMIfPossible();
+	}
+
+	private String getRootFilePathWithContext(String contextPath) {
+		return VABPathTools.append(contextPath, AASX_RES_FILE_CONTEXT_PATH);
 	}
 
 	private DefaultServlet createDefaultServlet() {
@@ -551,13 +555,13 @@ public class AASServerComponent implements IComponent {
 		return new JSONAASBundleFactory(jsonContent).create();
 	}
 
-	private static Set<AASBundle> loadBundleFromAASX(String aasxPath) throws IOException, ParserConfigurationException, SAXException, InvalidFormatException, URISyntaxException {
+	private static Set<AASBundle> loadBundleFromAASX(String aasxPath, String childFilePath) throws IOException, ParserConfigurationException, SAXException, InvalidFormatException, URISyntaxException {
 		logger.info("Loading aas from aasx \"" + aasxPath + "\"");
 
 		// Instantiate the aasx package manager
 		try (AASXToMetamodelConverter packageManager = new AASXToMetamodelConverter(aasxPath)) {
 			// Unpack the files referenced by the aas
-			packageManager.unzipRelatedFiles();
+			packageManager.unzipRelatedFilesToChildPath(childFilePath);
 
 			// Retrieve the aas from the package
 			return packageManager.retrieveAASBundles();
@@ -571,13 +575,21 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
+	private Collection<AASBundle> getFlatAASBundles() {
+		Collection<AASBundle> result = new ArrayList<AASBundle>();
+		for (Collection<AASBundle> bundle : this.aasBundles) {
+			result.addAll(bundle);
+		}
+		return result;
+	}
+
 	private VABHTTPInterface<?> createAggregatorServlet() {
 		aggregator = createAASAggregator();
 		loadAASBundles();
 		
 		if (aasBundles != null) {
 			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
-				AASBundleHelper.integrate(aggregator, aasBundles);
+				AASBundleHelper.integrate(aggregator, getFlatAASBundles());
 			}
 		}
 
@@ -623,7 +635,7 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private void loadAASBundles() {
-		if (aasBundles != null) {
+		if (!aasBundles.isEmpty()) {
 			return;
 		}
 
@@ -631,22 +643,31 @@ public class AASServerComponent implements IComponent {
 		aasBundles = loadAASFromSource(aasSources);
 	}
 
-	private Set<AASBundle> loadAASFromSource(List<String> aasSources) {
+	private List<Collection<AASBundle>> loadAASFromSource(List<String> aasSources) {
 		if (aasSources.isEmpty()) {
-			return Collections.emptySet();
+			return new ArrayList<>();
 		}
 
-		Set<AASBundle> aasBundlesSet = new HashSet<>();
+		List<Collection<AASBundle>> aasBundlesSet = new ArrayList<>();
 
-		aasSources.stream().map(this::loadBundleFromFile).forEach(aasBundlesSet::addAll);
+		for (int i = 0; i < aasSources.size(); i++) {
+			String aasSource = aasSources.get(i);
+			String subFilePath = getAASXFileSubPath(i);
+			Set<AASBundle> loadedBundles = loadBundleFromFile(aasSource, subFilePath);
+			aasBundlesSet.add(loadedBundles);
+		}
 
 		return aasBundlesSet;
 	}
 
-	private Set<AASBundle> loadBundleFromFile(String aasSource) {
+	private String getAASXFileSubPath(int aasxIndex) {
+		return "aasx" + Integer.toString(aasxIndex);
+	}
+
+	private Set<AASBundle> loadBundleFromFile(String aasSource, String childFilePath) {
 		try {
 			if (aasSource.endsWith(".aasx")) {
-				return loadBundleFromAASX(aasSource);
+				return loadBundleFromAASX(aasSource, childFilePath);
 			} else if (aasSource.endsWith(".json")) {
 				return loadBundleFromJSON(aasSource);
 			} else if (aasSource.endsWith(".xml")) {
@@ -739,7 +760,8 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private String getSMIdShortFromSMId(IIdentifier smId) {
-		for (AASBundle bundle : aasBundles) {
+		Collection<AASBundle> flatAasBundles = getFlatAASBundles();
+		for (AASBundle bundle : flatAasBundles) {
 			for (ISubmodel sm : bundle.getSubmodels()) {
 				if (smId.getId().equals(sm.getIdentification().getId())) {
 					return sm.getIdShort();
@@ -750,7 +772,8 @@ public class AASServerComponent implements IComponent {
 	}
 
 	private String getAASIdFromSMId(IIdentifier smId) {
-		for (AASBundle bundle : aasBundles) {
+		Collection<AASBundle> flatAasBundles = getFlatAASBundles();
+		for (AASBundle bundle : flatAasBundles) {
 			for (ISubmodel sm : bundle.getSubmodels()) {
 				if (smId.getId().equals(sm.getIdentification().getId())) {
 					return bundle.getAAS().getIdentification().getId();
@@ -765,11 +788,18 @@ public class AASServerComponent implements IComponent {
 	 * configuration
 	 */
 	private void modifyFilePaths(String hostName, int port, String rootPath) {
-		rootPath = rootPath + "/files";
-		for (AASBundle bundle : aasBundles) {
+		for (int i = 0; i < aasBundles.size(); i++) {
+			Collection<AASBundle> bundleSet = aasBundles.get(i);
+			String bundleFileRootPath = VABPathTools.concatenatePaths(rootPath, getAASXFileSubPath(i), "files");
+			modifyFilePathsInBundleSet(bundleSet, hostName, port, bundleFileRootPath);
+		}
+	}
+
+	private void modifyFilePathsInBundleSet(Collection<AASBundle> bundleSet, String hostName, int port, String bundleFileRootPath) {
+		for (AASBundle bundle : bundleSet) {
 			Set<ISubmodel> submodels = bundle.getSubmodels();
 			for (ISubmodel sm : submodels) {
-				SubmodelFileEndpointLoader.setRelativeFileEndpoints(sm, hostName, port, rootPath);
+				SubmodelFileEndpointLoader.setRelativeFileEndpoints(sm, hostName, port, bundleFileRootPath);
 			}
 		}
 	}
@@ -778,7 +808,11 @@ public class AASServerComponent implements IComponent {
 		if (aasBundles == null || aasBundles.isEmpty()) {
 			return "defaultNoShellId";
 		}
-		return aasBundles.stream().findFirst().get().getAAS().getIdShort();
+		Collection<AASBundle> firstBundleSet = aasBundles.get(0);
+		if (firstBundleSet == null || firstBundleSet.isEmpty()) {
+			return "defaultNoShellId";
+		}
+		return firstBundleSet.stream().findFirst().get().getAAS().getIdShort();
 	}
 
 	private String getMqttSubmodelClientId() {
@@ -788,8 +822,7 @@ public class AASServerComponent implements IComponent {
 	private void addAasxFilesResourceServlet(BaSyxContext context) {
 		HttpServlet httpServlet = createDefaultServlet();
 		
-		String childContextPath = contextConfig.getContextPath() + AASX_RES_FILE_CONTEXT_PATH;
-		
+		String childContextPath = VABPathTools.append(contextConfig.getContextPath(), AASX_RES_FILE_CONTEXT_PATH);
 		Context childContext = createChildContextForAasxResourceFiles(childContextPath, AASX_RES_FILE_DOCBASE_PATH);
 		
 		context.addChildContext(new BaSyxChildContext(childContext, httpServlet, AASX_RES_FILE_SERVLET_MAPPING_PATTERN));
@@ -800,7 +833,6 @@ public class AASServerComponent implements IComponent {
 		childContext.setPath(childContextPath);
 		childContext.setDocBase(childDocbasePath);
 		childContext.addLifecycleListener(new Tomcat.FixContextListener());
-		
 		return childContext;
 	}
 	
