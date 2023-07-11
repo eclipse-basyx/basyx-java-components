@@ -33,8 +33,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -43,6 +43,7 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
@@ -51,21 +52,27 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * Provides BaSyxStorageAPI implementation for MongoDB
  * 
- * @author fischer
+ * @author fischer, jungjan, witt
  *
  * @param <T>
  */
 public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
-	private static final String SMIDPATH = Identifiable.IDENTIFICATION + "." + Identifier.ID;
+	private final String INDEX_KEY = Identifiable.IDENTIFICATION + "." + Identifier.ID;
 
 	protected BaSyxMongoDBConfiguration config;
 	protected MongoClient client;
 	protected MongoOperations mongoOps;
 
+	/**
+	 * @deprecated Please use the other constructor with MongoClient client. 
+	 *             Using this constructor may lead to inefficient resource utilization.
+	 */
+	@Deprecated
 	public MongoDBBaSyxStorageAPI(String collectionName, Class<T> type, BaSyxMongoDBConfiguration config) {
 		this(collectionName, type, config, MongoClients.create(config.getConnectionUrl()));
 	}
@@ -75,65 +82,86 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		this.config = config;
 		this.client = client;
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
-		this.configureIndexForSubmodelId();
+		this.configureIndexKey();
 	}
 
-	private void configureIndexForSubmodelId() {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(SMIDPATH).build();
-		this.mongoOps.indexOps(Submodel.class).ensureIndex(idIndex);
+	private void configureIndexKey() {
+		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(INDEX_KEY).build();
+		this.mongoOps.indexOps(TYPE).ensureIndex(idIndex);
 	}
 
 	@Override
 	public T createOrUpdate(T obj) {
-		throw new NotImplementedException();
+		String key = getKey(obj);
+		if (alreadyExists(key)) {
+			return update(obj, key);
+		}
+
+		T created = mongoOps.insert(obj, getCollectionName());
+		return handleMongoDbIdAttribute(created);
+	}
+
+	private boolean alreadyExists(String key) {
+		Query hasId = query(where(INDEX_KEY).is(key));
+		return mongoOps.exists(hasId, getCollectionName());
 	}
 
 	@Override
 	public T update(T obj, String key) {
-		Query hasId = query(where(SMIDPATH).is(key));
-		T replaced = mongoOps.findAndReplace(hasId, obj, COLLECTION_NAME);
+		T replaced = findAndReplaceIfExists(obj, key);
 		if (replaced == null) {
-			mongoOps.insert(obj, COLLECTION_NAME);
+			logger.warn("Could not execute update for key {} as it does not exist in the database; Creating new entry...", key);
+			return createOrUpdate(obj);
 		}
-		// Remove mongoDB-specific map attribute from SM
-		// mongoOps modify sm on save - thus _id has to be removed here...
-		((Submodel) obj).remove("_id");
-		return obj;
+		replaced = handleMongoDbIdAttribute(replaced);
+		return replaced;
 	}
 
-	@Override
-	public Collection<T> retrieveAll() {
-		throw new NotImplementedException();
+	private T findAndReplaceIfExists(T obj, String key) {
+		Query hasId = query(where(INDEX_KEY).is(key));
+		FindAndReplaceOptions replacementOptions = setupReplacemantOptionsToReturnNew();
+		T replaced = mongoOps.findAndReplace(hasId, obj, replacementOptions.returnNew(), getCollectionName());
+		return replaced;
+	}
+
+	private FindAndReplaceOptions setupReplacemantOptionsToReturnNew() {
+		FindAndReplaceOptions replacementOptions = FindAndReplaceOptions.empty();
+		replacementOptions.returnNew();
+		return replacementOptions;
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handleMongoDbIdAttribute(T data) {
+		if (data instanceof Map)
+			((Map<String, Object>) data).remove("_id");
+		return data;
 	}
 
 	@Override
 	public boolean delete(String key) {
-		throw new NotImplementedException();
+		Query hasId = query(where(INDEX_KEY).is(key));
+		DeleteResult result = mongoOps.remove(hasId, getCollectionName());
+		return result.getDeletedCount() == 1L;
 	}
 
 	@Override
 	public void createCollectionIfNotExists(String collectionName) {
-		throw new NotImplementedException();
+		// MongoOperations implicitly creates Collections.
 	}
 
 	@Override
 	public void deleteCollection() {
-		throw new NotImplementedException();
+		mongoOps.dropCollection(getCollectionName());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public T rawRetrieve(String key) {
-		// Query Submodel from MongoDB
-		Query hasId = query(where(SMIDPATH).is(key));
-		Submodel result = mongoOps.findOne(hasId, Submodel.class, COLLECTION_NAME);
+		Query hasId = query(where(INDEX_KEY).is(key));
+		var result = mongoOps.findOne(hasId, TYPE, getCollectionName());
 		if (result == null) {
-			throw new ResourceNotFoundException("The submodel " + key + " could not be found in the database.");
+			throw new ResourceNotFoundException("No Object for key '" + key + "' found in the database.");
 		}
-
-		// Remove mongoDB-specific map attribute from AASDescriptor
-		result.remove("_id");
-
+		result = handleMongoDbIdAttribute(result);
 		return (T) result;
 	}
 
@@ -161,5 +189,23 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public void deleteFile(Submodel submodel, String idShort) {
 		MongoDBFileHelper.deleteAllFilesFromGridFsIfIsFileSubmodelElement(client, config, submodel, idShort);
+	}
+
+	@Override
+	public Collection<T> rawRetrieveAll() {
+		Collection<T> data = mongoOps.findAll(TYPE, getCollectionName());
+		data = data.stream()
+				.map(this::handleMongoDbIdAttribute)
+				.collect(Collectors.toList());
+		return data;
+	}
+
+	@Override
+	public Object getStorageConnection() {
+		return mongoOps;
+	}
+
+	public MongoClient getClient() {
+		return client;
 	}
 }

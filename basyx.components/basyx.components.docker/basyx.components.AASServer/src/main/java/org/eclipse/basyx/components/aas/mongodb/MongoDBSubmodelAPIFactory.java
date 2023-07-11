@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2022, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -44,14 +44,14 @@ public class MongoDBSubmodelAPIFactory implements ISubmodelAPIFactory {
 	private BaSyxMongoDBConfiguration config;
 	private MongoClient client;
 
-	@Deprecated
-	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
-	}
-
 	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
 		this.config = config;
 		this.client = client;
+	}
+
+	@Deprecated
+	public MongoDBSubmodelAPIFactory(BaSyxMongoDBConfiguration config) {
+		this(config, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	@Deprecated

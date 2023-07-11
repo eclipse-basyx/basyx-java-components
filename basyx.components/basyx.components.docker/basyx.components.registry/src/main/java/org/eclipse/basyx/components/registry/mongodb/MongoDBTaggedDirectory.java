@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021-2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2021, 2022, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -64,18 +64,18 @@ public class MongoDBTaggedDirectory extends MapTaggedDirectory {
 	}
 
 	@Override
-	public void registerSubmodel(IIdentifier aas, TaggedSubmodelDescriptor descriptor) {
-		super.register(aas, descriptor);
+	public void registerSubmodel(IIdentifier shellIdentifier, TaggedSubmodelDescriptor descriptor) {
+		super.register(shellIdentifier, descriptor);
 		addSubmodelTags(descriptor);
-		updateTagMap(aas, descriptor);
+		updateTagMap(shellIdentifier, descriptor);
 	}
 
-	private void updateTagMap(IIdentifier aas, TaggedSubmodelDescriptor descriptor) {
+	private void updateTagMap(IIdentifier shellIdentifier, TaggedSubmodelDescriptor descriptor) {
 		tagMap.values().forEach(tagSet -> {
-			tagSet.forEach(tagDesc -> {
-				if (descriptorEqualsToGivenAASId(aas, tagDesc)) {
-					if (!containsSubmodelDescriptor(descriptor, tagDesc))
-						tagDesc.addSubmodelDescriptor(descriptor);
+			tagSet.forEach(taggedDescriptor -> {
+				if (descriptorEqualsToGivenAASId(shellIdentifier, taggedDescriptor)) {
+					if (!containsSubmodelDescriptor(descriptor, taggedDescriptor))
+						taggedDescriptor.addSubmodelDescriptor(descriptor);
 				}
 			});
 		});
@@ -85,7 +85,7 @@ public class MongoDBTaggedDirectory extends MapTaggedDirectory {
 		return tagDesc.getSubmodelDescriptorFromIdShort(descriptor.getIdShort()) != null;
 	}
 
-	private boolean descriptorEqualsToGivenAASId(IIdentifier aas, TaggedAASDescriptor tagDesc) {
-		return tagDesc.getIdentifier().getId().equals(aas.getId());
+	private boolean descriptorEqualsToGivenAASId(IIdentifier shellIdentifier, TaggedAASDescriptor taggedDescriptor) {
+		return taggedDescriptor.getIdentifier().getId().equals(shellIdentifier.getId());
 	}
 }
