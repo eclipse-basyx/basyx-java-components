@@ -35,7 +35,6 @@ import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
-import org.eclipse.basyx.vab.exception.FeatureNotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,23 +120,25 @@ public class MongoDBAASAPI implements IAASAPI {
 	}
 
 	/**
-	 * This Method is just here to avoid breaking changes. It has no effect at all.
+	 * This Method enables to switch the BaSyxMongoDBConfiguration at runtime
 	 * 
 	 * @param config
 	 */
-	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config) {
-		throw new FeatureNotImplementedException("The Configuration shall be set set during instantiation using one of the constructors.");
+		this.collectionName = config.getAASCollection();
+		MongoDBBaSyxStorageAPIFactory<AssetAdministrationShell> storageApiFactory = new MongoDBBaSyxStorageAPIFactory<>(config, AssetAdministrationShell.class, this.collectionName);
+		this.storageApi = storageApiFactory.create();
 	}
 
 	/**
-	 * This Method is just here to avoid breaking changes. It has no effect at all.
+	 * This Method enables to switch the BaSyxMongoDBConfiguration at runtime
 	 * 
 	 * @param config
 	 */
-	@Deprecated
 	public void setConfiguration(BaSyxMongoDBConfiguration config, MongoClient client) {
-		throw new FeatureNotImplementedException("The Configuration and the MongoClient shall be set set during instantiation using one of the constructors.");
+		this.collectionName = config.getAASCollection();
+		MongoDBBaSyxStorageAPIFactory<AssetAdministrationShell> storageApiFactory = new MongoDBBaSyxStorageAPIFactory<>(config, AssetAdministrationShell.class, this.collectionName, client);
+		this.storageApi = storageApiFactory.create();
 	}
 
 	/**
