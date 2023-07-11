@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
@@ -91,7 +92,7 @@ public class TestMongoDBSubmodelAPI {
 
 		java.io.File value = submodelAPI.getSubmodelElementFile("fileSmeIdShort");
 
-		assertEquals("mySubmodelId-fileSmeIdShort.xml", value.getName());
+		assertEquals("#"+ Objects.hashCode(submodelAPI.getSubmodelId())+"#mySubmodelId-fileSmeIdShort.xml", value.getName());
 		assertEquals(expected.length(), value.length());
 	}
 

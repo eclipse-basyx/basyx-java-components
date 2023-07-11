@@ -26,7 +26,10 @@
 package org.eclipse.basyx.components.internal.mongodb;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
@@ -57,7 +60,7 @@ public class MongoDBFileHelper {
 		File file = File.createAsFacade((Map<String, Object>) element);
 		GridFSBucket bucket = getGridFSBucket(client, config);
 		String fileName = constructFileName(submodelId, file, idShortPath);
-		deleteAllDuplicateFiles(bucket, fileName);
+		deleteAllDuplicateFiles(bucket, fileName, legacyFileName(submodelId, file, idShortPath));
 		bucket.uploadFromStream(fileName, newValue);
 		return fileName;
 	}
@@ -69,7 +72,11 @@ public class MongoDBFileHelper {
 			return;
 		File file = File.createAsFacade(submodelElement);
 		GridFSBucket bucket = MongoDBFileHelper.getGridFSBucket(client, config);
-		bucket.find(Filters.eq("filename", file.getValue())).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+		deleteAllDuplicateFiles(bucket, constructFileName(sm.getIdentification().getId(), file, idShort), legacyFileName(sm.getIdentification().getId(), file, idShort));
+	}
+
+	protected static boolean fileExists(GridFSBucket bucket, String fileName) {
+		return bucket.find(Filters.eq("filename", fileName)).first() != null;
 	}
 
 	public static GridFSBucket getGridFSBucket(MongoClient client, BaSyxMongoDBConfiguration config) {
@@ -77,13 +84,31 @@ public class MongoDBFileHelper {
 		return GridFSBuckets.create(database, config.getFileCollection());
 	}
 
-	private static void deleteAllDuplicateFiles(GridFSBucket bucket, String fileName) {
-		bucket.find(Filters.eq("filename", fileName)).forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
+	private static void deleteAllDuplicateFiles(GridFSBucket bucket, String... fileNames) {
+		bucket.find(Filters.or(
+						Arrays.stream(fileNames)
+								.map(fileName -> Filters.eq("filename", fileName))
+								.collect(Collectors.toList())))
+				.forEach(gridFile -> bucket.delete(gridFile.getObjectId()));
 	}
 
 	public static String constructFileName(String submodelId, File file, String idShortPath) {
+		String fileName = submodelId + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
+		// replace those chars that are not permitted on filesystems
+		fileName = fileName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+		// ensure the filename is still unique to be used as key in MongoDB storage layer
+		return String.format("#%s#", Objects.hashCode(submodelId)).concat(fileName);
+	}
+	/**
+	 * This method is kept for backwards compatibility to still find files from DB which where stored with old scheme.
+	 * @param file the filename of this file is requested.
+	 * @param idShortPath the shortId of the given file.
+	 * @return the filename as it was constructed in older versions.
+	 */
+	public static String legacyFileName(String submodelId, File file, String idShortPath) {
 		return submodelId + "-" + idShortPath.replaceAll("/", "-") + getFileExtension(file);
 	}
+
 
 	private static String getFileExtension(File file) {
 		MimeTypes allTypes = MimeTypes.getDefaultMimeTypes();
