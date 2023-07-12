@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
@@ -72,11 +73,25 @@ public abstract class AASXSuite {
 	protected static final String aasShortId = "Festo_3S7PM0CP4BD";
 	protected static final ModelUrn aasId = new ModelUrn("smart.festo.com/demo/aas/1/1/454576463545648365874");
 	protected static final ModelUrn smId = new ModelUrn("www.company.com/ids/sm/4343_5072_7091_3242");
-	protected static final String smShortId = "Nameplate";
+	protected static final String smIdShort = "Nameplate";
+
+	protected static final String aasAIdShort = "aasA";
+	protected static final String smAIdShort = "a";
+	protected static final CustomId aasAId = new CustomId("AssetAdministrationShell---51A6D8AE");
+	protected static final CustomId smAId = new CustomId("fileTestA");
+	protected static final String aasBIdShort = "aasB";
+	protected static final String smBIdShort = "b";
+	protected static final CustomId aasBId = new CustomId("AssetAdministrationShell---51A6D8AF");
+	protected static final CustomId smBId = new CustomId("fileTestB");
+	protected static final String fileShortIdPath = "file";
 
 	// Has to be individualized by each test inheriting from this suite
 	protected static String aasEndpoint;
 	protected static String smEndpoint;
+	protected static String aasAEndpoint;
+	protected static String smAEndpoint;
+	protected static String aasBEndpoint;
+	protected static String smBEndpoint;
 	protected static String rootEndpoint;
 
 	private ConnectedAssetAdministrationShellManager manager;
@@ -93,8 +108,14 @@ public abstract class AASXSuite {
 		// Create a dummy registry to test integration of XML AAS
 		aasRegistry = new InMemoryRegistry();
 		AASDescriptor descriptor = new AASDescriptor(aasShortId, aasId, aasEndpoint);
-		descriptor.addSubmodelDescriptor(new SubmodelDescriptor(smShortId, smId, smEndpoint));
+		descriptor.addSubmodelDescriptor(new SubmodelDescriptor(smIdShort, smId, smEndpoint));
 		aasRegistry.register(descriptor);
+		AASDescriptor descriptorA = new AASDescriptor(aasAIdShort, aasAId, aasAEndpoint);
+		descriptorA.addSubmodelDescriptor(new SubmodelDescriptor(smAIdShort, smAId, smAEndpoint));
+		aasRegistry.register(descriptorA);
+		AASDescriptor descriptorB = new AASDescriptor(aasBIdShort, aasBId, aasBEndpoint);
+		descriptorB.addSubmodelDescriptor(new SubmodelDescriptor(smBIdShort, smBId, smBEndpoint));
+		aasRegistry.register(descriptorB);
 
 		// Create a ConnectedAssetAdministrationShell using a
 		// ConnectedAssetAdministrationShellManager
@@ -110,18 +131,18 @@ public abstract class AASXSuite {
 
 	@Test
 	public void testGetSingleSubmodel() throws Exception {
-		ISubmodel subModel = getConnectedSubmodel();
-		assertEquals(smShortId, subModel.getIdShort());
+		ISubmodel subModel = manager.retrieveSubmodel(aasId, smId);
+		assertEquals(smIdShort, subModel.getIdShort());
 	}
 
 	@Test
 	public void testGetSingleModule() throws Exception {
-		final String FILE_ENDING = "basyx-temp/files/aasx/Nameplate/marking_rcm.jpg";
-		final String FILE_PATH = rootEndpoint + "basyx-temp/files/aasx/Nameplate/marking_rcm.jpg";
+		final String FILE_ENDING = "basyx-temp/aasx0/files/aasx/Nameplate/marking_rcm.jpg";
+		final String FILE_PATH = rootEndpoint + "basyx-temp/aasx0/files/aasx/Nameplate/marking_rcm.jpg";
 		checkFile(FILE_PATH);
 
 		// Get the submdoel nameplate
-		ISubmodel nameplate = getConnectedSubmodel();
+		ISubmodel nameplate = manager.retrieveSubmodel(aasId, smId);
 		// Get the submodel element collection marking_rcm
 		ConnectedSubmodelElementCollection marking_rcm = (ConnectedSubmodelElementCollection) nameplate.getSubmodelElements().get("Marking_RCM");
 		Collection<ISubmodelElement> values = marking_rcm.getValue();
@@ -138,6 +159,24 @@ public abstract class AASXSuite {
 				assertTrue(fileurl.endsWith(FILE_ENDING));
 			}
 		}
+	}
+	
+	@Test
+	public void testCollidingFiles() throws Exception {
+		final String FILE_ENDING_A = "basyx-temp/aasx1/files/aasx/files/text.txt";
+		final String FILE_ENDING_B = "basyx-temp/aasx2/files/aasx/files/text.txt";
+
+		checkFile(rootEndpoint + FILE_ENDING_A);
+		checkFile(rootEndpoint + FILE_ENDING_B);
+
+		ISubmodel smA = manager.retrieveSubmodel(aasAId, smAId);
+		ISubmodel smB = manager.retrieveSubmodel(aasBId, smBId);
+
+		String fileAValue = (String) smA.getSubmodelElement("file").getValue();
+		String fileBValue = (String) smB.getSubmodelElement("file").getValue();
+
+		assertTrue(fileAValue.endsWith(FILE_ENDING_A));
+		assertTrue(fileBValue.endsWith(FILE_ENDING_B));
 	}
 
 	@Test
@@ -186,15 +225,5 @@ public abstract class AASXSuite {
 	 */
 	private ConnectedAssetAdministrationShell getConnectedAssetAdministrationShell() throws Exception {
 		return manager.retrieveAAS(aasId);
-	}
-
-	/**
-	 * Gets the connected Submodel
-	 * 
-	 * @return connected SM
-	 * @throws Exception
-	 */
-	private ISubmodel getConnectedSubmodel() {
-		return manager.retrieveSubmodel(aasId, smId);
 	}
 }

@@ -26,6 +26,7 @@ package org.eclipse.basyx.regression.AASServer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.file.Paths;
 
 import javax.servlet.ServletException;
@@ -59,7 +60,7 @@ public class TestAASXAASServer extends AASXSuite {
 		// Setup component's test configuration
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "aasx/01_Festo.aasx");
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "[\"aasx/01_Festo.aasx\", \"aasx/a.aasx\", \"aasx/b.aasx\"]");
 
 		String docBasepath = Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), AASXToMetamodelConverter.TEMP_DIRECTORY).toAbsolutePath().toString();
 		contextConfig.setDocBasePath(docBasepath);
@@ -70,7 +71,13 @@ public class TestAASXAASServer extends AASXSuite {
 
 		rootEndpoint = contextConfig.getUrl() + "/";
 		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
-		smEndpoint = aasEndpoint + "/submodels/" + smShortId + "/submodel";
+		smEndpoint = aasEndpoint + "/submodels/" + smIdShort + "/submodel";
+		String encodedAasAId = URLEncoder.encode(aasAId.getId(), "UTF-8");
+		aasAEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + encodedAasAId + "/aas";
+		smAEndpoint = aasAEndpoint + "/submodels/" + smAIdShort + "/submodel";
+		String encodedAasBId = URLEncoder.encode(aasBId.getId(), "UTF-8");
+		aasBEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + encodedAasBId + "/aas";
+		smBEndpoint = aasBEndpoint + "/submodels/" + smBIdShort + "/submodel";
 		logger.info("AAS URL for servlet test: " + aasEndpoint);
 	}
 
