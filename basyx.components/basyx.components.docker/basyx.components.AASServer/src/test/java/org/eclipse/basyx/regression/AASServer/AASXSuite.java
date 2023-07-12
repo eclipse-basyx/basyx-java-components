@@ -122,39 +122,6 @@ public abstract class AASXSuite {
 		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
 		manager = new ConnectedAssetAdministrationShellManager(aasRegistry, connectorFactory);
 	}
-	// 0
-	// smart.festo.com/demo/aas/1/1/454576463545648365874={modelType={name=AssetAdministrationShellDescriptor},
-	// idShort=Festo_3S7PM0CP4BD, identification={idType=IRI,
-	// id=smart.festo.com/demo/aas/1/1/454576463545648365874},
-	// endpoints=[{type=http,
-	// address=http://localhost:4001/aasServer//shells/smart.festo.com%2Fdemo%2Faas%2F1%2F1%2F454576463545648365874/aas}],
-	// submodels=[{modelType={name=SubmodelDescriptor}, idShort=Nameplate,
-	// identification={idType=IRI, id=www.company.com/ids/sm/4343_5072_7091_3242},
-	// endpoints=[{type=http,
-	// address=http://localhost:4001/aasServer//shells/smart.festo.com%2Fdemo%2Faas%2F1%2F1%2F454576463545648365874/aas/submodels/Nameplate/submodel}]}]}
-	// 1
-	// AssetAdministrationShell---51A6D8AE={
-	// modelType={name=AssetAdministrationShellDescriptor},
-	// idShort=aasA,
-	// identification={idType=Custom, id=AssetAdministrationShell---51A6D8AE},
-	// endpoints=[
-	// {type=http,
-	// address=http://localhost:4001/aasServer//shells/AssetAdministrationShell---51A6D8AE/aas}],
-	// submodels=[
-	// {modelType={name=SubmodelDescriptor}, idShort=a,
-	// identification={idType=Custom, id=fileTestA},
-	// endpoints=[{type=http,
-	// address=http://localhost:4001/aasServer//shells/smart.festo.com%2Fdemo%2Faas%2F1%2F1%2F454576463545648365874/aas/submodels/a/submodel}]}]}
-	// 2
-	// AssetAdministrationShell---51A6D8AF={modelType={name=AssetAdministrationShellDescriptor},
-	// idShort=aasB, identification={idType=Custom,
-	// id=AssetAdministrationShell---51A6D8AF}, endpoints=[{type=http,
-	// address=null}], submodels=[{modelType={name=SubmodelDescriptor}, idShort=b,
-	// identification={idType=Custom, id=fileTestB}, endpoints=[{type=http,
-	// address=http://localhost:4001/aasServer//shells/smart.festo.com%2Fdemo%2Faas%2F1%2F1%2F454576463545648365874/aas/submodels/b/submodel}]}]}
-	// AssetAdministrationShell---51A6D8AF
-	// not found (A)
-	// AssetAdministrationShell---51A6D8AE
 
 	@Test
 	public void testGetSingleAAS() throws Exception {

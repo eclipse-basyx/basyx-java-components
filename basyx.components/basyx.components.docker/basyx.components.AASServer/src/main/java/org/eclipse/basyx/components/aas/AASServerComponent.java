@@ -225,7 +225,7 @@ public class AASServerComponent implements IComponent {
 	 *            The bundle that will be loaded during startup
 	 */
 	public void setAASBundle(AASBundle aasBundle) {
-		this.aasBundles = new ArrayList<Collection<AASBundle>>();
+		this.aasBundles = new ArrayList<>();
 		Collection<AASBundle> firstBundleSet = Collections.singleton(aasBundle);
 		this.aasBundles.add(firstBundleSet);
 	}
