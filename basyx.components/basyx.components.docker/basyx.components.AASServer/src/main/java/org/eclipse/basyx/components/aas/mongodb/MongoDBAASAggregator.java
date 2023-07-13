@@ -25,10 +25,8 @@
 package org.eclipse.basyx.components.aas.mongodb;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.eclipse.basyx.aas.aggregator.AASAggregator;
@@ -44,7 +42,6 @@ import org.eclipse.basyx.components.aas.aascomponent.MongoDBAASServerComponentFa
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
-import org.eclipse.basyx.extensions.shared.authorization.internal.NotAuthorizedException;
 import org.eclipse.basyx.submodel.aggregator.SubmodelAggregatorFactory;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
 import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
@@ -56,7 +53,6 @@ import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
@@ -69,11 +65,10 @@ import com.mongodb.client.MongoClients;
  *
  * @see AASAggregator AASAggregator for the "InMemory"-variant
  *
- * @author espen, wege, witt, jugnjan
+ * @author espen, wege, witt, jugnjan, zhangzai
  *
  */
 public class MongoDBAASAggregator implements IAASAggregator {
-	protected Map<String, MultiSubmodelProvider> shellProviderMap = new HashMap<>();
 
 	private IAASRegistry registry;
 
@@ -106,7 +101,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		this.shellApiFactory = shellAPIFactory;
 		this.submodelAggregatorFactory = submodelAggregatorFactory;
 		this.registry = registry;
-		init();
 	}
 
 	/**
@@ -361,16 +355,14 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	private static MongoDBBaSyxStorageAPI<Submodel> submodelStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
 		String submodelCollectionName = config.getSubmodelCollection();
-		MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi = client == null
-				? MongoDBBaSyxStorageAPIFactory.<Submodel>create(submodelCollectionName, Submodel.class, config)
+		MongoDBBaSyxStorageAPI<Submodel> submodelStorageApi = client == null ? MongoDBBaSyxStorageAPIFactory.<Submodel>create(submodelCollectionName, Submodel.class, config)
 				: MongoDBBaSyxStorageAPIFactory.<Submodel>create(submodelCollectionName, Submodel.class, config, client);
 		return submodelStorageApi;
 	}
 
 	private static MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApiFromConfig(BaSyxMongoDBConfiguration config, MongoClient client) {
 		String shellCollectionName = config.getAASCollection();
-		MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi = client == null
-				? MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(shellCollectionName, AssetAdministrationShell.class, config)
+		MongoDBBaSyxStorageAPI<AssetAdministrationShell> shellStorageApi = client == null ? MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(shellCollectionName, AssetAdministrationShell.class, config)
 				: MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(shellCollectionName, AssetAdministrationShell.class, config, client);
 		return shellStorageApi;
 	}
@@ -406,18 +398,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		Collection<Submodel> submodels = submodelStorageApi.retrieveAll();
 		shells.forEach(shell -> shellStorageApi.delete(shell.getIdentification().getId()));
 		submodels.forEach(shell -> submodelStorageApi.delete(shell.getIdentification().getId()));
-		shellProviderMap.clear();
-	}
-
-	private void init() {
-		Collection<AssetAdministrationShell> data = shellStorageApi.retrieveAll();
-		data.forEach(shell -> {
-			String shellIdentificationId = shell.getIdentification().getId();
-			IAASAPI shellApi = shellApiFactory.create(shell);
-			MultiSubmodelProvider provider = createMultiSubmodelProvider(shellApi);
-			addSubmodelsFromDB(provider, shell);
-			shellProviderMap.put(shell.getIdentification().getId(), provider);
-		});
 	}
 
 	/**
@@ -472,21 +452,15 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	}
 
 	private List<String> getSubmodelIdentificationIdsFromSubmodelReferences(Collection<IReference> submodelRefs) {
-		List<String> submodelIdentificationIds = submodelRefs.stream()
-				.map(this::getLastKeyFromReference)
-				.filter(lastKey -> lastKey.getIdType() != KeyType.IDSHORT)
-				.map(lastKey -> lastKey.getValue()).collect(Collectors.toList());
+		List<String> submodelIdentificationIds = submodelRefs.stream().map(this::getLastKeyFromReference).filter(lastKey -> lastKey.getIdType() != KeyType.IDSHORT).map(lastKey -> lastKey.getValue()).collect(Collectors.toList());
 		return submodelIdentificationIds;
 	}
 
 	private List<String> getSubmodelIdShortsFromSubmodelReferences(Collection<IReference> submodelRefs) {
-		List<String> submodelIdShorts = submodelRefs.stream()
-				.map(this::getLastKeyFromReference)
-				.filter(lastKey -> lastKey.getIdType() == KeyType.IDSHORT)
-				.map(lastKey -> lastKey.getValue()).collect(Collectors.toList());
+		List<String> submodelIdShorts = submodelRefs.stream().map(this::getLastKeyFromReference).filter(lastKey -> lastKey.getIdType() == KeyType.IDSHORT).map(lastKey -> lastKey.getValue()).collect(Collectors.toList());
 		return submodelIdShorts;
 	}
-	
+
 	private IKey getLastKeyFromReference(IReference reference) {
 		List<IKey> keys = reference.getKeys();
 		IKey lastKey = keys.get(keys.size() - 1);
@@ -510,20 +484,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<IAssetAdministrationShell> getAASList() {
-		return shellProviderMap.values().stream().map(provider -> {
-			try {
-				return provider.getValue("/aas");
-			} catch (NotAuthorizedException e) {
-				return null;
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				throw new RuntimeException();
-			}
-		}).filter(Objects::nonNull).map(shellMap -> {
-			AssetAdministrationShell shell = new AssetAdministrationShell();
-			shell.putAll((Map<? extends String, ? extends Object>) shellMap);
-			return shell;
-		}).collect(Collectors.toList());
+		return shellStorageApi.retrieveAll().stream().map(aas -> (IAssetAdministrationShell) aas).collect(Collectors.toList());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -537,22 +498,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	@Override
 	public void createAAS(AssetAdministrationShell shell) {
-		IAASAPI shellApi = this.shellApiFactory.create(shell);
-		MultiSubmodelProvider provider = createMultiSubmodelProvider(shellApi);
-		shellProviderMap.put(shell.getIdentification().getId(), provider);
+		this.shellApiFactory.create(shell);
 	}
 
 	@Override
 	public void updateAAS(AssetAdministrationShell shell) {
-		IIdentifier shellIdentification = shell.getIdentification();
-		String shellIdentificationId = shellIdentification.getId();
-
-		MultiSubmodelProvider oldProvider = (MultiSubmodelProvider) getAASProvider(shellIdentification);
-
-		IAASAPI shellApi = this.shellApiFactory.create(shell);
-		MultiSubmodelProvider updatedProvider = updateAASProvider(shellApi, oldProvider);
-
-		shellProviderMap.put(shellIdentificationId, updatedProvider);
+		this.shellApiFactory.create(shell);
 	}
 
 	private MultiSubmodelProvider updateAASProvider(IAASAPI shellApi, MultiSubmodelProvider oldProvider) {
@@ -563,26 +514,24 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return new MultiSubmodelProvider(contentProvider, this.registry, connectorFactory, shellApiFactory, submodelAggregator);
 	}
 
-
 	@Override
 	public void deleteAAS(IIdentifier shellIdentifier) {
 		String shellIdentificationId = shellIdentifier.getId();
 		shellStorageApi.delete(shellIdentificationId);
-		shellProviderMap.remove(shellIdentificationId);
 	}
 
 	public MultiSubmodelProvider getProviderForAASId(String shellIdentificationId) {
-		return shellProviderMap.get(shellIdentificationId);
+		AssetAdministrationShell shell = shellStorageApi.retrieve(shellIdentificationId);
+
+		IAASAPI shellApi = this.shellApiFactory.create(shell); // FIXME a new shell is created every time when using shellApiFactory
+		MultiSubmodelProvider provider = createMultiSubmodelProvider(shellApi);
+
+		addSubmodelsFromDB(provider, shell);
+		return provider;
 	}
 
 	@Override
 	public IModelProvider getAASProvider(IIdentifier shellIdentificationId) {
-		MultiSubmodelProvider provider = shellProviderMap.get(shellIdentificationId.getId());
-
-		if (provider == null) {
-			throw new ResourceNotFoundException("AAS with Id " + shellIdentificationId.getId() + " does not exist");
-		}
-
-		return provider;
+		return getProviderForAASId(shellIdentificationId.getId());
 	}
 }

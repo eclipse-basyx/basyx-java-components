@@ -152,14 +152,11 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 
 	@Test
 	public void testDeleteReachesDatabase() {
-		final BaSyxMongoDBConfiguration config = new BaSyxMongoDBConfiguration();
-		config.loadFromResource(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH);
+		final MongoClient client = MongoClients.create(mongoDBConfig.getConnectionUrl());
 
-		final MongoClient client = MongoClients.create(config.getConnectionUrl());
+		final MongoTemplate mongoOps = new MongoTemplate(client, mongoDBConfig.getDatabase());
 
-		final MongoTemplate mongoOps = new MongoTemplate(client, config.getDatabase());
-
-		final String aasCollection = config.getAASCollection();
+		final String aasCollection = mongoDBConfig.getAASCollection();
 
 		final IAASAggregator aggregator = getAggregator();
 
@@ -198,7 +195,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected IAASAggregator getAggregator() {
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(BaSyxMongoDBConfiguration.DEFAULT_CONFIG_PATH);
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
 		aggregator.reset();
 
 		return aggregator;
@@ -207,6 +204,8 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void checkInitialSetupAfterCreatingAndRegisteringAasAndSubmodel() {
+		createAssetAdministrationShell(AAS_ID);
+		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
 		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator, AAS_ID, SM_IDSHORT);
 
@@ -273,6 +272,9 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		restartAasServer();
 
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
+		// Create two AASs
+		createAssetAdministrationShell(AAS_ID);
+		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
 		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) getAssetAdministrationShellProviderFromMongoDBAggregator(aggregator, AAS_ID, SM_IDSHORT);
 
 		Map<String, Object> submodelObject = (Map<String, Object>) aasProvider.getValue(PREFIX_SUBMODEL_PATH + SM_IDSHORT + SUFFIX_SUBMODEL_PATH);

@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.extensions.internal.storage.BaSyxStorageAPI;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -70,8 +71,8 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	protected MongoOperations mongoOps;
 
 	/**
-	 * @deprecated Please use the other constructor with MongoClient client. 
-	 *             Using this constructor may lead to inefficient resource utilization.
+	 * @deprecated Please use the other constructor with MongoClient client. Using
+	 *             this constructor may lead to inefficient resource utilization.
 	 */
 	@Deprecated
 	public MongoDBBaSyxStorageAPI(String collectionName, Class<T> type, BaSyxMongoDBConfiguration config) {
@@ -109,6 +110,9 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public T update(T obj, String key) {
+		if (isShellType(obj.getClass())) {
+			obj = checkShellSubmodelReferences(obj);
+		}
 		T replaced = findAndReplaceIfExists(obj, key);
 		if (replaced == null) {
 			logger.warn("Could not execute update for key {} as it does not exist in the database; Creating new entry...", key);
@@ -116,6 +120,23 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		}
 		replaced = handleMongoDbIdAttribute(replaced);
 		return replaced;
+	}
+
+	private T checkShellSubmodelReferences(T obj) {
+		AssetAdministrationShell shellObj = (AssetAdministrationShell) obj;
+		String id = getKey(obj);
+		AssetAdministrationShell oldShell = (AssetAdministrationShell) retrieve(id);
+		if (oldShell != null)
+			return handleSubmodelReferences(shellObj, oldShell);
+		return obj;
+	}
+
+	@SuppressWarnings("unchecked")
+	private T handleSubmodelReferences(AssetAdministrationShell shellObj, AssetAdministrationShell oldShell) {
+		if (shellObj.getSubmodelReferences().isEmpty()) {
+			shellObj.setSubmodelReferences(oldShell.getSubmodelReferences());
+		}
+		return (T) shellObj;
 	}
 
 	private T findAndReplaceIfExists(T obj, String key) {
@@ -201,9 +222,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	@Override
 	public Collection<T> rawRetrieveAll() {
 		Collection<T> data = mongoOps.findAll(TYPE, getCollectionName());
-		data = data.stream()
-				.map(this::handleMongoDbIdAttribute)
-				.collect(Collectors.toList());
+		data = data.stream().map(this::handleMongoDbIdAttribute).collect(Collectors.toList());
 		return data;
 	}
 
