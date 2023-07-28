@@ -53,9 +53,13 @@ import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.restapi.SubmodelProvider;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -69,7 +73,7 @@ import com.mongodb.client.MongoClients;
  *
  */
 public class MongoDBAASAggregator implements IAASAggregator {
-
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private IAASRegistry registry;
 
 	/**
@@ -434,7 +438,8 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		List<String> submodelIdShorts = getSubmodelIdShortsFromSubmodelReferences(submodelRefs);
 		submodelIdentificationIds = completeSubmodelIdentificationsIdsByIdShorts(submodelIdentificationIds, submodelIdShorts);
 
-		createProviderForSubmodels(provider, submodelIdentificationIds);
+			createProviderForSubmodels(provider, submodelIdentificationIds);
+
 	}
 
 	private void createProviderForSubmodels(MultiSubmodelProvider provider, List<String> submodelIdentificationIds) {
@@ -477,8 +482,14 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	private void addSubmodelProvidersById(String submodelIdentificationId, MultiSubmodelProvider provider) {
 		ISubmodelAPI submodelApi = new MongoDBSubmodelAPI(this.submodelStorageApi, submodelIdentificationId);
-		SubmodelProvider submodelProvider = new SubmodelProvider(submodelApi);
-		provider.addSubmodel(submodelProvider);
+		try {
+			SubmodelProvider submodelProvider = new SubmodelProvider(submodelApi);
+			provider.addSubmodel(submodelProvider);
+		} catch (ResourceNotFoundException noSubmodelsInDB) {
+			// ignore
+			logger.warn("Could not add submodel with identificationId '{}'.", submodelIdentificationId);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")

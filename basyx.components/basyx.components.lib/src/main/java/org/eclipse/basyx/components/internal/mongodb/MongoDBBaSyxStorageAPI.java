@@ -110,9 +110,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 
 	@Override
 	public T update(T obj, String key) {
-		if (isShellType(obj.getClass())) {
-			obj = checkShellSubmodelReferences(obj);
-		}
+
 		T replaced = findAndReplaceIfExists(obj, key);
 		if (replaced == null) {
 			logger.warn("Could not execute update for key {} as it does not exist in the database; Creating new entry...", key);
@@ -120,23 +118,6 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		}
 		replaced = handleMongoDbIdAttribute(replaced);
 		return replaced;
-	}
-
-	private T checkShellSubmodelReferences(T obj) {
-		AssetAdministrationShell shellObj = (AssetAdministrationShell) obj;
-		String id = getKey(obj);
-		AssetAdministrationShell oldShell = (AssetAdministrationShell) retrieve(id);
-		if (oldShell != null)
-			return handleSubmodelReferences(shellObj, oldShell);
-		return obj;
-	}
-
-	@SuppressWarnings("unchecked")
-	private T handleSubmodelReferences(AssetAdministrationShell shellObj, AssetAdministrationShell oldShell) {
-		if (shellObj.getSubmodelReferences().isEmpty()) {
-			shellObj.setSubmodelReferences(oldShell.getSubmodelReferences());
-		}
-		return (T) shellObj;
 	}
 
 	private T findAndReplaceIfExists(T obj, String key) {
