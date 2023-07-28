@@ -57,7 +57,6 @@ import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -515,14 +514,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	@Override
 	public void updateAAS(AssetAdministrationShell shell) {
 		this.shellApiFactory.create(shell);
-	}
-
-	private MultiSubmodelProvider updateAASProvider(IAASAPI shellApi, MultiSubmodelProvider oldProvider) {
-		AASModelProvider contentProvider = createContentProvider(shellApi);
-		IConnectorFactory connectorFactory = oldProvider.getConnectorFactory();
-		ISubmodelAggregator submodelAggregator = oldProvider.getSmAggregator();
-
-		return new MultiSubmodelProvider(contentProvider, this.registry, connectorFactory, shellApiFactory, submodelAggregator);
 	}
 
 	@Override
