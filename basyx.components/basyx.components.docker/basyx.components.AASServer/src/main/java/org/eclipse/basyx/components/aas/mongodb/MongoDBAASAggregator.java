@@ -411,7 +411,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		AASModelProvider contentProvider = createContentProvider(shellApi);
 		IConnectorFactory connectorFactory = new HTTPConnectorFactory();
 
-		ISubmodelAggregator submodelAggregator = getSubmodelAggregatorInstance();
+		ISubmodelAggregator submodelAggregator = getSubmodelAggregatorInstance(shellApi.getAAS().getIdentification());
 
 		return new MultiSubmodelProvider(contentProvider, this.registry, connectorFactory, this.shellApiFactory, submodelAggregator);
 	}
@@ -420,12 +420,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return new AASModelProvider(shellApi);
 	}
 
-	private ISubmodelAggregator getSubmodelAggregatorInstance() {
+	private ISubmodelAggregator getSubmodelAggregatorInstance(IIdentifier shellId) {
 		if (submodelAggregatorFactory == null) {
 			return submodelAggregator;
 		}
 
-		return submodelAggregatorFactory.create();
+		return submodelAggregatorFactory.create(shellId);
 	}
 
 	/**

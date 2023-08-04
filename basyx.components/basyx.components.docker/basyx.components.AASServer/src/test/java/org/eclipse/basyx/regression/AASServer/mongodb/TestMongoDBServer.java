@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -78,6 +79,7 @@ public class TestMongoDBServer extends AASServerSuite {
 	private static BaSyxMongoDBConfiguration mongoDBConfig;
 	private static BaSyxContextConfiguration contextConfig;
 	private static BaSyxAASServerConfiguration aasConfig;
+	private static IAASRegistry registry;
 
 	private boolean executed = false;
 
@@ -130,7 +132,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		createAssetAdministrationShell();
 		createSubmodel();
 
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, aasRegistry);
 		ISubmodel persistentSM = getSubmodelFromAggregator(aggregator);
 
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());

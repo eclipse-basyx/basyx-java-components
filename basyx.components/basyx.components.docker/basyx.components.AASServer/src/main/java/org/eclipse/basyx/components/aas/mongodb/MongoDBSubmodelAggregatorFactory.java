@@ -63,8 +63,8 @@ public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFact
 	}
 
 	@Override
-	public ISubmodelAggregator create(IIdentifier ignored) {
-		return create();
+	public ISubmodelAggregator create(IIdentifier shellId) {
+		return new MongoDBSubmodelAggregator(submodelAPIFactory, config, client, shellId);
 	}
 
 }

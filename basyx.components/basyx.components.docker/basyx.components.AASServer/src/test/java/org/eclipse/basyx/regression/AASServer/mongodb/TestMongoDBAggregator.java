@@ -195,9 +195,8 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected IAASAggregator getAggregator() {
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
 		aggregator.reset();
-
 		return aggregator;
 	}
 
@@ -206,7 +205,8 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	public void checkInitialSetupAfterCreatingAndRegisteringAasAndSubmodel() {
 		createAssetAdministrationShell(AAS_ID);
 		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
+
 		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator, AAS_ID, SM_IDSHORT);
 
 		assertEquals(SM_IDSHORT, persistentSubmodel.getIdShort());

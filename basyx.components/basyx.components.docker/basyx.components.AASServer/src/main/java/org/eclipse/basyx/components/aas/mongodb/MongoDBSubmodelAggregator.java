@@ -25,6 +25,13 @@
 
 package org.eclipse.basyx.components.aas.mongodb;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
@@ -32,7 +39,12 @@ import org.eclipse.basyx.submodel.aggregator.SubmodelAggregator;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
+import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
+import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPIFactory;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
 
@@ -44,9 +56,15 @@ import com.mongodb.client.MongoClient;
  */
 public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	private MongoDBBaSyxStorageAPI<Submodel> storageApi;
+	private IIdentifier shellId;
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, BaSyxMongoDBConfiguration config, MongoClient client) {
 		this(submodelApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config, client));
+	}
+
+	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, BaSyxMongoDBConfiguration config, MongoClient client, IIdentifier shellId) {
+		this(submodelApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config, client));
+		this.shellId = shellId;
 	}
 
 	public MongoDBSubmodelAggregator(ISubmodelAPIFactory submodelApiFactory, MongoDBBaSyxStorageAPI<Submodel> storageApi) {
@@ -59,18 +77,71 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 		this(submodelApiFactory, MongoDBBaSyxStorageAPIFactory.<Submodel>create(config.getSubmodelCollection(), Submodel.class, config));
 	}
 
-
 	@Override
 	public void deleteSubmodelByIdentifier(IIdentifier submodelIdentifier) {
-		super.deleteSubmodelByIdentifier(submodelIdentifier);
 		storageApi.delete(submodelIdentifier.getId());
 	}
 
 	@Override
 	public void deleteSubmodelByIdShort(String idShort) {
 		ISubmodel submodel = getSubmodelbyIdShort(idShort);
-		super.deleteSubmodelByIdShort(idShort);
 		storageApi.delete(submodel.getIdentification().getId());
 	}
 
+	@Override
+	public Collection<ISubmodel> getSubmodelList() {
+		MongoOperations mongoOperation = (MongoOperations) storageApi.getStorageConnection();
+		Query hasParentId = query(where("parent.keys.[0].value").is(shellId.getId()));
+		List<ISubmodel> submodels = mongoOperation.find(hasParentId, ISubmodel.class, storageApi.getCollectionName());
+		return submodels;
+	}
+
+
+
+	@Override
+	public ISubmodel getSubmodel(IIdentifier identifier) throws ResourceNotFoundException {
+		return storageApi.retrieve(identifier.getId());
+	}
+
+	@Override
+	public void createSubmodel(Submodel submodel) {
+		storageApi.createOrUpdate(submodel);
+	}
+
+	@Override
+	public void updateSubmodel(Submodel submodel) throws ResourceNotFoundException {
+		storageApi.createOrUpdate(submodel);
+	}
+
+	@Override
+	public void createSubmodel(ISubmodelAPI submodelAPI) {
+		storageApi.createOrUpdate((Submodel) submodelAPI.getSubmodel());
+	}
+
+	@Override
+	public ISubmodel getSubmodelbyIdShort(String idShort) throws ResourceNotFoundException {
+		Optional<ISubmodel> submodelOptional = getSubmodelList().stream().filter(submodel -> {
+			return isTargetSubmodel(shellId, submodel, idShort);
+		}).findAny();
+		if (submodelOptional.isEmpty())
+			throw new ResourceNotFoundException("The submodel with idShort '" + idShort + "' could not be found");
+		return submodelOptional.get();
+	}
+
+	private boolean isTargetSubmodel(IIdentifier shellId, ISubmodel submodel, String idShort) {
+		String shellIdValue = submodel.getParent().getKeys().get(0).getValue();
+		return (submodel.getIdShort().equals(idShort)) && shellIdValue.equals(shellId.getId());
+	}
+
+	@Override
+	public ISubmodelAPI getSubmodelAPIById(IIdentifier identifier) throws ResourceNotFoundException {
+		Submodel submodel = (Submodel) getSubmodel(identifier);
+		return new VABSubmodelAPIFactory().create(submodel);
+	}
+
+	@Override
+	public ISubmodelAPI getSubmodelAPIByIdShort(String idShort) throws ResourceNotFoundException {
+		Submodel submodel = (Submodel) getSubmodelbyIdShort(idShort);
+		return new VABSubmodelAPIFactory().create(submodel);
+	}
 }
