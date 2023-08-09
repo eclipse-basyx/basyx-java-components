@@ -491,7 +491,6 @@ public class MongoDBAASAggregator implements IAASAggregator {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<IAssetAdministrationShell> getAASList() {
 		return shellStorageApi.retrieveAll().stream().map(aas -> (IAssetAdministrationShell) aas).collect(Collectors.toList());

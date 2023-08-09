@@ -53,7 +53,7 @@ public class TestMongoDBSubmodelAggregator extends SubmodelAggregatorSuite {
 	public static void initialize() {
 		BaSyxMongoDBConfiguration config = getMongoDBConfiguration();
 		MongoClient client = MongoClients.create(config.getConnectionUrl());
-		aggregator = new MongoDBSubmodelAggregator(new MongoDBSubmodelAPIFactory(config, client), config, client, new CustomId("testShellId"));
+		aggregator = new MongoDBSubmodelAggregator(new MongoDBSubmodelAPIFactory(config, client), config, client);
 	}
 
 	@Override
