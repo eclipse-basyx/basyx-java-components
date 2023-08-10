@@ -28,7 +28,6 @@ package org.eclipse.basyx.components.internal.mongodb;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,10 +43,11 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -87,7 +87,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 	}
 
 	private void configureIndexKey() {
-		TextIndexDefinition idIndex = TextIndexDefinition.builder().onField(INDEX_KEY).build();
+		Index idIndex = new Index().on(INDEX_KEY, Direction.ASC);
 		this.mongoOps.indexOps(TYPE).ensureIndex(idIndex);
 	}
 
