@@ -29,7 +29,7 @@ Additionally to video documentation of the [SDK](https://github.com/eclipse-basy
 [![Getting started with Eclipse BaSyx: Easy AAS setup with off-the-shelf components](http://img.youtube.com/vi/nGRNg0sj1oY/mqdefault.jpg)](https://www.youtube.com/watch?v=nGRNg0sj1oY)
 
 *BaSyx-Middleware – easily explained with the model factory*
-
+ 
 
 ## Contributing
 
