@@ -98,7 +98,7 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 		Collection<IReference> submodelRefs = shell.getSubmodelReferences();
 
 		if (submodelRefs.isEmpty()) {
-			return returnAllSubmodels();
+			return findSubmodelsWithGivenParentId();
 		}
 		List<String> submodelIds = submodelRefs.stream().map(ref -> {
 			return getLastKeyFromReference(ref).getValue();
@@ -111,6 +111,13 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 
 	private List<ISubmodel> returnAllSubmodels() {
 		return storageApi.retrieveAll().stream().map(submodel -> (ISubmodel) submodel).collect(Collectors.toList());
+	}
+
+	private List<ISubmodel> findSubmodelsWithGivenParentId(){
+		return storageApi.retrieveAll().stream().filter(submodel -> {
+			IReference parentRef = submodel.getParent();
+			return (parentRef != null) && (parentRef.getKeys().get(0).getValue().equals(shellId.getId()));
+		}).collect(Collectors.toList());
 	}
 
 	private IKey getLastKeyFromReference(IReference reference) {
