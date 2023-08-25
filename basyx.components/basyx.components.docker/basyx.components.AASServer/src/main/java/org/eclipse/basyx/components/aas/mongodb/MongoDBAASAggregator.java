@@ -524,7 +524,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 	public MultiSubmodelProvider getProviderForAASId(String shellIdentificationId) {
 		AssetAdministrationShell shell = shellStorageApi.retrieve(shellIdentificationId);
 
-		IAASAPI shellApi = this.shellApiFactory.create(shell); // FIXME a new shell is created every time when using shellApiFactory
+		IAASAPI shellApi = this.shellApiFactory.create(shell.getIdentification());
 		MultiSubmodelProvider provider = createMultiSubmodelProvider(shellApi);
 
 		addSubmodelsFromDB(provider, shell);
