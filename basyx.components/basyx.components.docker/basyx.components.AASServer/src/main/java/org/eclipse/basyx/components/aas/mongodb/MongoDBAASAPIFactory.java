@@ -67,8 +67,7 @@ public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
 	@Override
 	public IAASAPI create(IIdentifier aasId) {
-		MongoDBAASAPI api = new MongoDBAASAPI(storageAPI, aasId.getId());
-		return api;
+		return new MongoDBAASAPI(storageAPI, aasId.getId());
 	}
 
 }

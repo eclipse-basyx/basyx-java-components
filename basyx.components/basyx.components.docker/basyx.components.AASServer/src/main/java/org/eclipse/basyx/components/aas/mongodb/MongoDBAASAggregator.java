@@ -437,7 +437,7 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		List<String> submodelIdShorts = getSubmodelIdShortsFromSubmodelReferences(submodelRefs);
 		submodelIdentificationIds = completeSubmodelIdentificationsIdsByIdShorts(submodelIdentificationIds, submodelIdShorts);
 
-			createProviderForSubmodels(provider, submodelIdentificationIds);
+		createProviderForSubmodels(provider, submodelIdentificationIds);
 
 	}
 

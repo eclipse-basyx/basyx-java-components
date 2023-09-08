@@ -109,7 +109,11 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 
 		component.setRegistry(registry);
 		component.startComponent();
+	}
 
+	@Override
+	public void setup() {
+		super.setup();
 		createAssetAdministrationShell(AAS_ID);
 		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
 	}
@@ -203,8 +207,6 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void checkInitialSetupAfterCreatingAndRegisteringAasAndSubmodel() {
-		createAssetAdministrationShell(AAS_ID);
-		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
 
 		ISubmodel persistentSubmodel = getSubmodelFromAggregator(aggregator, AAS_ID, SM_IDSHORT);
@@ -247,9 +249,6 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 	}
 
 	private void createAASWithSubmodelWithCollidingIdShort() {
-		createAssetAdministrationShell(AAS_ID);
-		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
-
 		createAssetAdministrationShell(AAS_ID_2);
 		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION_2, AAS_ID_2);
 	}
@@ -272,9 +271,7 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		restartAasServer();
 
 		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, registry);
-		// Create two AASs
-		createAssetAdministrationShell(AAS_ID);
-		createSubmodel(SM_IDSHORT, SM_IDENTIFICATION, AAS_ID);
+
 		MultiSubmodelProvider aasProvider = (MultiSubmodelProvider) getAssetAdministrationShellProviderFromMongoDBAggregator(aggregator, AAS_ID, SM_IDSHORT);
 
 		Map<String, Object> submodelObject = (Map<String, Object>) aasProvider.getValue(PREFIX_SUBMODEL_PATH + SM_IDSHORT + SUFFIX_SUBMODEL_PATH);
