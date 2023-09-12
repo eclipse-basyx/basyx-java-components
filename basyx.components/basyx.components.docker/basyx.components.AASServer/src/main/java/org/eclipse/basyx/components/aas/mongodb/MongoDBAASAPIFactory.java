@@ -30,6 +30,7 @@ import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
 import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 
 import com.mongodb.client.MongoClient;
 
@@ -59,10 +60,14 @@ public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
 	@Override
 	public IAASAPI getAASApi(AssetAdministrationShell shell) {
-		new MongoDBAASAPI(storageAPI, shell.getIdentification().getId());
 		MongoDBAASAPI api = new MongoDBAASAPI(storageAPI, shell.getIdentification().getId());
 		api.setAAS(shell);
 		return api;
+	}
+
+	@Override
+	public IAASAPI create(IIdentifier aasId) {
+		return new MongoDBAASAPI(storageAPI, aasId.getId());
 	}
 
 }
