@@ -342,16 +342,12 @@ public class MongoDBAASAggregator implements IAASAggregator {
 		return new SubmodelAggregatorFactory(submodelApiFactory);
 	}
 
+	@SuppressWarnings("deprecation")
 	private static ISubmodelAPIFactory initSubmodelApiFactory(BaSyxMongoDBConfiguration config) {
 		return new MongoDBSubmodelAPIFactory(config);
 	}
 
-	private MongoDBSubmodelAPI createAPI(Submodel submodel, BaSyxMongoDBConfiguration config) {
-		MongoDBSubmodelAPI api = new MongoDBSubmodelAPI(config, submodel.getIdentification().getId());
-		api.setSubmodel(submodel);
-		return api;
-	}
-
+	@SuppressWarnings("deprecation")
 	private static IAASAPIFactory initShellApiFactory(BaSyxMongoDBConfiguration config) {
 		return new MongoDBAASAPIFactory(config);
 	}

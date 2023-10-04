@@ -43,11 +43,9 @@ import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.Identifiable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.client.MongoClient;
@@ -83,12 +81,6 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 		this.config = config;
 		this.client = client;
 		this.mongoOps = new MongoTemplate(client, config.getDatabase());
-		this.configureIndexKey();
-	}
-
-	private void configureIndexKey() {
-		Index idIndex = new Index().on(INDEX_KEY, Direction.ASC);
-		this.mongoOps.indexOps(TYPE).ensureIndex(idIndex);
 	}
 
 	@Override
@@ -163,7 +155,7 @@ public class MongoDBBaSyxStorageAPI<T> extends BaSyxStorageAPI<T> {
 			throw new ResourceNotFoundException("No Object for key '" + key + "' found in the database.");
 		}
 		result = handleMongoDbIdAttribute(result);
-		return (T) result;
+		return result;
 	}
 
 	@Override
