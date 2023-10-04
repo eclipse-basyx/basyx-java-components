@@ -130,7 +130,7 @@ public class TestMongoDBServer extends AASServerSuite {
 		createAssetAdministrationShell();
 		createSubmodel();
 
-		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig);
+		MongoDBAASAggregator aggregator = new MongoDBAASAggregator(mongoDBConfig, aasRegistry);
 		ISubmodel persistentSM = getSubmodelFromAggregator(aggregator);
 
 		assertEquals(SM_IDSHORT, persistentSM.getIdShort());

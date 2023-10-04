@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,14 +79,14 @@ public class BaSyxSecurityConfiguration extends BaSyxConfiguration {
 	 * Constructor with predefined value map
 	 */
 	public BaSyxSecurityConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, Collections.emptyList());
 	}
 
 	/**
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxSecurityConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), Collections.emptyList());
 	}
 
 	/**

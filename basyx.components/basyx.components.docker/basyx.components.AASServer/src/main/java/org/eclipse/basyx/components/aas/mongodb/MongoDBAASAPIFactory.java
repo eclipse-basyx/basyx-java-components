@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2022, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -28,37 +28,46 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.restapi.api.IAASAPI;
 import org.eclipse.basyx.aas.restapi.api.IAASAPIFactory;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPI;
+import org.eclipse.basyx.components.internal.mongodb.MongoDBBaSyxStorageAPIFactory;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 
 /**
  * 
  * Factory for creating a MongoDBAASAPI
  * 
- * @author fried
+ * @author fried, jungjan, witt
  *
  */
 public class MongoDBAASAPIFactory implements IAASAPIFactory {
 
-	private BaSyxMongoDBConfiguration config;
-	private MongoClient client;
+	private MongoDBBaSyxStorageAPI<AssetAdministrationShell> storageAPI;
 
 	@Deprecated
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config) {
-		this(config, MongoClients.create(config.getConnectionUrl()));
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config));
 	}
 
 	public MongoDBAASAPIFactory(BaSyxMongoDBConfiguration config, MongoClient client) {
-		this.config = config;
-		this.client = client;
+		this(MongoDBBaSyxStorageAPIFactory.<AssetAdministrationShell>create(config.getAASCollection(), AssetAdministrationShell.class, config, client));
+	}
+
+	public MongoDBAASAPIFactory(MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI) {
+		this.storageAPI = mongoDBStorageAPI;
 	}
 
 	@Override
-	public IAASAPI getAASApi(AssetAdministrationShell aas) {
-		MongoDBAASAPI api = new MongoDBAASAPI(config, aas.getIdentification().getId(), client);
-		api.setAAS(aas);
+	public IAASAPI getAASApi(AssetAdministrationShell shell) {
+		MongoDBAASAPI api = new MongoDBAASAPI(storageAPI, shell.getIdentification().getId());
+		api.setAAS(shell);
 		return api;
+	}
+
+	@Override
+	public IAASAPI create(IIdentifier aasId) {
+		return new MongoDBAASAPI(storageAPI, aasId.getId());
 	}
 
 }

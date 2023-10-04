@@ -31,14 +31,21 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPI;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.qualifier.LangStrings;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.File;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.MultiLanguageProperty;
+import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.junit.Test;
 
 import com.mongodb.MongoGridFSException;
@@ -85,7 +92,7 @@ public class TestMongoDBSubmodelAPI {
 
 		java.io.File value = submodelAPI.getSubmodelElementFile("fileSmeIdShort");
 
-		assertEquals("mySubmodelId-fileSmeIdShort.xml", value.getName());
+		assertEquals("#"+ Objects.hashCode(submodelAPI.getSubmodelId())+"#mySubmodelId-fileSmeIdShort.xml", value.getName());
 		assertEquals(expected.length(), value.length());
 	}
 
@@ -102,6 +109,43 @@ public class TestMongoDBSubmodelAPI {
 
 		OutputStream os = new FileOutputStream("fileSmeIdShort.xml");
 		bucket.downloadToStream("fileSmeIdShort.xml", os);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void submodelElementInCollection() {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		SubmodelElementCollection collection = new SubmodelElementCollection("collection");
+		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
+		collection.addSubmodelElement(mlprop);
+		submodelAPI.addSubmodelElement(collection);
+
+		LangStrings expected = new LangStrings("de", "Hallo!");
+		submodelAPI.updateSubmodelElement(collection.getIdShort() + "/" + mlprop.getIdShort(), expected);
+
+		Object value = submodelAPI.getSubmodelElementValue(collection.getIdShort() + "/" + mlprop.getIdShort());
+
+		Collection<ISubmodelElement> updatedSubmodelElements = submodelAPI.getSubmodelElements();
+		Map<String, Object> updatedCollectionMap = (Map<String, Object>) submodelAPI.getSubmodelElement("collection");
+		Collection<?> collectionValue = (Collection<?>) updatedCollectionMap.get(Property.VALUE);
+
+		assertEquals(1, updatedSubmodelElements.size());
+		assertEquals(1, collectionValue.size());
+		assertEquals(expected, value);
+	}
+
+	@Test(expected = ResourceNotFoundException.class)
+	public void submodelElementInCollectionNotExistingAsHighLevelElement() {
+		MongoDBSubmodelAPI submodelAPI = createAPIWithPreconfiguredSubmodel();
+		SubmodelElementCollection collection = new SubmodelElementCollection("collection");
+		MultiLanguageProperty mlprop = new MultiLanguageProperty("myMLP");
+		collection.addSubmodelElement(mlprop);
+		submodelAPI.addSubmodelElement(collection);
+
+		LangStrings expected = new LangStrings("de", "Hallo!");
+		submodelAPI.updateSubmodelElement(collection.getIdShort() + "/" + mlprop.getIdShort(), expected);
+
+		submodelAPI.getSubmodelElementValue(mlprop.getIdShort());
 	}
 
 	private void uploadDummyFile(MongoDBSubmodelAPI submodelAPI, String idShort) throws FileNotFoundException {

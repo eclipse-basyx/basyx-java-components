@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 the Eclipse BaSyx Authors
+ * Copyright (C) 2022, 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -46,15 +46,15 @@ public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFact
 	private ISubmodelAPIFactory submodelAPIFactory;
 	private MongoClient client;
 
-	@Deprecated
-	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
-		this(config, submodelAPIFactory, MongoClients.create(config.getConnectionUrl()));
-	}
-
 	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory, MongoClient client) {
 		this.config = config;
 		this.client = client;
 		this.submodelAPIFactory = submodelAPIFactory;
+	}
+
+	@Deprecated
+	public MongoDBSubmodelAggregatorFactory(BaSyxMongoDBConfiguration config, ISubmodelAPIFactory submodelAPIFactory) {
+		this(config, submodelAPIFactory, MongoClients.create(config.getConnectionUrl()));
 	}
 
 	@Override
@@ -63,8 +63,8 @@ public class MongoDBSubmodelAggregatorFactory implements ISubmodelAggregatorFact
 	}
 
 	@Override
-	public ISubmodelAggregator create(IIdentifier ignored) {
-		return create();
+	public ISubmodelAggregator create(IIdentifier shellId) {
+		return new MongoDBSubmodelAggregator(submodelAPIFactory, config, client, shellId);
 	}
 
 }

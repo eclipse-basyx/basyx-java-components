@@ -24,7 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.basyx.vab.modelprovider.VABPathTools;
@@ -85,14 +87,14 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxContextConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), getPropertiesExcludedFromLogging());
 	}
 
 	/**
 	 * Constructor with predefined value map
 	 */
 	public BaSyxContextConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, getPropertiesExcludedFromLogging());
 	}
 
 	/**
@@ -286,5 +288,9 @@ public class BaSyxContextConfiguration extends BaSyxConfiguration {
 			return "https://";
 		}
 		return "http://";
+	}
+
+	private static List<String> getPropertiesExcludedFromLogging() {
+		return Collections.singletonList(SSL_KEY_PASSWORD);
 	}
 }

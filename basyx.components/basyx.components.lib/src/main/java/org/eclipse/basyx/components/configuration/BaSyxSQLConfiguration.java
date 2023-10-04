@@ -24,7 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,14 +73,14 @@ public class BaSyxSQLConfiguration extends BaSyxConfiguration {
 	 * Constructor with predefined value map
 	 */
 	public BaSyxSQLConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, getPropertiesExcludedFromLogging());
 	}
 
 	/**
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxSQLConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), getPropertiesExcludedFromLogging());
 	}
 
 	/**
@@ -152,5 +154,9 @@ public class BaSyxSQLConfiguration extends BaSyxConfiguration {
 
 	public void setPrefix(String prefix) {
 		setProperty(PREFIX, prefix);
+	}
+
+	private static List<String> getPropertiesExcludedFromLogging() {
+		return Collections.singletonList(PASS);
 	}
 }

@@ -1,5 +1,6 @@
 package org.eclipse.basyx.regression.support.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.eclipse.basyx.components.configuration.BaSyxConfiguration;
@@ -19,7 +20,7 @@ public class DummyBaSyxConfiguration extends BaSyxConfiguration {
 	public static final String AASX_UPLOAD = "aas.aasxUpload";
 
 	public DummyBaSyxConfiguration() {
-		super(new HashMap<String, String>());
+		super(new HashMap<String, String>(), Collections.emptyList());
 	}
 
 	public void loadFromEnvironmentVariables() {

@@ -24,6 +24,7 @@
  ******************************************************************************/
 package org.eclipse.basyx.components.configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -81,14 +82,14 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	 * Constructor with predefined value map
 	 */
 	public BaSyxMqttConfiguration(Map<String, String> values) {
-		super(values);
+		super(values, getPropertiesExcludedFromLogging());
 	}
 
 	/**
 	 * Empty Constructor - use default values
 	 */
 	public BaSyxMqttConfiguration() {
-		super(getDefaultProperties());
+		super(getDefaultProperties(), getPropertiesExcludedFromLogging());
 	}
 
 	/**
@@ -209,6 +210,10 @@ public class BaSyxMqttConfiguration extends BaSyxConfiguration {
 	}
 	
 	public String getClientId() {
-	  return getProperty(CLIENT_ID);
+		return getProperty(CLIENT_ID);
+	}
+
+	private static List<String> getPropertiesExcludedFromLogging() {
+		return Collections.singletonList(PASS);
 	}
 }
