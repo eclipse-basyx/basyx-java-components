@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.eclipse.basyx.extensions.shared.authorization.internal.TagTargetInformation;
 import org.eclipse.basyx.extensions.shared.authorization.internal.TargetInformation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -73,7 +72,7 @@ public class PathTargetInformation implements TargetInformation {
 			return true;
 		}
 
-		if (!(o instanceof TagTargetInformation)) {
+		if (!(o instanceof PathTargetInformation)) {
 			return false;
 		}
 
@@ -89,6 +88,6 @@ public class PathTargetInformation implements TargetInformation {
 
 	@Override
 	public String toString() {
-		return new StringBuilder("BaSyxObjectTargetInformation{").append("tag='").append(path).append('\'').append('}').toString();
+		return new StringBuilder("PathTargetInformation{").append("path='").append(path).append('\'').append('}').toString();
 	}
 }
