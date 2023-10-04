@@ -54,6 +54,7 @@ public class TestMongoDBAAASAPI {
 	private static MongoDBBaSyxStorageAPI<AssetAdministrationShell> mongoDBStorageAPI;
 	private final static String SHELL_IDENTIFICATION_ID = "testIdentificationId";
 
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void setUpClass() {
 		mongoDBStorageAPI = new MongoDBBaSyxStorageAPI<>(COLLECTION_NAME, AssetAdministrationShell.class, config);
