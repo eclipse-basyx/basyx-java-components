@@ -128,7 +128,7 @@
 			<groupId>com.tngtech.keycloakmock</groupId>
 			<artifactId>mock</artifactId>
 			<scope>test</scope>
-			<version>0.15.2</version>
+			<version>0.16.0</version>
 		</dependency>
 
 		<dependency>
