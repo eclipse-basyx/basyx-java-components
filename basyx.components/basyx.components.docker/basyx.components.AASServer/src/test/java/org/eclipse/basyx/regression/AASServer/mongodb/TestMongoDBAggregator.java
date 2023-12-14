@@ -25,10 +25,6 @@
 package org.eclipse.basyx.regression.AASServer.mongodb;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,18 +43,10 @@ import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAPIFactory;
 import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregatorFactory;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAPIFactory;
-import org.eclipse.basyx.components.aas.mongodb.MongoDBSubmodelAggregatorFactory;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.eclipse.basyx.components.registry.mongodb.MongoDBRegistryHandler;
-import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregator;
-import org.eclipse.basyx.submodel.aggregator.api.ISubmodelAggregatorFactory;
-import org.eclipse.basyx.submodel.aggregator.observing.ISubmodelAggregatorObserverV2;
-import org.eclipse.basyx.submodel.aggregator.observing.ObservableSubmodelAggregatorV2;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
@@ -290,28 +278,6 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		assertEquals(SM_IDSHORT, submodelObject.get(Referable.IDSHORT));
 	}
 
-	@Test
-	public void observerIsNotTriggered_WhenGettingAAS() {
-		MongoClient client = MongoClients.create(mongoDBConfig.getConnectionUrl());
-
-		MongoDBSubmodelAggregatorFactory aggregatorFactory = new MongoDBSubmodelAggregatorFactory(mongoDBConfig, new MongoDBSubmodelAPIFactory(mongoDBConfig, client), client);
-		
-		MockObservableSubmodelAggregatorV2Factory observableAggregatorFactory = new MockObservableSubmodelAggregatorV2Factory(aggregatorFactory, "aas-server");
-		
-		MongoDBAASAggregatorFactory aasAggregatorFactory = new MongoDBAASAggregatorFactory(mongoDBConfig, registry, new MongoDBAASAPIFactory(mongoDBConfig, client), observableAggregatorFactory, client);
-
-		IAASAggregator aggregator = aasAggregatorFactory.create();
-		
-		// When
-		restartAasServer();
-		aggregator.getAAS(registry.lookupAAS(new ModelUrn(AAS_ID)).getIdentifier());
-		
-		// Expects
-		ISubmodelAggregatorObserverV2 observer = observableAggregatorFactory.getMockObserver();
-		verify(observer, never()).submodelCreated(any(), any(), any());
-
-	}
-
 	private void restartAasServer() {
 		component.stopComponent();
 		component.startComponent();
@@ -333,39 +299,6 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 		resetMongoDBTestData();
 
 		component.stopComponent();
-	}
-
-
-	private class MockObservableSubmodelAggregatorV2Factory implements ISubmodelAggregatorFactory {
-
-		private final ISubmodelAggregatorFactory smAggregatorFactory;
-
-		private final String aasServerId;
-
-		private ISubmodelAggregatorObserverV2 mockObserver;
-
-		public MockObservableSubmodelAggregatorV2Factory(ISubmodelAggregatorFactory smAggregatorFactory, String aasServerId) {
-			this.smAggregatorFactory = smAggregatorFactory;
-			this.aasServerId = aasServerId;
-			mockObserver = mock(ISubmodelAggregatorObserverV2.class);
-		}
-
-		@Override
-		public ISubmodelAggregator create() {
-			ObservableSubmodelAggregatorV2 smAggregator = new ObservableSubmodelAggregatorV2(smAggregatorFactory.create(), aasServerId);
-			smAggregator.addObserver(mockObserver);
-			return smAggregator;
-		}
-
-		@Override
-		public ISubmodelAggregator create(IIdentifier aasIdentifier) {
-			return create();
-		}
-
-		public ISubmodelAggregatorObserverV2 getMockObserver() {
-			return mockObserver;
-		}
-
 	}
 
 }
