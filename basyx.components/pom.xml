@@ -5,7 +5,7 @@
 
 	<groupId>org.eclipse.basyx</groupId>
 	<artifactId>basyx.components</artifactId>
-	<version>1.5.0</version>
+	<version>1.5.1-SNAPSHOT</version>
 	<name>BaSyx Components</name>
 	<description>BaSyx Off-the-Shelf Components</description>
 	<url>https://www.eclipse.org/basyx/</url>
@@ -262,8 +262,14 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Mockito for mocking in JUnit tests -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.5.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-
 	<!-- Specifies dependency settings for all submodules using these dependencies -->
 	<dependencyManagement>
 		<dependencies>
@@ -281,14 +287,14 @@
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.5.0</version>
+				<version>1.5.1-SNAPSHOT</version>
 			</dependency>
 
 			<!-- BaSyx SDK tests -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.5.0</version>
+				<version>1.5.1-SNAPSHOT</version>
 				<classifier>tests</classifier>
 				<scope>test</scope>
 			</dependency>
