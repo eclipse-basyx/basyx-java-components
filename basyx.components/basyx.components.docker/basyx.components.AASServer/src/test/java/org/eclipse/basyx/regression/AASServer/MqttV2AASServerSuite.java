@@ -60,7 +60,7 @@ public abstract class MqttV2AASServerSuite extends AASServerSuite {
 	protected static AASServerComponent component;
 	protected static Server mqttBroker;
 	protected MqttTestListener listener;
-	private static final String AAS_SERVER_ID = "aas-server";
+	protected static final String AAS_SERVER_ID = "aas-server";
 
 	@Override
 	protected String getURL() {

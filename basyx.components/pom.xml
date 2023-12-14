@@ -262,8 +262,14 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Mockito for mocking in JUnit tests -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.5.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-
 	<!-- Specifies dependency settings for all submodules using these dependencies -->
 	<dependencyManagement>
 		<dependencies>

@@ -66,7 +66,6 @@ import org.xml.sax.SAXException;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-
 /**
  * Testing various behaviors of MongoDBAASAggregator Using
  * MongoDBAASAggregator's constructors to set registry and adding AAS and
@@ -301,4 +300,5 @@ public class TestMongoDBAggregator extends AASAggregatorSuite {
 
 		component.stopComponent();
 	}
+
 }
