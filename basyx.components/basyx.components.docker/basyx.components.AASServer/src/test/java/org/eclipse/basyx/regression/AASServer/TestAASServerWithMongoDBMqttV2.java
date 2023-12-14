@@ -110,6 +110,4 @@ public class TestAASServerWithMongoDBMqttV2 extends MqttV2AASServerSuite {
 		return mongoDBConfig;
 	}
 
-
-
 }
