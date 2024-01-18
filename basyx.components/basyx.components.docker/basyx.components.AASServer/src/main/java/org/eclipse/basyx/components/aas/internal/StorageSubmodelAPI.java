@@ -205,8 +205,7 @@ public abstract class StorageSubmodelAPI implements ISubmodelAPI {
 	public void uploadSubmodelElementFile(String idShortPath, InputStream fileStream) {
 		VABSubmodelAPI api = new VABSubmodelAPI(new VABLambdaProvider(getSubmodel()));
 		ISubmodelElement element = api.getSubmodelElement(idShortPath);
-		String fileName = storageApi.writeFile(idShortPath, getSubmodel().getIdentification().getId(), fileStream, element);
-		updateSubmodelElement(idShortPath, fileName);
+		storageApi.writeFile(idShortPath, getSubmodel().getIdentification().getId(), fileStream, element);
 	}
 
 }

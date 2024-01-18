@@ -251,22 +251,12 @@ public class AASServerComponent implements IComponent {
 
 		loadAASServerFeaturesFromConfig();
 		initializeAASServerFeatures();
-
 		BaSyxContext context = contextConfig.createBaSyxContext();
+
+		initializeAasBundles(context);
+
 		context.addServletMapping("/*", createAggregatorServlet());
 		addAASServerFeaturesToContext(context);
-
-		// An initial AAS has been loaded from the drive?
-		if (aasBundles != null) {
-			createBasyxResourceDirectoryIfNotExists();
-			
-			addAasxFilesResourceServlet(context);
-
-			// 2. Fix the file paths according to the servlet configuration
-			modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), getRootFilePathWithContext(contextConfig.getContextPath()));
-
-			registerWhitelistedSubmodels();
-		}
 
 		logger.info("Start the server");
 		server = new BaSyxHTTPServer(context);
@@ -523,6 +513,24 @@ public class AASServerComponent implements IComponent {
 		}
 	}
 
+	private void initializeAasBundles(BaSyxContext context) {
+		loadAASBundles();
+
+		if (aasBundles == null)
+			return;
+
+		logger.info("Initializing AAS Bundles");
+
+		createBasyxResourceDirectoryIfNotExists();
+
+		addAasxFilesResourceServlet(context);
+
+		// 2. Fix the file paths according to the servlet configuration
+		modifyFilePaths(contextConfig.getHostname(), contextConfig.getPort(), getRootFilePathWithContext(contextConfig.getContextPath()));
+
+		registerWhitelistedSubmodels();
+	}
+
 	private void cleanUpAASServerFeatures() {
 		for (IAASServerFeature aasServerFeature : aasServerFeatureList) {
 			aasServerFeature.cleanUp();
@@ -585,7 +593,6 @@ public class AASServerComponent implements IComponent {
 
 	private VABHTTPInterface<?> createAggregatorServlet() {
 		aggregator = createAASAggregator();
-		loadAASBundles();
 		
 		if (aasBundles != null) {
 			try (final var ignored = ElevatedCodeAuthentication.enterElevatedCodeAuthenticationArea()) {
@@ -844,5 +851,6 @@ public class AASServerComponent implements IComponent {
 		
         directory.mkdir();
 	}
+
 	
 }
