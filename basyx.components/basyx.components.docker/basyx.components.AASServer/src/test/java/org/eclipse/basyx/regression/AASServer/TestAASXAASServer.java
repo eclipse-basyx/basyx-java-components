@@ -26,14 +26,12 @@ package org.eclipse.basyx.regression.AASServer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.nio.file.Paths;
 
 import javax.servlet.ServletException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
@@ -41,8 +39,6 @@ import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguratio
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -52,7 +48,6 @@ import org.xml.sax.SAXException;
  *
  */
 public class TestAASXAASServer extends AASXSuite {
-	private static Logger logger = LoggerFactory.getLogger(TestAASXAASServer.class);
 	private static AASServerComponent component;
 
 	@BeforeClass
@@ -69,16 +64,7 @@ public class TestAASXAASServer extends AASXSuite {
 		component = new AASServerComponent(contextConfig, aasConfig);
 		component.startComponent();
 
-		rootEndpoint = contextConfig.getUrl() + "/";
-		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
-		smEndpoint = aasEndpoint + "/submodels/" + smIdShort + "/submodel";
-		String encodedAasAId = URLEncoder.encode(aasAId.getId(), "UTF-8");
-		aasAEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + encodedAasAId + "/aas";
-		smAEndpoint = aasAEndpoint + "/submodels/" + smAIdShort + "/submodel";
-		String encodedAasBId = URLEncoder.encode(aasBId.getId(), "UTF-8");
-		aasBEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + encodedAasBId + "/aas";
-		smBEndpoint = aasBEndpoint + "/submodels/" + smBIdShort + "/submodel";
-		logger.info("AAS URL for servlet test: " + aasEndpoint);
+		buildEndpoints(contextConfig);
 	}
 
 	@AfterClass

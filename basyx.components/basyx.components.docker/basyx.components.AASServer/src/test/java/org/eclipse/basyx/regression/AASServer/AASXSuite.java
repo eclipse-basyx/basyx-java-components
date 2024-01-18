@@ -36,6 +36,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
@@ -44,12 +45,14 @@ import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.memory.InMemoryRegistry;
+import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.dataelement.IFile;
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.ConnectedSubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.dataelement.ConnectedFile;
+import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -86,6 +89,7 @@ public abstract class AASXSuite {
 	protected static final String fileShortIdPath = "file";
 
 	// Has to be individualized by each test inheriting from this suite
+	// Default configuration is provided by buildEnpoints method
 	protected static String aasEndpoint;
 	protected static String smEndpoint;
 	protected static String aasAEndpoint;
@@ -137,9 +141,8 @@ public abstract class AASXSuite {
 
 	@Test
 	public void testGetSingleModule() throws Exception {
-		final String FILE_ENDING = "basyx-temp/aasx0/files/aasx/Nameplate/marking_rcm.jpg";
-		final String FILE_PATH = rootEndpoint + "basyx-temp/aasx0/files/aasx/Nameplate/marking_rcm.jpg";
-		checkFile(FILE_PATH);
+		final String FILE_ENDING = VABPathTools.buildPath(new String[] { "basyx-temp", "aasx0", "files", "aasx", "Nameplate", "marking_rcm.jpg" }, 0);
+		checkFile(VABPathTools.concatenatePaths(rootEndpoint, FILE_ENDING));
 
 		// Get the submdoel nameplate
 		ISubmodel nameplate = manager.retrieveSubmodel(aasId, smId);
@@ -163,11 +166,11 @@ public abstract class AASXSuite {
 	
 	@Test
 	public void testCollidingFiles() throws Exception {
-		final String FILE_ENDING_A = "basyx-temp/aasx1/files/aasx/files/text.txt";
-		final String FILE_ENDING_B = "basyx-temp/aasx2/files/aasx/files/text.txt";
+		final String FILE_ENDING_A = VABPathTools.buildPath(new String[] { "basyx-temp", "aasx1", "files", "aasx", "files", "text.txt" }, 0);
+		final String FILE_ENDING_B = VABPathTools.buildPath(new String[] { "basyx-temp", "aasx2", "files", "aasx", "files", "text.txt" }, 0);
 
-		checkFile(rootEndpoint + FILE_ENDING_A);
-		checkFile(rootEndpoint + FILE_ENDING_B);
+		checkFile(VABPathTools.concatenatePaths(rootEndpoint, FILE_ENDING_A));
+		checkFile(VABPathTools.concatenatePaths(rootEndpoint, FILE_ENDING_B));
 
 		ISubmodel smA = manager.retrieveSubmodel(aasAId, smAId);
 		ISubmodel smB = manager.retrieveSubmodel(aasBId, smBId);
@@ -192,6 +195,23 @@ public abstract class AASXSuite {
 			checkElementCollectionFiles(sm.getSubmodelElements().values());
 		}
 
+	}
+
+	protected static void buildEndpoints(BaSyxContextConfiguration contextConfig) {
+		rootEndpoint = VABPathTools.stripSlashes(contextConfig.getUrl());
+
+		aasEndpoint = VABPathTools.concatenatePaths(rootEndpoint, AASAggregatorProvider.PREFIX, aasId.getEncodedURN(), "aas");
+		smEndpoint = VABPathTools.concatenatePaths(aasEndpoint, "submodels", smIdShort, "submodel");
+
+		String encodedAasAId = VABPathTools.encodePathElement(aasAId.getId());
+		aasAEndpoint = VABPathTools.concatenatePaths(rootEndpoint, AASAggregatorProvider.PREFIX, encodedAasAId, "aas");
+		smAEndpoint = VABPathTools.concatenatePaths(aasAEndpoint, "submodels", smAIdShort, "submodel");
+
+		String encodedAasBId = VABPathTools.encodePathElement(aasBId.getId());
+		aasBEndpoint = VABPathTools.concatenatePaths(rootEndpoint, AASAggregatorProvider.PREFIX, encodedAasBId, "aas");
+		smBEndpoint = VABPathTools.concatenatePaths(aasBEndpoint, "submodels", smBIdShort, "submodel");
+
+		logger.info("AAS URL for servlet test: " + aasEndpoint);
 	}
 
 	private void checkElementCollectionFiles(Collection<ISubmodelElement> elements) {

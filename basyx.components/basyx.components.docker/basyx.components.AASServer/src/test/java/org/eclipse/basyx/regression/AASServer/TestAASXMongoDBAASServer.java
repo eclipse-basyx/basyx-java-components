@@ -24,11 +24,9 @@
  ******************************************************************************/
 package org.eclipse.basyx.regression.AASServer;
 
-import java.net.URLEncoder;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
@@ -38,8 +36,6 @@ import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
 import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Test accessing to AAS using basys aas SDK
@@ -48,7 +44,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class TestAASXMongoDBAASServer extends AASXSuite {
-	private static Logger logger = LoggerFactory.getLogger(TestAASXMongoDBAASServer.class);
 	private static AASServerComponent component;
 	private static BaSyxMongoDBConfiguration basyxMongoDBConfig = buildBaSyxMongoDBConfiguration();
 
@@ -68,16 +63,7 @@ public class TestAASXMongoDBAASServer extends AASXSuite {
 		component = new AASServerComponent(contextConfig, aasConfig, basyxMongoDBConfig);
 		component.startComponent();
 
-		rootEndpoint = contextConfig.getUrl() + "/";
-		aasEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + aasId.getEncodedURN() + "/aas";
-		smEndpoint = aasEndpoint + "/submodels/" + smIdShort + "/submodel";
-		String encodedAasAId = URLEncoder.encode(aasAId.getId(), "UTF-8");
-		aasAEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + encodedAasAId + "/aas";
-		smAEndpoint = aasAEndpoint + "/submodels/" + smAIdShort + "/submodel";
-		String encodedAasBId = URLEncoder.encode(aasBId.getId(), "UTF-8");
-		aasBEndpoint = rootEndpoint + "/" + AASAggregatorProvider.PREFIX + "/" + encodedAasBId + "/aas";
-		smBEndpoint = aasBEndpoint + "/submodels/" + smBIdShort + "/submodel";
-		logger.info("AAS URL for servlet test: " + aasEndpoint);
+		buildEndpoints(contextConfig);
 	}
 
 	@AfterClass
