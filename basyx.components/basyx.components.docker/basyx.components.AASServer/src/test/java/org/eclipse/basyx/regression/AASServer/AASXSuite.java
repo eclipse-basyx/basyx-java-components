@@ -25,8 +25,13 @@
 package org.eclipse.basyx.regression.AASServer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,6 +41,13 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.eclipse.basyx.aas.aggregator.restapi.AASAggregatorProvider;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
@@ -60,6 +72,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 /**
  * Suite for testing that the XMLAAS servlet is set up correctly. The tests here
@@ -148,22 +161,12 @@ public abstract class AASXSuite {
 		ISubmodel nameplate = manager.retrieveSubmodel(aasId, smId);
 		// Get the submodel element collection marking_rcm
 		ConnectedSubmodelElementCollection marking_rcm = (ConnectedSubmodelElementCollection) nameplate.getSubmodelElements().get("Marking_RCM");
-		Collection<ISubmodelElement> values = marking_rcm.getValue();
 
-		// navigate to the File element
-		Iterator<ISubmodelElement> iter = values.iterator();
-		while (iter.hasNext()) {
-			ISubmodelElement element = iter.next();
-			if (element instanceof ConnectedFile) {
-				ConnectedFile connectedFile = (ConnectedFile) element;
-				// get value of the file element
+		ConnectedFile fileSE = retrieveFileSEFromCollection(marking_rcm);
 
-				String fileurl = connectedFile.getValue();
-				assertTrue(fileurl.endsWith(FILE_ENDING));
-			}
-		}
+		assertTrue(fileSE.getValue().endsWith(FILE_ENDING));
 	}
-	
+
 	@Test
 	public void testCollidingFiles() throws Exception {
 		final String FILE_ENDING_A = VABPathTools.buildPath(new String[] { "basyx-temp", "aasx1", "files", "aasx", "files", "text.txt" }, 0);
@@ -195,6 +198,50 @@ public abstract class AASXSuite {
 			checkElementCollectionFiles(sm.getSubmodelElements().values());
 		}
 
+	}
+
+	@Test
+	public void fileValueIsCorrectlyUpdated_whenFileIsUpdated() throws Exception {
+		final String UPLOAD_ENDPOINT = VABPathTools.concatenatePaths(smEndpoint, "submodelElements", "Marking_CRUUS", "File", "upload");
+
+		// Retrieve fileSE
+		ISubmodel nameplate = manager.retrieveSubmodel(aasId, smId);
+		ConnectedSubmodelElementCollection marking_cruus = (ConnectedSubmodelElementCollection) nameplate.getSubmodelElements().get("Marking_CRUUS");
+		ConnectedFile fileSE = retrieveFileSEFromCollection(marking_cruus);
+		
+		String fileEndpointBefore = fileSE.getValue();
+		checkFile(fileEndpointBefore);
+
+		// When the file is updated
+		CloseableHttpResponse response = uploadDummyFileToSubmodelElement(UPLOAD_ENDPOINT, getFileFromResources("BaSyx.png"), ContentType.IMAGE_PNG);
+		try {
+	        int statusCode = response.getStatusLine().getStatusCode();
+	        
+			assertEquals(HttpStatus.CREATED.value(), statusCode);
+
+			// Then
+			String fileEndpointAfter = fileSE.getValue();
+
+			assertNotEquals(fileEndpointBefore, fileEndpointAfter);
+			checkFile(fileEndpointAfter);
+
+	    } finally {
+	        response.close();
+	    }
+	}
+
+
+	private ConnectedFile retrieveFileSEFromCollection(ConnectedSubmodelElementCollection marking_rcm) throws Exception {
+		Collection<ISubmodelElement> values = marking_rcm.getValue();
+
+		Iterator<ISubmodelElement> iter = values.iterator();
+		while (iter.hasNext()) {
+			ISubmodelElement element = iter.next();
+			if (element instanceof ConnectedFile) {
+				return (ConnectedFile) element;
+			}
+		}
+		throw new RuntimeException("No File SubmodelElement found in " + marking_rcm.getIdShort());
 	}
 
 	protected static void buildEndpoints(BaSyxContextConfiguration contextConfig) {
@@ -245,5 +292,25 @@ public abstract class AASXSuite {
 	 */
 	private ConnectedAssetAdministrationShell getConnectedAssetAdministrationShell() throws Exception {
 		return manager.retrieveAAS(aasId);
+	}
+
+	private File getFileFromResources(String filename) throws IOException, URISyntaxException {
+		URL resource = getClass().getClassLoader().getResource(filename);
+		if (resource == null)
+			throw new IllegalArgumentException("File not found!");
+
+		return new File(resource.toURI());
+
+	}
+
+	private CloseableHttpResponse uploadDummyFileToSubmodelElement(String endpoint, File file, ContentType contentType) throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
+
+		// Create the file entity
+		HttpEntity fileEntity = MultipartEntityBuilder.create().addBinaryBody("file", file, contentType, file.getName()).build();
+		HttpPost postRequest = new HttpPost(endpoint);
+		postRequest.setEntity(fileEntity);
+
+		return client.execute(postRequest);
 	}
 }
