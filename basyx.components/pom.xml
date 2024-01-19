@@ -34,6 +34,17 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>sonatype.snapshots</id>
+			<name>Sonatype Snapshot Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>Eclipse BaSyx SDK GitHub Packages</id>
 			<url>https://maven.pkg.github.com/eclipse-basyx/basyx-java-sdk</url>
 		</repository>
