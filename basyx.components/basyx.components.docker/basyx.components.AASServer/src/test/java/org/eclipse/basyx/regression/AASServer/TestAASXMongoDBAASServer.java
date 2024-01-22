@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -49,7 +49,6 @@ public class TestAASXMongoDBAASServer extends AASXSuite {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		// Setup component's test configuration
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
 		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.MONGODB, "[\"aasx/01_Festo.aasx\", \"aasx/a.aasx\", \"aasx/b.aasx\"]");
@@ -59,7 +58,6 @@ public class TestAASXMongoDBAASServer extends AASXSuite {
 
 		resetMongoDBTestData();
 
-		// Start the component
 		component = new AASServerComponent(contextConfig, aasConfig, basyxMongoDBConfig);
 		component.startComponent();
 
@@ -71,7 +69,7 @@ public class TestAASXMongoDBAASServer extends AASXSuite {
 		component.stopComponent();
 	}
 
-	// TODO
+	// TODO Investigation needed on why it's failing for TestAASXMongoDBAASServer
 	@Override
 	public void testCollidingFiles() throws Exception {
 	}
@@ -87,5 +85,4 @@ public class TestAASXMongoDBAASServer extends AASXSuite {
 		mongoDBConfig.setSubmodelCollection("TestAASXMongoDBAASServer_SM");
 		return mongoDBConfig;
 	}
-
 }

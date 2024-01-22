@@ -78,7 +78,7 @@ import org.springframework.http.HttpStatus;
  * Suite for testing that the XMLAAS servlet is set up correctly. The tests here
  * can be used by the servlet test itself and the integration test
  * 
- * @author schnicke, espen
+ * @author schnicke, espen, mateusmolina
  *
  */
 public abstract class AASXSuite {
@@ -204,7 +204,6 @@ public abstract class AASXSuite {
 	public void fileValueIsCorrectlyUpdated_whenFileIsUpdated() throws Exception {
 		final String UPLOAD_ENDPOINT = VABPathTools.concatenatePaths(smEndpoint, "submodelElements", "Marking_CRUUS", "File", "upload");
 
-		// Retrieve fileSE
 		ISubmodel nameplate = manager.retrieveSubmodel(aasId, smId);
 		ConnectedSubmodelElementCollection marking_cruus = (ConnectedSubmodelElementCollection) nameplate.getSubmodelElements().get("Marking_CRUUS");
 		ConnectedFile fileSE = retrieveFileSEFromCollection(marking_cruus);
@@ -212,14 +211,12 @@ public abstract class AASXSuite {
 		String fileEndpointBefore = fileSE.getValue();
 		checkFile(fileEndpointBefore);
 
-		// When the file is updated
 		CloseableHttpResponse response = uploadDummyFileToSubmodelElement(UPLOAD_ENDPOINT, getFileFromResources("BaSyx.png"), ContentType.IMAGE_PNG);
 		try {
 	        int statusCode = response.getStatusLine().getStatusCode();
 	        
 			assertEquals(HttpStatus.CREATED.value(), statusCode);
 
-			// Then
 			String fileEndpointAfter = fileSE.getValue();
 
 			assertNotEquals(fileEndpointBefore, fileEndpointAfter);
@@ -229,7 +226,6 @@ public abstract class AASXSuite {
 	        response.close();
 	    }
 	}
-
 
 	private ConnectedFile retrieveFileSEFromCollection(ConnectedSubmodelElementCollection marking_rcm) throws Exception {
 		Collection<ISubmodelElement> values = marking_rcm.getValue();
@@ -306,7 +302,6 @@ public abstract class AASXSuite {
 	private CloseableHttpResponse uploadDummyFileToSubmodelElement(String endpoint, File file, ContentType contentType) throws IOException {
 		CloseableHttpClient client = HttpClients.createDefault();
 
-		// Create the file entity
 		HttpEntity fileEntity = MultipartEntityBuilder.create().addBinaryBody("file", file, contentType, file.getName()).build();
 		HttpPost postRequest = new HttpPost(endpoint);
 		postRequest.setEntity(fileEntity);
