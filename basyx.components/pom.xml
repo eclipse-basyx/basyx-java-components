@@ -5,7 +5,7 @@
 
 	<groupId>org.eclipse.basyx</groupId>
 	<artifactId>basyx.components</artifactId>
-	<version>1.5.0</version>
+	<version>1.5.1</version>
 	<name>BaSyx Components</name>
 	<description>BaSyx Off-the-Shelf Components</description>
 	<url>https://www.eclipse.org/basyx/</url>
@@ -31,6 +31,17 @@
 			<url>https://repo1.maven.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sonatype.snapshots</id>
+			<name>Sonatype Snapshot Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
 			</snapshots>
 		</repository>
 		<repository>
@@ -81,7 +92,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.11.0</version>
+					<version>3.12.1</version>
 					<configuration>
 						<source>11</source>
 						<target>11</target>
@@ -128,7 +139,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.1.2</version>
+					<version>3.2.5</version>
 					<configuration>
 						<excludes>
 							<exclude>**/*HTTP*</exclude>
@@ -141,7 +152,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.1.2</version>
+					<version>3.2.5</version>
 					<executions>
 						<execution>
 							<goals>
@@ -262,8 +273,14 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Mockito for mocking in JUnit tests -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.10.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-
 	<!-- Specifies dependency settings for all submodules using these dependencies -->
 	<dependencyManagement>
 		<dependencies>
@@ -273,7 +290,7 @@
 			<dependency>
 	    		<groupId>ch.qos.logback</groupId>
 	    		<artifactId>logback-classic</artifactId>
-	    		<version>1.4.11</version>
+	    		<version>1.4.14</version>
 			</dependency>
 		
 		
@@ -281,14 +298,14 @@
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.5.0</version>
+				<version>1.5.1</version>
 			</dependency>
 
 			<!-- BaSyx SDK tests -->
 			<dependency>
 				<groupId>org.eclipse.basyx</groupId>
 				<artifactId>basyx.sdk</artifactId>
-				<version>1.5.0</version>
+				<version>1.5.1</version>
 				<classifier>tests</classifier>
 				<scope>test</scope>
 			</dependency>

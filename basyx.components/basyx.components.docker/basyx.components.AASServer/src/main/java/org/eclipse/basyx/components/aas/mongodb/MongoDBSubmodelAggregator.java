@@ -42,7 +42,6 @@ import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPI;
 import org.eclipse.basyx.submodel.restapi.api.ISubmodelAPIFactory;
-import org.eclipse.basyx.submodel.restapi.vab.VABSubmodelAPIFactory;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 
 import com.mongodb.client.MongoClient;
@@ -159,12 +158,12 @@ public class MongoDBSubmodelAggregator extends SubmodelAggregator {
 	@Override
 	public ISubmodelAPI getSubmodelAPIById(IIdentifier identifier) throws ResourceNotFoundException {
 		Submodel submodel = (Submodel) getSubmodel(identifier);
-		return new VABSubmodelAPIFactory().create(submodel);
+		return submodelApiFactory.create(submodel);
 	}
 
 	@Override
 	public ISubmodelAPI getSubmodelAPIByIdShort(String idShort) throws ResourceNotFoundException {
 		Submodel submodel = (Submodel) getSubmodelbyIdShort(idShort);
-		return new VABSubmodelAPIFactory().create(submodel);
+		return submodelApiFactory.create(submodel);
 	}
 }

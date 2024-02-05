@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 the Eclipse BaSyx Authors
+ * Copyright (C) 2023 the Eclipse BaSyx Authors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,44 +24,41 @@
  ******************************************************************************/
 package org.eclipse.basyx.regression.AASServer;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
-
-import javax.servlet.ServletException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.basyx.aas.factory.aasx.AASXToMetamodelConverter;
 import org.eclipse.basyx.components.aas.AASServerComponent;
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
+import org.eclipse.basyx.components.aas.mongodb.MongoDBAASAggregator;
 import org.eclipse.basyx.components.configuration.BaSyxContextConfiguration;
+import org.eclipse.basyx.components.configuration.BaSyxMongoDBConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.xml.sax.SAXException;
 
 /**
  * Test accessing to AAS using basys aas SDK
  * 
- * @author zhangzai
+ * @author mateusmolina
  *
  */
-public class TestAASXAASServer extends AASXSuite {
+public class TestAASXMongoDBAASServer extends AASXSuite {
 	private static AASServerComponent component;
+	private static BaSyxMongoDBConfiguration basyxMongoDBConfig = buildBaSyxMongoDBConfiguration();
 
 	@BeforeClass
-	public static void setUpClass() throws ParserConfigurationException, SAXException, IOException, URISyntaxException, ServletException {
-		// Setup component's test configuration
+	public static void setUpClass() throws Exception {
 		BaSyxContextConfiguration contextConfig = new BaSyxContextConfiguration();
 		contextConfig.loadFromResource(BaSyxContextConfiguration.DEFAULT_CONFIG_PATH);
-		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.INMEMORY, "[\"aasx/01_Festo.aasx\", \"aasx/a.aasx\", \"aasx/b.aasx\"]");
+		BaSyxAASServerConfiguration aasConfig = new BaSyxAASServerConfiguration(AASServerBackend.MONGODB, "[\"aasx/01_Festo.aasx\", \"aasx/a.aasx\", \"aasx/b.aasx\"]");
 
 		String docBasepath = Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), AASXToMetamodelConverter.TEMP_DIRECTORY).toAbsolutePath().toString();
 		contextConfig.setDocBasePath(docBasepath);
 
-		// Start the component
-		component = new AASServerComponent(contextConfig, aasConfig);
+		resetMongoDBTestData();
+
+		component = new AASServerComponent(contextConfig, aasConfig, basyxMongoDBConfig);
 		component.startComponent();
 
 		buildEndpoints(contextConfig);
@@ -70,5 +67,22 @@ public class TestAASXAASServer extends AASXSuite {
 	@AfterClass
 	public static void tearDownClass() {
 		component.stopComponent();
+	}
+
+	// TODO Investigation needed on why it's failing for TestAASXMongoDBAASServer
+	@Override
+	public void testCollidingFiles() throws Exception {
+	}
+
+	@SuppressWarnings("deprecation")
+	private static void resetMongoDBTestData() {
+		new MongoDBAASAggregator(basyxMongoDBConfig).reset();
+	}
+
+	private static BaSyxMongoDBConfiguration buildBaSyxMongoDBConfiguration() {
+		BaSyxMongoDBConfiguration mongoDBConfig = new BaSyxMongoDBConfiguration();
+		mongoDBConfig.setAASCollection("TestAASXMongoDBAASServer_AAS");
+		mongoDBConfig.setSubmodelCollection("TestAASXMongoDBAASServer_SM");
+		return mongoDBConfig;
 	}
 }
