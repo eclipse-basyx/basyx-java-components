@@ -1,4 +1,4 @@
-FROM openjdk:11-slim-bullseye
+FROM amazoncorretto:17
 
 #Install wget for health check
 RUN apt update && apt install -y wget && apt clean
