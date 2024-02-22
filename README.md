@@ -1,4 +1,4 @@
-# Eclipse BaSyx Java Components [![Docker Pulls](https://img.shields.io/docker/pulls/eclipsebasyx/aas-server?style=plastic)](https://hub.docker.com/search?q=eclipsebasyx)
+# Eclipse BaSyx V1 Java Components [![Docker Pulls](https://img.shields.io/docker/pulls/eclipsebasyx/aas-server?style=plastic)](https://hub.docker.com/search?q=eclipsebasyx)
 [![BaSyx Logo](https://www.eclipse.org/basyx/img/basyxlogo.png)](https://www.eclipse.org/basyx/)
 
 [![AAS Server javadoc](https://javadoc.io/badge2/org.eclipse.basyx/basyx.components.AASServer/javadoc.svg)](https://javadoc.io/doc/org.eclipse.basyx/basyx.components.AASServer) AAS Server 
@@ -8,7 +8,10 @@
 [![Components Lib javadoc](https://javadoc.io/badge2/org.eclipse.basyx/basyx.components.lib/javadoc.svg)](https://javadoc.io/doc/org.eclipse.basyx/basyx.components.lib) Components Lib
 
 
-This repository contains BaSyx Java V1. If you're looking for BaSyx Java V2, see [here](https://github.com/eclipse-basyx/basyx-java-server-sdk).
+> [!WARNING]
+> This repository contains BaSyx Java V1.
+>
+> We recommend to use [BaSyx Java V2](https://github.com/eclipse-basyx/basyx-java-server-sdk) to ensure compatibility to the latest specifications of IDTA.
 
 
 The Eclipse BaSyx Java Components are part of the [Eclipse BaSyx middleware](https://www.eclipse.org/basyx/). The Components utilize the [BaSyx Java SDK](https://github.com/eclipse-basyx/basyx-java-sdk) to provide easy to use off-the-shelf components and have been created within the [BaSys](https://www.basys40.de/) project.
